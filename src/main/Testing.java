@@ -1,4 +1,4 @@
-package staccato;
+package main;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
