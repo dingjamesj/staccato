@@ -10,21 +10,27 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
-public class Testing extends JFrame {
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+
+
+public class StaccatoWindow extends JFrame {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8433054944653490532L;
 	
-	private static final int WIDTH = 520;
-	private static final int HEIGHT = 399;
+	private static final int WIDTH = 530;
+	private static final int HEIGHT = 430;
 	private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
 	private static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
 	private static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 12);
 	
-	private Testing() {
+	private StaccatoWindow() {
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
@@ -57,9 +63,16 @@ public class Testing extends JFrame {
 	}
 	
 	public static void main(String[] args) {
-
-		Testing gui = new Testing();
-		gui.setVisible(true);
+		
+		FlatLaf.registerCustomDefaultsSource("themes");
+		FlatDarkLaf.setup();
+		
+		SwingUtilities.invokeLater(() -> {
+			
+			StaccatoWindow gui = new StaccatoWindow();
+			gui.setVisible(true);
+			
+		});
 		
 	}
 

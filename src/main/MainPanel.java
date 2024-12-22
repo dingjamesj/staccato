@@ -20,7 +20,6 @@ public class MainPanel extends JPanel {
 		
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
-		
 		JPanel labelPanel = new JPanel();
 		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
 		
@@ -87,6 +86,12 @@ public class MainPanel extends JPanel {
 		labelPanel.add(Box.createRigidArea(new Dimension(1, 3)));
 		textFieldPanel.add(directoryTextField);
 		add(textFieldPanel);
+		
+	}
+	
+	public static void main(String[] args) {
+		
+		StaccatoWindow.main(args);
 		
 	}
 	
