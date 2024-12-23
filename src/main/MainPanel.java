@@ -18,6 +18,8 @@ public class MainPanel extends JPanel {
 	
 	public MainPanel(Font paramLabelFont, Font inputFont) {
 		
+		//TODO Use GridBagLayout
+		
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
 		JPanel labelPanel = new JPanel();
@@ -59,6 +61,7 @@ public class MainPanel extends JPanel {
 		urlTextField.setFont(inputFont);
 		urlTextField.setColumns(15);
 		urlTextField.setAlignmentX(LEFT_ALIGNMENT);
+		urlTextField.putClientProperty("JTextField.placeholderText", "Spotify or YouTube Link");
 		JTextField titleTextField = new JTextField();
 		titleTextField.setFont(inputFont);
 		titleTextField.setColumns(10);
