@@ -2,6 +2,8 @@ package main;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,43 +22,41 @@ public class MainPanel extends JPanel {
 		
 		//TODO Use GridBagLayout
 		
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		setLayout(new GridBagLayout());
+		GridBagConstraints constraints = new GridBagConstraints();
 		
-		JPanel labelPanel = new JPanel();
-		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
-		
-		JLabel urlLabel = new JLabel("URL Address:");
+		JLabel urlLabel = new JLabel("URL Address: ");
 		urlLabel.setFont(paramLabelFont);
 		urlLabel.setAlignmentX(RIGHT_ALIGNMENT);
-		JLabel titleLabel = new JLabel("Title:");
+		JLabel titleLabel = new JLabel("Title: ");
 		titleLabel.setFont(paramLabelFont);
 		titleLabel.setAlignmentX(RIGHT_ALIGNMENT);
-		JLabel artistLabel = new JLabel("Artist:");
+		JLabel artistLabel = new JLabel("Artist: ");
 		artistLabel.setFont(paramLabelFont);
 		artistLabel.setAlignmentX(RIGHT_ALIGNMENT);
-		JLabel albumLabel = new JLabel("Album:");
+		JLabel albumLabel = new JLabel("Album: ");
 		albumLabel.setFont(paramLabelFont);
 		albumLabel.setAlignmentX(RIGHT_ALIGNMENT);
-		JLabel directoryLabel = new JLabel("Download Location:");
+		JLabel directoryLabel = new JLabel("Download Location: ");
 		directoryLabel.setFont(paramLabelFont);
 		directoryLabel.setAlignmentX(RIGHT_ALIGNMENT);
 		
-		labelPanel.add(urlLabel);
-		labelPanel.add(Box.createVerticalStrut(3));
-		labelPanel.add(titleLabel);
-		labelPanel.add(Box.createVerticalStrut(3));
-		labelPanel.add(artistLabel);
-		labelPanel.add(Box.createVerticalStrut(3));
-		labelPanel.add(albumLabel);
-		labelPanel.add(Box.createVerticalStrut(3));
-		labelPanel.add(directoryLabel);
-		add(labelPanel);
-		add(Box.createHorizontalStrut(5));
-		
-		
-		JPanel textFieldPanel = new JPanel();
-		textFieldPanel.setLayout(new BoxLayout(textFieldPanel, BoxLayout.Y_AXIS));
-		
+		constraints.gridx = 1;
+		constraints.gridy = 1;
+		add(urlLabel, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 2;
+		add(titleLabel, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 3;
+		add(artistLabel, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 4;
+		add(albumLabel, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 5;
+		add(directoryLabel, constraints);
+				
 		JTextField urlTextField = new JTextField();
 		urlTextField.setFont(inputFont);
 		urlTextField.setColumns(15);
@@ -79,16 +79,21 @@ public class MainPanel extends JPanel {
 		albumTextField.setColumns(17);
 		directoryTextField.setAlignmentX(LEFT_ALIGNMENT);
 		
-		textFieldPanel.add(urlTextField);
-		labelPanel.add(Box.createRigidArea(new Dimension(1, 3)));
-		textFieldPanel.add(titleTextField);
-		labelPanel.add(Box.createRigidArea(new Dimension(1, 3)));
-		textFieldPanel.add(artistTextField);
-		labelPanel.add(Box.createRigidArea(new Dimension(1, 3)));
-		textFieldPanel.add(albumTextField);
-		labelPanel.add(Box.createRigidArea(new Dimension(1, 3)));
-		textFieldPanel.add(directoryTextField);
-		add(textFieldPanel);
+		constraints.gridx = 2;
+		constraints.gridy = 1;
+		add(urlTextField, constraints);
+		constraints.gridx = 2;
+		constraints.gridy = 2;
+		add(titleTextField, constraints);
+		constraints.gridx = 2;
+		constraints.gridy = 3;
+		add(artistTextField, constraints);
+		constraints.gridx = 2;
+		constraints.gridy = 4;
+		add(albumTextField, constraints);
+		constraints.gridx = 2;
+		constraints.gridy = 5;
+		add(directoryTextField, constraints);
 		
 	}
 	
