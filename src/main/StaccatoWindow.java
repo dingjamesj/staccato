@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 
@@ -31,6 +32,7 @@ public class StaccatoWindow extends JFrame {
 	private static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 12);
 	private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
 	private static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
+	private final static Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
 	
 	private StaccatoWindow() {
 		
@@ -54,10 +56,11 @@ public class StaccatoWindow extends JFrame {
 		contentPanel.add(titlePanel);
 		
 		JPanel mainPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
+		contentPanel.add(Box.createVerticalStrut(5));
 		contentPanel.add(mainPanel);
 		
-		JPanel bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT);
-		contentPanel.add(Box.createVerticalStrut(11));
+		JPanel bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT);
+		contentPanel.add(Box.createVerticalStrut(15));
 		contentPanel.add(bottomPanel);
 		
 		
