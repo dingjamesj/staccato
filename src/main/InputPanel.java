@@ -1,25 +1,22 @@
 package main;
 
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class MainPanel extends JPanel {
+public class InputPanel extends JPanel {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -892554275836568837L; 
 	
-	public MainPanel(Font paramLabelFont, Font inputFont) {
+	public InputPanel(Font paramLabelFont, Font inputFont) {
 		
 		//TODO Use GridBagLayout
 		
@@ -39,7 +36,7 @@ public class MainPanel extends JPanel {
 		JLabel albumLabel = new JLabel("Album: ");
 		albumLabel.setFont(paramLabelFont);
 		albumLabel.setAlignmentX(RIGHT_ALIGNMENT);
-		JLabel directoryLabel = new JLabel("Download Location: ");
+		JLabel directoryLabel = new JLabel("     Download Location: ");
 		directoryLabel.setFont(paramLabelFont);
 		directoryLabel.setAlignmentX(RIGHT_ALIGNMENT);
 		
@@ -83,7 +80,7 @@ public class MainPanel extends JPanel {
 		directoryTextField.setFont(inputFont);
 		directoryTextField.setColumns(17);
 		directoryTextField.setAlignmentX(LEFT_ALIGNMENT);
-		
+				
 		constraints.anchor = GridBagConstraints.WEST;
 		constraints.ipady = 6;
 		constraints.insets = new Insets(2, 0, 2, 0);
