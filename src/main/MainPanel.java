@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -25,6 +26,7 @@ public class MainPanel extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
 		
+		
 		JLabel urlLabel = new JLabel("URL Address: ");
 		urlLabel.setFont(paramLabelFont);
 		urlLabel.setAlignmentX(RIGHT_ALIGNMENT);
@@ -41,6 +43,8 @@ public class MainPanel extends JPanel {
 		directoryLabel.setFont(paramLabelFont);
 		directoryLabel.setAlignmentX(RIGHT_ALIGNMENT);
 		
+		constraints.anchor = GridBagConstraints.EAST;
+		
 		constraints.gridx = 1;
 		constraints.gridy = 1;
 		add(urlLabel, constraints);
@@ -56,7 +60,8 @@ public class MainPanel extends JPanel {
 		constraints.gridx = 1;
 		constraints.gridy = 5;
 		add(directoryLabel, constraints);
-				
+		
+		
 		JTextField urlTextField = new JTextField();
 		urlTextField.setFont(inputFont);
 		urlTextField.setColumns(15);
@@ -76,8 +81,12 @@ public class MainPanel extends JPanel {
 		albumTextField.setAlignmentX(LEFT_ALIGNMENT);
 		JTextField directoryTextField = new JTextField();
 		directoryTextField.setFont(inputFont);
-		albumTextField.setColumns(17);
+		directoryTextField.setColumns(17);
 		directoryTextField.setAlignmentX(LEFT_ALIGNMENT);
+		
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.ipady = 6;
+		constraints.insets = new Insets(2, 0, 2, 0);
 		
 		constraints.gridx = 2;
 		constraints.gridy = 1;
