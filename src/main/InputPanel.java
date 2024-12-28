@@ -16,6 +16,8 @@ public class InputPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -892554275836568837L; 
 	
+	private JTextField[] songTextFields = new JTextField[3];
+	
 	public InputPanel(Font paramLabelFont, Font inputFont) {
 		
 		//TODO Use GridBagLayout
@@ -68,14 +70,17 @@ public class InputPanel extends JPanel {
 		titleTextField.setFont(inputFont);
 		titleTextField.setColumns(10);
 		titleTextField.setAlignmentX(LEFT_ALIGNMENT);
+		songTextFields[0] = titleTextField;
 		JTextField artistTextField = new JTextField();
 		artistTextField.setFont(inputFont);
 		artistTextField.setColumns(10);
 		artistTextField.setAlignmentX(LEFT_ALIGNMENT);
+		songTextFields[1] = artistTextField;
 		JTextField albumTextField = new JTextField();
 		albumTextField.setFont(inputFont);
 		albumTextField.setColumns(10);
 		albumTextField.setAlignmentX(LEFT_ALIGNMENT);
+		songTextFields[2] = albumTextField;
 		JTextField directoryTextField = new JTextField();
 		directoryTextField.setFont(inputFont);
 		directoryTextField.setColumns(17);
@@ -100,6 +105,18 @@ public class InputPanel extends JPanel {
 		constraints.gridx = 2;
 		constraints.gridy = 5;
 		add(directoryTextField, constraints);
+		
+		setSongTextFieldsEnabled(false);
+		
+	}
+	
+	public void setSongTextFieldsEnabled(boolean enabled) {
+		
+		for(int i = 0; i < songTextFields.length; i++) {
+			
+			songTextFields[i].setEnabled(enabled);
+			
+		}
 		
 	}
 	

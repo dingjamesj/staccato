@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 
@@ -55,12 +54,13 @@ public class StaccatoWindow extends JFrame {
 		titlePanel.add(titleLabel, BorderLayout.CENTER);
 		contentPanel.add(titlePanel);
 		
-		JPanel mainPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
-		contentPanel.add(Box.createVerticalStrut(5));
+		InputPanel mainPanel;
+		BottomPanel bottomPanel;
+		mainPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
+		contentPanel.add(Box.createVerticalStrut(4));
 		contentPanel.add(mainPanel);
-		
-		JPanel bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT);
-		contentPanel.add(Box.createVerticalStrut(15));
+		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, mainPanel);
+		contentPanel.add(Box.createVerticalStrut(12));
 		contentPanel.add(bottomPanel);
 		
 		
