@@ -31,7 +31,11 @@ public class StaccatoWindow extends JFrame {
 	private static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 12);
 	private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
 	private static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
-	private final static Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
+	private static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
+	private static final int INSTALLER_WIDTH = 300;
+	private static final int INSTALLER_HEIGHT = 215;
+	
+	private InstallerWindow installerWindow;
 	
 	private StaccatoWindow() {
 		
@@ -66,6 +70,14 @@ public class StaccatoWindow extends JFrame {
 		
 		add(contentPanel, new GridBagConstraints());
 		
+		installerWindow = new InstallerWindow(INSTALLER_WIDTH, INSTALLER_HEIGHT);
+		
+	}
+	
+	private void createMissingSoftwarePopup() {
+		
+		installerWindow.setVisible(true);
+		
 	}
 	
 	public static void main(String[] args) {
@@ -77,6 +89,15 @@ public class StaccatoWindow extends JFrame {
 			
 			StaccatoWindow gui = new StaccatoWindow();
 			gui.setVisible(true);
+			
+			boolean ytdlpInstalled = Downloader.checkDLPInstalled();
+			boolean ffmpegInstalled = Downloader.checkFFMPEGInstalled();
+			boolean ffprobeInstalled = Downloader.checkFFPROBEInstalled();
+			if(!ytdlpInstalled || !ffmpegInstalled || !ffprobeInstalled) {
+				
+				gui.createMissingSoftwarePopup();
+				
+			}
 			
 		});
 		

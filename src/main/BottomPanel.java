@@ -82,7 +82,6 @@ public class BottomPanel extends JPanel {
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(100);
 		progressBar.putClientProperty("JProgressBar.largeHeight", true);
-		progressBar.setValue(50);
 		
 		infoLabel = new JLabel("100-song limit for Spotify Playlists");
 		infoLabel.setFont(infoFont);

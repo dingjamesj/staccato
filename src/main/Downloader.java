@@ -99,8 +99,9 @@ public abstract class Downloader {
 	
 	public static boolean checkDLPInstalled() {
 		
-		String[] command = {"yt-dlp", "-h"};
+		String[] command = {"yt-dlp", "--version"};
 		ProcessBuilder checkerProcess = new ProcessBuilder(command);
+		checkerProcess.inheritIO();
 		
 		try {
 			
@@ -109,7 +110,6 @@ public abstract class Downloader {
 		} catch (IOException e) {
 			
 			e.printStackTrace();
-			
 			return false;
 			
 		}
@@ -120,14 +120,44 @@ public abstract class Downloader {
 	
 	public static boolean checkFFMPEGInstalled() {
 		
-		return true;
+		String[] command = {"ffmpeg", "-version"};
+		ProcessBuilder checkerProcess = new ProcessBuilder(command);
+		checkerProcess.inheritIO();
 		
+		try {
+			
+			checkerProcess.start();
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			return false;
+			
+		}
+		
+		return true;
+				
 	}
 	
 	public static boolean checkFFPROBEInstalled() {
 		
-		return true;
+		String[] command = {"ffprobe", "-version"};
+		ProcessBuilder checkerProcess = new ProcessBuilder(command);
+		checkerProcess.inheritIO();
 		
+		try {
+			
+			checkerProcess.start();
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			return false;
+			
+		}
+		
+		return true;
+				
 	}
 	
 	public static void main(String[] args) {
