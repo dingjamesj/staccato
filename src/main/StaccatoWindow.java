@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,6 +16,7 @@ import javax.swing.SwingUtilities;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
 
 public class StaccatoWindow extends JFrame {
@@ -32,11 +34,9 @@ public class StaccatoWindow extends JFrame {
 	private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
 	private static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	private static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
-	private static final int INSTALLER_WIDTH = 300;
+	private static final int INSTALLER_WIDTH = 320;
 	private static final int INSTALLER_HEIGHT = 215;
-	
-	private InstallerWindow installerWindow;
-	
+		
 	private StaccatoWindow() {
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -63,20 +63,50 @@ public class StaccatoWindow extends JFrame {
 		mainPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
 		contentPanel.add(Box.createVerticalStrut(4));
 		contentPanel.add(mainPanel);
-		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, mainPanel);
+		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, mainPanel, this);
 		contentPanel.add(Box.createVerticalStrut(12));
 		contentPanel.add(bottomPanel);
 		
 		
 		add(contentPanel, new GridBagConstraints());
-		
-		installerWindow = new InstallerWindow(INSTALLER_WIDTH, INSTALLER_HEIGHT);
-		
+				
 	}
 	
-	private void createMissingSoftwarePopup() {
+	public void createMissingSoftwarePopup(boolean ytdlpInstalled, boolean ffmpegInstalled, boolean ffprobeInstalled) {
 		
-		installerWindow.setVisible(true);
+		String missingSoftwareList = "";
+		if(!ytdlpInstalled) {
+			
+			missingSoftwareList += "yt-dlp, ";
+			
+		}
+		if(!ffmpegInstalled) {
+			
+			missingSoftwareList += "ffmpeg, ";
+			
+		}
+		if(!ffmpegInstalled) {
+			
+			missingSoftwareList += "ffprobe, ";
+			
+		}
+		
+		missingSoftwareList = missingSoftwareList.substring(0, missingSoftwareList.length() - 2);
+		int lastIndexOfSpace = missingSoftwareList.lastIndexOf(" ");
+		missingSoftwareList = missingSoftwareList.substring(0, lastIndexOfSpace) + " and" + missingSoftwareList.substring(lastIndexOfSpace);
+		
+		String toBeConjugation;
+		if(lastIndexOfSpace == -1) {
+			
+			toBeConjugation = " is";
+			
+		} else {
+			
+			toBeConjugation = " are";
+			
+		}
+		
+		new InstallationDialog(this, missingSoftwareList, toBeConjugation).setVisible(true);;
 		
 	}
 	
@@ -89,17 +119,50 @@ public class StaccatoWindow extends JFrame {
 			
 			StaccatoWindow gui = new StaccatoWindow();
 			gui.setVisible(true);
+			gui.setLocationRelativeTo(null);
 			
 			boolean ytdlpInstalled = Downloader.checkDLPInstalled();
 			boolean ffmpegInstalled = Downloader.checkFFMPEGInstalled();
 			boolean ffprobeInstalled = Downloader.checkFFPROBEInstalled();
 			if(!ytdlpInstalled || !ffmpegInstalled || !ffprobeInstalled) {
 				
-				gui.createMissingSoftwarePopup();
+				gui.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled, ffprobeInstalled);
 				
 			}
 			
 		});
+		
+	}
+	
+	private static class InstallationDialog extends JDialog {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2265787396135232040L;
+
+		public InstallationDialog(JFrame parent, String missingSoftwareList, String toBeConjugation) {
+			
+			/*
+			JOptionPane.showConfirmDialog(this, missingSoftwareList + toBeConjugation + " missing. These programs are required for staccato to function.\nAllow staccato to install " + missingSoftwareList + "?", "Error: Missing Software", JOptionPane.YES_NO_OPTION);
+			 * 
+			 */
+			
+			super(parent, true);
+			setSize(INSTALLER_WIDTH, INSTALLER_HEIGHT);
+			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			setTitle("Error: Missing Software");
+			setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
+			setLocationRelativeTo(parent);
+			setResizable(false);
+			
+			JPanel topPanel = new JPanel();
+			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+			topPanel.add(new JLabel(new FlatOptionPaneErrorIcon()));
+			
+			add(topPanel);
+			
+		}
 		
 	}
 

@@ -26,7 +26,9 @@ public class BottomPanel extends JPanel {
 	private JRadioButton audioButton;
 	private JRadioButton videoButton;
 	
-	public BottomPanel(Font buttonFont, Font statusFont, Font infoFont, InputPanel inputPanel) {
+	private final StaccatoWindow parentWindow;
+	
+	public BottomPanel(Font buttonFont, Font statusFont, Font infoFont, InputPanel inputPanel, StaccatoWindow parentWindow) {
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
@@ -98,12 +100,20 @@ public class BottomPanel extends JPanel {
 		add(infoLabel);
 		
 		radioButtonGroup.setSelected(playlistButton.getModel(), true);
+		this.parentWindow = parentWindow;
 		
 	}
 	
 	private void downloadAction() {
 		
-		
+		boolean ytdlpInstalled = Downloader.checkDLPInstalled();
+		boolean ffmpegInstalled = Downloader.checkFFMPEGInstalled();
+		boolean ffprobeInstalled = Downloader.checkFFPROBEInstalled();
+		if(!ytdlpInstalled || !ffmpegInstalled || !ffprobeInstalled) {
+			
+			parentWindow.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled, ffprobeInstalled);
+			
+		}
 		
 	}
 	
