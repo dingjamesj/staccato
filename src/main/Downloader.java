@@ -2,8 +2,11 @@ package main;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.InterruptedByTimeoutException;
 
 public abstract class Downloader {
+	
+	private static BottomPanel bottomPanel;
 	
 	/**
 	 * Downloads an mp3 given a YouTube URL.
@@ -49,51 +52,49 @@ public abstract class Downloader {
 	
 	/**
 	 * Updates yt-dlp, ffmpeg, and ffprobe
-	 * @return 0 if software is up-to-date, 1 if software was successfully updated, -1 if software was unsuccessfully updated
 	 */
-	public static int checkAndUpdateSoftware() {
+	public static int checkAndInstallSoftware() {
 		
 		//TODO update ffmpeg and ffprobe
+		int returnValue = 0;
 		
-		int sumReturnVal = 0;
-		
+		bottomPanel.setStatusText("Checking if yt-dlp is installed");
 		if(!checkDLPInstalled()) {
 			
-			String[] command = {"winget", "install", "yt-dlp"};
-			ProcessBuilder installProcess = new ProcessBuilder(command);
-			installProcess.inheritIO();
-			
-			try {
+			returnValue = installSoftware("yt-dlp");
+			if(returnValue != 0) {
 				
-				installProcess.start();
-				
-			} catch (IOException e) {
-
-				e.printStackTrace();
-				sumReturnVal -= 1;
+				return returnValue;
 				
 			}
 			
 		}
 		
+		bottomPanel.setStatusText("Checking if ffmpeg is installed");
 		if(!checkFFMPEGInstalled()) {
 			
-			//Here, if it was unsuccessful, the sumReturnVal would decrease by 2
+			returnValue = installSoftware("ffmpeg");
+			if(returnValue != 0) {
+				
+				return returnValue;
+				
+			}
 			
 		}
 		
+		bottomPanel.setStatusText("Checking if ffprobe is installed");
 		if(!checkFFPROBEInstalled()) {
 			
-			//Here, if it was unsuccessful, the sumReturnVal would decrease by 4
+			returnValue = installSoftware("ffprobe");
+			if(returnValue != 0) {
+				
+				return returnValue;
+				
+			}
 			
 		}
 		
-		if(sumReturnVal >= 1) {
-			
-			sumReturnVal = 1;
-			
-		}
-		return sumReturnVal;
+		return 0;
 		
 	}
 	
@@ -158,6 +159,39 @@ public abstract class Downloader {
 		
 		return true;
 				
+	}
+	
+	public static void setBottomPanel(BottomPanel bottomPanel) {
+		
+		Downloader.bottomPanel = bottomPanel;
+		
+	}
+	
+	private static int installSoftware(String name) {
+		
+		String[] command = {"winget", "install", name};
+		ProcessBuilder installProcess = new ProcessBuilder(command);
+		installProcess.inheritIO();
+		
+		try {
+			
+			Process process = installProcess.start();
+			process.waitFor();
+			
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			return -1;
+			
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+			return -2;
+			
+		}
+		
+		return 0;
+		
 	}
 	
 	public static void main(String[] args) {

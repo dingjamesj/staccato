@@ -117,9 +117,15 @@ public class BottomPanel extends JPanel {
 		
 	}
 	
-	private void setStatusText(String text) {
+	public void setStatusText(String text) {
 		
 		statusLabel.setText(text);
+		
+	}
+	
+	public void setProgressBar(int percent) {
+		
+		progressBar.setValue(percent);
 		
 	}
 	

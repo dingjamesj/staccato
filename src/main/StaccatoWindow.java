@@ -1,12 +1,16 @@
 package main;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,8 +38,6 @@ public class StaccatoWindow extends JFrame {
 	private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
 	private static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	private static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
-	private static final int INSTALLER_WIDTH = 320;
-	private static final int INSTALLER_HEIGHT = 215;
 		
 	private StaccatoWindow() {
 		
@@ -69,7 +71,9 @@ public class StaccatoWindow extends JFrame {
 		
 		
 		add(contentPanel, new GridBagConstraints());
-				
+		
+		Downloader.setBottomPanel(bottomPanel);
+		
 	}
 	
 	public void createMissingSoftwarePopup(boolean ytdlpInstalled, boolean ffmpegInstalled, boolean ffprobeInstalled) {
@@ -120,7 +124,7 @@ public class StaccatoWindow extends JFrame {
 			StaccatoWindow gui = new StaccatoWindow();
 			gui.setVisible(true);
 			gui.setLocationRelativeTo(null);
-			
+						
 			boolean ytdlpInstalled = Downloader.checkDLPInstalled();
 			boolean ffmpegInstalled = Downloader.checkFFMPEGInstalled();
 			boolean ffprobeInstalled = Downloader.checkFFPROBEInstalled();
@@ -149,18 +153,62 @@ public class StaccatoWindow extends JFrame {
 			 */
 			
 			super(parent, true);
-			setSize(INSTALLER_WIDTH, INSTALLER_HEIGHT);
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setTitle("Error: Missing Software");
 			setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
-			setLocationRelativeTo(parent);
 			setResizable(false);
 			
 			JPanel topPanel = new JPanel();
 			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+			topPanel.add(Box.createHorizontalStrut(15));
 			topPanel.add(new JLabel(new FlatOptionPaneErrorIcon()));
+			topPanel.add(Box.createHorizontalStrut(12));
+			topPanel.add(new JLabel("<html>" + missingSoftwareList + toBeConjugation + " missing. <br></br>These programs are required for staccato to function.</html>"));
+			topPanel.add(Box.createHorizontalStrut(15));
 			
+			add(Box.createVerticalStrut(10));
 			add(topPanel);
+			
+			JPanel bottomPanel = new JPanel();
+			JButton yesButton = new JButton("Yes");
+			yesButton.setBackground(new Color(0x80005d));
+			yesButton.addActionListener((e) -> {
+				
+				Downloader.checkAndInstallSoftware();
+				
+			});
+			JButton noButton = new JButton("No");
+			noButton.addActionListener((e) -> {
+				
+				System.exit(0);
+				
+			});
+			
+			bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+			bottomPanel.add(Box.createHorizontalStrut(15));
+			bottomPanel.add(new JLabel("<html>Do you allow staccato to install " + missingSoftwareList + "?<br></br><i><b>Clicking \"No\" will exit the program.</i></b></html>"));
+			bottomPanel.add(Box.createHorizontalStrut(12));
+			bottomPanel.add(yesButton);
+			bottomPanel.add(Box.createHorizontalStrut(6));
+			bottomPanel.add(noButton);
+			bottomPanel.add(Box.createHorizontalStrut(15));
+			
+			add(Box.createVerticalStrut(15));
+			add(bottomPanel);
+			add(Box.createVerticalStrut(15));
+			pack();
+			setLocationRelativeTo(parent);
+			
+			addWindowListener(new WindowAdapter() {
+				
+				@Override
+				public void windowClosed(WindowEvent e) {
+
+					System.exit(0);
+					
+				}
+				
+			});
 			
 		}
 		
