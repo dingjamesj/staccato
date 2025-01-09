@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -114,6 +112,41 @@ public class StaccatoWindow extends JFrame {
 		
 	}
 	
+	public void createErrorPopup(String title, String message) {
+		
+		JDialog dialog = new JDialog(this, true);
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		dialog.setTitle(title);
+		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
+		dialog.setResizable(false);
+		
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+		topPanel.add(Box.createHorizontalStrut(15));
+		topPanel.add(new JLabel(new FlatOptionPaneErrorIcon()));
+		topPanel.add(Box.createHorizontalStrut(12));
+		topPanel.add(new JLabel(message));
+		topPanel.add(Box.createHorizontalStrut(15));
+		
+		dialog.add(Box.createVerticalStrut(10));
+		dialog.add(topPanel);
+		
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+		JButton okayButton = new JButton("OK");
+		okayButton.setBackground(new Color(0x80005d));
+		okayButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		bottomPanel.add(okayButton);
+		
+		dialog.add(Box.createVerticalStrut(15));
+		dialog.add(bottomPanel);
+		dialog.add(Box.createVerticalStrut(15));
+		dialog.pack();
+		dialog.setLocationRelativeTo(this);
+		dialog.setVisible(true);
+		
+	}
+	
 	public static void main(String[] args) {
 		
 		FlatLaf.registerCustomDefaultsSource("themes");
@@ -125,9 +158,9 @@ public class StaccatoWindow extends JFrame {
 			gui.setVisible(true);
 			gui.setLocationRelativeTo(null);
 						
-			boolean ytdlpInstalled = Downloader.checkDLPInstalled();
-			boolean ffmpegInstalled = Downloader.checkFFMPEGInstalled();
-			boolean ffprobeInstalled = Downloader.checkFFPROBEInstalled();
+			boolean ytdlpInstalled = Downloader.checkSoftwareInstalled("yt-dlp");
+			boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
+			boolean ffprobeInstalled = Downloader.checkSoftwareInstalled("ffprobe");
 			if(!ytdlpInstalled || !ffmpegInstalled || !ffprobeInstalled) {
 				
 				gui.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled, ffprobeInstalled);
@@ -174,6 +207,7 @@ public class StaccatoWindow extends JFrame {
 			yesButton.setBackground(new Color(0x80005d));
 			yesButton.addActionListener((e) -> {
 				
+				dispose();
 				Downloader.checkAndInstallSoftware();
 				
 			});
@@ -198,17 +232,6 @@ public class StaccatoWindow extends JFrame {
 			add(Box.createVerticalStrut(15));
 			pack();
 			setLocationRelativeTo(parent);
-			
-			addWindowListener(new WindowAdapter() {
-				
-				@Override
-				public void windowClosed(WindowEvent e) {
-
-					System.exit(0);
-					
-				}
-				
-			});
 			
 		}
 		

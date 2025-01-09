@@ -2,7 +2,6 @@ package main;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.InterruptedByTimeoutException;
 
 public abstract class Downloader {
 	
@@ -55,11 +54,15 @@ public abstract class Downloader {
 	 */
 	public static int checkAndInstallSoftware() {
 		
-		//TODO update ffmpeg and ffprobe
+		//----------------------------------------------
+		//TODO PUT THIS ON A MULTITHREAD
+		//----------------------------------------------
+		
 		int returnValue = 0;
 		
+		bottomPanel.setProgressBar(16);
 		bottomPanel.setStatusText("Checking if yt-dlp is installed");
-		if(!checkDLPInstalled()) {
+		if(!checkSoftwareInstalled("yt-dlp")) {
 			
 			returnValue = installSoftware("yt-dlp");
 			if(returnValue != 0) {
@@ -70,8 +73,9 @@ public abstract class Downloader {
 			
 		}
 		
+		bottomPanel.setProgressBar(50);
 		bottomPanel.setStatusText("Checking if ffmpeg is installed");
-		if(!checkFFMPEGInstalled()) {
+		if(!checkSoftwareInstalled("ffmpeg")) {
 			
 			returnValue = installSoftware("ffmpeg");
 			if(returnValue != 0) {
@@ -82,8 +86,9 @@ public abstract class Downloader {
 			
 		}
 		
+		bottomPanel.setProgressBar(83);
 		bottomPanel.setStatusText("Checking if ffprobe is installed");
-		if(!checkFFPROBEInstalled()) {
+		if(!checkSoftwareInstalled("ffprobe")) {
 			
 			returnValue = installSoftware("ffprobe");
 			if(returnValue != 0) {
@@ -98,67 +103,36 @@ public abstract class Downloader {
 		
 	}
 	
-	public static boolean checkDLPInstalled() {
+	public static boolean checkSoftwareInstalled(String software) {
 		
-		String[] command = {"yt-dlp", "--version"};
+		String[] command = new String[2];
+		command[0] = software;
+		if(software.equals("yt-dlp")) {
+			
+			command[1] = "--version";
+			
+		} else {
+			
+			command[1] = "-version";
+			
+		}
+		
 		ProcessBuilder checkerProcess = new ProcessBuilder(command);
 		checkerProcess.inheritIO();
 		
 		try {
 			
-			checkerProcess.start();
+			Process process = checkerProcess.start();
+			process.waitFor();
 			
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			
-			e.printStackTrace();
 			return false;
 			
 		}
 		
 		return true;
 		
-	}
-	
-	public static boolean checkFFMPEGInstalled() {
-		
-		String[] command = {"ffmpeg", "-version"};
-		ProcessBuilder checkerProcess = new ProcessBuilder(command);
-		checkerProcess.inheritIO();
-		
-		try {
-			
-			checkerProcess.start();
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			return false;
-			
-		}
-		
-		return true;
-				
-	}
-	
-	public static boolean checkFFPROBEInstalled() {
-		
-		String[] command = {"ffprobe", "-version"};
-		ProcessBuilder checkerProcess = new ProcessBuilder(command);
-		checkerProcess.inheritIO();
-		
-		try {
-			
-			checkerProcess.start();
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			return false;
-			
-		}
-		
-		return true;
-				
 	}
 	
 	public static void setBottomPanel(BottomPanel bottomPanel) {
@@ -196,7 +170,7 @@ public abstract class Downloader {
 	
 	public static void main(String[] args) {
 		
-		System.out.println(download("https://www.youtube.com/watch?v=HfWLgELllZs", "D:/"));
+		installSoftware("yt-dlp");
 		
 	}
 	

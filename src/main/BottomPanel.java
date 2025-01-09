@@ -106,9 +106,9 @@ public class BottomPanel extends JPanel {
 	
 	private void downloadAction() {
 		
-		boolean ytdlpInstalled = Downloader.checkDLPInstalled();
-		boolean ffmpegInstalled = Downloader.checkFFMPEGInstalled();
-		boolean ffprobeInstalled = Downloader.checkFFPROBEInstalled();
+		boolean ytdlpInstalled = Downloader.checkSoftwareInstalled("yt-dlp");
+		boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
+		boolean ffprobeInstalled = Downloader.checkSoftwareInstalled("ffprobe");
 		if(!ytdlpInstalled || !ffmpegInstalled || !ffprobeInstalled) {
 			
 			parentWindow.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled, ffprobeInstalled);
@@ -125,6 +125,7 @@ public class BottomPanel extends JPanel {
 	
 	public void setProgressBar(int percent) {
 		
+		System.out.println("PROGRESS BAR " + percent);
 		progressBar.setValue(percent);
 		
 	}
