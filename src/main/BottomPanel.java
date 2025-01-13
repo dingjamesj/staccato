@@ -39,7 +39,15 @@ public class BottomPanel extends JPanel {
 		downloadButton.setBorderPainted(false);
 		downloadButton.addActionListener((event) -> {
 			
-			downloadAction();
+			Thread downloadThread = new Thread(() -> {
+				
+				parentWindow.setIsDownloading(true);
+				downloadAction();
+				parentWindow.setIsDownloading(false);
+				
+			});
+			
+			downloadThread.start();
 			
 		});
 		
@@ -105,16 +113,15 @@ public class BottomPanel extends JPanel {
 	}
 	
 	private void downloadAction() {
-		
+				
 		boolean ytdlpInstalled = Downloader.checkSoftwareInstalled("yt-dlp");
 		boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
-		boolean ffprobeInstalled = Downloader.checkSoftwareInstalled("ffprobe");
-		if(!ytdlpInstalled || !ffmpegInstalled || !ffprobeInstalled) {
+		if(!ytdlpInstalled || !ffmpegInstalled) {
 			
-			parentWindow.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled, ffprobeInstalled);
+			parentWindow.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled);
 			
 		}
-		
+				
 	}
 	
 	public void setStatusText(String text) {
@@ -127,6 +134,12 @@ public class BottomPanel extends JPanel {
 		
 		System.out.println("PROGRESS BAR " + percent);
 		progressBar.setValue(percent);
+		
+	}
+	
+	public StaccatoWindow getStaccatoWindow() {
+		
+		return parentWindow;
 		
 	}
 	

@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -18,6 +20,7 @@ import javax.swing.SwingUtilities;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
 
@@ -36,10 +39,136 @@ public class StaccatoWindow extends JFrame {
 	private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
 	private static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	private static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
-		
+	
+	private boolean isDownloading = false;
+	
 	private StaccatoWindow() {
 		
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		//This is just the loading screen
+		
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setSize(WIDTH, HEIGHT);
+		setTitle("staccato");
+		setResizable(false);
+		setLayout(new BorderLayout());
+		
+		JLabel loadingLabel = new JLabel("<html><b><i>Loading...</b></i><html>");
+		loadingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		loadingLabel.setVerticalAlignment(SwingConstants.CENTER);
+		add(loadingLabel, BorderLayout.CENTER);
+		
+	}
+	
+	public void createMissingSoftwarePopup(boolean ytdlpInstalled, boolean ffmpegInstalled) {
+		
+		String missingSoftwareList;
+		if(!ytdlpInstalled && !ffmpegInstalled) {
+			
+			missingSoftwareList = "yt-dlp and FFmpeg";
+			
+		} else if(!ytdlpInstalled) {
+			
+			missingSoftwareList = "yt-dlp";
+			
+		} else {
+			
+			missingSoftwareList = "FFmpeg";
+			
+		}
+		
+		new InstallationDialog(this, missingSoftwareList).setVisible(true);;
+		
+	}
+	
+	public void createErrorPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
+		
+		JDialog dialog = new JDialog(this, true);
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		dialog.setTitle(title);
+		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
+		dialog.setResizable(false);
+		
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+		topPanel.add(Box.createHorizontalStrut(15));
+		topPanel.add(new JLabel(icon));
+		topPanel.add(Box.createHorizontalStrut(12));
+		topPanel.add(new JLabel(message));
+		topPanel.add(Box.createHorizontalStrut(15));
+		
+		dialog.add(Box.createVerticalStrut(10));
+		dialog.add(topPanel);
+		
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+		JButton okayButton = new JButton("OK");
+		okayButton.setBackground(new Color(0x80005d));
+		okayButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		okayButton.addActionListener((e) -> {
+			
+			dialog.dispose();
+			
+		});
+		bottomPanel.add(okayButton);
+		
+		dialog.add(Box.createVerticalStrut(15));
+		dialog.add(bottomPanel);
+		dialog.add(Box.createVerticalStrut(15));
+		dialog.pack();
+		dialog.setLocationRelativeTo(this);
+		dialog.setVisible(true);
+		
+	}
+	
+	public void setIsDownloading(boolean isDownloading) {
+		
+		this.isDownloading = isDownloading;
+		
+	}
+	
+	public boolean getIsDownloading() {
+		
+		return isDownloading;
+		
+	}
+	
+	public static void main(String[] args) {
+		
+		FlatLaf.registerCustomDefaultsSource("themes");
+		FlatDarkLaf.setup();
+		
+		SwingUtilities.invokeLater(() -> {
+			
+			StaccatoWindow gui = new StaccatoWindow();
+			gui.setVisible(true);
+			gui.setLocationRelativeTo(null);
+			
+			Thread loadingThread = new Thread(() -> {
+				
+				boolean ytdlpInstalled = Downloader.checkSoftwareInstalled("yt-dlp");
+				boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
+				if(!ytdlpInstalled || !ffmpegInstalled) {
+					
+					gui.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled);
+					
+				}
+				
+				gui.init();
+				
+			});
+			
+			loadingThread.start();
+			
+		});
+		
+	}
+	
+	private void init() {
+		
+		getContentPane().removeAll();
+		
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); //We manually program the closing functionality
 		setSize(WIDTH, HEIGHT);
 		setTitle("staccato");
 		setLayout(new GridBagLayout());
@@ -70,104 +199,31 @@ public class StaccatoWindow extends JFrame {
 		
 		add(contentPanel, new GridBagConstraints());
 		
-		Downloader.setBottomPanel(bottomPanel);
+		revalidate();
+		repaint();
 		
-	}
-	
-	public void createMissingSoftwarePopup(boolean ytdlpInstalled, boolean ffmpegInstalled, boolean ffprobeInstalled) {
+		//END OF COMPONENT ADDING
 		
-		String missingSoftwareList = "";
-		if(!ytdlpInstalled) {
-			
-			missingSoftwareList += "yt-dlp, ";
-			
-		}
-		if(!ffmpegInstalled) {
-			
-			missingSoftwareList += "ffmpeg, ";
-			
-		}
-		if(!ffmpegInstalled) {
-			
-			missingSoftwareList += "ffprobe, ";
-			
-		}
+		addWindowListener(new WindowAdapter() {
 		
-		missingSoftwareList = missingSoftwareList.substring(0, missingSoftwareList.length() - 2);
-		int lastIndexOfSpace = missingSoftwareList.lastIndexOf(" ");
-		missingSoftwareList = missingSoftwareList.substring(0, lastIndexOfSpace) + " and" + missingSoftwareList.substring(lastIndexOfSpace);
-		
-		String toBeConjugation;
-		if(lastIndexOfSpace == -1) {
-			
-			toBeConjugation = " is";
-			
-		} else {
-			
-			toBeConjugation = " are";
-			
-		}
-		
-		new InstallationDialog(this, missingSoftwareList, toBeConjugation).setVisible(true);;
-		
-	}
-	
-	public void createErrorPopup(String title, String message) {
-		
-		JDialog dialog = new JDialog(this, true);
-		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		dialog.setTitle(title);
-		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
-		dialog.setResizable(false);
-		
-		JPanel topPanel = new JPanel();
-		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-		topPanel.add(Box.createHorizontalStrut(15));
-		topPanel.add(new JLabel(new FlatOptionPaneErrorIcon()));
-		topPanel.add(Box.createHorizontalStrut(12));
-		topPanel.add(new JLabel(message));
-		topPanel.add(Box.createHorizontalStrut(15));
-		
-		dialog.add(Box.createVerticalStrut(10));
-		dialog.add(topPanel);
-		
-		JPanel bottomPanel = new JPanel();
-		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-		JButton okayButton = new JButton("OK");
-		okayButton.setBackground(new Color(0x80005d));
-		okayButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		bottomPanel.add(okayButton);
-		
-		dialog.add(Box.createVerticalStrut(15));
-		dialog.add(bottomPanel);
-		dialog.add(Box.createVerticalStrut(15));
-		dialog.pack();
-		dialog.setLocationRelativeTo(this);
-		dialog.setVisible(true);
-		
-	}
-	
-	public static void main(String[] args) {
-		
-		FlatLaf.registerCustomDefaultsSource("themes");
-		FlatDarkLaf.setup();
-		
-		SwingUtilities.invokeLater(() -> {
-			
-			StaccatoWindow gui = new StaccatoWindow();
-			gui.setVisible(true);
-			gui.setLocationRelativeTo(null);
-						
-			boolean ytdlpInstalled = Downloader.checkSoftwareInstalled("yt-dlp");
-			boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
-			boolean ffprobeInstalled = Downloader.checkSoftwareInstalled("ffprobe");
-			if(!ytdlpInstalled || !ffmpegInstalled || !ffprobeInstalled) {
+			@Override
+			public void windowClosing(WindowEvent e) {
 				
-				gui.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled, ffprobeInstalled);
+				if(!isDownloading) {
+					
+					System.exit(0);
+					
+				} else {
+					
+					createErrorPopup("Download In Progress", "Cannot exit program: download is in progress.", new FlatOptionPaneErrorIcon());
+					
+				}
 				
 			}
-			
+		
 		});
+		
+		Downloader.setBottomPanel(bottomPanel);
 		
 	}
 	
@@ -178,7 +234,7 @@ public class StaccatoWindow extends JFrame {
 		 */
 		private static final long serialVersionUID = -2265787396135232040L;
 
-		public InstallationDialog(JFrame parent, String missingSoftwareList, String toBeConjugation) {
+		public InstallationDialog(StaccatoWindow parent, String missingSoftwareList) {
 			
 			/*
 			JOptionPane.showConfirmDialog(this, missingSoftwareList + toBeConjugation + " missing. These programs are required for staccato to function.\nAllow staccato to install " + missingSoftwareList + "?", "Error: Missing Software", JOptionPane.YES_NO_OPTION);
@@ -196,7 +252,15 @@ public class StaccatoWindow extends JFrame {
 			topPanel.add(Box.createHorizontalStrut(15));
 			topPanel.add(new JLabel(new FlatOptionPaneErrorIcon()));
 			topPanel.add(Box.createHorizontalStrut(12));
-			topPanel.add(new JLabel("<html>" + missingSoftwareList + toBeConjugation + " missing. <br></br>These programs are required for staccato to function.</html>"));
+			if(missingSoftwareList.contains(" ")) {
+				
+				topPanel.add(new JLabel("<html>" + missingSoftwareList + " are missing. <br></br>These programs are required for staccato to function.</html>"));
+				
+			} else {
+				
+				topPanel.add(new JLabel("<html>" + missingSoftwareList + " is missing. <br></br>These programs are required for staccato to function.</html>"));
+				
+			}
 			topPanel.add(Box.createHorizontalStrut(15));
 			
 			add(Box.createVerticalStrut(10));
@@ -208,7 +272,16 @@ public class StaccatoWindow extends JFrame {
 			yesButton.addActionListener((e) -> {
 				
 				dispose();
-				Downloader.checkAndInstallSoftware();
+				
+				Thread installationThread = new Thread(() -> {
+					
+					parent.setIsDownloading(true);
+					Downloader.checkAndInstallSoftware();
+					parent.setIsDownloading(false);
+					
+				});
+				
+				installationThread.start();
 				
 			});
 			JButton noButton = new JButton("No");

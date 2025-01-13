@@ -3,6 +3,8 @@ package main;
 import java.io.File;
 import java.io.IOException;
 
+import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
+
 public abstract class Downloader {
 	
 	private static BottomPanel bottomPanel;
@@ -49,21 +51,16 @@ public abstract class Downloader {
 		
 	}
 	
-	/**
-	 * Updates yt-dlp, ffmpeg, and ffprobe
-	 */
 	public static int checkAndInstallSoftware() {
-		
-		//----------------------------------------------
-		//TODO PUT THIS ON A MULTITHREAD
-		//----------------------------------------------
 		
 		int returnValue = 0;
 		
-		bottomPanel.setProgressBar(16);
+		bottomPanel.setProgressBar(10);
 		bottomPanel.setStatusText("Checking if yt-dlp is installed");
 		if(!checkSoftwareInstalled("yt-dlp")) {
 			
+			bottomPanel.setProgressBar(30);
+			bottomPanel.setStatusText("Installing yt-dlp");
 			returnValue = installSoftware("yt-dlp");
 			if(returnValue != 0) {
 				
@@ -73,10 +70,12 @@ public abstract class Downloader {
 			
 		}
 		
-		bottomPanel.setProgressBar(50);
-		bottomPanel.setStatusText("Checking if ffmpeg is installed");
+		bottomPanel.setProgressBar(60);
+		bottomPanel.setStatusText("Checking if FFmpeg is installed");
 		if(!checkSoftwareInstalled("ffmpeg")) {
 			
+			bottomPanel.setProgressBar(80);
+			bottomPanel.setStatusText("Installing FFmpeg");
 			returnValue = installSoftware("ffmpeg");
 			if(returnValue != 0) {
 				
@@ -86,18 +85,9 @@ public abstract class Downloader {
 			
 		}
 		
-		bottomPanel.setProgressBar(83);
-		bottomPanel.setStatusText("Checking if ffprobe is installed");
-		if(!checkSoftwareInstalled("ffprobe")) {
-			
-			returnValue = installSoftware("ffprobe");
-			if(returnValue != 0) {
-				
-				return returnValue;
-				
-			}
-			
-		}
+		bottomPanel.setProgressBar(0);
+		bottomPanel.setStatusText("Status: Idle");
+		bottomPanel.getStaccatoWindow().createErrorPopup("Restart Staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
 		
 		return 0;
 		
@@ -127,6 +117,7 @@ public abstract class Downloader {
 			
 		} catch (IOException | InterruptedException e) {
 			
+			System.out.println(software + " does not exist.");
 			return false;
 			
 		}
@@ -170,7 +161,8 @@ public abstract class Downloader {
 	
 	public static void main(String[] args) {
 		
-		installSoftware("yt-dlp");
+//		installSoftware("yt-dlp");
+		StaccatoWindow.main(args);
 		
 	}
 	
