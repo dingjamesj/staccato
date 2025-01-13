@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 
+import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
+
 public class BottomPanel extends JPanel {
 
 	/**
@@ -19,6 +21,7 @@ public class BottomPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -7262047713711324913L;
 
+	private JButton downloadButton;
 	private JLabel statusLabel;
 	private JProgressBar progressBar;
 	private JLabel infoLabel;
@@ -32,7 +35,7 @@ public class BottomPanel extends JPanel {
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		JButton downloadButton = new JButton("Download");
+		downloadButton = new JButton("Download");
 		downloadButton.setFont(buttonFont);
 		downloadButton.setAlignmentX(CENTER_ALIGNMENT);
 		downloadButton.setBackground(new Color(0x80005d));
@@ -98,13 +101,13 @@ public class BottomPanel extends JPanel {
 		infoLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		add(downloadButton);
-		add(Box.createVerticalStrut(4));
+		add(Box.createVerticalStrut(5));
 		add(statusLabel);
 		add(Box.createVerticalStrut(5));
 		add(radioButtonPanel);
 		add(Box.createVerticalStrut(10));
 		add(progressBar);
-		add(Box.createVerticalStrut(8));
+		add(Box.createVerticalStrut(10));
 		add(infoLabel);
 		
 		radioButtonGroup.setSelected(playlistButton.getModel(), true);
@@ -118,7 +121,7 @@ public class BottomPanel extends JPanel {
 		boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
 		if(!ytdlpInstalled || !ffmpegInstalled) {
 			
-			parentWindow.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled);
+			parentWindow.createPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
 			
 		}
 				
@@ -140,6 +143,16 @@ public class BottomPanel extends JPanel {
 	public StaccatoWindow getStaccatoWindow() {
 		
 		return parentWindow;
+		
+	}
+	
+	@Override
+	public void setEnabled(boolean enabled) {
+		
+		playlistButton.setEnabled(enabled);
+		audioButton.setEnabled(enabled);
+		videoButton.setEnabled(enabled);
+		downloadButton.setEnabled(enabled);
 		
 	}
 	

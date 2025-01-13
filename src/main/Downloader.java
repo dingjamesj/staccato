@@ -3,6 +3,7 @@ package main;
 import java.io.File;
 import java.io.IOException;
 
+import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
 public abstract class Downloader {
@@ -51,16 +52,26 @@ public abstract class Downloader {
 		
 	}
 	
+	/**
+	 * If yt-dlp is missing, then does </br><code>winget install yt-dlp</code></br>
+	 * If FFmpeg is missing, then does </br><code>winget uninstall yt-dlp ffmpeg</br>winget install yt-dlp</code></br>
+	 * The latter has more steps because, for whatever reason, FFmpeg only works when it is installed as part of yt-dlp.</br>
+	 * Hence, if FFmpeg is shown as "missing," it is oftentimes actually installed but just not showing for some reason.
+	 * @return
+	 */
 	public static int checkAndInstallSoftware() {
 		
-		int returnValue = 0;
+		int returnValue;
 		
-		bottomPanel.setProgressBar(10);
+		bottomPanel.setProgressBar(5);
 		bottomPanel.setStatusText("Checking if yt-dlp is installed");
 		if(!checkSoftwareInstalled("yt-dlp")) {
 			
-			bottomPanel.setProgressBar(30);
-			bottomPanel.setStatusText("Installing yt-dlp");
+			bottomPanel.setProgressBar(40);
+			bottomPanel.setStatusText("Installing yt-dlp and FFmpeg");
+			returnValue = installSoftware("yt-dlp");
+			
+			//If we install yt-dlp, then FFmpeg will be installed too (they are bundled together)
 			returnValue = installSoftware("yt-dlp");
 			if(returnValue != 0) {
 				
@@ -68,27 +79,46 @@ public abstract class Downloader {
 				
 			}
 			
+			bottomPanel.setProgressBar(0);
+			bottomPanel.setStatusText("Idle");
+			bottomPanel.getStaccatoWindow().createPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
+			
+			return 0;
+			
 		}
 		
-		bottomPanel.setProgressBar(60);
+		bottomPanel.setProgressBar(10);
 		bottomPanel.setStatusText("Checking if FFmpeg is installed");
 		if(!checkSoftwareInstalled("ffmpeg")) {
 			
-			bottomPanel.setProgressBar(80);
-			bottomPanel.setStatusText("Installing FFmpeg");
-			returnValue = installSoftware("ffmpeg");
+			bottomPanel.setProgressBar(40);
+			bottomPanel.setStatusText("Uninstalling yt-dlp and FFmpeg");
+			returnValue = uninstallSoftware("ffmpeg", "yt-dlp");
 			if(returnValue != 0) {
 				
 				return returnValue;
 				
 			}
 			
+			bottomPanel.setProgressBar(60);
+			bottomPanel.setStatusText("Re-installing yt-dlp and FFmpeg");
+			returnValue = installSoftware("yt-dlp");
+			if(returnValue != 0) {
+				
+				return returnValue;
+				
+			}
+			
+			bottomPanel.setProgressBar(0);
+			bottomPanel.setStatusText("Idle");
+			bottomPanel.getStaccatoWindow().createPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
+			
+			return 0;
+			
 		}
 		
-		bottomPanel.setProgressBar(0);
-		bottomPanel.setStatusText("Status: Idle");
-		bottomPanel.getStaccatoWindow().createErrorPopup("Restart Staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
-		
+		//This should never happen.
+		bottomPanel.getStaccatoWindow().createPopup("Information", "No software was installed.", new FlatOptionPaneInformationIcon());
 		return 0;
 		
 	}
@@ -132,9 +162,23 @@ public abstract class Downloader {
 		
 	}
 	
-	private static int installSoftware(String name) {
+	private static int installSoftware(String... names) {
 		
-		String[] command = {"winget", "install", name};
+		if(names == null) {
+			
+			return 0;
+			
+		}
+		
+		String[] command = new String[2 + names.length];
+		command[0] = "winget";
+		command[1] = "install";
+		for(int i = 0; i < names.length; i++) {
+			
+			command[2 + i] = names[i];
+			
+		}
+		
 		ProcessBuilder installProcess = new ProcessBuilder(command);
 		installProcess.inheritIO();
 		
@@ -159,9 +203,49 @@ public abstract class Downloader {
 		
 	}
 	
+	private static int uninstallSoftware(String... names) {
+		
+		if(names == null) {
+			
+			return 0;
+			
+		}
+		
+		String[] command = new String[2 + names.length];
+		command[0] = "winget";
+		command[1] = "uninstall";
+		for(int i = 0; i < names.length; i++) {
+			
+			command[2 + i] = names[i];
+			
+		}
+		
+		ProcessBuilder uninstallProcess = new ProcessBuilder(command);
+		uninstallProcess.inheritIO();
+		
+		try {
+			
+			Process process = uninstallProcess.start();
+			process.waitFor();
+			
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			return -1;
+			
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+			return -2;
+			
+		}
+		
+		return 0;
+		
+	}
+	
 	public static void main(String[] args) {
 		
-//		installSoftware("yt-dlp");
 		StaccatoWindow.main(args);
 		
 	}

@@ -16,7 +16,7 @@ public class InputPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -892554275836568837L; 
 	
-	private JTextField[] songTextFields = new JTextField[3];
+	private JTextField[] textFields = new JTextField[5];
 	
 	public InputPanel(Font paramLabelFont, Font inputFont) {
 		
@@ -66,25 +66,27 @@ public class InputPanel extends JPanel {
 		urlTextField.setColumns(15);
 		urlTextField.setAlignmentX(LEFT_ALIGNMENT);
 		urlTextField.putClientProperty("JTextField.placeholderText", "Spotify or YouTube Link");
+		textFields[0] = urlTextField;
 		JTextField titleTextField = new JTextField();
 		titleTextField.setFont(inputFont);
 		titleTextField.setColumns(10);
 		titleTextField.setAlignmentX(LEFT_ALIGNMENT);
-		songTextFields[0] = titleTextField;
+		textFields[1] = titleTextField;
 		JTextField artistTextField = new JTextField();
 		artistTextField.setFont(inputFont);
 		artistTextField.setColumns(10);
 		artistTextField.setAlignmentX(LEFT_ALIGNMENT);
-		songTextFields[1] = artistTextField;
+		textFields[2] = artistTextField;
 		JTextField albumTextField = new JTextField();
 		albumTextField.setFont(inputFont);
 		albumTextField.setColumns(10);
 		albumTextField.setAlignmentX(LEFT_ALIGNMENT);
-		songTextFields[2] = albumTextField;
+		textFields[3] = albumTextField;
 		JTextField directoryTextField = new JTextField();
 		directoryTextField.setFont(inputFont);
 		directoryTextField.setColumns(17);
 		directoryTextField.setAlignmentX(LEFT_ALIGNMENT);
+		textFields[4] = directoryTextField;
 				
 		constraints.anchor = GridBagConstraints.WEST;
 		constraints.ipady = 6;
@@ -112,9 +114,18 @@ public class InputPanel extends JPanel {
 	
 	public void setSongTextFieldsEnabled(boolean enabled) {
 		
-		for(int i = 0; i < songTextFields.length; i++) {
+		textFields[1].setEnabled(enabled);
+		textFields[2].setEnabled(enabled);
+		textFields[3].setEnabled(enabled);
+		
+	}
+	
+	@Override
+	public void setEnabled(boolean enabled) {
+		
+		for(int i = 0; i < textFields.length; i++) {
 			
-			songTextFields[i].setEnabled(enabled);
+			textFields[i].setEnabled(enabled);
 			
 		}
 		

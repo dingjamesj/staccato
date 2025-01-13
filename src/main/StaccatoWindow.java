@@ -40,6 +40,8 @@ public class StaccatoWindow extends JFrame {
 	private static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	private static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
 	
+	private InputPanel inputPanel;
+	private BottomPanel bottomPanel;
 	private boolean isDownloading = false;
 	
 	private StaccatoWindow() {
@@ -81,7 +83,7 @@ public class StaccatoWindow extends JFrame {
 		
 	}
 	
-	public void createErrorPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
+	public void createPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
 		
 		JDialog dialog = new JDialog(this, true);
 		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -124,6 +126,8 @@ public class StaccatoWindow extends JFrame {
 	public void setIsDownloading(boolean isDownloading) {
 		
 		this.isDownloading = isDownloading;
+		inputPanel.setEnabled(!isDownloading);
+		bottomPanel.setEnabled(!isDownloading);
 		
 	}
 	
@@ -152,9 +156,11 @@ public class StaccatoWindow extends JFrame {
 					
 					gui.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled);
 					
+				} else {
+					
+					gui.init();
+					
 				}
-				
-				gui.init();
 				
 			});
 			
@@ -165,6 +171,8 @@ public class StaccatoWindow extends JFrame {
 	}
 	
 	private void init() {
+		
+		System.out.println("GUI init()");
 		
 		getContentPane().removeAll();
 		
@@ -187,12 +195,10 @@ public class StaccatoWindow extends JFrame {
 		titlePanel.add(titleLabel, BorderLayout.CENTER);
 		contentPanel.add(titlePanel);
 		
-		InputPanel mainPanel;
-		BottomPanel bottomPanel;
-		mainPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
+		inputPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
 		contentPanel.add(Box.createVerticalStrut(4));
-		contentPanel.add(mainPanel);
-		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, mainPanel, this);
+		contentPanel.add(inputPanel);
+		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, inputPanel, this);
 		contentPanel.add(Box.createVerticalStrut(12));
 		contentPanel.add(bottomPanel);
 		
@@ -215,7 +221,7 @@ public class StaccatoWindow extends JFrame {
 					
 				} else {
 					
-					createErrorPopup("Download In Progress", "Cannot exit program: download is in progress.", new FlatOptionPaneErrorIcon());
+					createPopup("Download In Progress", "Cannot exit program: download is in progress.", new FlatOptionPaneErrorIcon());
 					
 				}
 				
@@ -258,7 +264,7 @@ public class StaccatoWindow extends JFrame {
 				
 			} else {
 				
-				topPanel.add(new JLabel("<html>" + missingSoftwareList + " is missing. <br></br>These programs are required for staccato to function.</html>"));
+				topPanel.add(new JLabel("<html>" + missingSoftwareList + " is missing. <br></br>This program is required for staccato to function.</html>"));
 				
 			}
 			topPanel.add(Box.createHorizontalStrut(15));
@@ -281,6 +287,7 @@ public class StaccatoWindow extends JFrame {
 					
 				});
 				
+				parent.init();
 				installationThread.start();
 				
 			});
@@ -305,6 +312,17 @@ public class StaccatoWindow extends JFrame {
 			add(Box.createVerticalStrut(15));
 			pack();
 			setLocationRelativeTo(parent);
+			
+			addWindowListener(new WindowAdapter() {
+				
+				@Override
+				public void windowClosing(WindowEvent e) {
+					
+					System.exit(0);
+					
+				}
+				
+			});
 			
 		}
 		
