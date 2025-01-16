@@ -1,8 +1,11 @@
 package main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
+import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
@@ -15,7 +18,7 @@ public abstract class Downloader {
 	 * 
 	 * @param url YouTube URL
 	 * @param dir Directory to put the mp3
-	 * @return 0 if download successful, -1 if directory does not exist, -2 if yt-dlp isn't installed, -3 if IOException was thrown during process execution
+	 * @return 0 if download successful, -1 if directory does not exist, -2 if yt-dlp isn't installed, -3 if IOException was thrown during process execution, -4 if process was interrupted
 	 */
 	public static int download(String url, String dir) {
 		
@@ -24,6 +27,7 @@ public abstract class Downloader {
 		File dirObject = new File(dir);
 		if(!dirObject.exists()) {
 			
+			setGUIErrorStatus("Directory does not exist");
 			return -1;
 			
 		}
@@ -32,7 +36,8 @@ public abstract class Downloader {
 		downloadProcess.inheritIO();
 		try {
 			
-			downloadProcess.start();
+			Process process = downloadProcess.start();
+			process.waitFor();
 			
 		} catch (IOException e) {
 			
@@ -40,14 +45,95 @@ public abstract class Downloader {
 			
 			if(message.toLowerCase().contains("cannot run program \"yt-dlp\"")) {
 				
+				setGUIErrorStatus("Cannot run yt-dlp");
+				e.printStackTrace();
 				return -2;
 				
 			}
 			
+			setGUIErrorStatus("IO Error: " + message);
+			e.printStackTrace();
+			return -3;
+			
+		} catch (InterruptedException e) {
+			
+			setGUIErrorStatus("Download was interrupted");
+			e.printStackTrace();
+			return -4;
+			
+		}
+		
+		return 0;
+		
+	}
+
+	/**
+	 * 
+	 * @return 0 if updated successfully, -1 if update ended unsuccessfully, -2 if there is missing software
+	 */
+	public static int updateSoftware() {
+		
+		setGUIStatus("Checking for updates");
+		
+		String[] command = {"yt-dlp", "--update"};
+		ProcessBuilder updateProcess = new ProcessBuilder(command);
+		updateProcess.inheritIO();
+		
+		try {
+			
+			Process process = updateProcess.start();
+			
+			BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String output = "";
+			int lineCount = 0;
+			while(output != null) {
+				
+				lineCount++;
+				
+				if(output.contains("up to date")) {
+					
+					break;
+					
+				}
+				
+				if(lineCount > 2) {
+					
+					setGUIStatus("Updating");
+					break;
+					
+				}
+				
+				output = processOutput.readLine();
+				
+			}
+			
+			process.waitFor();
+			
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			
+			if(e.getMessage().contains("cannot run program \"yt-dlp\"")) {
+				
+				setGUIErrorStatus("yt-dlp is not installed");
+				return -2;
+				
+			} else {
+				
+				setGUIErrorStatus("IOException: " + e.getMessage());
+				return -1;
+				
+			}
+			
+		} catch(InterruptedException e) {
+			
+			setGUIErrorStatus("Download process was interrupted");
+			e.printStackTrace();
 			return -3;
 			
 		}
 		
+		setGUIStatus(0, "Idle");
 		return 0;
 		
 	}
@@ -59,18 +145,16 @@ public abstract class Downloader {
 	 * Hence, if FFmpeg is shown as "missing," it is oftentimes actually installed but just not showing for some reason.
 	 * @return
 	 */
-	public static int checkAndInstallSoftware() {
+	public static int installSoftware() {
+				
+		setGUIStatus(5, "Checking if yt-dlp is installed");
 		
 		int returnValue;
 		
-		bottomPanel.setProgressBar(5);
-		bottomPanel.setStatusText("Checking if yt-dlp is installed");
 		if(!checkSoftwareInstalled("yt-dlp")) {
 			
-			bottomPanel.setProgressBar(40);
-			bottomPanel.setStatusText("Installing yt-dlp and FFmpeg");
-			returnValue = installSoftware("yt-dlp");
-			
+			setGUIStatus(40, "Installing yt-dlp and FFmpeg");
+						
 			//If we install yt-dlp, then FFmpeg will be installed too (they are bundled together)
 			returnValue = installSoftware("yt-dlp");
 			if(returnValue != 0) {
@@ -79,20 +163,18 @@ public abstract class Downloader {
 				
 			}
 			
-			bottomPanel.setProgressBar(0);
-			bottomPanel.setStatusText("Idle");
-			bottomPanel.getStaccatoWindow().createPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
-			
+			setGUIStatus(0, "Idle");
+			showGUIPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
 			return 0;
 			
 		}
 		
-		bottomPanel.setProgressBar(10);
-		bottomPanel.setStatusText("Checking if FFmpeg is installed");
+		//If yt-dlp isn't installed but FFmpeg is...
+		setGUIStatus(10, "Checking if FFmpeg is installed");
 		if(!checkSoftwareInstalled("ffmpeg")) {
 			
-			bottomPanel.setProgressBar(40);
-			bottomPanel.setStatusText("Uninstalling yt-dlp and FFmpeg");
+			setGUIStatus(40, "Uninstalling yt-dlp and FFmpeg");
+			
 			returnValue = uninstallSoftware("ffmpeg", "yt-dlp");
 			if(returnValue != 0) {
 				
@@ -100,8 +182,8 @@ public abstract class Downloader {
 				
 			}
 			
-			bottomPanel.setProgressBar(60);
-			bottomPanel.setStatusText("Re-installing yt-dlp and FFmpeg");
+			setGUIStatus(60, "Re-installing yt-dlp and FFmpeg");
+			
 			returnValue = installSoftware("yt-dlp");
 			if(returnValue != 0) {
 				
@@ -109,17 +191,15 @@ public abstract class Downloader {
 				
 			}
 			
-			bottomPanel.setProgressBar(0);
-			bottomPanel.setStatusText("Idle");
-			bottomPanel.getStaccatoWindow().createPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
-			
+			setGUIStatus(0, "Idle");
+			showGUIPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
 			return 0;
 			
 		}
 		
 		//This should never happen.
-		bottomPanel.getStaccatoWindow().createPopup("Information", "No software was installed.", new FlatOptionPaneInformationIcon());
-		return 0;
+		showGUIPopup("Information", "No software was installed (TELL JAMES DING THAT THIS SHOULD NEVER HAPPEN).", new FlatOptionPaneInformationIcon());
+		return Integer.MIN_VALUE;
 		
 	}
 	
@@ -145,9 +225,14 @@ public abstract class Downloader {
 			Process process = checkerProcess.start();
 			process.waitFor();
 			
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			
 			System.out.println(software + " does not exist.");
+			return false;
+			
+		} catch(InterruptedException e) {
+			
+			e.printStackTrace();
 			return false;
 			
 		}
@@ -189,16 +274,19 @@ public abstract class Downloader {
 			
 		} catch (IOException e) {
 
+			setGUIErrorStatus("IO Error: " + e.getMessage());
 			e.printStackTrace();
 			return -1;
 			
 		} catch (InterruptedException e) {
 			
+			setGUIErrorStatus("Installation was interrupted");
 			e.printStackTrace();
 			return -2;
 			
 		}
 		
+		setGUIStatus(0, "Idle");
 		return 0;
 		
 	}
@@ -230,23 +318,77 @@ public abstract class Downloader {
 			
 		} catch (IOException e) {
 
+			setGUIErrorStatus("IO Error: " + e.getMessage());
 			e.printStackTrace();
 			return -1;
 			
 		} catch (InterruptedException e) {
 			
+			setGUIErrorStatus("Installation was interrupted");
 			e.printStackTrace();
 			return -2;
 			
 		}
 		
+		setGUIStatus(0, "Idle");
 		return 0;
+		
+	}
+	
+	private static void setGUIStatus(int progressBar, String status) {
+		
+		if(bottomPanel == null) {
+			
+			return;
+			
+		}
+		
+		bottomPanel.setProgressBar(progressBar);
+		bottomPanel.setStatusText(status, false);
+		
+	}
+	
+	private static void setGUIStatus(String status) {
+		
+		if(bottomPanel == null) {
+			
+			return;
+			
+		}
+		
+		bottomPanel.setStatusText(status, false);
+		
+	}
+	
+	private static void setGUIErrorStatus(String status) {
+		
+		if(bottomPanel == null) {
+			
+			return;
+			
+		}
+		
+		bottomPanel.setProgressBar(0);
+		bottomPanel.setStatusText(status, true);
+		
+	}
+	
+	private static void showGUIPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
+		
+		if(bottomPanel == null) {
+			
+			return;
+			
+		}
+		
+		bottomPanel.getStaccatoWindow().createPopup(title, message, icon);
 		
 	}
 	
 	public static void main(String[] args) {
 		
 		StaccatoWindow.main(args);
+//		updateSoftware();
 		
 	}
 	

@@ -31,14 +31,15 @@ public class StaccatoWindow extends JFrame {
 	 */
 	private static final long serialVersionUID = 8433054944653490532L;
 	
-	private static final int WIDTH = 538;
-	private static final int HEIGHT = 430;
-	private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
-	private static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
-	private static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 12);
-	private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
-	private static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
-	private static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
+	public static final int WIDTH = 538;
+	public static final int HEIGHT = 430;
+	public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
+	public static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
+	public static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 12);
+	public static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
+	public static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
+	public static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
+	public static final Color ERROR_STATUS_COLOR = new Color(255, 0, 0);
 	
 	private InputPanel inputPanel;
 	private BottomPanel bottomPanel;
@@ -159,6 +160,10 @@ public class StaccatoWindow extends JFrame {
 				} else {
 					
 					gui.init();
+					
+					gui.setIsDownloading(true);
+					Downloader.updateSoftware();
+					gui.setIsDownloading(false);
 					
 				}
 				
@@ -282,7 +287,7 @@ public class StaccatoWindow extends JFrame {
 				Thread installationThread = new Thread(() -> {
 					
 					parent.setIsDownloading(true);
-					Downloader.checkAndInstallSoftware();
+					Downloader.installSoftware();
 					parent.setIsDownloading(false);
 					
 				});

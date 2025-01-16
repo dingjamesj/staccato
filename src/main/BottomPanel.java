@@ -130,6 +130,22 @@ public class BottomPanel extends JPanel {
 	public void setStatusText(String text) {
 		
 		statusLabel.setText(text);
+		statusLabel.setForeground(Color.WHITE);
+		
+	}
+	
+	public void setStatusText(String text, boolean isError) {
+		
+		statusLabel.setText(text);
+		if(isError) {
+			
+			statusLabel.setForeground(StaccatoWindow.ERROR_STATUS_COLOR);
+			
+		} else {
+			
+			statusLabel.setForeground(Color.WHITE);
+			
+		}
 		
 	}
 	
