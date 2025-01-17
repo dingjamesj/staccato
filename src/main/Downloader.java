@@ -22,7 +22,7 @@ public abstract class Downloader {
 	 */
 	public static int download(String url, String dir) {
 		
-		String[] command = {"yt-dlp", "--extract-audio", "\"" + url + "\""};
+		String[] command = {"yt-dlp", "--extract-audio", "--audio-format", "mp3", "\"" + url + "\""};
 		ProcessBuilder downloadProcess = new ProcessBuilder(command);
 		File dirObject = new File(dir);
 		if(!dirObject.exists()) {
@@ -339,6 +339,10 @@ public abstract class Downloader {
 		
 		if(bottomPanel == null) {
 			
+			System.out.println("==================================================================");
+			System.out.println("Progress: " + progressBar + "%");
+			System.out.println(status);
+			System.out.println("==================================================================");
 			return;
 			
 		}
@@ -352,6 +356,9 @@ public abstract class Downloader {
 		
 		if(bottomPanel == null) {
 			
+			System.out.println("==================================================================");
+			System.out.println(status);
+			System.out.println("==================================================================");
 			return;
 			
 		}
@@ -364,6 +371,9 @@ public abstract class Downloader {
 		
 		if(bottomPanel == null) {
 			
+			System.err.println("==================================================================");
+			System.err.println(status);
+			System.err.println("==================================================================");
 			return;
 			
 		}
@@ -377,6 +387,11 @@ public abstract class Downloader {
 		
 		if(bottomPanel == null) {
 			
+			System.out.println("==================================================================");
+			System.out.println(title);
+			System.out.println(message);
+			System.out.println("[icon " + icon.getClass().getName() + "]");
+			System.out.println("==================================================================");
 			return;
 			
 		}
@@ -387,8 +402,9 @@ public abstract class Downloader {
 	
 	public static void main(String[] args) {
 		
-		StaccatoWindow.main(args);
-//		updateSoftware();
+//		StaccatoWindow.main(args);
+		
+		download("https://www.youtube.com/watch?v=56hqrlQxMMI", "D:/");
 		
 	}
 	

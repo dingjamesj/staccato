@@ -131,6 +131,36 @@ public class InputPanel extends JPanel {
 		
 	}
 	
+	public String getURL() {
+		
+		return textFields[0].getText();
+		
+	}
+	
+	public String getTitle() {
+		
+		return textFields[1].getText();
+		
+	}
+	
+	public String getArtist() {
+		
+		return textFields[2].getText();
+		
+	}
+	
+	public String getAlbum() {
+		
+		return textFields[3].getText();
+		
+	}
+	
+	public String getDirectory() {
+		
+		return textFields[4].getText();
+		
+	}
+	
 	public static void main(String[] args) {
 		
 		StaccatoWindow.main(args);

@@ -25,11 +25,13 @@ public class BottomPanel extends JPanel {
 	private JLabel statusLabel;
 	private JProgressBar progressBar;
 	private JLabel infoLabel;
+	private ButtonGroup radioButtons;
 	private JRadioButton playlistButton;
 	private JRadioButton audioButton;
 	private JRadioButton videoButton;
 	
 	private final StaccatoWindow parentWindow;
+	private final InputPanel inputPanel;
 	
 	public BottomPanel(Font buttonFont, Font statusFont, Font infoFont, InputPanel inputPanel, StaccatoWindow parentWindow) {
 		
@@ -79,10 +81,10 @@ public class BottomPanel extends JPanel {
 			inputPanel.setSongTextFieldsEnabled(false);
 			
 		});
-		ButtonGroup radioButtonGroup = new ButtonGroup();
-		radioButtonGroup.add(playlistButton);
-		radioButtonGroup.add(audioButton);
-		radioButtonGroup.add(videoButton);
+		radioButtons = new ButtonGroup();
+		radioButtons.add(playlistButton);
+		radioButtons.add(audioButton);
+		radioButtons.add(videoButton);
 		radioButtonPanel.add(playlistButton);
 		radioButtonPanel.add(Box.createHorizontalStrut(20));
 		radioButtonPanel.add(audioButton);
@@ -110,21 +112,40 @@ public class BottomPanel extends JPanel {
 		add(Box.createVerticalStrut(10));
 		add(infoLabel);
 		
-		radioButtonGroup.setSelected(playlistButton.getModel(), true);
+		radioButtons.setSelected(playlistButton.getModel(), true);
 		this.parentWindow = parentWindow;
+		this.inputPanel = inputPanel;
 		
 	}
 	
 	private void downloadAction() {
-				
-		boolean ytdlpInstalled = Downloader.checkSoftwareInstalled("yt-dlp");
-		boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
-		if(!ytdlpInstalled || !ffmpegInstalled) {
+		
+		if(!Downloader.checkSoftwareInstalled("yt-dlp") || !Downloader.checkSoftwareInstalled("ffmpeg")) {
 			
 			parentWindow.createPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
+			return;
+			
+		}
+		
+		if(audioButton.isSelected()) {
+			
+			downloadAudioAction();
 			
 		}
 				
+	}
+	
+	private void downloadAudioAction() {
+		
+		String url = inputPanel.getURL();
+		String dir = inputPanel.getDirectory();
+		
+		if(url.contains("youtube.com")) {
+			
+			Downloader.download(url, dir);
+			
+		}
+		
 	}
 	
 	public void setStatusText(String text) {
