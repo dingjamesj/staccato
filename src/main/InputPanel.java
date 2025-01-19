@@ -16,6 +16,8 @@ public class InputPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -892554275836568837L; 
 	
+	private static InputPanel mainInputPanel;
+	
 	private JTextField[] textFields = new JTextField[5];
 	
 	public InputPanel(Font paramLabelFont, Font inputFont) {
@@ -69,17 +71,17 @@ public class InputPanel extends JPanel {
 		textFields[0] = urlTextField;
 		JTextField titleTextField = new JTextField();
 		titleTextField.setFont(inputFont);
-		titleTextField.setColumns(10);
+		titleTextField.setColumns(11);
 		titleTextField.setAlignmentX(LEFT_ALIGNMENT);
 		textFields[1] = titleTextField;
 		JTextField artistTextField = new JTextField();
 		artistTextField.setFont(inputFont);
-		artistTextField.setColumns(10);
+		artistTextField.setColumns(11);
 		artistTextField.setAlignmentX(LEFT_ALIGNMENT);
 		textFields[2] = artistTextField;
 		JTextField albumTextField = new JTextField();
 		albumTextField.setFont(inputFont);
-		albumTextField.setColumns(10);
+		albumTextField.setColumns(11);
 		albumTextField.setAlignmentX(LEFT_ALIGNMENT);
 		textFields[3] = albumTextField;
 		JTextField directoryTextField = new JTextField();
@@ -108,16 +110,8 @@ public class InputPanel extends JPanel {
 		constraints.gridy = 5;
 		add(directoryTextField, constraints);
 		
-		setSongTextFieldsEnabled(false);
-		
-	}
-	
-	public void setSongTextFieldsEnabled(boolean enabled) {
-		
-		textFields[1].setEnabled(enabled);
-		textFields[2].setEnabled(enabled);
-		textFields[3].setEnabled(enabled);
-		
+		mainInputPanel = this;
+				
 	}
 	
 	@Override
@@ -158,6 +152,36 @@ public class InputPanel extends JPanel {
 	public String getDirectory() {
 		
 		return textFields[4].getText();
+		
+	}
+	
+	public static String getInputURL() {
+		
+		return mainInputPanel.getURL();
+		
+	}
+	
+	public static String getInputTitle() {
+		
+		return mainInputPanel.getTitle();
+		
+	}
+	
+	public static String getInputArtist() {
+		
+		return mainInputPanel.getArtist();
+		
+	}
+	
+	public static String getInputAlbum() {
+		
+		return mainInputPanel.getAlbum();
+		
+	}
+	
+	public static String getInputDirectory() {
+		
+		return mainInputPanel.getDirectory();
 		
 	}
 	

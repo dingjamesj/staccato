@@ -5,13 +5,13 @@ import java.awt.Font;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 
+import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
 public class BottomPanel extends JPanel {
@@ -21,19 +21,16 @@ public class BottomPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -7262047713711324913L;
 
+	private static BottomPanel mainBottomPanel;
+	
 	private JButton downloadButton;
 	private JLabel statusLabel;
 	private JProgressBar progressBar;
 	private JLabel infoLabel;
-	private ButtonGroup radioButtons;
-	private JRadioButton playlistButton;
-	private JRadioButton audioButton;
-	private JRadioButton videoButton;
 	
 	private final StaccatoWindow parentWindow;
-	private final InputPanel inputPanel;
 	
-	public BottomPanel(Font buttonFont, Font statusFont, Font infoFont, InputPanel inputPanel, StaccatoWindow parentWindow) {
+	public BottomPanel(Font buttonFont, Font statusFont, Font infoFont, StaccatoWindow parentWindow) {
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
@@ -60,37 +57,6 @@ public class BottomPanel extends JPanel {
 		statusLabel.setFont(statusFont);
 		statusLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
-		JPanel radioButtonPanel = new JPanel();
-		radioButtonPanel.setLayout(new BoxLayout(radioButtonPanel, BoxLayout.X_AXIS));
-		
-		playlistButton = new JRadioButton("Playlist");
-		playlistButton.addActionListener((event) -> {
-			
-			inputPanel.setSongTextFieldsEnabled(false);
-			
-		});
-		audioButton = new JRadioButton("Individual Audio");
-		audioButton.addActionListener((event) -> {
-			
-			inputPanel.setSongTextFieldsEnabled(true);
-			
-		});
-		videoButton = new JRadioButton("Video");
-		videoButton.addActionListener((event) -> {
-			
-			inputPanel.setSongTextFieldsEnabled(false);
-			
-		});
-		radioButtons = new ButtonGroup();
-		radioButtons.add(playlistButton);
-		radioButtons.add(audioButton);
-		radioButtons.add(videoButton);
-		radioButtonPanel.add(playlistButton);
-		radioButtonPanel.add(Box.createHorizontalStrut(20));
-		radioButtonPanel.add(audioButton);
-		radioButtonPanel.add(Box.createHorizontalStrut(20));
-		radioButtonPanel.add(videoButton);
-		
 		progressBar = new JProgressBar();
 		progressBar.setAlignmentX(CENTER_ALIGNMENT);
 		progressBar.setForeground(new Color(0x80005d));
@@ -98,23 +64,23 @@ public class BottomPanel extends JPanel {
 		progressBar.setMaximum(100);
 		progressBar.putClientProperty("JProgressBar.largeHeight", true);
 		
-		infoLabel = new JLabel("100-song limit for Spotify Playlists");
+		infoLabel = new JLabel("<html><div style='text-align: center;'>100-song limit for Spotify Playlists<br></br>"
+				+ "Title, artist, and album fields are only for single audio downloads</div></html>");
+		infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		infoLabel.setFont(infoFont);
 		infoLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		add(downloadButton);
-		add(Box.createVerticalStrut(5));
+		add(Box.createVerticalStrut(10));
 		add(statusLabel);
-		add(Box.createVerticalStrut(5));
-		add(radioButtonPanel);
 		add(Box.createVerticalStrut(10));
 		add(progressBar);
-		add(Box.createVerticalStrut(10));
+		add(Box.createVerticalStrut(12));
 		add(infoLabel);
 		
-		radioButtons.setSelected(playlistButton.getModel(), true);
 		this.parentWindow = parentWindow;
-		this.inputPanel = inputPanel;
+		
+		mainBottomPanel = this;
 		
 	}
 	
@@ -127,24 +93,40 @@ public class BottomPanel extends JPanel {
 			
 		}
 		
-		if(audioButton.isSelected()) {
+		String url = InputPanel.getInputURL();
+		String title = InputPanel.getInputTitle();
+		String artist = InputPanel.getInputArtist();
+		String album = InputPanel.getInputAlbum();
+		String dir = InputPanel.getInputAlbum();
+		
+		if(url.isBlank()) {
 			
-			downloadAudioAction();
+			setStatusText("Please input a URL", true);
+			return;
 			
 		}
-				
-	}
-	
-	private void downloadAudioAction() {
-		
-		String url = inputPanel.getURL();
-		String dir = inputPanel.getDirectory();
 		
 		if(url.contains("youtube.com")) {
 			
-			Downloader.download(url, dir);
+			downloadYouTubeAction(url, dir, false);
+			
+		} else if(url.contains("spotify.com")) {
+			
+			
 			
 		}
+		
+	}
+	
+	private void downloadYouTubeAction(String url, String dir, boolean isPlaylist) {
+		
+		Downloader.download(url, dir);
+		
+	}
+	
+	private void downloadSpotifyAction(String url, String dir, boolean isPlaylist) {
+		
+		
 		
 	}
 	
@@ -186,10 +168,57 @@ public class BottomPanel extends JPanel {
 	@Override
 	public void setEnabled(boolean enabled) {
 		
-		playlistButton.setEnabled(enabled);
-		audioButton.setEnabled(enabled);
-		videoButton.setEnabled(enabled);
 		downloadButton.setEnabled(enabled);
+		
+	}
+	
+	public static void setGUIStatus(int progressBar, String status) {
+		
+		if(mainBottomPanel == null) {
+			
+			System.out.println("==================================================================");
+			System.out.println("Progress: " + progressBar + "%");
+			System.out.println(status);
+			System.out.println("==================================================================");
+			return;
+			
+		}
+		
+		mainBottomPanel.setProgressBar(progressBar);
+		mainBottomPanel.setStatusText(status, false);
+		
+	}
+	
+	public static void setGUIErrorStatus(String status) {
+		
+		if(mainBottomPanel == null) {
+			
+			System.err.println("==================================================================");
+			System.err.println(status);
+			System.err.println("==================================================================");
+			return;
+			
+		}
+		
+		mainBottomPanel.setProgressBar(0);
+		mainBottomPanel.setStatusText(status, true);
+		
+	}
+	
+	public static void showGUIPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
+		
+		if(mainBottomPanel == null) {
+			
+			System.out.println("==================================================================");
+			System.out.println(title);
+			System.out.println(message);
+			System.out.println("[icon " + icon.getClass().getName() + "]");
+			System.out.println("==================================================================");
+			return;
+			
+		}
+		
+		mainBottomPanel.getStaccatoWindow().createPopup(title, message, icon);
 		
 	}
 	

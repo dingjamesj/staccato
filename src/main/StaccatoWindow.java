@@ -129,7 +129,7 @@ public class StaccatoWindow extends JFrame {
 		this.isDownloading = isDownloading;
 		inputPanel.setEnabled(!isDownloading);
 		bottomPanel.setEnabled(!isDownloading);
-		
+				
 	}
 	
 	public boolean getIsDownloading() {
@@ -203,7 +203,7 @@ public class StaccatoWindow extends JFrame {
 		inputPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
 		contentPanel.add(Box.createVerticalStrut(4));
 		contentPanel.add(inputPanel);
-		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, inputPanel, this);
+		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, this);
 		contentPanel.add(Box.createVerticalStrut(12));
 		contentPanel.add(bottomPanel);
 		
@@ -233,9 +233,7 @@ public class StaccatoWindow extends JFrame {
 			}
 		
 		});
-		
-		Downloader.setBottomPanel(bottomPanel);
-		
+				
 	}
 	
 	private static class InstallationDialog extends JDialog {
