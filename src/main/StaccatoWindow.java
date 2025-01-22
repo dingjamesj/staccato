@@ -22,6 +22,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
+import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
 
 public class StaccatoWindow extends JFrame {
@@ -40,6 +41,8 @@ public class StaccatoWindow extends JFrame {
 	public static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	public static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
 	public static final Color ERROR_STATUS_COLOR = new Color(255, 0, 0);
+	public static final String SPOTIFY_CLIENT_ID_DIR_STR = System.getProperty("user.dir") + "\\clid.txt";
+	public static final String SPOTIFY_CLIENT_SECRET_DIR_STR = System.getProperty("user.dir") + "\\clscr.txt";
 	
 	private InputPanel inputPanel;
 	private BottomPanel bottomPanel;
@@ -177,7 +180,7 @@ public class StaccatoWindow extends JFrame {
 	
 	private void init() {
 		
-		System.out.println("GUI init()");
+		System.out.println("GUI init");
 		
 		getContentPane().removeAll();
 		

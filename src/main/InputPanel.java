@@ -84,7 +84,7 @@ public class InputPanel extends JPanel {
 		albumTextField.setColumns(11);
 		albumTextField.setAlignmentX(LEFT_ALIGNMENT);
 		textFields[3] = albumTextField;
-		JTextField directoryTextField = new JTextField();
+		JTextField directoryTextField = new JTextField(System.getProperty("user.dir"));
 		directoryTextField.setFont(inputFont);
 		directoryTextField.setColumns(17);
 		directoryTextField.setAlignmentX(LEFT_ALIGNMENT);
