@@ -1,6 +1,5 @@
 package main;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -9,7 +8,6 @@ import java.util.Map;
 
 import org.apache.hc.core5.http.ParseException;
 
-import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
@@ -17,18 +15,60 @@ import com.neovisionaries.i18n.CountryCode;
 
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
+import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
+import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 public abstract class MusicFetcher {
 	
-	public static Paging<PlaylistTrack> getSpotifyPlaylist(String url) {
+	/**
+	 * @param url Spotify URL
+	 * @return An array of StaccatoTracks
+	 */
+	public static StaccatoTrack[] convertSpotifyData(String url) {
 		
-		String[] apiKeys = getIDandSecret();
+		Track[] tracks;
+		if(url.contains("/track/")) {
+			
+			tracks = new Track[] {getSpotifyTrack(url)};
+			
+		} else if(url.contains("/playlist/")) {
+			
+			tracks = getSpotifyPlaylist(url);
+			
+		} else {
+			
+			BottomPanel.setGUIErrorStatus("Only Spotify songs and playlists are supported");
+			return null;
+			
+		}
+		
+		StaccatoTrack[] data = new StaccatoTrack[tracks.length];
+		String artistsStr;
+		for(int i = 0; i < tracks.length; i++) {
+			
+			artistsStr = "";
+			for(int a = 0; a < tracks[i].getArtists().length; a++) {
+				
+				artistsStr += tracks[i].getName() + " ";
+				
+			}
+			
+			data[i] = new StaccatoTrack(tracks[i].getName(), artistsStr, tracks[i].getAlbum().getName(), 
+					searchYouTube(tracks[i].getName(), artistsStr, 5), tracks[i].getAlbum().getImages()[0].getUrl());
+			
+		}
+		
+		return data;
+		
+	}
+	
+	public static String getAlbumCoverURL(String albumTitle, String artists) {
+		
+		String[] apiKeys = APIKeysStorage.getIDandSecret();
 		if(apiKeys == null) {
 			
 			return null;
@@ -37,13 +77,59 @@ public abstract class MusicFetcher {
 		
 		String clientID = apiKeys[0];
 		String clientSecret = apiKeys[1];
-		
 		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
+		
+		SearchAlbumsRequest request = spotifyApi.searchAlbums(albumTitle + " " + artists).market(CountryCode.US).build();
+		try {
+			
+			AlbumSimplified[] albums = request.execute().getItems();
+			return albums[0].getImages()[0].getUrl();
+			
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Parse Exception (getAlbumCoverURL): " + e.getMessage());
+			
+		} catch (SpotifyWebApiException e) {
+
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Spotify API Exception (getAlbumCoverURL): " + e.getMessage());
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("IO Exception (getAlbumCoverURL): " + e.getMessage());
+			
+		}
+		
+		return null;
+		
+	}
+	
+	private static Track[] getSpotifyPlaylist(String url) {
+		
+		String[] apiKeys = APIKeysStorage.getIDandSecret();
+		if(apiKeys == null) {
+			
+			return null;
+			
+		}
+		
+		String clientID = apiKeys[0];
+		String clientSecret = apiKeys[1];
+		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
+		
 		GetPlaylistsItemsRequest request = spotifyApi.getPlaylistsItems(url).market(CountryCode.US).build();
 		try {
 			
-			Paging<PlaylistTrack> playlistItems = request.execute();
-			return playlistItems;
+			PlaylistTrack[] playlistItems = request.execute().getItems();
+			Track[] tracks = new Track[playlistItems.length];
+			for(int i = 0; i < playlistItems.length; i++) {
+				
+				tracks[i] = (Track) playlistItems[i].getTrack();
+				
+			}
+			return tracks;
 			
 		} catch (ParseException e) {
 			
@@ -66,9 +152,9 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	public static Track getSpotifyTrack(String url) {
+	private static Track getSpotifyTrack(String url) {
 		
-		String[] apiKeys = getIDandSecret();
+		String[] apiKeys = APIKeysStorage.getIDandSecret();
 		if(apiKeys == null) {
 			
 			return null;
@@ -115,7 +201,8 @@ public abstract class MusicFetcher {
 		
 		String[] command = {"yt-dlp", "--write-info-json", "--skip-download", "--no-write-playlist-metafiles", "\"ytsearch" + numResults + ":" + title + " " + artist + "\""};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		File jsonDir = new File(System.getProperty("user.dir") + "\\temp");
+		File jsonDir = new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR);
+		jsonDir.mkdir();
 		processBuilder.directory(jsonDir);
 		processBuilder.inheritIO();
 		
@@ -132,19 +219,20 @@ public abstract class MusicFetcher {
 			if(message.toLowerCase().contains("cannot run program \"yt-dlp\"")) {
 				
 				BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
-				e.printStackTrace();
+				clearTemporaryJSONs();
 				return null;
 				
 			}
 			
 			BottomPanel.setGUIErrorStatus("IO Exception (searchYouTube): " + message);
-			e.printStackTrace();
+			clearTemporaryJSONs();
 			return null;
 			
 		} catch (InterruptedException e) {
 			
 			e.printStackTrace();
 			BottomPanel.setGUIErrorStatus("Download was interrupted");
+			clearTemporaryJSONs();
 			return null;
 			
 		}
@@ -153,6 +241,7 @@ public abstract class MusicFetcher {
 		if(jsonFiles == null) {
 			
 			BottomPanel.setGUIErrorStatus("No search results found");
+			clearTemporaryJSONs();
 			return null;
 			
 		}
@@ -174,18 +263,21 @@ public abstract class MusicFetcher {
 				
 				e.printStackTrace();
 				BottomPanel.setGUIErrorStatus("JSON IO Exception (searchYouTube): " + e.getMessage());
+				clearTemporaryJSONs();
 				return null;
 				
 			} catch (JsonSyntaxException e) {
 				
 				e.printStackTrace();
 				BottomPanel.setGUIErrorStatus("JSON file is malformed");
+				clearTemporaryJSONs();
 				return null;
 				
 			} catch (FileNotFoundException e) {
 				
 				e.printStackTrace();
 				BottomPanel.setGUIErrorStatus("JSON file was not found");
+				clearTemporaryJSONs();
 				return null;
 				
 			}
@@ -202,6 +294,7 @@ public abstract class MusicFetcher {
 			
 		}
 		
+		clearTemporaryJSONs();
 		return "https://www.youtube.com/watch?v=" + ids[maxPointsIndex];
 		
 	}
@@ -271,76 +364,14 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	public static String getAPIKey(String dirStr) {
+	private static void clearTemporaryJSONs() {
 		
-		File file = new File(dirStr);
-		String text = "";
-		String currLine = "";
-		
-		try {
+		String[] jsonDirStrs = new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR).list();
+		for(String dirStr: jsonDirStrs) {
 			
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			
-			currLine = reader.readLine();
-			while(currLine != null) {
-				
-				text += currLine;
-				
-			}
-			
-			reader.close();
-			
-		} catch (FileNotFoundException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Spotify API key file not found at " + dirStr);
-			return null;
-			
-		} catch (IOException e) {
-
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("IO Exception (getAPIKey): " + e.getMessage());
-			return null;
+			new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR, dirStr).delete();
 			
 		}
-				
-		return text;
-		
-	}
-	
-	public static String[] getIDandSecret() {
-		
-		String clientID = getAPIKey(StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR);
-		String clientSecret = getAPIKey(StaccatoWindow.SPOTIFY_CLIENT_SECRET_DIR_STR);
-		
-		if(clientID == null && clientSecret == null) {
-			
-			BottomPanel.showGUIPopup("No API Key Found", "<html>A <b>Spotify API client ID</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR
-					+ "<br></br>and a <b>Spotify API client secret</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_SECRET_DIR_STR
-					+ "<br></br>For more information on how to get the client ID and secret, please go to "
-					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>", 
-					new FlatOptionPaneWarningIcon());
-			return null;
-			
-		} else if(clientID == null) {
-			
-			BottomPanel.showGUIPopup("No API Key Found", "<html>A <b>Spotify API client ID</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR
-					+ "<br></br>For more information on how to get the client ID, please go to "
-					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>", 
-					new FlatOptionPaneWarningIcon());
-			return null;
-			
-		} else if(clientSecret == null) {
-			
-			BottomPanel.showGUIPopup("No API Key Found", "<html>A <b>Spotify API client secret</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR
-					+ "<br></br>For more information on how to get the client ID and secret, please go to "
-					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>", 
-					new FlatOptionPaneWarningIcon());
-			return null;
-			
-		}
-		
-		return new String[] {clientID, clientSecret};
 		
 	}
 	

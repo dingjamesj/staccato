@@ -108,25 +108,48 @@ public class BottomPanel extends JPanel {
 		
 		if(url.contains("youtube.com")) {
 			
-			downloadYouTubeAction(url, dir, false);
+			downloadYouTubeAction(url, dir, title + " " + artist);
+			//Now we need to find the file in the directory. Note that the file will be in the format of "[title] [artist] [video id].mp3"
 			
 		} else if(url.contains("spotify.com")) {
 			
-			
+			downloadSpotifyAction(url, dir);
 			
 		}
 		
 	}
 	
-	private void downloadYouTubeAction(String url, String dir, boolean isPlaylist) {
+	private void downloadYouTubeAction(String url, String dir, String fileName) {
 		
-		Downloader.download(url, dir);
+		boolean isPlaylist = false;
+		
+		if(isPlaylist) {
+			
+			//Do something else if it's a playlist
+			
+		} else {
+			
+			Downloader.download(url, dir, fileName);
+			
+		}
 		
 	}
 	
-	private void downloadSpotifyAction(String url, String dir, boolean isPlaylist) {
+	private void downloadSpotifyAction(String url, String dir) {
 		
+		StaccatoTrack[] data = MusicFetcher.convertSpotifyData(url);
 		
+		if(data.length > 1) {
+			
+			dir = "make this a playlist dir";
+			
+		}
+		
+		for(int i = 0; i < data.length; i++) {
+			
+			Downloader.download(data[i].getYouTubeURL(), dir, data[i].getTitle() + " " + data[i].getArtist());
+			
+		}
 		
 	}
 	

@@ -15,17 +15,16 @@ public abstract class Downloader {
 	 * 
 	 * @param url YouTube URL
 	 * @param dir Directory to put the mp3
-	 * @return 0 if download successful, -1 if directory does not exist, -2 if yt-dlp isn't installed, -3 if IOException was thrown during process execution, -4 if process was interrupted
 	 */
-	public static int download(String url, String dirStr) {
+	public static void download(String url, String dirStr, String fileName) {
 		
-		String[] command = {"yt-dlp", "--extract-audio", "--audio-format", "mp3", "\"" + url + "\""};
+		String[] command = {"yt-dlp", "--extract-audio", "--audio-format", "mp3", "-o", fileName + " %(id)s.%(ext)s", "--no-playlist", "\"" + url + "\""};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		File dir = new File(dirStr);
 		if(!dir.exists()) {
 			
 			BottomPanel.setGUIErrorStatus("Directory does not exist");
-			return -1;
+			return;
 			
 		}
 		
@@ -45,22 +44,17 @@ public abstract class Downloader {
 				
 				BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
 				e.printStackTrace();
-				return -2;
 				
 			}
 			
 			BottomPanel.setGUIErrorStatus("IO Error: " + message);
-			return -3;
 			
 		} catch (InterruptedException e) {
 			
 			e.printStackTrace();
 			BottomPanel.setGUIErrorStatus("Download was interrupted");
-			return -4;
 			
 		}
-		
-		return 0;
 		
 	}
 
