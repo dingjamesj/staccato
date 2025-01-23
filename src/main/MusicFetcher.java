@@ -16,8 +16,10 @@ import com.neovisionaries.i18n.CountryCode;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
+import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
@@ -192,10 +194,50 @@ public abstract class MusicFetcher {
 		
 	}
 	
+	public static String getSpotifyPlaylistName(String url) {
+		
+		String[] apiKeys = APIKeysStorage.getIDandSecret();
+		if(apiKeys == null) {
+			
+			return null;
+			
+		}
+		
+		String clientID = apiKeys[0];
+		String clientSecret = apiKeys[1];
+		
+		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
+		GetPlaylistRequest request = spotifyApi.getPlaylist(url).market(CountryCode.US).build();
+		try {
+			
+			Playlist playlist = request.execute();
+			return playlist.getName();
+			
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Parse Exception (getSpotifyTrack): " + e.getMessage());
+			
+		} catch (SpotifyWebApiException e) {
+
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Spotify API Exception (getSpotifyTrack): " + e.getMessage());
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("IO Exception (getSpotifyTrack): " + e.getMessage());
+			
+		}
+		
+		return null;
+		
+	}
+	
 	/**
 	 * @param arg
 	 * @param numResults
-	 * @return The URL of the YouTube video with the best matching results to arg
+	 * @return The ID of the YouTube video with the best matching results to arg
 	 */
 	private static String searchYouTube(String title, String artist, int numResults) {
 		
@@ -295,7 +337,7 @@ public abstract class MusicFetcher {
 		}
 		
 		clearTemporaryJSONs();
-		return "https://www.youtube.com/watch?v=" + ids[maxPointsIndex];
+		return ids[maxPointsIndex];
 		
 	}
 	

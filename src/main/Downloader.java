@@ -13,18 +13,27 @@ public abstract class Downloader {
 	/**
 	 * Downloads an mp3 given a YouTube URL.
 	 * 
-	 * @param url YouTube URL
+	 * @param url YouTube video URL
 	 * @param dir Directory to put the mp3
+	 * @return The directory of where the file is located
 	 */
-	public static void download(String url, String dirStr, String fileName) {
+	public static String download(String url, String dirStr, String fileName) {
 		
-		String[] command = {"yt-dlp", "--extract-audio", "--audio-format", "mp3", "-o", fileName + " %(id)s.%(ext)s", "--no-playlist", "\"" + url + "\""};
+		//This is the (number) at the end of a file (for example, "FileName (1).mp3")
+		int uniqueNumber = countRepeatedFileNames(dirStr, fileName);
+		
+		String[] command = {"yt-dlp", 
+				"--audio-format", "mp3", 
+				"-o", "\"" + fileName + " (" + uniqueNumber + ").%(ext)s\"",
+				"--extract-audio",
+				"--no-playlist",
+				"\"" + url + "\""};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		File dir = new File(dirStr);
 		if(!dir.exists()) {
 			
 			BottomPanel.setGUIErrorStatus("Directory does not exist");
-			return;
+			return null;
 			
 		}
 		
@@ -34,6 +43,15 @@ public abstract class Downloader {
 			
 			Process downloadProcess = processBuilder.start();
 			downloadProcess.waitFor();
+			if(uniqueNumber > 0) {
+				
+				return dirStr + "\\" + fileName + " (" + uniqueNumber + ").mp3";
+				
+			} else {
+				
+				return dirStr + "\\" + fileName + ".mp3";
+				
+			}
 			
 		} catch (IOException e) {
 			
@@ -44,6 +62,7 @@ public abstract class Downloader {
 				
 				BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
 				e.printStackTrace();
+				return null;
 				
 			}
 			
@@ -55,6 +74,8 @@ public abstract class Downloader {
 			BottomPanel.setGUIErrorStatus("Download was interrupted");
 			
 		}
+		
+		return null;
 		
 	}
 
@@ -317,6 +338,39 @@ public abstract class Downloader {
 		
 		BottomPanel.setGUIStatus(0, "Idle");
 		return 0;
+		
+	}
+	
+	public static int countRepeatedFileNames(String dirStr, String fileName) {
+		
+		File dir = new File(dirStr);
+		if(!dir.exists()) {
+			
+			BottomPanel.setGUIErrorStatus("Directory " + dirStr + " does not exist (countRepeatedFileNames)");
+			return -1;
+			
+		}
+		
+		int count = 0;
+		int fileNameLength = fileName.length();
+		String[] fileNameStrs = dir.list();
+		for(String fileNameStr: fileNameStrs) {
+			
+			if(fileNameStr.length() < fileNameLength) {
+				
+				continue;
+				
+			}
+			
+			if(fileNameStr.substring(0, fileNameLength).equals(fileName)) {
+				
+				count++;
+				
+			}
+			
+		}
+		
+		return count;
 		
 	}
 	

@@ -5,16 +5,16 @@ public class StaccatoTrack {
 	private String title;
 	private String artist;
 	private String album;
-	private String youtubeURL;
+	private String youtubeID;
 	private String albumCoverImageURL;
 	private String fileLocation;
 	
-	public StaccatoTrack(String title, String artist, String album, String youtubeURL, String albumCoverImageURL) {
+	public StaccatoTrack(String title, String artist, String album, String youtubeID, String albumCoverImageURL) {
 		
 		this.title = title;
 		this.artist = artist;
 		this.album = album;
-		this.youtubeURL = youtubeURL;
+		this.youtubeID = youtubeID;
 		this.albumCoverImageURL = albumCoverImageURL;
 		
 	}
@@ -37,9 +37,9 @@ public class StaccatoTrack {
 		
 	}
 	
-	public String getYouTubeURL() {
+	public String getYouTubeID() {
 		
-		return youtubeURL;
+		return youtubeID;
 		
 	}
 	

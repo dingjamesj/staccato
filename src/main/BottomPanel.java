@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -141,13 +142,30 @@ public class BottomPanel extends JPanel {
 		
 		if(data.length > 1) {
 			
-			dir = "make this a playlist dir";
+			String playlistName = MusicFetcher.getSpotifyPlaylistName(url);
+			File playlistFolder;
+			
+			int uniqueNumber = Downloader.countRepeatedFileNames(dir, playlistName);
+			if(uniqueNumber > 0) {
+				
+				playlistFolder = new File(dir + "\\" + playlistName + " (" + uniqueNumber + ")");
+				dir += "\\" + playlistName + " (" + uniqueNumber + ")";
+				
+			} else {
+				
+				playlistFolder = new File(dir + "\\" + playlistName);
+				dir += "\\" + playlistName;
+				
+			}
+
+			playlistFolder.mkdir();
 			
 		}
 		
+		String downloadLocationStr;
 		for(int i = 0; i < data.length; i++) {
 			
-			Downloader.download(data[i].getYouTubeURL(), dir, data[i].getTitle() + " " + data[i].getArtist());
+			downloadLocationStr = Downloader.download("https://www.youtube.com/watch?v=" + data[i].getYouTubeID(), dir, data[i].getTitle() + " " + data[i].getArtist() + " " + data[i].getYouTubeID());
 			
 		}
 		
