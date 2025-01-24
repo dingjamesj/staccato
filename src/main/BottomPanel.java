@@ -16,10 +16,7 @@ import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
 public class BottomPanel extends JPanel {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -7262047713711324913L;
 
 	private static BottomPanel mainBottomPanel;
@@ -120,7 +117,7 @@ public class BottomPanel extends JPanel {
 		
 	}
 	
-	private void downloadYouTubeAction(String url, String dir, String fileName) {
+	private static void downloadYouTubeAction(String url, String dir, String fileName) {
 		
 		boolean isPlaylist = false;
 		
@@ -136,7 +133,7 @@ public class BottomPanel extends JPanel {
 		
 	}
 	
-	private void downloadSpotifyAction(String url, String dir) {
+	private static void downloadSpotifyAction(String url, String dir) {
 		
 		StaccatoTrack[] data = MusicFetcher.convertSpotifyData(url);
 		
@@ -265,7 +262,8 @@ public class BottomPanel extends JPanel {
 	
 	public static void main(String[] args) {
 		
-		StaccatoWindow.main(args);
+		downloadSpotifyAction("https://open.spotify.com/track/74X2u8JMVooG2QbjRxXwR8?si=6c3ea48d93974722", "D:/");
+//		StaccatoWindow.main(args);
 		
 	}
 	

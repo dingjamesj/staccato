@@ -26,9 +26,6 @@ import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
 public class StaccatoWindow extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8433054944653490532L;
 	
 	public static final int WIDTH = 538;
@@ -41,8 +38,9 @@ public class StaccatoWindow extends JFrame {
 	public static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
 	public static final Color ERROR_STATUS_COLOR = new Color(255, 0, 0);
 	public static final String TEMP_JSON_FILES_DIR_STR = System.getProperty("user.dir") + "\\temp";
-	public static final String SPOTIFY_CLIENT_ID_DIR_STR = System.getProperty("user.dir") + "\\clid.txt";
-	public static final String SPOTIFY_CLIENT_SECRET_DIR_STR = System.getProperty("user.dir") + "\\clscr.txt";
+	public static final String SPOTIFY_CLIENT_API_KEYS_DIR_STR = System.getProperty("user.dir") + "\\staccatoapikeys.dat";
+	
+	public static StaccatoWindow mainWindow;
 	
 	private InputPanel inputPanel;
 	private BottomPanel bottomPanel;
@@ -63,6 +61,8 @@ public class StaccatoWindow extends JFrame {
 		loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		loadingLabel.setVerticalAlignment(SwingConstants.CENTER);
 		add(loadingLabel, BorderLayout.CENTER);
+		
+		mainWindow = this;
 		
 	}
 	
@@ -236,14 +236,17 @@ public class StaccatoWindow extends JFrame {
 			}
 		
 		});
+		
+		if(APIKeysStorage.getIDandSecret() == null) {
+			
+			APIKeysStorage.openSetAPIKeysDialog(true);
+			
+		}
 				
 	}
 	
 	private static class InstallationDialog extends JDialog {
-		
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = -2265787396135232040L;
 
 		public InstallationDialog(StaccatoWindow parent, String missingSoftwareList) {

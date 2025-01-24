@@ -1,12 +1,22 @@
 package main;
 
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
-import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 
 public class APIKeysStorage {
 
@@ -15,74 +25,99 @@ public class APIKeysStorage {
 	 */
 	public static String[] getIDandSecret() {
 		
-		String clientID = getAPIKey(StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR);
-		String clientSecret = getAPIKey(StaccatoWindow.SPOTIFY_CLIENT_SECRET_DIR_STR);
-		
-		if(clientID == null && clientSecret == null) {
+		File apiKeysFile = new File(StaccatoWindow.SPOTIFY_CLIENT_API_KEYS_DIR_STR);
+		if(!apiKeysFile.exists()) {
 			
-			BottomPanel.showGUIPopup("No API Key Found", "<html>A <b>Spotify API client ID</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR
-					+ "<br></br>and a <b>Spotify API client secret</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_SECRET_DIR_STR
-					+ "<br></br>For more information on how to get the client ID and secret, please go to "
-					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>", 
-					new FlatOptionPaneWarningIcon());
-			return null;
-			
-		} else if(clientID == null) {
-			
-			BottomPanel.showGUIPopup("No API Key Found", "<html>A <b>Spotify API client ID</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR
-					+ "<br></br>For more information on how to get the client ID, please go to "
-					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>", 
-					new FlatOptionPaneWarningIcon());
-			return null;
-			
-		} else if(clientSecret == null) {
-			
-			BottomPanel.showGUIPopup("No API Key Found", "<html>A <b>Spotify API client secret</b> was not found at " + StaccatoWindow.SPOTIFY_CLIENT_ID_DIR_STR
-					+ "<br></br>For more information on how to get the client ID and secret, please go to "
-					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>", 
-					new FlatOptionPaneWarningIcon());
+			BottomPanel.setGUIErrorStatus("File containing API keys is missing");
 			return null;
 			
 		}
 		
-		return new String[] {clientID, clientSecret};
-		
-	}
-	
-	private static String getAPIKey(String dirStr) {
-		
-		File file = new File(dirStr);
-		String text = "";
-		String currLine = "";
+		String id = null;
+		String secret = null;
 		
 		try {
 			
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			
-			currLine = reader.readLine();
-			while(currLine != null) {
-				
-				text += currLine;
-				
-			}
-			
+			ObjectInputStream reader = new ObjectInputStream(new FileInputStream(apiKeysFile));
+			id = reader.readUTF();
+			secret = reader.readUTF();
 			reader.close();
 			
 		} catch (FileNotFoundException e) {
 			
 			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Spotify API key file not found at " + dirStr);
+			BottomPanel.setGUIErrorStatus("File containing API keys is missing (this particular error should not happen though---we check if it's missing beforehand)");
 			return null;
 			
 		} catch (IOException e) {
-
+			
 			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("IO Exception (getAPIKey): " + e.getMessage());
-			return null;
+			BottomPanel.setGUIErrorStatus("IO Exception (getIDandSecret): " + e.getMessage());
+			return new String[] {}; //I don't want this to be null---I want to differentiate it between when there is no API key file
 			
 		}
+		
+		return new String[] {id, secret};
+		
+	}
+	
+	public static void setIDandSecret(String id, String secret) {
+		
+		File apiKeysFile = new File(StaccatoWindow.SPOTIFY_CLIENT_API_KEYS_DIR_STR);
+		if(!apiKeysFile.exists()) {
+			
+			try {
 				
-		return text;
+				apiKeysFile.createNewFile();
+				
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+				BottomPanel.setGUIErrorStatus("IO Exception (setIDandSecret): " + e.getMessage());
+				return;
+				
+			}
+			
+		}
+		
+		try {
+			
+			ObjectOutputStream printer = new ObjectOutputStream(new FileOutputStream(apiKeysFile));
+			printer.writeUTF(id);
+			printer.writeUTF(secret);
+			printer.close();
+			
+		} catch (FileNotFoundException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("File containing API keys is missing (this particular error should not happen though---we check if it's missing beforehand)");
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("IO Exception (setIDandSecret): " + e.getMessage());
+			
+		}
+		
+	}
+	
+	public static void openSetAPIKeysDialog(boolean isMissing) {
+		
+		if(!isMissing) {
+			
+			new SetAPIKeysDialog("<html>You may input your <b>Spotify API Client ID and Secret</b> here."
+					+ "<br></br>For more information on how to get the client ID and secret, please go to "
+					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>")
+			.setVisible(true);
+			
+		} else {
+			
+			new SetAPIKeysDialog("<html>The <b>Spotify API Client ID and Secret</b> were not found. These are required to download Spotify links."
+					+ "<br></br>For more information on how to get the client ID and secret, please go to "
+					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>")
+			.setVisible(true);
+			
+		}
 		
 	}
 	
@@ -97,6 +132,84 @@ public class APIKeysStorage {
 		}
 		
 		StaccatoWindow.main(args);
+		
+	}
+	
+	private static class SetAPIKeysDialog extends JDialog {
+
+		private static final long serialVersionUID = -7898127114696759816L;
+		
+		private JTextField idTextField;
+		private JTextField secretTextField;
+		
+		public SetAPIKeysDialog(String message) {
+			
+			super(StaccatoWindow.mainWindow, true);
+			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			setTitle("Set Spotify API Keys");
+			setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
+			setResizable(false);
+			
+			JPanel messagePanel = new JPanel();
+			messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.X_AXIS));
+			messagePanel.add(Box.createHorizontalStrut(15));
+			messagePanel.add(new JLabel(new FlatOptionPaneInformationIcon()));
+			messagePanel.add(Box.createHorizontalStrut(12));
+			messagePanel.add(new JLabel(message));
+			messagePanel.add(Box.createHorizontalStrut(15));
+			
+			JPanel idPanel = new JPanel();
+			idPanel.setLayout(new BoxLayout(idPanel, BoxLayout.X_AXIS));
+			idPanel.add(Box.createHorizontalStrut(15));
+			idPanel.add(new JLabel("Client ID: "));
+			idTextField = new JTextField(8);
+			idPanel.add(idTextField);
+			idPanel.add(Box.createHorizontalStrut(15));
+			
+			JPanel secretPanel = new JPanel();
+			secretPanel.setLayout(new BoxLayout(secretPanel, BoxLayout.X_AXIS));
+			secretPanel.add(Box.createHorizontalStrut(15));
+			secretPanel.add(new JLabel("Client Secret: "));
+			secretTextField = new JTextField(8);
+			secretPanel.add(secretTextField);
+			secretPanel.add(Box.createHorizontalStrut(15));
+			
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+			buttonPanel.add(Box.createHorizontalStrut(15));
+			JButton submitButton = new JButton("Submit");
+			submitButton.addActionListener((e) -> {
+				
+				setIDandSecret(idTextField.getText(), secretTextField.getText());
+				dispose();
+				
+			});
+			JButton cancelButton = new JButton("Cancel");
+			cancelButton.addActionListener((e) -> {
+				
+				setIDandSecret("", ""); //This is to prevent staccato from asking again
+				dispose();
+				
+			});
+			buttonPanel.add(submitButton);
+			buttonPanel.add(Box.createHorizontalStrut(8));
+			buttonPanel.add(cancelButton);
+			buttonPanel.add(Box.createHorizontalStrut(15));
+			
+			add(Box.createVerticalStrut(15));
+			add(messagePanel);
+			add(Box.createVerticalStrut(8));
+			add(idPanel);
+			add(Box.createVerticalStrut(6));
+			add(secretPanel);
+			add(Box.createVerticalStrut(10));
+			add(buttonPanel);
+			add(Box.createVerticalStrut(10));
+			
+			pack();
+			setLocationRelativeTo(StaccatoWindow.mainWindow);
+			
+		}
 		
 	}
 	
