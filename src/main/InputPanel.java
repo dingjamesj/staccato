@@ -37,7 +37,7 @@ public class InputPanel extends JPanel {
 		JLabel albumLabel = new JLabel("Album: ");
 		albumLabel.setFont(paramLabelFont);
 		albumLabel.setAlignmentX(RIGHT_ALIGNMENT);
-		JLabel directoryLabel = new JLabel("     Download Location: ");
+		JLabel directoryLabel = new JLabel("        Download Location: ");
 		directoryLabel.setFont(paramLabelFont);
 		directoryLabel.setAlignmentX(RIGHT_ALIGNMENT);
 		

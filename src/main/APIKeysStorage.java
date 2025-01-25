@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -112,7 +113,7 @@ public class APIKeysStorage {
 			
 		} else {
 			
-			new SetAPIKeysDialog("<html>The <b>Spotify API Client ID and Secret</b> were not found. These are required to download Spotify links."
+			new SetAPIKeysDialog("<html>The <b>Spotify API Client ID and Secret</b> were not found or invalid. <b><u>These are required to download Spotify links.</b></u>"
 					+ "<br></br>For more information on how to get the client ID and secret, please go to "
 					+ "<br></br><a href=\"https://developer.spotify.com/documentation/web-api/tutorials/getting-started\">https://developer.spotify.com/documentation/web-api/tutorials/getting-started</a>.</html>")
 			.setVisible(true);
@@ -143,12 +144,14 @@ public class APIKeysStorage {
 		private JTextField secretTextField;
 		
 		public SetAPIKeysDialog(String message) {
-			
+						
 			super(StaccatoWindow.mainWindow, true);
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setTitle("Set Spotify API Keys");
 			setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 			setResizable(false);
+			
+			String[] apiKeys = getIDandSecret();
 			
 			JPanel messagePanel = new JPanel();
 			messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.X_AXIS));
@@ -174,6 +177,13 @@ public class APIKeysStorage {
 			secretPanel.add(secretTextField);
 			secretPanel.add(Box.createHorizontalStrut(15));
 			
+			if(apiKeys != null) {
+				
+				idTextField.setText(apiKeys[0]);
+				secretTextField.setText(apiKeys[1]);
+				
+			}
+			
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 			buttonPanel.add(Box.createHorizontalStrut(15));
@@ -184,13 +194,22 @@ public class APIKeysStorage {
 				dispose();
 				
 			});
+			submitButton.setBackground(new Color(0x80005d));
+			submitButton.setBorderPainted(false);
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.addActionListener((e) -> {
 				
-				setIDandSecret("", ""); //This is to prevent staccato from asking again
+				if(apiKeys == null) {
+					
+					setIDandSecret("", "");
+					
+				}
+				
 				dispose();
 				
 			});
+			cancelButton.setBackground(new Color(0x80005d));
+			cancelButton.setBorderPainted(false);
 			buttonPanel.add(submitButton);
 			buttonPanel.add(Box.createHorizontalStrut(8));
 			buttonPanel.add(cancelButton);

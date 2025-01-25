@@ -15,10 +15,16 @@ import com.neovisionaries.i18n.CountryCode;
 
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.exceptions.detailed.BadRequestException;
+import se.michaelthelin.spotify.exceptions.detailed.NotFoundException;
+import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
+import se.michaelthelin.spotify.requests.data.AbstractDataRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequest;
@@ -32,18 +38,40 @@ public abstract class MusicFetcher {
 	 */
 	public static StaccatoTrack[] convertSpotifyData(String url) {
 		
+		if(!url.contains("spotify.com")) {
+			
+			BottomPanel.setGUIErrorStatus("This URL " + url + " is not a Spotify link (this message should never appear since we check beforehand)");
+			return null;
+			
+		}
+		
 		Track[] tracks;
 		if(url.contains("/track/")) {
 			
-			tracks = new Track[] {getSpotifyTrack(url)};
-			
+			Track singleTrack = getSpotifyTrack(extractSpotifyIDFromURL(url));
+			if(singleTrack == null) {
+				
+				tracks = null;
+				
+			} else {
+				
+				tracks = new Track[] {singleTrack};
+				
+			}
+						
 		} else if(url.contains("/playlist/")) {
 			
-			tracks = getSpotifyPlaylist(url);
+			tracks = getSpotifyPlaylist(extractSpotifyIDFromURL(url));
 			
 		} else {
 			
 			BottomPanel.setGUIErrorStatus("Only Spotify songs and playlists are supported");
+			return null;
+			
+		}
+		
+		if(tracks == null) {
+			
 			return null;
 			
 		}
@@ -55,7 +83,7 @@ public abstract class MusicFetcher {
 			artistsStr = "";
 			for(int a = 0; a < tracks[i].getArtists().length; a++) {
 				
-				artistsStr += tracks[i].getName() + " ";
+				artistsStr += tracks[i].getArtists()[a].getName() + " ";
 				
 			}
 			
@@ -70,61 +98,37 @@ public abstract class MusicFetcher {
 	
 	public static String getAlbumCoverURL(String albumTitle, String artists) {
 		
-		String[] apiKeys = APIKeysStorage.getIDandSecret();
-		if(apiKeys == null) {
+		SpotifyApi spotifyApi = getSpotifyAPI();
+		
+		SearchAlbumsRequest request = spotifyApi.searchAlbums(albumTitle + " " + artists).market(CountryCode.US).build();
+		Paging<AlbumSimplified> data = getDataWithSpotifyAPIRequest(request, "getAlbumCoverURL");
+		
+		if(data == null) {
 			
 			return null;
 			
-		}
-		
-		String clientID = apiKeys[0];
-		String clientSecret = apiKeys[1];
-		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
-		
-		SearchAlbumsRequest request = spotifyApi.searchAlbums(albumTitle + " " + artists).market(CountryCode.US).build();
-		try {
+		} else {
 			
-			AlbumSimplified[] albums = request.execute().getItems();
-			return albums[0].getImages()[0].getUrl();
-			
-		} catch (ParseException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Parse Exception (getAlbumCoverURL): " + e.getMessage());
-			
-		} catch (SpotifyWebApiException e) {
-
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Spotify API Exception (getAlbumCoverURL): " + e.getMessage());
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("IO Exception (getAlbumCoverURL): " + e.getMessage());
+			return data.getItems()[0].getImages()[0].getUrl();
 			
 		}
-		
-		return null;
 		
 	}
 	
-	private static Track[] getSpotifyPlaylist(String url) {
+	private static Track[] getSpotifyPlaylist(String id) {
 		
-		String[] apiKeys = APIKeysStorage.getIDandSecret();
-		if(apiKeys == null) {
+		SpotifyApi spotifyApi = getSpotifyAPI();
+		
+		GetPlaylistsItemsRequest request = spotifyApi.getPlaylistsItems(id).market(CountryCode.US).build();
+		Paging<PlaylistTrack> data = getDataWithSpotifyAPIRequest(request, "getSpotifyPlaylist");
+		
+		if(data == null) {
 			
 			return null;
 			
-		}
-		
-		String clientID = apiKeys[0];
-		String clientSecret = apiKeys[1];
-		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
-		
-		GetPlaylistsItemsRequest request = spotifyApi.getPlaylistsItems(url).market(CountryCode.US).build();
-		try {
+		} else {
 			
-			PlaylistTrack[] playlistItems = request.execute().getItems();
+			PlaylistTrack[] playlistItems = data.getItems();
 			Track[] tracks = new Track[playlistItems.length];
 			for(int i = 0; i < playlistItems.length; i++) {
 				
@@ -133,104 +137,36 @@ public abstract class MusicFetcher {
 			}
 			return tracks;
 			
-		} catch (ParseException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Parse Exception (getSpotifyPlaylist): " + e.getMessage());
-			
-		} catch (SpotifyWebApiException e) {
-
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Spotify API Exception (getSpotifyPlaylist): " + e.getMessage());
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("IO Exception (getSpotifyPlaylist): " + e.getMessage());
-			
 		}
+				
+	}
+	
+	private static Track getSpotifyTrack(String id) {
 		
-		return null;
+		SpotifyApi spotifyApi = getSpotifyAPI();
+
+		GetTrackRequest request = spotifyApi.getTrack(id).market(CountryCode.US).build();
+		
+		return getDataWithSpotifyAPIRequest(request, "getSpotifyTrack");
 		
 	}
 	
-	private static Track getSpotifyTrack(String url) {
+	public static String getSpotifyPlaylistName(String id) {
 		
-		String[] apiKeys = APIKeysStorage.getIDandSecret();
-		if(apiKeys == null) {
-			
-			return null;
-			
-		}
-		
-		String clientID = apiKeys[0];
-		String clientSecret = apiKeys[1];
-		
-		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
-		GetTrackRequest request = spotifyApi.getTrack(url).market(CountryCode.US).build();
-		try {
-			
-			Track track = request.execute();
-			return track;
-			
-		} catch (ParseException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Parse Exception (getSpotifyTrack): " + e.getMessage());
-			
-		} catch (SpotifyWebApiException e) {
+		SpotifyApi spotifyApi = getSpotifyAPI();
 
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Spotify API Exception (getSpotifyTrack): " + e.getMessage());
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("IO Exception (getSpotifyTrack): " + e.getMessage());
-			
-		}
+		GetPlaylistRequest request = spotifyApi.getPlaylist(id).market(CountryCode.US).build();
+		Playlist playlist = getDataWithSpotifyAPIRequest(request, "getSpotifyPlaylistName");
 		
-		return null;
-		
-	}
-	
-	public static String getSpotifyPlaylistName(String url) {
-		
-		String[] apiKeys = APIKeysStorage.getIDandSecret();
-		if(apiKeys == null) {
+		if(playlist == null) {
 			
 			return null;
 			
-		}
-		
-		String clientID = apiKeys[0];
-		String clientSecret = apiKeys[1];
-		
-		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
-		GetPlaylistRequest request = spotifyApi.getPlaylist(url).market(CountryCode.US).build();
-		try {
+		} else {
 			
-			Playlist playlist = request.execute();
 			return playlist.getName();
 			
-		} catch (ParseException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Parse Exception (getSpotifyTrack): " + e.getMessage());
-			
-		} catch (SpotifyWebApiException e) {
-
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Spotify API Exception (getSpotifyTrack): " + e.getMessage());
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("IO Exception (getSpotifyTrack): " + e.getMessage());
-			
 		}
-		
-		return null;
 		
 	}
 	
@@ -417,6 +353,127 @@ public abstract class MusicFetcher {
 		
 	}
 	
+	private static SpotifyApi getSpotifyAPI() {
+		
+		String[] apiKeys = APIKeysStorage.getIDandSecret();
+		if(apiKeys == null) {
+			
+			return null;
+			
+		}
+		
+		String clientID = apiKeys[0];
+		String clientSecret = apiKeys[1];
+		System.out.println(clientID + " " + clientSecret);
+		SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(clientID).setClientSecret(clientSecret).build();
+		ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
+		try {
+			
+			ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+			spotifyApi.setAccessToken(clientCredentials.getAccessToken());
+			return spotifyApi;
+			
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Parse Exception (getSpotifyAPI): " + e.getMessage());
+			
+		} catch(BadRequestException e) {
+						
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + "(getSpotifyAPI): " + "The provided Spotify API client ID and secret may be invalid");
+			APIKeysStorage.openSetAPIKeysDialog(true);
+			
+		} catch (SpotifyWebApiException e) {
+
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + "(getSpotifyAPI): " + e.getMessage());
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("IO Exception (getSpotifyAPI): " + e.getMessage());
+			
+		}
+		
+		return null;
+		
+	}
+	
+	private static <T> T getDataWithSpotifyAPIRequest(AbstractDataRequest<T> request, String methodName) {
+		
+		try {
+			
+			T data = request.execute();
+			return data;
+			
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Parse Exception (" + methodName + "): " + e.getMessage());
+			
+		} catch(BadRequestException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + "(" + methodName + "): " + "The provided Spotify API client ID and secret may be invalid");
+			APIKeysStorage.openSetAPIKeysDialog(true);
+			
+		} catch(NotFoundException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Spotify track/playlist not found");
+			
+		} catch (SpotifyWebApiException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + "(" + methodName + "): " + e.getMessage());
+			
+		}  catch (IOException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("IO Exception (" + methodName + "): " + e.getMessage());
+			
+		}
+		
+		return null;
+		
+	}
+	
+	private static String extractSpotifyIDFromURL(String url) {
+		
+		//https://open.spotify.com/track/50a8bKqlwDEqeiEknrzkTO?si=7d803f686f0c4175
+		//https://open.spotify.com/playlist/1zUUwGZh02drh2M13yNcVD?si=9e646c914f5843d6
+		int idBeginIndex = url.indexOf("/track/");
+		if(idBeginIndex == -1) {
+			
+			idBeginIndex = url.indexOf("/playlist/");
+			if(idBeginIndex == -1) {
+				
+				return null;
+				
+			}
+			
+			idBeginIndex += "/playlist/".length();
+			
+		} else {
+			
+			idBeginIndex += "/track/".length();
+			
+		}
+		
+		int questionMarkIndex = url.indexOf("?");
+		if(questionMarkIndex == -1) {
+			
+			return url.substring(idBeginIndex);
+			
+		} else {
+			
+			return url.substring(idBeginIndex, questionMarkIndex);
+			
+		}
+		
+	}
+	
 	public static void main(String[] args) {
 		
 //		File jsonDir = new File("D:\\TESTING FOR STACCATO");
@@ -426,6 +483,12 @@ public abstract class MusicFetcher {
 //			System.out.println(i + ": " + jsonFiles[i].getName());
 //			
 //		}
+//		
+//		System.out.println(extractSpotifyIDFromURL("https://open.spotify.com/track/50a8bKqlwDEqeiEknrzkTO"));
+//		System.out.println(extractSpotifyIDFromURL("https://open.spotify.com/playlist/1zUUwGZh02drh2M13yNcVD"));
+//		System.out.println(extractSpotifyIDFromURL("https://open.spotify.com/track/3ruoIF2UnoXdzK8mR61ebq?si=65c4f9f7b10a4973"));
+		
+//		getSpotifyAPI();
 		
 		StaccatoWindow.main(args);
 		

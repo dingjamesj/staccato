@@ -42,7 +42,18 @@ public class BottomPanel extends JPanel {
 			Thread downloadThread = new Thread(() -> {
 				
 				parentWindow.setIsDownloading(true);
-				downloadAction();
+				
+				try {
+					
+					downloadAction();
+					
+				} catch (Exception e) {
+					
+					e.printStackTrace();
+					setGUIErrorStatus(e.getClass().getSimpleName() + ": " + e.getMessage());
+					
+				}
+				
 				parentWindow.setIsDownloading(false);
 				
 			});
@@ -56,16 +67,16 @@ public class BottomPanel extends JPanel {
 		statusLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		progressBar = new JProgressBar();
-		progressBar.setAlignmentX(CENTER_ALIGNMENT);
 		progressBar.setForeground(new Color(0x80005d));
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(100);
 		progressBar.putClientProperty("JProgressBar.largeHeight", true);
+		progressBar.setAlignmentX(CENTER_ALIGNMENT);
 		
 		infoLabel = new JLabel("<html><div style='text-align: center;'>100-song limit for Spotify Playlists<br></br>"
 				+ "Title, artist, and album fields are only for single audio downloads</div></html>");
-		infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		infoLabel.setFont(infoFont);
+		infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		infoLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		add(downloadButton);
@@ -95,7 +106,7 @@ public class BottomPanel extends JPanel {
 		String title = InputPanel.getInputTitle();
 		String artist = InputPanel.getInputArtist();
 		String album = InputPanel.getInputAlbum();
-		String dir = InputPanel.getInputAlbum();
+		String dir = InputPanel.getInputDirectory();
 		
 		if(url.isBlank()) {
 			
@@ -112,6 +123,10 @@ public class BottomPanel extends JPanel {
 		} else if(url.contains("spotify.com")) {
 			
 			downloadSpotifyAction(url, dir);
+			
+		} else {
+			
+			BottomPanel.setGUIErrorStatus("Only YouTube and Spotify links are supported");
 			
 		}
 		
@@ -136,6 +151,11 @@ public class BottomPanel extends JPanel {
 	private static void downloadSpotifyAction(String url, String dir) {
 		
 		StaccatoTrack[] data = MusicFetcher.convertSpotifyData(url);
+		if(data == null) {
+			
+			return;
+			
+		}
 		
 		if(data.length > 1) {
 			

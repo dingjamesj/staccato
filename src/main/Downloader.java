@@ -32,7 +32,7 @@ public abstract class Downloader {
 		File dir = new File(dirStr);
 		if(!dir.exists()) {
 			
-			BottomPanel.setGUIErrorStatus("Directory does not exist");
+			BottomPanel.setGUIErrorStatus("Directory \"" + dirStr + "\" does not exist");
 			return null;
 			
 		}
