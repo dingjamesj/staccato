@@ -40,4 +40,4 @@ buildNumber.properties
 # Local Files
 /staccatoapikeys.dat
 *.mp3
-/temp/
+temp/
