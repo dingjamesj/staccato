@@ -439,10 +439,11 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	private static String extractSpotifyIDFromURL(String url) {
+	public static String extractSpotifyIDFromURL(String url) {
 		
 		//https://open.spotify.com/track/50a8bKqlwDEqeiEknrzkTO?si=7d803f686f0c4175
 		//https://open.spotify.com/playlist/1zUUwGZh02drh2M13yNcVD?si=9e646c914f5843d6
+		
 		int idBeginIndex = url.indexOf("/track/");
 		if(idBeginIndex == -1) {
 			
@@ -461,7 +462,41 @@ public abstract class MusicFetcher {
 			
 		}
 		
-		int questionMarkIndex = url.indexOf("?");
+		int questionMarkIndex = url.indexOf('?');
+		if(questionMarkIndex == -1) {
+			
+			return url.substring(idBeginIndex);
+			
+		} else {
+			
+			return url.substring(idBeginIndex, questionMarkIndex);
+			
+		}
+		
+	}
+	
+	public static String extractYouTubeIDFromURL(String url) {
+		
+		//https://youtu.be/tfSS1e3kYeo?si=v4rcNgiHwUIQV5J6
+		//https://www.youtube.com/watch?v=tfSS1e3kYeo
+		//https://youtu.be/tfSS1e3kYeo?si=v4rcNgiHwUIQV5J6&t=2
+		
+		int idBeginIndex;
+		if(url.contains("youtu.be/")) {
+			
+			idBeginIndex = url.indexOf("youtu.be/") + "youtu.be/".length();
+			
+		} else if(url.contains("youtube.com/watch?v=")) {
+			
+			idBeginIndex = url.indexOf("youtube.com/watch?v=") + "youtube.com/watch?v=".length();
+			
+		} else {
+			
+			return null;
+			
+		}
+		
+		int questionMarkIndex = url.indexOf('?', idBeginIndex);
 		if(questionMarkIndex == -1) {
 			
 			return url.substring(idBeginIndex);

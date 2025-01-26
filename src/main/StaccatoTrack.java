@@ -1,14 +1,17 @@
 package main;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.ArtworkFactory;
 
 public class StaccatoTrack {
 
@@ -127,31 +130,59 @@ public class StaccatoTrack {
 	
 	public void writeID3Tags() {
 		
+		if(!fileExists()) {
+			
+			BottomPanel.setGUIErrorStatus("File does not exist at \"" + fileLocation + "\" (writeID3Tags, THIS SHOULD NOT HAPPEN)");
+			return;
+			
+		}
+		
 		try {
 			
 			AudioFile audioFile = AudioFileIO.read(new File(fileLocation));
+			Tag tag = audioFile.getTag();
 			
-		} catch (CannotReadException e) {
+			Artwork coverImage = null;
+			try {
+			
+				URL url = new URI(coverImageURL).toURL();
+				ByteArrayOutputStream coverImageURLByteArrayStream = new ByteArrayOutputStream();
+				url.openStream().transferTo(coverImageURLByteArrayStream);
+				coverImageURLByteArrayStream.toByteArray();
+				coverImage = ArtworkFactory.getNew();
+				coverImage.setBinaryData(coverImageURLByteArrayStream.toByteArray());
+				coverImageURLByteArrayStream.close();
+				
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+				BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + " (writeID3Tags): " + e.getMessage());
+				
+			}
+			
+			tag.setField(FieldKey.TITLE, title);
+			tag.setField(FieldKey.ARTIST, artist);
+			tag.setField(FieldKey.ALBUM, album);
+			if(coverImage != null) {
+				
+				tag.setField(coverImage);
+				
+			}
+			
+			audioFile.commit();
+			
+		} catch (Exception e) {
 			
 			e.printStackTrace();
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			
-		} catch (TagException e) {
-			
-			e.printStackTrace();
-			
-		} catch (ReadOnlyFileException e) {
-			
-			e.printStackTrace();
-			
-		} catch (InvalidAudioFrameException e) {
-			
-			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + " (writeID3Tags): " + e.getMessage());
 			
 		}
+		
+	}
+	
+	public boolean fileExists() {
+		
+		return fileLocation == null || new File(fileLocation).exists();
 		
 	}
 	
@@ -185,6 +216,12 @@ public class StaccatoTrack {
 		}
 		
 		return count;
+		
+	}
+	
+	public static void main(String[] args) {
+		
+		BottomPanel.main(args);
 		
 	}
 	

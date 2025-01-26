@@ -1,7 +1,6 @@
 package main;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -58,19 +57,19 @@ public abstract class Installer {
 			
 			if(e.getMessage().contains("cannot run program \"yt-dlp\"")) {
 				
-				BottomPanel.setGUIErrorStatus("yt-dlp is not installed");
+				BottomPanel.setGUIErrorStatus("yt-dlp is not installed (updateSoftware)");
 				return -2;
 				
 			} else {
 				
-				BottomPanel.setGUIErrorStatus("IOException: " + e.getMessage());
+				BottomPanel.setGUIErrorStatus("IOException (updateSoftware): " + e.getMessage());
 				return -1;
 				
 			}
 			
 		} catch(InterruptedException e) {
 			
-			BottomPanel.setGUIErrorStatus("Download process was interrupted");
+			BottomPanel.setGUIErrorStatus("Download process was interrupted (updateSoftware)");
 			e.printStackTrace();
 			return -3;
 			
@@ -211,13 +210,13 @@ public abstract class Installer {
 			
 		} catch (IOException e) {
 
-			BottomPanel.setGUIErrorStatus("IO Error: " + e.getMessage());
+			BottomPanel.setGUIErrorStatus("IO Error (installSoftware): " + e.getMessage());
 			e.printStackTrace();
 			return -1;
 			
 		} catch (InterruptedException e) {
 			
-			BottomPanel.setGUIErrorStatus("Installation was interrupted");
+			BottomPanel.setGUIErrorStatus("Installation was interrupted (installSoftware)");
 			e.printStackTrace();
 			return -2;
 			
@@ -255,13 +254,13 @@ public abstract class Installer {
 			
 		} catch (IOException e) {
 
-			BottomPanel.setGUIErrorStatus("IO Error: " + e.getMessage());
+			BottomPanel.setGUIErrorStatus("IO Error (uninstallSoftware): " + e.getMessage());
 			e.printStackTrace();
 			return -1;
 			
 		} catch (InterruptedException e) {
 			
-			BottomPanel.setGUIErrorStatus("Installation was interrupted");
+			BottomPanel.setGUIErrorStatus("Installation was interrupted (uninstallSoftware)");
 			e.printStackTrace();
 			return -2;
 			

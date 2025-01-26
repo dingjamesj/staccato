@@ -3,7 +3,6 @@ package main;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -12,13 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
-
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
@@ -111,11 +103,6 @@ public class BottomPanel extends JPanel {
 		}
 		
 		String url = InputPanel.getInputURL();
-		//-----We only use these for YouTube downloads-----
-		String title = InputPanel.getInputTitle();
-		String artist = InputPanel.getInputArtist();
-		String album = InputPanel.getInputAlbum();
-		//-------------------------------------------------
 		String dir = InputPanel.getInputDirectory();
 		
 		if(url.isBlank()) {
@@ -125,10 +112,9 @@ public class BottomPanel extends JPanel {
 			
 		}
 		
-		if(url.contains("youtube.com")) {
+		if(url.contains("youtube.com") || url.contains("youtu.be")) {
 			
-			downloadYouTubeAction(url, dir, title + " " + artist);
-			//Now we need to find the file in the directory. Note that the file will be in the format of "[title] [artist] [video id].mp3"
+			downloadYouTubeAction(url, dir);
 			
 		} else if(url.contains("spotify.com")) {
 			
@@ -142,7 +128,11 @@ public class BottomPanel extends JPanel {
 		
 	}
 	
-	private static void downloadYouTubeAction(String url, String dir, String fileName) {
+	private static void downloadYouTubeAction(String url, String dir) {
+		
+		String title = InputPanel.getInputTitle();
+		String artist = InputPanel.getInputArtist();
+		String album = InputPanel.getInputAlbum();
 		
 		boolean isPlaylist = false;
 		
@@ -152,7 +142,13 @@ public class BottomPanel extends JPanel {
 			
 		} else {
 			
-//			Downloader.download(url, dir, fileName);
+			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.getAlbumCoverURL(album, artist), MusicFetcher.extractYouTubeIDFromURL(url));
+			data.download(dir);
+			if(data.fileExists()) {
+				
+				data.writeID3Tags();
+				
+			}
 			
 		}
 		
@@ -192,6 +188,11 @@ public class BottomPanel extends JPanel {
 		for(int i = 0; i < data.length; i++) {
 			
 			data[i].download(dir);
+			if(data[i].fileExists()) {
+				
+				data[i].writeID3Tags();
+				
+			}
 			
 		}
 		
@@ -291,8 +292,8 @@ public class BottomPanel extends JPanel {
 	
 	public static void main(String[] args) {
 		
-		downloadSpotifyAction("https://open.spotify.com/track/74X2u8JMVooG2QbjRxXwR8?si=6c3ea48d93974722", "D:/");
-//		StaccatoWindow.main(args);
+//		downloadSpotifyAction("https://open.spotify.com/track/74X2u8JMVooG2QbjRxXwR8?si=6c3ea48d93974722", "D:/");
+		StaccatoWindow.main(args);
 		
 	}
 	
