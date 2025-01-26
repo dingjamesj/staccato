@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 
-public class APIKeysStorage {
+public abstract class APIKeysStorage {
 
 	/**
 	 * @return An array that contains the Spotify Client ID and the secret, in that order

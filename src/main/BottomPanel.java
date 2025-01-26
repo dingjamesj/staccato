@@ -3,6 +3,7 @@ package main;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -11,6 +12,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
@@ -95,7 +103,7 @@ public class BottomPanel extends JPanel {
 	
 	private void downloadAction() {
 		
-		if(!Downloader.checkSoftwareInstalled("yt-dlp") || !Downloader.checkSoftwareInstalled("ffmpeg")) {
+		if(!Installer.checkSoftwareInstalled("yt-dlp") || !Installer.checkSoftwareInstalled("ffmpeg")) {
 			
 			parentWindow.createPopup("Restart staccato", "Please restart staccato to complete the installation.", new FlatOptionPaneWarningIcon());
 			return;
@@ -103,9 +111,11 @@ public class BottomPanel extends JPanel {
 		}
 		
 		String url = InputPanel.getInputURL();
+		//-----We only use these for YouTube downloads-----
 		String title = InputPanel.getInputTitle();
 		String artist = InputPanel.getInputArtist();
 		String album = InputPanel.getInputAlbum();
+		//-------------------------------------------------
 		String dir = InputPanel.getInputDirectory();
 		
 		if(url.isBlank()) {
@@ -142,7 +152,7 @@ public class BottomPanel extends JPanel {
 			
 		} else {
 			
-			Downloader.download(url, dir, fileName);
+//			Downloader.download(url, dir, fileName);
 			
 		}
 		
@@ -162,7 +172,7 @@ public class BottomPanel extends JPanel {
 			String playlistName = MusicFetcher.getSpotifyPlaylistName(url);
 			File playlistFolder;
 			
-			int uniqueNumber = Downloader.countRepeatedFileNames(dir, playlistName);
+			int uniqueNumber = StaccatoTrack.countRepeatedFileNames(dir, playlistName);
 			if(uniqueNumber > 0) {
 				
 				playlistFolder = new File(dir + "\\" + playlistName + " (" + uniqueNumber + ")");
@@ -179,10 +189,9 @@ public class BottomPanel extends JPanel {
 			
 		}
 		
-		String downloadLocationStr;
 		for(int i = 0; i < data.length; i++) {
 			
-			downloadLocationStr = Downloader.download("https://www.youtube.com/watch?v=" + data[i].getYouTubeID(), dir, data[i].getTitle() + " " + data[i].getArtist() + " " + data[i].getYouTubeID());
+			data[i].download(dir);
 			
 		}
 		

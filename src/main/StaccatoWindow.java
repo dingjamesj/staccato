@@ -154,8 +154,8 @@ public class StaccatoWindow extends JFrame {
 			
 			Thread loadingThread = new Thread(() -> {
 				
-				boolean ytdlpInstalled = Downloader.checkSoftwareInstalled("yt-dlp");
-				boolean ffmpegInstalled = Downloader.checkSoftwareInstalled("ffmpeg");
+				boolean ytdlpInstalled = Installer.checkSoftwareInstalled("yt-dlp");
+				boolean ffmpegInstalled = Installer.checkSoftwareInstalled("ffmpeg");
 				if(!ytdlpInstalled || !ffmpegInstalled) {
 					
 					gui.createMissingSoftwarePopup(ytdlpInstalled, ffmpegInstalled);
@@ -165,7 +165,7 @@ public class StaccatoWindow extends JFrame {
 					gui.init();
 					
 					gui.setIsDownloading(true);
-					Downloader.updateSoftware();
+					Installer.updateSoftware();
 					gui.setIsDownloading(false);
 					
 				}
@@ -251,11 +251,6 @@ public class StaccatoWindow extends JFrame {
 
 		public InstallationDialog(StaccatoWindow parent, String missingSoftwareList) {
 			
-			/*
-			JOptionPane.showConfirmDialog(this, missingSoftwareList + toBeConjugation + " missing. These programs are required for staccato to function.\nAllow staccato to install " + missingSoftwareList + "?", "Error: Missing Software", JOptionPane.YES_NO_OPTION);
-			 * 
-			 */
-			
 			super(parent, true);
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setTitle("Error: Missing Software");
@@ -294,7 +289,7 @@ public class StaccatoWindow extends JFrame {
 					
 					try {
 						
-						Downloader.installSoftware();
+						Installer.installSoftware();
 						
 					} catch (Exception exception) {
 						

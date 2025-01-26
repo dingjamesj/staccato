@@ -16,7 +16,6 @@
     </plugins>
   </build>
   <dependencies>
- 	<!-- https://mvnrepository.com/artifact/com.formdev/flatlaf -->
 	<dependency>
 	    <groupId>com.formdev</groupId>
 	    <artifactId>flatlaf</artifactId>
@@ -31,6 +30,11 @@
   		<groupId>se.michaelthelin.spotify</groupId>
   		<artifactId>spotify-web-api-java</artifactId>
   		<version>9.1.1</version>
+	</dependency>
+	<dependency>
+    	<groupId>net.jthink</groupId>
+    	<artifactId>jaudiotagger</artifactId>
+    	<version>3.0.1</version>
 	</dependency>
   </dependencies>
 </project>

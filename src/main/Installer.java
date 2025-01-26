@@ -8,76 +8,7 @@ import java.io.InputStreamReader;
 import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
-public abstract class Downloader {
-		
-	/**
-	 * Downloads an mp3 given a YouTube URL.
-	 * 
-	 * @param url YouTube video URL
-	 * @param dir Directory to put the mp3
-	 * @return The directory of where the file is located
-	 */
-	public static String download(String url, String dirStr, String fileName) {
-		
-		//This is the (number) at the end of a file (for example, "FileName (1).mp3")
-		int uniqueNumber = countRepeatedFileNames(dirStr, fileName);
-		
-		String[] command = {"yt-dlp", 
-				"--audio-format", "mp3", 
-				"-o", "\"" + fileName + " (" + uniqueNumber + ").%(ext)s\"",
-				"--extract-audio",
-				"--no-playlist",
-				"\"" + url + "\""};
-		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		File dir = new File(dirStr);
-		if(!dir.exists()) {
-			
-			BottomPanel.setGUIErrorStatus("Directory \"" + dirStr + "\" does not exist");
-			return null;
-			
-		}
-		
-		processBuilder.directory(dir);
-		processBuilder.inheritIO();
-		try {
-			
-			Process downloadProcess = processBuilder.start();
-			downloadProcess.waitFor();
-			if(uniqueNumber > 0) {
-				
-				return dirStr + "\\" + fileName + " (" + uniqueNumber + ").mp3";
-				
-			} else {
-				
-				return dirStr + "\\" + fileName + ".mp3";
-				
-			}
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			String message = e.getMessage();
-			
-			if(message.toLowerCase().contains("cannot run program \"yt-dlp\"")) {
-				
-				BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
-				e.printStackTrace();
-				return null;
-				
-			}
-			
-			BottomPanel.setGUIErrorStatus("IO Error: " + message);
-			
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Download was interrupted");
-			
-		}
-		
-		return null;
-		
-	}
+public abstract class Installer {
 
 	/**
 	 * 
@@ -341,40 +272,11 @@ public abstract class Downloader {
 		
 	}
 	
-	public static int countRepeatedFileNames(String dirStr, String fileName) {
-		
-		File dir = new File(dirStr);
-		if(!dir.exists()) {
-			
-			BottomPanel.setGUIErrorStatus("Directory " + dirStr + " does not exist (countRepeatedFileNames)");
-			return -1;
-			
-		}
-		
-		int count = 0;
-		int fileNameLength = fileName.length();
-		String[] fileNameStrs = dir.list();
-		for(String fileNameStr: fileNameStrs) {
-			
-			if(fileNameStr.length() < fileNameLength) {
-				
-				continue;
-				
-			}
-			
-			if(fileNameStr.substring(0, fileNameLength).equals(fileName)) {
-				
-				count++;
-				
-			}
-			
-		}
-		
-		return count;
-		
-	}
-	
 	public static void main(String[] args) {
+		
+//		File dir = new File("");
+//		System.out.println(dir.exists());
+//		System.out.println(dir.getPath());
 		
 		StaccatoWindow.main(args);
 		
