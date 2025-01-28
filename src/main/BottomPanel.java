@@ -133,12 +133,26 @@ public class BottomPanel extends JPanel {
 		String title = InputPanel.getInputTitle();
 		String artist = InputPanel.getInputArtist();
 		String album = InputPanel.getInputAlbum();
-		
-		boolean isPlaylist = false;
-		
-		if(isPlaylist) {
+				
+		if(url.contains("/playlist")) {
 			
-			//Do something else if it's a playlist
+			String playlistName = MusicFetcher.getYouTubePlaylistName(url);
+			File playlistFolder;
+			
+			int uniqueNumber = StaccatoTrack.countRepeatedFileNames(dir, playlistName);
+			if(uniqueNumber > 0) {
+				
+				playlistFolder = new File(dir + "\\" + playlistName + " (" + uniqueNumber + ")");
+				dir += "\\" + playlistName + " (" + uniqueNumber + ")";
+				
+			} else {
+				
+				playlistFolder = new File(dir + "\\" + playlistName);
+				dir += "\\" + playlistName;
+				
+			}
+
+			playlistFolder.mkdir();
 			
 		} else {
 			

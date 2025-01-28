@@ -1,9 +1,11 @@
 package main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 import org.apache.hc.core5.http.ParseException;
@@ -99,6 +101,11 @@ public abstract class MusicFetcher {
 	public static String getAlbumCoverURL(String albumTitle, String artists) {
 		
 		SpotifyApi spotifyApi = getSpotifyAPI();
+		if(spotifyApi == null) {
+			
+			return null;
+			
+		}
 		
 		SearchAlbumsRequest request = spotifyApi.searchAlbums(albumTitle + " " + artists).market(CountryCode.US).build();
 		Paging<AlbumSimplified> data = getDataWithSpotifyAPIRequest(request, "getAlbumCoverURL");
@@ -118,6 +125,11 @@ public abstract class MusicFetcher {
 	private static Track[] getSpotifyPlaylist(String id) {
 		
 		SpotifyApi spotifyApi = getSpotifyAPI();
+		if(spotifyApi == null) {
+			
+			return null;
+			
+		}
 		
 		GetPlaylistsItemsRequest request = spotifyApi.getPlaylistsItems(id).market(CountryCode.US).build();
 		Paging<PlaylistTrack> data = getDataWithSpotifyAPIRequest(request, "getSpotifyPlaylist");
@@ -144,7 +156,12 @@ public abstract class MusicFetcher {
 	private static Track getSpotifyTrack(String id) {
 		
 		SpotifyApi spotifyApi = getSpotifyAPI();
-
+		if(spotifyApi == null) {
+			
+			return null;
+			
+		}
+		
 		GetTrackRequest request = spotifyApi.getTrack(id).market(CountryCode.US).build();
 		
 		return getDataWithSpotifyAPIRequest(request, "getSpotifyTrack");
@@ -154,7 +171,12 @@ public abstract class MusicFetcher {
 	public static String getSpotifyPlaylistName(String id) {
 		
 		SpotifyApi spotifyApi = getSpotifyAPI();
-
+		if(spotifyApi == null) {
+			
+			return null;
+			
+		}
+		
 		GetPlaylistRequest request = spotifyApi.getPlaylist(id).market(CountryCode.US).build();
 		Playlist playlist = getDataWithSpotifyAPIRequest(request, "getSpotifyPlaylistName");
 		
@@ -177,7 +199,13 @@ public abstract class MusicFetcher {
 	 */
 	private static String searchYouTube(String title, String artist, int numResults) {
 		
-		String[] command = {"yt-dlp", "--write-info-json", "--skip-download", "--no-write-playlist-metafiles", "\"ytsearch" + numResults + ":" + title + " " + artist + "\""};
+		String[] command = {
+				"yt-dlp", 
+				"--write-info-json",
+				"--skip-download", 
+				"--no-write-playlist-metafiles", 
+				"\"ytsearch" + numResults + ":" + title + " " + artist + "\""
+				};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		File jsonDir = new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR);
 		jsonDir.mkdir();
@@ -277,6 +305,66 @@ public abstract class MusicFetcher {
 		
 	}
 	
+	public static String getYouTubePlaylistName(String url) {
+		
+		String[] command = {
+				"yt-dlp", 
+				"--skip-download",
+				"--no-warning",
+				"-I",
+				"1:1",
+				"--print",
+				"playlist_title",
+				"\"" + url + "\""
+				};
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		processBuilder.inheritIO();
+		
+		try {
+			
+			Process playlistNameGetterProcess = processBuilder.start();
+			BufferedReader processOutput = new BufferedReader(new InputStreamReader(playlistNameGetterProcess.getInputStream()));
+			String output = "";
+			String buffer = "";
+			while(buffer != null) {
+				
+				buffer = processOutput.readLine();
+				if(buffer != null) {
+					
+					output = buffer;
+					
+				}
+				
+			}
+			playlistNameGetterProcess.waitFor();
+			
+			return output;
+			
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			
+			if(e.getMessage().contains("cannot run program \"yt-dlp\"")) {
+				
+				BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
+				
+			} else {
+				
+				BottomPanel.setGUIErrorStatus("IOException (updateSoftware): " + e.getMessage());
+				
+			}
+			
+		} catch(InterruptedException e) {
+			
+			e.printStackTrace();
+			BottomPanel.setGUIErrorStatus("Download process was interrupted (updateSoftware)");
+			
+		}
+		
+		return null;
+		
+	}
+	
 	@SuppressWarnings("rawtypes")
 	private static int calculateVideoScore(Map videoData, int videoIndex, String targetTitle, String targetArtist) {
 		
@@ -358,6 +446,7 @@ public abstract class MusicFetcher {
 		String[] apiKeys = APIKeysStorage.getIDandSecret();
 		if(apiKeys == null) {
 			
+			APIKeysStorage.openSetAPIKeysDialog(true);
 			return null;
 			
 		}
@@ -381,7 +470,7 @@ public abstract class MusicFetcher {
 		} catch(BadRequestException e) {
 						
 			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + "(getSpotifyAPI): " + "The provided Spotify API client ID and secret may be invalid");
+			BottomPanel.setGUIErrorStatus("The provided Spotify API client ID and secret may be invalid");
 			APIKeysStorage.openSetAPIKeysDialog(true);
 			
 		} catch (SpotifyWebApiException e) {
@@ -524,6 +613,8 @@ public abstract class MusicFetcher {
 //		System.out.println(extractSpotifyIDFromURL("https://open.spotify.com/track/3ruoIF2UnoXdzK8mR61ebq?si=65c4f9f7b10a4973"));
 		
 //		getSpotifyAPI();
+		
+//		System.out.println(getYouTubePlaylistName("https://www.youtube.com/playlist?list=PLpeFO20OwBF7iEECy0biLfP34s0j-8wzk"));
 		
 		StaccatoWindow.main(args);
 		
