@@ -179,7 +179,7 @@ public class BottomPanel extends JPanel {
 			
 		}
 		
-		if(data.length > 1) {
+		if(url.contains("/playlist/")) {
 			
 			String playlistName = MusicFetcher.getSpotifyPlaylistName(url);
 			File playlistFolder;
