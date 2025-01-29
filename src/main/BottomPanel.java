@@ -154,13 +154,15 @@ public class BottomPanel extends JPanel {
 			
 			playlistFolder.mkdir();
 			
-		} else {
+		}
+		
+		StaccatoTrack[] data = MusicFetcher.convertYouTubeData(url, title, artist, album);
+		for(int i = 0; i < data.length; i++) {
 			
-			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.getAlbumCoverURL(album, artist), MusicFetcher.extractYouTubeIDFromURL(url));
-			data.download(dir);
-			if(data.fileExists()) {
+			data[i].download(dir);
+			if(data[i].fileExists()) {
 				
-				data.writeID3Tags();
+				data[i].writeID3Tags();
 				
 			}
 			
