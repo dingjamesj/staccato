@@ -69,7 +69,7 @@ public class StaccatoTrack {
 					"--extract-audio",
 					"--no-playlist",
 					"\"https://www.youtube.com/watch?v=" + youtubeID + "\""
-					};
+			};
 			
 		} else {
 			
@@ -80,7 +80,7 @@ public class StaccatoTrack {
 					"--extract-audio",
 					"--no-playlist",
 					"\"https://www.youtube.com/watch?v=" + youtubeID + "\""
-					};
+			};
 			
 		}
 		
@@ -216,6 +216,72 @@ public class StaccatoTrack {
 		}
 		
 		return count;
+		
+	}
+	
+	public String getTitle() {
+		
+		return title;
+		
+	}
+	
+	public String getArtist() {
+		
+		return artist;
+		
+	}
+	
+	public String getAlbum() {
+		
+		return album;
+		
+	}
+	
+	public String getYouTubeID() {
+		
+		return youtubeID;
+		
+	}
+	
+	public String getCoverImageURL() {
+		
+		return coverImageURL;
+		
+	}
+	
+	public String getFileLocation() {
+		
+		return fileLocation;
+		
+	}
+	
+	public void setTitle(String title) {
+		
+		this.title = title;
+		
+	}
+	
+	public void setArtist(String artist) {
+		
+		this.artist = artist;
+		
+	}
+	
+	public void setAlbum(String album) {
+		
+		this.album = album;
+		
+	}
+	
+	public void setYouTubeID(String youtubeID) {
+		
+		this.youtubeID = youtubeID;
+		
+	}
+	
+	public void setCoverImageURL(String coverImageURL) {
+		
+		this.coverImageURL = coverImageURL;
 		
 	}
 	

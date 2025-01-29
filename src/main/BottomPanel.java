@@ -133,7 +133,7 @@ public class BottomPanel extends JPanel {
 		String title = InputPanel.getInputTitle();
 		String artist = InputPanel.getInputArtist();
 		String album = InputPanel.getInputAlbum();
-				
+		
 		if(url.contains("/playlist")) {
 			
 			String playlistName = MusicFetcher.getYouTubePlaylistName(url);
@@ -151,7 +151,7 @@ public class BottomPanel extends JPanel {
 				dir += "\\" + playlistName;
 				
 			}
-
+			
 			playlistFolder.mkdir();
 			
 		} else {

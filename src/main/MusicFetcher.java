@@ -98,6 +98,175 @@ public abstract class MusicFetcher {
 		
 	}
 	
+	public static StaccatoTrack[] convertYouTubeData(String url, String... args) {
+		
+		if(!url.contains("youtube.com") && !url.contains("youtu.be")) {
+			
+			BottomPanel.setGUIErrorStatus("This URL " + url + " is not a YouTube link (this message should never appear since we check beforehand)");
+			return null;
+			
+		}
+		
+		if(args != null && args.length != 3) {
+			
+			BottomPanel.setGUIErrorStatus("Missing song property arguments (convertYouTubeData) (THIS ERROR SHOULD NOT HAPPEN!!)");
+			return null;
+			
+		}
+		
+		if(url.contains("/playlist")) {
+			
+			ProcessBuilder processBuilder;
+			Process process;
+			BufferedReader processOutput;
+			String output;
+			
+			try {
+				
+				String[] playlistLengthCommand = {
+						"yt-dlp",
+						"--skip-download",
+						"--no-warning",
+						"--print",
+						"playlist_count",
+						"\"" + url + "\""
+				};
+				processBuilder = new ProcessBuilder(playlistLengthCommand);
+				process = processBuilder.start();
+				processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				output = processOutput.readLine();
+				processOutput.close();
+				process.waitFor();
+				
+				StaccatoTrack[] data = new StaccatoTrack[Integer.parseInt(output)];
+				
+				String[] getPlaylistIDsCommand = {
+						"yt-dlp",
+						"--skip-download",
+						"--no-warning",
+						"--print",
+						"id",
+						"\"" + url + "\""
+				};
+				processBuilder = new ProcessBuilder(getPlaylistIDsCommand);
+				process = processBuilder.start();
+				processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				output = processOutput.readLine();
+				for(int i = 0; output != null; i++) {
+					
+					data[i] = new StaccatoTrack(null, null, null, output, null);
+					output = processOutput.readLine();
+					
+				}
+				processOutput.close();
+				process.waitFor();
+				
+				String[] getPlaylistTitlesCommand = {
+						"yt-dlp",
+						"--skip-download",
+						"--no-warning",
+						"--print",
+						"title",
+						"\"" + url + "\""
+				};
+				processBuilder = new ProcessBuilder(getPlaylistTitlesCommand);
+				process = processBuilder.start();
+				processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				output = processOutput.readLine();
+				for(int i = 0; output != null; i++) {
+					
+					data[i].setTitle(output);
+					output = processOutput.readLine();
+					
+				}
+				processOutput.close();
+				process.waitFor();
+				
+				String[] getPlaylistArtistsCommand = {
+						"yt-dlp",
+						"--skip-download",
+						"--no-warning",
+						"--print",
+						"artist",
+						"\"" + url + "\""
+				};
+				processBuilder = new ProcessBuilder(getPlaylistArtistsCommand);
+				process = processBuilder.start();
+				processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				output = processOutput.readLine();
+				for(int i = 0; output != null; i++) {
+					
+					data[i].setArtist(output);
+					output = processOutput.readLine();
+					
+				}
+				processOutput.close();
+				process.waitFor();
+				
+				String[] getPlaylistAlbumsCommand = {
+						"yt-dlp",
+						"--skip-download",
+						"--no-warning",
+						"--print",
+						"album",
+						"\"" + url + "\""
+				};
+				processBuilder = new ProcessBuilder(getPlaylistAlbumsCommand);
+				process = processBuilder.start();
+				processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				output = processOutput.readLine();
+				for(int i = 0; output != null; i++) {
+					
+					data[i].setAlbum(output);
+					output = processOutput.readLine();
+					
+				}
+				processOutput.close();
+				process.waitFor();
+				
+				for(int i = 0; i < data.length; i++) {
+					
+					data[i].setCoverImageURL(getAlbumCoverURL(data[i].getAlbum(), data[i].getArtist()));
+					
+				}
+				
+				return data;
+				
+			} catch (IOException e) {
+
+				e.printStackTrace();
+				
+				if(e.getMessage().contains("cannot run program \"yt-dlp\"")) {
+					
+					BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
+					
+				} else {
+					
+					BottomPanel.setGUIErrorStatus("IOException (updateSoftware): " + e.getMessage());
+					
+				}
+				
+			} catch(InterruptedException e) {
+				
+				e.printStackTrace();
+				BottomPanel.setGUIErrorStatus("Download process was interrupted (updateSoftware)");
+				
+			}
+			
+			return null;
+			
+		} else {
+			
+			String title = args[0];
+			String artist = args[1];
+			String album = args[2];
+			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.getAlbumCoverURL(album, artist), MusicFetcher.extractYouTubeIDFromURL(url));
+			return new StaccatoTrack[] {data};
+			
+		}
+		
+	}
+	
 	public static String getAlbumCoverURL(String albumTitle, String artists) {
 		
 		SpotifyApi spotifyApi = getSpotifyAPI();
@@ -205,7 +374,7 @@ public abstract class MusicFetcher {
 				"--skip-download", 
 				"--no-write-playlist-metafiles", 
 				"\"ytsearch" + numResults + ":" + title + " " + artist + "\""
-				};
+		};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		File jsonDir = new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR);
 		jsonDir.mkdir();
@@ -316,7 +485,7 @@ public abstract class MusicFetcher {
 				"--print",
 				"playlist_title",
 				"\"" + url + "\""
-				};
+		};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		processBuilder.inheritIO();
 		
@@ -336,6 +505,7 @@ public abstract class MusicFetcher {
 				}
 				
 			}
+			processOutput.close();
 			playlistNameGetterProcess.waitFor();
 			
 			return output;

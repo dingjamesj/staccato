@@ -49,6 +49,7 @@ public abstract class Installer {
 				
 			}
 			
+			processOutput.close();
 			updateProcess.waitFor();
 			
 		} catch (IOException e) {
