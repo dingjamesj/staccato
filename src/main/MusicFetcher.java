@@ -1,18 +1,11 @@
 package main;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Map;
 
 import org.apache.hc.core5.http.ParseException;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import com.neovisionaries.i18n.CountryCode;
 
 import se.michaelthelin.spotify.SpotifyApi;
@@ -33,6 +26,8 @@ import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequ
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 public abstract class MusicFetcher {
+	
+	public static final String YTDLP_SEARCH_INFO_SEPARATOR = "<><><><><><><><><>"; //This is the separator used because angle brackets aren't allowed in YouTube descriptions
 	
 	/**
 	 * @param url Spotify URL
@@ -369,21 +364,60 @@ public abstract class MusicFetcher {
 	private static String searchYouTube(String title, String artist, int numResults) {
 		
 		String[] command = {
-				"yt-dlp", 
-				"--write-info-json",
-				"--skip-download", 
-				"--no-write-playlist-metafiles", 
+				"yt-dlp",
+				"--skip-download",
+				"--print",
+				"%(id)s\n%(title)s\n%(channel)s\n%(description)s\n" + YTDLP_SEARCH_INFO_SEPARATOR,
 				"\"ytsearch" + numResults + ":" + title + " " + artist + "\""
 		};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		File jsonDir = new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR);
-		jsonDir.mkdir();
-		processBuilder.directory(jsonDir);
-		processBuilder.inheritIO();
 		
+		String[][] properties = new String[numResults][4]; //Each property is in the order of ID, title, channel, description
 		try {
 			
 			Process searchProcess = processBuilder.start();
+			BufferedReader processOutput = new BufferedReader(new InputStreamReader(searchProcess.getInputStream()));
+			String outputStr = processOutput.readLine();
+			int propertyCount = 0;
+			while(outputStr != null) {
+				
+				if(propertyCount % 4 != 3) {
+					
+					//This is the normal case, when the property is the ID, title, or channel
+					
+					//output[search result index][property index]
+					properties[propertyCount / 4][propertyCount % 4] = outputStr;
+					propertyCount++;
+					
+					outputStr = processOutput.readLine();
+					
+					continue;
+					
+				}
+				
+				//When the property is a description, it may have multiple lines
+				while(!outputStr.equals(YTDLP_SEARCH_INFO_SEPARATOR)) {
+					
+					if(properties[propertyCount / 4][3] == null) {
+						
+						properties[propertyCount / 4][3] = outputStr;
+						
+					} else {
+						
+						properties[propertyCount / 4][3] += "\n" + outputStr;
+						
+					}
+					
+					outputStr = processOutput.readLine();
+					
+				}
+				
+				propertyCount++;
+				outputStr = processOutput.readLine();
+				
+			}
+			
+			processOutput.close();
 			searchProcess.waitFor();
 			
 		} catch (IOException e) {
@@ -394,83 +428,38 @@ public abstract class MusicFetcher {
 			if(message.toLowerCase().contains("cannot run program \"yt-dlp\"")) {
 				
 				BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
-				clearTemporaryJSONs();
 				return null;
 				
 			}
 			
 			BottomPanel.setGUIErrorStatus("IO Exception (searchYouTube): " + message);
-			clearTemporaryJSONs();
 			return null;
 			
 		} catch (InterruptedException e) {
 			
 			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Download was interrupted");
-			clearTemporaryJSONs();
+			BottomPanel.setGUIErrorStatus("Search was interrupted");
 			return null;
 			
 		}
 		
-		File[] jsonFiles = jsonDir.listFiles();
-		if(jsonFiles == null) {
-			
-			BottomPanel.setGUIErrorStatus("No search results found");
-			clearTemporaryJSONs();
-			return null;
-			
-		}
-		
-		@SuppressWarnings("rawtypes")
-		Map map;
-		Gson gson = new Gson();
-		int[] points = new int[jsonFiles.length];
-		String[] ids = new String[jsonFiles.length];
+		int currPoints;
 		int maxPoints = Integer.MIN_VALUE;
 		int maxPointsIndex = -1;
-		for(int i = 0; i < jsonFiles.length; i++) {
+		for(int i = 0; i < properties.length; i++) {
 			
-			try {
-				
-				map = gson.fromJson(new FileReader(jsonFiles[i]), Map.class);
-				
-			} catch (JsonIOException e) {
-				
-				e.printStackTrace();
-				BottomPanel.setGUIErrorStatus("JSON IO Exception (searchYouTube): " + e.getMessage());
-				clearTemporaryJSONs();
-				return null;
-				
-			} catch (JsonSyntaxException e) {
-				
-				e.printStackTrace();
-				BottomPanel.setGUIErrorStatus("JSON file is malformed");
-				clearTemporaryJSONs();
-				return null;
-				
-			} catch (FileNotFoundException e) {
-				
-				e.printStackTrace();
-				BottomPanel.setGUIErrorStatus("JSON file was not found");
-				clearTemporaryJSONs();
-				return null;
-				
-			}
+			currPoints = calculateVideoScore(properties[i], i, title, artist);
 			
-			points[i] = calculateVideoScore(map, i, title, artist);
-			ids[i] = map.get("id").toString();
-			
-			if(points[i] > maxPoints) {
+			if(currPoints > maxPoints) {
 				
-				maxPoints = points[i];
+				maxPoints = currPoints;
 				maxPointsIndex = i;
 				
 			}
 			
 		}
 		
-		clearTemporaryJSONs();
-		return ids[maxPointsIndex];
+		return properties[maxPointsIndex][0];
 		
 	}
 	
@@ -535,16 +524,15 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	@SuppressWarnings("rawtypes")
-	private static int calculateVideoScore(Map videoData, int videoIndex, String targetTitle, String targetArtist) {
+	private static int calculateVideoScore(String[] videoData, int videoIndex, String targetTitle, String targetArtist) {
 		
 		targetTitle = targetTitle.toLowerCase();
 		targetArtist = targetArtist.toLowerCase();
 		
 		int score = 0;
-		String videoTitle = videoData.get("title").toString().toLowerCase();
-		String channelName = videoData.get("channel").toString().toLowerCase();
-		String description = videoData.get("description").toString().toLowerCase();
+		String videoTitle = videoData[1].toLowerCase();
+		String channelName = videoData[2].toLowerCase();
+		String description = videoData[3].toLowerCase();
 		
 		if(!videoTitle.contains(targetTitle)) {
 			
@@ -597,17 +585,6 @@ public abstract class MusicFetcher {
 		}
 		
 		return score;
-		
-	}
-	
-	private static void clearTemporaryJSONs() {
-		
-		String[] jsonDirStrs = new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR).list();
-		for(String dirStr: jsonDirStrs) {
-			
-			new File(StaccatoWindow.TEMP_JSON_FILES_DIR_STR, dirStr).delete();
-			
-		}
 		
 	}
 	

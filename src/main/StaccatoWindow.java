@@ -37,8 +37,6 @@ public class StaccatoWindow extends JFrame {
 	public static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	public static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
 	public static final Color ERROR_STATUS_COLOR = new Color(0xff4545);
-	public static final String TEMP_JSON_FILES_DIR_STR = System.getProperty("user.dir") + "\\temp";
-	public static final String SPOTIFY_CLIENT_API_KEYS_DIR_STR = System.getProperty("user.dir") + "\\staccatoapikeys.dat";
 	
 	public static StaccatoWindow mainWindow;
 	

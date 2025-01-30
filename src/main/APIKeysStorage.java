@@ -21,12 +21,14 @@ import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 
 public abstract class APIKeysStorage {
 
+	public static final String SPOTIFY_CLIENT_API_KEYS_DIR_STR = System.getProperty("user.dir") + "\\staccatoapikeys.dat";
+	
 	/**
 	 * @return An array that contains the Spotify Client ID and the secret, in that order
 	 */
 	public static String[] getIDandSecret() {
 		
-		File apiKeysFile = new File(StaccatoWindow.SPOTIFY_CLIENT_API_KEYS_DIR_STR);
+		File apiKeysFile = new File(SPOTIFY_CLIENT_API_KEYS_DIR_STR);
 		if(!apiKeysFile.exists()) {
 			
 			BottomPanel.setGUIErrorStatus("File containing API keys is missing");
@@ -64,7 +66,7 @@ public abstract class APIKeysStorage {
 	
 	public static void setIDandSecret(String id, String secret) {
 		
-		File apiKeysFile = new File(StaccatoWindow.SPOTIFY_CLIENT_API_KEYS_DIR_STR);
+		File apiKeysFile = new File(SPOTIFY_CLIENT_API_KEYS_DIR_STR);
 		if(!apiKeysFile.exists()) {
 			
 			try {
