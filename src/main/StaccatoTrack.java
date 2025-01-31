@@ -285,6 +285,13 @@ public class StaccatoTrack {
 		
 	}
 	
+	@Override
+	public String toString() {
+		
+		return "\"" + title + "\" by " + artist + " @ " + youtubeID;
+		
+	}
+	
 	public static void main(String[] args) {
 		
 		BottomPanel.main(args);

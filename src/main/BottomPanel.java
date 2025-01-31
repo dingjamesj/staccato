@@ -159,6 +159,9 @@ public class BottomPanel extends JPanel {
 		StaccatoTrack[] data = MusicFetcher.convertYouTubeData(url, title, artist, album);
 		for(int i = 0; i < data.length; i++) {
 			
+			System.out.println("-------------------------");
+			System.out.println(data[i].toString());
+			System.out.println("-------------------------");
 			data[i].download(dir);
 			if(data[i].fileExists()) {
 				

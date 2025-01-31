@@ -255,7 +255,7 @@ public abstract class MusicFetcher {
 			String title = args[0];
 			String artist = args[1];
 			String album = args[2];
-			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.getAlbumCoverURL(album, artist), MusicFetcher.extractYouTubeIDFromURL(url));
+			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.extractYouTubeIDFromURL(url), MusicFetcher.getAlbumCoverURL(album, artist));
 			return new StaccatoTrack[] {data};
 			
 		}
