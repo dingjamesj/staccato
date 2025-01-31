@@ -143,20 +143,24 @@ public class StaccatoTrack {
 			Tag tag = audioFile.getTag();
 			
 			Artwork coverImage = null;
-			try {
-			
-				URL url = new URI(coverImageURL).toURL();
-				ByteArrayOutputStream coverImageURLByteArrayStream = new ByteArrayOutputStream();
-				url.openStream().transferTo(coverImageURLByteArrayStream);
-				coverImageURLByteArrayStream.toByteArray();
-				coverImage = ArtworkFactory.getNew();
-				coverImage.setBinaryData(coverImageURLByteArrayStream.toByteArray());
-				coverImageURLByteArrayStream.close();
+			if(coverImageURL != null) {
 				
-			} catch (Exception e) {
-				
-				e.printStackTrace();
-				BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + " (writeID3Tags): " + e.getMessage());
+				try {
+					
+					URL url = new URI(coverImageURL).toURL();
+					ByteArrayOutputStream coverImageURLByteArrayStream = new ByteArrayOutputStream();
+					url.openStream().transferTo(coverImageURLByteArrayStream);
+					coverImageURLByteArrayStream.toByteArray();
+					coverImage = ArtworkFactory.getNew();
+					coverImage.setBinaryData(coverImageURLByteArrayStream.toByteArray());
+					coverImageURLByteArrayStream.close();
+					
+				} catch (Exception e) {
+					
+					e.printStackTrace();
+					BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + " (writeID3Tags): " + e.getMessage());
+					
+				}
 				
 			}
 			

@@ -28,6 +28,7 @@ import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 public abstract class MusicFetcher {
 	
 	public static final String YTDLP_SEARCH_INFO_SEPARATOR = "<><><><><><><><><>"; //This is the separator used because angle brackets aren't allowed in YouTube descriptions
+	public static final String YOUTUBE_UNAVAILABLE_FIELD_PLACEHOLDER = "<N/A>";
 	
 	/**
 	 * @param url Spotify URL
@@ -183,6 +184,8 @@ public abstract class MusicFetcher {
 						"--no-warning",
 						"--print",
 						"artist",
+						"--output-na-placeholder",
+						YOUTUBE_UNAVAILABLE_FIELD_PLACEHOLDER,
 						"\"" + url + "\""
 				};
 				processBuilder = new ProcessBuilder(getPlaylistArtistsCommand);
@@ -204,6 +207,8 @@ public abstract class MusicFetcher {
 						"--no-warning",
 						"--print",
 						"album",
+						"--output-na-placeholder",
+						YOUTUBE_UNAVAILABLE_FIELD_PLACEHOLDER,
 						"\"" + url + "\""
 				};
 				processBuilder = new ProcessBuilder(getPlaylistAlbumsCommand);
@@ -220,6 +225,12 @@ public abstract class MusicFetcher {
 				process.waitFor();
 				
 				for(int i = 0; i < data.length; i++) {
+					
+					if(data[i].getAlbum().equals(YOUTUBE_UNAVAILABLE_FIELD_PLACEHOLDER) || data[i].getArtist().equals(YOUTUBE_UNAVAILABLE_FIELD_PLACEHOLDER)) {
+						
+						continue;
+						
+					}
 					
 					data[i].setCoverImageURL(getAlbumCoverURL(data[i].getAlbum(), data[i].getArtist()));
 					
@@ -255,7 +266,13 @@ public abstract class MusicFetcher {
 			String title = args[0];
 			String artist = args[1];
 			String album = args[2];
-			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.extractYouTubeIDFromURL(url), MusicFetcher.getAlbumCoverURL(album, artist));
+			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.extractYouTubeIDFromURL(url), null);
+			if(!album.isBlank() && !artist.isBlank()) {
+				
+				data.setCoverImageURL(MusicFetcher.getAlbumCoverURL(album, artist));
+				
+			}
+			
 			return new StaccatoTrack[] {data};
 			
 		}
@@ -477,27 +494,21 @@ public abstract class MusicFetcher {
 				"\"" + url + "\""
 		};
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		processBuilder.inheritIO();
 		
 		try {
 			
-			Process playlistNameGetterProcess = processBuilder.start();
-			BufferedReader processOutput = new BufferedReader(new InputStreamReader(playlistNameGetterProcess.getInputStream()));
-			String output = "";
-			String buffer = "";
-			while(buffer != null) {
+			Process process = processBuilder.start();
+			BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String output = null;
+			while(output == null) {
 				
-				buffer = processOutput.readLine();
-				if(buffer != null) {
-					
-					output = buffer;
-					
-				}
+				//We're getting the first non-null output
+				output = processOutput.readLine();
 				
 			}
-			processOutput.close();
-			playlistNameGetterProcess.waitFor();
 			
+			processOutput.close();
+			process.waitFor();
 			return output;
 			
 		} catch (IOException e) {
@@ -652,8 +663,7 @@ public abstract class MusicFetcher {
 		} catch(BadRequestException e) {
 			
 			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + "(" + methodName + "): " + "The provided Spotify API client ID and secret may be invalid");
-			APIKeysStorage.openSetAPIKeysDialog(true);
+			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + "(" + methodName + "): " + e.getMessage());
 			
 		} catch(NotFoundException e) {
 			

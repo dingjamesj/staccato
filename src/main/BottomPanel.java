@@ -137,6 +137,9 @@ public class BottomPanel extends JPanel {
 		if(url.contains("/playlist")) {
 			
 			String playlistName = MusicFetcher.getYouTubePlaylistName(url);
+			System.out.println("--------------PLAYLISTNAME---------------");
+			System.out.println(playlistName);
+			System.out.println("-----------------------------------------");
 			File playlistFolder;
 			
 			int uniqueNumber = StaccatoTrack.countRepeatedFileNames(dir, playlistName);
