@@ -182,6 +182,11 @@ public class BottomPanel extends JPanel {
 		if(url.contains("/playlist/")) {
 			
 			String playlistName = MusicFetcher.getSpotifyPlaylistName(url);
+			if(playlistName == null) {
+				
+				return;
+				
+			}
 			File playlistFolder;
 			
 			int uniqueNumber = StaccatoTrack.countRepeatedFileNames(dir, playlistName);

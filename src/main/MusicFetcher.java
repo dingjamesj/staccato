@@ -262,7 +262,7 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	public static String getAlbumCoverURL(String albumTitle, String artists) {
+	private static String getAlbumCoverURL(String albumTitle, String artists) {
 		
 		SpotifyApi spotifyApi = getSpotifyAPI();
 		if(spotifyApi == null) {
@@ -332,7 +332,7 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	public static String getSpotifyPlaylistName(String id) {
+	public static String getSpotifyPlaylistName(String url) {
 		
 		SpotifyApi spotifyApi = getSpotifyAPI();
 		if(spotifyApi == null) {
@@ -341,11 +341,12 @@ public abstract class MusicFetcher {
 			
 		}
 		
-		GetPlaylistRequest request = spotifyApi.getPlaylist(id).market(CountryCode.US).build();
+		GetPlaylistRequest request = spotifyApi.getPlaylist(extractSpotifyIDFromURL(url)).market(CountryCode.US).build();
 		Playlist playlist = getDataWithSpotifyAPIRequest(request, "getSpotifyPlaylistName");
 		
 		if(playlist == null) {
 			
+			BottomPanel.setGUIErrorStatus("Playlist not found");
 			return null;
 			
 		} else {
@@ -675,7 +676,7 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	public static String extractSpotifyIDFromURL(String url) {
+	private static String extractSpotifyIDFromURL(String url) {
 		
 		//https://open.spotify.com/track/50a8bKqlwDEqeiEknrzkTO?si=7d803f686f0c4175
 		//https://open.spotify.com/playlist/1zUUwGZh02drh2M13yNcVD?si=9e646c914f5843d6
@@ -711,7 +712,7 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	public static String extractYouTubeIDFromURL(String url) {
+	private static String extractYouTubeIDFromURL(String url) {
 		
 		//https://youtu.be/tfSS1e3kYeo?si=v4rcNgiHwUIQV5J6
 		//https://www.youtube.com/watch?v=tfSS1e3kYeo
