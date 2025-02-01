@@ -19,6 +19,9 @@ public class BottomPanel extends JPanel {
 	
 	private static final long serialVersionUID = -7262047713711324913L;
 
+	public static final int YOUTUBE_PROGRESS_MIDWAY_POINT = 50;
+	public static final int SPOTIFY_PROGRESS_MIDWAY_POINT = 35;
+	
 	private static BottomPanel mainBottomPanel;
 	
 	private JButton downloadButton;
@@ -46,6 +49,8 @@ public class BottomPanel extends JPanel {
 				try {
 					
 					downloadAction();
+					statusLabel.setText("Idle");
+					progressBar.setValue(0);
 					
 				} catch (Exception e) {
 					
@@ -62,7 +67,7 @@ public class BottomPanel extends JPanel {
 			
 		});
 		
-		statusLabel = new JLabel("Status: Idle");
+		statusLabel = new JLabel("Idle");
 		statusLabel.setFont(statusFont);
 		statusLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
@@ -136,6 +141,8 @@ public class BottomPanel extends JPanel {
 		
 		if(url.contains("/playlist")) {
 			
+			setGUIStatus(5, "Getting YouTube playlist name");
+			
 			String playlistName = MusicFetcher.getYouTubePlaylistName(url);
 			System.out.println("--------------PLAYLISTNAME---------------");
 			System.out.println(playlistName);
@@ -159,24 +166,32 @@ public class BottomPanel extends JPanel {
 			
 		}
 		
+		setGUIStatusText("Getting YouTube data");
 		StaccatoTrack[] data = MusicFetcher.convertYouTubeData(url, title, artist, album);
+		setGUIProgressBar(YOUTUBE_PROGRESS_MIDWAY_POINT);
 		for(int i = 0; i < data.length; i++) {
 			
 			System.out.println("-------------------------");
 			System.out.println(data[i].toString());
 			System.out.println("-------------------------");
+			setGUIStatusText("Downloading " + data[i].getTitle());
 			data[i].download(dir);
 			if(data[i].fileExists()) {
 				
+				setGUIStatusText("Writing metadata for " + data[i].getTitle());
 				data[i].writeID3Tags();
 				
 			}
+			
+			setGUIProgressBar(YOUTUBE_PROGRESS_MIDWAY_POINT + (100 - YOUTUBE_PROGRESS_MIDWAY_POINT) / data.length * (i + 1));
 			
 		}
 		
 	}
 	
 	private static void downloadSpotifyAction(String url, String dir) {
+		
+		setGUIStatus(5, "Getting Spotify data");
 		
 		StaccatoTrack[] data = MusicFetcher.convertSpotifyData(url);
 		if(data == null) {
@@ -185,8 +200,11 @@ public class BottomPanel extends JPanel {
 			
 		}
 		
+		setGUIProgressBar(35);
+		
 		if(url.contains("/playlist/")) {
 			
+			setGUIStatusText("Creating playlist folder");
 			String playlistName = MusicFetcher.getSpotifyPlaylistName(url);
 			if(playlistName == null) {
 				
@@ -214,12 +232,16 @@ public class BottomPanel extends JPanel {
 		
 		for(int i = 0; i < data.length; i++) {
 			
+			setGUIStatusText("Downloading " + data[i].getTitle());
 			data[i].download(dir);
 			if(data[i].fileExists()) {
 				
+				setGUIStatusText("Writing metadata for " + data[i].getTitle());
 				data[i].writeID3Tags();
 				
 			}
+			
+			setGUIProgressBar(SPOTIFY_PROGRESS_MIDWAY_POINT + (100 - SPOTIFY_PROGRESS_MIDWAY_POINT) / data.length * (i + 1));
 			
 		}
 		
@@ -249,7 +271,6 @@ public class BottomPanel extends JPanel {
 	
 	public void setProgressBar(int percent) {
 		
-		System.out.println("PROGRESS BAR " + percent);
 		progressBar.setValue(percent);
 		
 	}
@@ -264,6 +285,21 @@ public class BottomPanel extends JPanel {
 	public void setEnabled(boolean enabled) {
 		
 		downloadButton.setEnabled(enabled);
+		
+	}
+	
+	public static void setGUIStatusText(String status) {
+		
+		if(mainBottomPanel == null) {
+			
+			System.out.println("==================================================================");
+			System.out.println(status);
+			System.out.println("==================================================================");
+			return;
+			
+		}
+		
+		mainBottomPanel.setStatusText(status);
 		
 	}
 	
@@ -284,11 +320,26 @@ public class BottomPanel extends JPanel {
 		
 	}
 	
+	public static void setGUIProgressBar(int progressBar) {
+		
+		if(mainBottomPanel == null) {
+			
+			System.out.println("==================================================================");
+			System.out.println("Progress: " + progressBar + "%");
+			System.out.println("==================================================================");
+			return;
+			
+		}
+		
+		mainBottomPanel.setProgressBar(progressBar);
+		
+	}
+	
 	public static void setGUIErrorStatus(String status) {
 		
 		if(mainBottomPanel == null) {
 			
-			System.err.println("==================================================================");
+			System.err.println("===========================ERROR==================================");
 			System.err.println(status);
 			System.err.println("==================================================================");
 			return;

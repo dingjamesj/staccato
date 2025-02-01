@@ -125,6 +125,8 @@ public abstract class MusicFetcher {
 						"--no-warning",
 						"--print",
 						"playlist_count",
+						"-I",
+						"1:1",
 						"\"" + url + "\""
 				};
 				processBuilder = new ProcessBuilder(playlistLengthCommand);
@@ -133,6 +135,7 @@ public abstract class MusicFetcher {
 				output = processOutput.readLine();
 				processOutput.close();
 				process.waitFor();
+				BottomPanel.setGUIProgressBar(BottomPanel.YOUTUBE_PROGRESS_MIDWAY_POINT / 5);
 				
 				StaccatoTrack[] data = new StaccatoTrack[Integer.parseInt(output)];
 				
@@ -156,6 +159,7 @@ public abstract class MusicFetcher {
 				}
 				processOutput.close();
 				process.waitFor();
+				BottomPanel.setGUIProgressBar(BottomPanel.YOUTUBE_PROGRESS_MIDWAY_POINT / 5 * 2);
 				
 				String[] getPlaylistTitlesCommand = {
 						"yt-dlp",
@@ -177,6 +181,7 @@ public abstract class MusicFetcher {
 				}
 				processOutput.close();
 				process.waitFor();
+				BottomPanel.setGUIProgressBar(BottomPanel.YOUTUBE_PROGRESS_MIDWAY_POINT / 5 * 3);
 				
 				String[] getPlaylistArtistsCommand = {
 						"yt-dlp",
@@ -200,6 +205,7 @@ public abstract class MusicFetcher {
 				}
 				processOutput.close();
 				process.waitFor();
+				BottomPanel.setGUIProgressBar(BottomPanel.YOUTUBE_PROGRESS_MIDWAY_POINT / 5 * 4);
 				
 				String[] getPlaylistAlbumsCommand = {
 						"yt-dlp",
@@ -727,6 +733,7 @@ public abstract class MusicFetcher {
 		//https://youtu.be/tfSS1e3kYeo?si=v4rcNgiHwUIQV5J6
 		//https://www.youtube.com/watch?v=tfSS1e3kYeo
 		//https://youtu.be/tfSS1e3kYeo?si=v4rcNgiHwUIQV5J6&t=2
+		//https://www.youtube.com/watch?v=0Tdpq3FRGhY&list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF
 		
 		int idBeginIndex;
 		if(url.contains("youtu.be/")) {
@@ -744,13 +751,22 @@ public abstract class MusicFetcher {
 		}
 		
 		int questionMarkIndex = url.indexOf('?', idBeginIndex);
-		if(questionMarkIndex == -1) {
+		int amperstandIndex = url.indexOf('&', idBeginIndex);
+		if(questionMarkIndex == -1 && amperstandIndex == -1) {
 			
 			return url.substring(idBeginIndex);
 			
-		} else {
+		} else if(questionMarkIndex == -1) {
+			
+			return url.substring(idBeginIndex, amperstandIndex);
+			
+		} else if(amperstandIndex == -1) {
 			
 			return url.substring(idBeginIndex, questionMarkIndex);
+			
+		} else {
+			
+			return url.substring(idBeginIndex, Math.min(questionMarkIndex, amperstandIndex));
 			
 		}
 		
