@@ -10,13 +10,18 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
@@ -43,7 +48,8 @@ public class StaccatoWindow extends JFrame {
 	private InputPanel inputPanel;
 	private BottomPanel bottomPanel;
 	private boolean isDownloading = false;
-	
+	private final ImageIcon windowIcon = new ImageIcon(getClass().getResource("/staccatoicon.png"));
+
 	private StaccatoWindow() {
 		
 		//This is just the loading screen
@@ -53,6 +59,7 @@ public class StaccatoWindow extends JFrame {
 		setTitle("staccato");
 		setResizable(false);
 		setLayout(new BorderLayout());
+		setIconImage(windowIcon.getImage());
 		
 		JLabel loadingLabel = new JLabel("<html><b><i>Loading...</b></i><html>");
 		loadingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -211,8 +218,23 @@ public class StaccatoWindow extends JFrame {
 		
 		add(contentPanel, new GridBagConstraints());
 		
+		UIManager.put("TitlePane.embeddedForeground", new Color(0x1a1a1a));
+		UIManager.put("TitlePane.inactiveForeground", new Color(0x1a1a1a));
+		JMenuBar menuBar = new JMenuBar();
+		JMenu settingsMenu = new JMenu("Settings");
+		JMenuItem setSpotifyAPIKeysItem = new JMenuItem("Set Spotify API Keys");
+		settingsMenu.add(setSpotifyAPIKeysItem);
+		menuBar.add(settingsMenu);
+		setSpotifyAPIKeysItem.addActionListener((e) -> {
+			
+			APIKeysStorage.openSetAPIKeysDialog(false);
+			
+		});
+		setJMenuBar(menuBar);
+		
 		revalidate();
 		repaint();
+		SwingUtilities.updateComponentTreeUI(this);
 		
 		//END OF COMPONENT ADDING
 		
