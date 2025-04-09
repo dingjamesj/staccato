@@ -10,8 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class InputPanel extends JPanel {
-
-	private static final long serialVersionUID = -892554275836568837L; 
 	
 	private static InputPanel mainInputPanel;
 	

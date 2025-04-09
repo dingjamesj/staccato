@@ -32,8 +32,6 @@ import main.APIKeysStorage;
 
 
 public class StaccatoWindow extends JFrame {
-
-	private static final long serialVersionUID = 8433054944653490532L;
 	
 	public static final int WIDTH = 1500;
 	public static final int HEIGHT = 900;
@@ -66,6 +64,7 @@ public class StaccatoWindow extends JFrame {
 		setLayout(new GridBagLayout());
 		setIconImage(windowIcon.getImage());
 		
+		//-------------------START GUI BUILDING-------------------
 		
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -89,6 +88,8 @@ public class StaccatoWindow extends JFrame {
 		
 		add(contentPanel, new GridBagConstraints());
 		
+		//-----START MODIFYING MENU BAR-----
+
 		UIManager.put("TitlePane.embeddedForeground", new Color(0x1a1a1a));
 		UIManager.put("TitlePane.inactiveForeground", new Color(0x1a1a1a));
 		JMenuBar menuBar = new JMenuBar();
@@ -106,8 +107,10 @@ public class StaccatoWindow extends JFrame {
 		revalidate();
 		repaint();
 		SwingUtilities.updateComponentTreeUI(this);
+
+		//------END MODIFYING MENU BAR------
 		
-		//END OF COMPONENT ADDING
+		//-------------------END GUI BUILDING-------------------
 		
 		addWindowListener(new WindowAdapter() {
 		
