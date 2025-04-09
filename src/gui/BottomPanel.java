@@ -1,4 +1,4 @@
-package main;
+package gui;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,6 +14,10 @@ import javax.swing.SwingConstants;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
+
+import main.Installer;
+import main.MusicFetcher;
+import main.StaccatoTrack;
 
 public class BottomPanel extends JPanel {
 	

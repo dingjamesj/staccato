@@ -8,6 +8,8 @@ import org.apache.hc.core5.http.ParseException;
 
 import com.neovisionaries.i18n.CountryCode;
 
+import gui.BottomPanel;
+import gui.StaccatoWindow;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.exceptions.detailed.BadRequestException;

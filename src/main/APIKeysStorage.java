@@ -19,6 +19,9 @@ import javax.swing.JTextField;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 
+import gui.BottomPanel;
+import gui.StaccatoWindow;
+
 public abstract class APIKeysStorage {
 
 	public static final String SPOTIFY_CLIENT_API_KEYS_DIR_STR = System.getProperty("user.dir") + "\\staccatoapikeys.dat";

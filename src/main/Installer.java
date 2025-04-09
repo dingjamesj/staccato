@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
+import gui.BottomPanel;
+import gui.StaccatoWindow;
+
 public abstract class Installer {
 
 	/**

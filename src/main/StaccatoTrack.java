@@ -13,6 +13,8 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
+import gui.BottomPanel;
+
 public class StaccatoTrack {
 
 	private String title;
