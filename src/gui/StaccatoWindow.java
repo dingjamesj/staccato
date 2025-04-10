@@ -66,6 +66,7 @@ public class StaccatoWindow extends JFrame {
 		
 		//-------------------START GUI BUILDING-------------------
 		
+		/*
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		
@@ -84,9 +85,24 @@ public class StaccatoWindow extends JFrame {
 		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, this);
 		contentPanel.add(Box.createVerticalStrut(12));
 		contentPanel.add(bottomPanel);
-		
-		
+
 		add(contentPanel, new GridBagConstraints());
+		*/
+		
+		//-------START PANEL PLACEMENT------
+
+		PlaybarPanel playbarPanel = new PlaybarPanel();
+
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.anchor = GridBagConstraints.CENTER;
+
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.gridwidth = 3;
+		constraints.gridheight = 1;
+		add(playbarPanel, constraints);
+		
+		//--------END PANEL PLACEMENT-------
 		
 		//-----START MODIFYING MENU BAR-----
 
