@@ -61,40 +61,22 @@ public class StaccatoWindow extends JFrame {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); //We have a custom closing function
 		setSize(WIDTH, HEIGHT);
 		setTitle("staccato");
-		setLayout(new GridBagLayout());
 		setIconImage(windowIcon.getImage());
-		
-		//-------------------START GUI BUILDING-------------------
-		
-		/*
-		JPanel contentPanel = new JPanel();
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-		
-		
-		JPanel titlePanel = new JPanel();
-		titlePanel.setLayout(new BorderLayout());
-		JLabel titleLabel = new JLabel("staccato");
-		titleLabel.setFont(TITLE_FONT);
-		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		titlePanel.add(titleLabel, BorderLayout.CENTER);
-		contentPanel.add(titlePanel);
-		
-		inputPanel = new InputPanel(PARAM_LABEL_FONT, INPUT_FONT);		
-		contentPanel.add(Box.createVerticalStrut(4));
-		contentPanel.add(inputPanel);
-		bottomPanel = new BottomPanel(BUTTON_FONT, STATUS_FONT, INFO_FONT, this);
-		contentPanel.add(Box.createVerticalStrut(12));
-		contentPanel.add(bottomPanel);
-
-		add(contentPanel, new GridBagConstraints());
-		*/
-		
-		//-------START PANEL PLACEMENT------
-
-		PlaybarPanel playbarPanel = new PlaybarPanel();
-
+		setLayout(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.anchor = GridBagConstraints.CENTER;
+		
+		//-------------------START GUI BUILDING-------------------
+		//-------START PANEL PLACEMENT------
+
+		MusicListPanel musicListPanel = new MusicListPanel();
+		constraints.gridx = 1;
+		constraints.gridy = 0;
+		constraints.gridwidth = 1;
+		constraints.gridheight = 1;
+		add(musicListPanel, constraints);
+
+		PlaybarPanel playbarPanel = new PlaybarPanel();
 
 		constraints.gridx = 0;
 		constraints.gridy = 1;
@@ -125,7 +107,6 @@ public class StaccatoWindow extends JFrame {
 		SwingUtilities.updateComponentTreeUI(this);
 
 		//------END MODIFYING MENU BAR------
-		
 		//-------------------END GUI BUILDING-------------------
 		
 		addWindowListener(new WindowAdapter() {

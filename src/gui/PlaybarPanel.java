@@ -14,7 +14,7 @@ import javax.swing.JProgressBar;
 
 public class PlaybarPanel extends JPanel {
 
-    private static final Font TIME_FONT = new Font("Segoe UI", Font.BOLD, 45);
+	public static final Font TIME_FONT = new Font("Segoe UI", Font.PLAIN, 15);
     private static final ImageIcon PLAY_ICON = createImageIcon("src/main/resources/play.png");
     private static final ImageIcon PAUSE_ICON = createImageIcon("src/main/resources/pause.png");
     private static final ImageIcon SKIP_ICON = createImageIcon("src/main/resources/skip.png");
@@ -25,11 +25,6 @@ public class PlaybarPanel extends JPanel {
     private JProgressBar progressBar;
 
     public PlaybarPanel() {
-
-        System.out.println(PLAY_ICON == null);
-        System.out.println(PAUSE_ICON == null);
-        System.out.println(SKIP_ICON == null);
-        System.out.println(GO_BACK_ICON == null);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -65,6 +60,10 @@ public class PlaybarPanel extends JPanel {
         timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.X_AXIS));
         timeElapsedLabel = new JLabel("0:00");
         timeRemainingLabel = new JLabel("-:--");
+
+        timeElapsedLabel.setFont(TIME_FONT);
+        timeRemainingLabel.setFont(TIME_FONT);
+
         timePanel.add(timeElapsedLabel);
         timePanel.add(Box.createHorizontalGlue());
         timePanel.add(timeRemainingLabel);

@@ -15,7 +15,7 @@ import org.jaudiotagger.tag.images.ArtworkFactory;
 
 import gui.BottomPanel;
 
-public class StaccatoTrack {
+public class Track {
 
 	private String title;
 	private String artist;
@@ -24,7 +24,7 @@ public class StaccatoTrack {
 	private String coverImageURL;
 	private String fileLocation;
 	
-	public StaccatoTrack(String title, String artist, String album, String youtubeID, String coverImageURL) {
+	public Track(String title, String artist, String album, String youtubeID, String coverImageURL) {
 		
 		this.title = title;
 		this.artist = artist;

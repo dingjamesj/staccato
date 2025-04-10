@@ -17,7 +17,7 @@ import com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon;
 
 import main.Installer;
 import main.MusicFetcher;
-import main.StaccatoTrack;
+import main.Track;
 
 public class BottomPanel extends JPanel {
 	
@@ -153,7 +153,7 @@ public class BottomPanel extends JPanel {
 			System.out.println("-----------------------------------------");
 			File playlistFolder;
 			
-			int uniqueNumber = StaccatoTrack.countRepeatedFileNames(dir, playlistName);
+			int uniqueNumber = Track.countRepeatedFileNames(dir, playlistName);
 			if(uniqueNumber > 0) {
 				
 				playlistFolder = new File(dir + "\\" + playlistName + " (" + uniqueNumber + ")");
@@ -171,7 +171,7 @@ public class BottomPanel extends JPanel {
 		}
 		
 		setGUIStatusText("Getting YouTube data");
-		StaccatoTrack[] data = MusicFetcher.convertYouTubeData(url, title, artist, album);
+		Track[] data = MusicFetcher.convertYouTubeData(url, title, artist, album);
 		setGUIProgressBar(YOUTUBE_PROGRESS_MIDWAY_POINT);
 		for(int i = 0; i < data.length; i++) {
 			
@@ -197,7 +197,7 @@ public class BottomPanel extends JPanel {
 		
 		setGUIStatus(5, "Getting Spotify data");
 		
-		StaccatoTrack[] data = MusicFetcher.convertSpotifyData(url);
+		Track[] data = MusicFetcher.convertSpotifyData(url);
 		if(data == null) {
 			
 			return;
@@ -217,7 +217,7 @@ public class BottomPanel extends JPanel {
 			}
 			File playlistFolder;
 			
-			int uniqueNumber = StaccatoTrack.countRepeatedFileNames(dir, playlistName);
+			int uniqueNumber = Track.countRepeatedFileNames(dir, playlistName);
 			if(uniqueNumber > 0) {
 				
 				playlistFolder = new File(dir + "\\" + playlistName + " (" + uniqueNumber + ")");

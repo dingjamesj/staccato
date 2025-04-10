@@ -34,9 +34,9 @@ public abstract class MusicFetcher {
 	
 	/**
 	 * @param url Spotify URL
-	 * @return An array of StaccatoTracks
+	 * @return An array of main.StaccatoTracks
 	 */
-	public static StaccatoTrack[] convertSpotifyData(String url) {
+	public static main.Track[] convertSpotifyData(String url) {
 		
 		if(!url.contains("spotify.com")) {
 			
@@ -76,7 +76,7 @@ public abstract class MusicFetcher {
 			
 		}
 		
-		StaccatoTrack[] data = new StaccatoTrack[tracks.length];
+		main.Track[] data = new main.Track[tracks.length];
 		String artistsStr;
 		for(int i = 0; i < tracks.length; i++) {
 			
@@ -87,7 +87,7 @@ public abstract class MusicFetcher {
 				
 			}
 			
-			data[i] = new StaccatoTrack(tracks[i].getName(), artistsStr, tracks[i].getAlbum().getName(), 
+			data[i] = new main.Track(tracks[i].getName(), artistsStr, tracks[i].getAlbum().getName(), 
 					searchYouTube(tracks[i].getName(), artistsStr, 5), tracks[i].getAlbum().getImages()[0].getUrl());
 			
 		}
@@ -96,7 +96,7 @@ public abstract class MusicFetcher {
 		
 	}
 	
-	public static StaccatoTrack[] convertYouTubeData(String url, String... args) {
+	public static main.Track[] convertYouTubeData(String url, String... args) {
 		
 		if(!url.contains("youtube.com") && !url.contains("youtu.be")) {
 			
@@ -139,7 +139,7 @@ public abstract class MusicFetcher {
 				process.waitFor();
 				BottomPanel.setGUIProgressBar(BottomPanel.YOUTUBE_PROGRESS_MIDWAY_POINT / 5);
 				
-				StaccatoTrack[] data = new StaccatoTrack[Integer.parseInt(output)];
+				main.Track[] data = new main.Track[Integer.parseInt(output)];
 				
 				String[] getPlaylistIDsCommand = {
 						"yt-dlp",
@@ -155,7 +155,7 @@ public abstract class MusicFetcher {
 				output = processOutput.readLine();
 				for(int i = 0; output != null; i++) {
 					
-					data[i] = new StaccatoTrack(null, null, null, output, null);
+					data[i] = new main.Track(null, null, null, output, null);
 					output = processOutput.readLine();
 					
 				}
@@ -274,14 +274,14 @@ public abstract class MusicFetcher {
 			String title = args[0];
 			String artist = args[1];
 			String album = args[2];
-			StaccatoTrack data = new StaccatoTrack(title, artist, album, MusicFetcher.extractYouTubeIDFromURL(url), null);
+			main.Track data = new main.Track(title, artist, album, MusicFetcher.extractYouTubeIDFromURL(url), null);
 			if(!album.isBlank() && !artist.isBlank()) {
 				
 				data.setCoverImageURL(MusicFetcher.getAlbumCoverURL(album, artist));
 				
 			}
 			
-			return new StaccatoTrack[] {data};
+			return new main.Track[] {data};
 			
 		}
 		
