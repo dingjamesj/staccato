@@ -33,7 +33,7 @@ import main.APIKeysStorage;
 
 public class StaccatoWindow extends JFrame {
 	
-	public static final int WIDTH = 1500;
+	private static final int WIDTH = 1500;
 	public static final int HEIGHT = 900;
 	public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
 	public static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
@@ -69,15 +69,16 @@ public class StaccatoWindow extends JFrame {
 		//-------------------START GUI BUILDING-------------------
 		//-------START PANEL PLACEMENT------
 
-		MusicListPanel musicListPanel = new MusicListPanel();
+		TracklistPanel tracklistPanel = new TracklistPanel();
+		tracklistPanel.setBackground(Color.red);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
-		add(musicListPanel, constraints);
+		add(tracklistPanel, constraints);
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();
-
+		playbarPanel.setBackground(Color.cyan);
 		constraints.gridx = 0;
 		constraints.gridy = 1;
 		constraints.gridwidth = 3;

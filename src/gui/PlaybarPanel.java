@@ -14,7 +14,7 @@ import javax.swing.JProgressBar;
 
 public class PlaybarPanel extends JPanel {
 
-	public static final Font TIME_FONT = new Font("Segoe UI", Font.PLAIN, 15);
+	private static final Font TIME_FONT = new Font("Segoe UI", Font.PLAIN, 15);
     private static final ImageIcon PLAY_ICON = createImageIcon("src/main/resources/play.png");
     private static final ImageIcon PAUSE_ICON = createImageIcon("src/main/resources/pause.png");
     private static final ImageIcon SKIP_ICON = createImageIcon("src/main/resources/skip.png");
