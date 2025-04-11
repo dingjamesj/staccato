@@ -11,7 +11,7 @@ public class Playlist {
 
     public ImageIcon getPlaylistCover() {
 
-        return new ImageIcon("src/main/resources/go back.png");
+        return null;
 
     }
 

@@ -69,13 +69,32 @@ public class StaccatoWindow extends JFrame {
 		//-------------------START GUI BUILDING-------------------
 		//-------START PANEL PLACEMENT------
 
+		QueuePanel queuePanel = new QueuePanel();
+		queuePanel.setBackground(Color.green);
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.gridwidth = 1;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.BOTH;
+		add(queuePanel, constraints);
+
 		TracklistPanel tracklistPanel = new TracklistPanel();
 		tracklistPanel.setBackground(Color.red);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.BOTH;
 		add(tracklistPanel, constraints);
+
+		CurrentTrackInfoPanel currentTrackInfoPanel = new CurrentTrackInfoPanel();
+		currentTrackInfoPanel.setBackground(Color.magenta);
+		constraints.gridx = 2;
+		constraints.gridy = 0;
+		constraints.gridwidth = 1;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.BOTH;
+		add(currentTrackInfoPanel, constraints);
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();
 		playbarPanel.setBackground(Color.cyan);
@@ -83,6 +102,7 @@ public class StaccatoWindow extends JFrame {
 		constraints.gridy = 1;
 		constraints.gridwidth = 3;
 		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.BOTH;
 		add(playbarPanel, constraints);
 		
 		//--------END PANEL PLACEMENT-------
