@@ -28,9 +28,6 @@ import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
-import main.APIKeysStorage;
-
-
 public class StaccatoWindow extends JFrame {
 	
 	private static final int WIDTH = 1500;
@@ -45,8 +42,6 @@ public class StaccatoWindow extends JFrame {
 	
 	public static StaccatoWindow mainWindow;
 	
-	private InputPanel inputPanel;
-	private BottomPanel bottomPanel;
 	private boolean isDownloading = false;
 	private final ImageIcon windowIcon = new ImageIcon(getClass().getResource("/staccatoicon.png"));
 
@@ -118,7 +113,7 @@ public class StaccatoWindow extends JFrame {
 		menuBar.add(settingsMenu);
 		setSpotifyAPIKeysItem.addActionListener((e) -> {
 			
-			APIKeysStorage.openSetAPIKeysDialog(false);
+			// APIKeysStorage.openSetAPIKeysDialog(false);
 			
 		});
 		setJMenuBar(menuBar);
@@ -149,11 +144,11 @@ public class StaccatoWindow extends JFrame {
 		
 		});
 		
-		if(APIKeysStorage.getIDandSecret() == null) {
+		// if(APIKeysStorage.getIDandSecret() == null) {
 			
-			APIKeysStorage.openSetAPIKeysDialog(true);
+		// 	APIKeysStorage.openSetAPIKeysDialog(true);
 			
-		}
+		// }
 		
 		mainWindow = this;
 		
@@ -202,9 +197,7 @@ public class StaccatoWindow extends JFrame {
 	public void setIsDownloading(boolean isDownloading) {
 		
 		this.isDownloading = isDownloading;
-		inputPanel.setEnabled(!isDownloading);
-		bottomPanel.setEnabled(!isDownloading);
-				
+		
 	}
 	
 	public boolean getIsDownloading() {

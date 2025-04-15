@@ -13,8 +13,6 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
-import gui.BottomPanel;
-
 public class Track {
 
 	private String title;
@@ -52,7 +50,6 @@ public class Track {
 		File dir = new File(dirStr);
 		if(!dir.exists()) {
 			
-			BottomPanel.setGUIErrorStatus("Directory \"" + dirStr + "\" does not exist");
 			return -1;
 			
 		}
@@ -112,17 +109,13 @@ public class Track {
 			
 			if(message.toLowerCase().contains("cannot run program \"yt-dlp\"")) {
 				
-				BottomPanel.setGUIErrorStatus("Cannot run yt-dlp");
 				e.printStackTrace();
 				
 			}
-			
-			BottomPanel.setGUIErrorStatus("IO Error: " + message);
-			
+						
 		} catch (InterruptedException e) {
 			
 			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus("Download was interrupted");
 			
 		}
 		
@@ -134,7 +127,6 @@ public class Track {
 		
 		if(!fileExists()) {
 			
-			BottomPanel.setGUIErrorStatus("File does not exist at \"" + fileLocation + "\" (writeID3Tags, THIS SHOULD NOT HAPPEN)");
 			return;
 			
 		}
@@ -160,7 +152,6 @@ public class Track {
 				} catch (Exception e) {
 					
 					e.printStackTrace();
-					BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + " (writeID3Tags): " + e.getMessage());
 					
 				}
 				
@@ -180,7 +171,6 @@ public class Track {
 		} catch (Exception e) {
 			
 			e.printStackTrace();
-			BottomPanel.setGUIErrorStatus(e.getClass().getSimpleName() + " (writeID3Tags): " + e.getMessage());
 			
 		}
 		
@@ -197,7 +187,6 @@ public class Track {
 		File dir = new File(dirStr);
 		if(!dir.exists()) {
 			
-			BottomPanel.setGUIErrorStatus("Directory " + dirStr + " does not exist (countRepeatedFileNames)");
 			return -1;
 			
 		}
@@ -295,12 +284,6 @@ public class Track {
 	public String toString() {
 		
 		return "\"" + title + "\" by " + artist + " @ " + youtubeID;
-		
-	}
-	
-	public static void main(String[] args) {
-		
-		BottomPanel.main(args);
 		
 	}
 	
