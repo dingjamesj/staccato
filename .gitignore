@@ -41,6 +41,8 @@ buildNumber.properties
 /staccatoapikeys.dat
 *.mp3
 temp/
+.cache
+
 
 #-------------------------------------- PYTHON --------------------------------------
 
