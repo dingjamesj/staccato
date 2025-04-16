@@ -32,7 +32,7 @@ public class TracklistPanel extends JPanel {
         //you would say initHomePage()
         //the home page would just have recently opened playlists
 
-        initPlaylistPage(new Playlist());
+        initPlaylistPage(new Playlist("D:\\"));
 
     }
 
@@ -44,9 +44,9 @@ public class TracklistPanel extends JPanel {
 
         //-----BEGIN BUILDING PLAYLIST INFO PANEL-----
 
-        JButton playlistCoverButton = new JButton(playlist.getPlaylistCover() == null ? PLACEHOLDER_ART_ICON : playlist.getPlaylistCover());
+        JButton playlistCoverButton = new JButton(playlist.getCoverArt() == null ? PLACEHOLDER_ART_ICON : playlist.getCoverArt());
         JLabel playlistTitleLabel = new JLabel(playlist.getTitle());
-        JLabel playlistDescriptionLabel = new JLabel(playlist.getDescription());
+        JLabel playlistDescriptionLabel = new JLabel(createDescription(playlist));
         JButton refreshDirectoryButton = new JButton(REFRESH_ICON);
         JButton resyncToOriginButton = new JButton(RESYNC_ICON);
 
@@ -123,6 +123,12 @@ public class TracklistPanel extends JPanel {
 
         return new ImageIcon(urlStr);
 
+    }
+
+    private static String createDescription(Playlist playlist) {
+
+        return "<html>" + playlist.getDirectory() + "<br></br>" + playlist.getSize() + ", " + playlist.getDuration() + " </html>";
+        
     }
 
 }
