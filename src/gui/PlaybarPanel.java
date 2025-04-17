@@ -24,6 +24,8 @@ public class PlaybarPanel extends JPanel {
     private JLabel timeRemainingLabel;
     private JProgressBar progressBar;
 
+    public static PlaybarPanel playbarPanel;
+
     public PlaybarPanel() {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -76,6 +78,8 @@ public class PlaybarPanel extends JPanel {
         add(progressbarPanel);
 
         //------END PROGRESS BAR PANEL------
+
+        PlaybarPanel.playbarPanel = this;
 
     }
 

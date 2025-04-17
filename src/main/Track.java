@@ -38,12 +38,13 @@ public class Track implements Serializable {
 	private transient int duration = -1;
 	private transient String artworkURL;
 	
-	public Track(String title, String artists, String album) {
+	public Track(String title, String artists, String album, String artworkURL, String youtubeID) {
 		
 		this.title = title;
 		this.artists = artists;
 		this.album = album;
-		this.youtubeID = "";
+		this.artworkURL = artworkURL;
+		this.youtubeID = youtubeID;
 		this.fileLocation = "";
 		
 	}

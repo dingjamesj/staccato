@@ -18,6 +18,8 @@ public class QueuePanel extends JPanel {
 
     private DefaultTableModel tableModel;
 
+    public static QueuePanel queuePanel;
+
     public QueuePanel() {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -32,6 +34,8 @@ public class QueuePanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(queueTable);
         queueTable.setFillsViewportHeight(true);
         add(scrollPane);
+
+        QueuePanel.queuePanel = this;
 
     }
 

@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.net.URL;
 
+import javax.sound.midi.Track;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,12 +28,16 @@ public class TracklistPanel extends JPanel {
 
     private DefaultTableModel tableModel;
 
+    public static TracklistPanel tracklistPanel;
+
     public TracklistPanel() {
 
         //you would say initHomePage()
         //the home page would just have recently opened playlists
 
         initPlaylistPage(new Playlist("D:\\"));
+
+        TracklistPanel.tracklistPanel = this;
 
     }
 

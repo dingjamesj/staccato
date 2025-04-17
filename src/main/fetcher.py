@@ -30,9 +30,12 @@ def set_spotify_api_keys(client_id: str, client_secret: str):
     except IOError as e:
         print(e)
 
-def get_spotify_playlist_tracks(id: str) -> list[dict]:
+def get_spotify_playlist_tracks(spotify_id: str) -> list[dict]:
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=keys[0], client_secret=keys[1]))
-    return sp.playlist_tracks(playlist_id=id, market=market)["items"]
+    return sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
+
+def get_spotify_track(spotify_id: str) -> dict:
+    return None
 
 def search_youtube(title: str, artists: str) -> str:
     # Search for the top few videos---searching with "{Title} {1st artist}"
@@ -57,25 +60,6 @@ def search_youtube(title: str, artists: str) -> str:
             id_with_largest_score = search_result["id"]
     # Return
     return f"https://www.youtube.com/watch?v={id_with_largest_score}"
-
-def send_tracks_to_java(id: str):
-    tracks_java_data: list[dict] = [] # Data we will send over to our Java program
-    tracks: list[dict] = get_spotify_playlist_tracks(id)
-    artists: str = None
-    for track in tracks:
-        artists = ""
-        for artist_data in track["track"]["artists"]:
-            artists = artists + artist_data["name"] + ", "
-        artists = artists[:-2]
-        tracks_java_data.append({
-            "title": track["track"]["name"],
-            "artists": artists,
-            "album": track["track"]["album"]["name"],
-            "artworkURL": track["track"]["album"]["images"][0]["url"],
-            "youtubeID": search_youtube(track["track"]["name"], track["track"]["artists"][0]["name"])
-        })
-    return tracks_java_data
-    # TODO: Send tracks_java_data over to the Java program
 
 # How well a video's info matches up with the target track information.
 def calculate_video_score(search_result: dict, index: int, target_title: str, target_artists: str) -> int:
@@ -131,6 +115,7 @@ if __name__ == "__main__":
     #     print(data["youtubeID"])
     #     print()
     
-    print(send_tracks_to_java("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=c3ad19f5390b4aa1"))
+    # print(send_tracks_to_java("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=c3ad19f5390b4aa1"))
+    # print(send_tracks_to_java("https://open.spotify.com/track/5SIvP6TdWc9DNvKbENjnYc?si=1da78ef172254cf1", True))
 
     pass

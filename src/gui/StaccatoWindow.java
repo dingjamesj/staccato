@@ -28,6 +28,8 @@ import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
+import py4j.GatewayServer;
+
 public class StaccatoWindow extends JFrame {
 	
 	private static final int WIDTH = 1500;
@@ -39,13 +41,40 @@ public class StaccatoWindow extends JFrame {
 	public static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	public static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
 	public static final Color ERROR_STATUS_COLOR = new Color(0xff4545);
-	
-	public static StaccatoWindow mainWindow;
-	
+		
 	private boolean isDownloading = false;
 	private final ImageIcon windowIcon = new ImageIcon(getClass().getResource("/staccatoicon.png"));
 
-	private StaccatoWindow() {
+	public static StaccatoWindow staccatoWindow;
+
+	public static void main(String[] args) {
+
+        //---------------START GUI BUILDING-----------
+
+        FlatLaf.registerCustomDefaultsSource("themes");
+		FlatDarkLaf.setup();
+		
+		SwingUtilities.invokeLater(() -> {
+			
+			staccatoWindow = new StaccatoWindow();
+			staccatoWindow.setVisible(true);
+			staccatoWindow.setLocationRelativeTo(null);
+		
+			//------------END GUI BUILDING------------
+
+			//-------START PYTHON COMMUNICATION-------
+			
+			GatewayServer pythonGatewayServer = new GatewayServer(staccatoWindow);
+			pythonGatewayServer.start();
+			System.out.println("[Java] Py4J Gateway Server Started");
+
+			//--------END PYTHON COMMUNICATION--------
+			
+		});
+
+	}
+
+	public StaccatoWindow() {
 		
 		//This is just the loading screen
 		
@@ -150,7 +179,7 @@ public class StaccatoWindow extends JFrame {
 			
 		// }
 		
-		mainWindow = this;
+		StaccatoWindow.staccatoWindow = this;
 		
 	}
 	
@@ -203,21 +232,6 @@ public class StaccatoWindow extends JFrame {
 	public boolean getIsDownloading() {
 		
 		return isDownloading;
-		
-	}
-	
-	public static void main(String[] args) {
-		
-		FlatLaf.registerCustomDefaultsSource("themes");
-		FlatDarkLaf.setup();
-		
-		SwingUtilities.invokeLater(() -> {
-			
-			StaccatoWindow gui = new StaccatoWindow();
-			gui.setVisible(true);
-			gui.setLocationRelativeTo(null);
-			
-		});
 		
 	}
 
