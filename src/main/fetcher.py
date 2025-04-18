@@ -8,8 +8,8 @@ import yt_dlp
 SETTINGS_FILE_LOCATION = ""
 NUM_ACCEPTED_SEARCHES = 5
 
-keys: list[str] = None
-market: str = None
+keys: list[str] = ["you are not getting my KEYS", "NO"]
+market: str = "US"
 
 def update_settings():
     try:
@@ -35,7 +35,8 @@ def get_spotify_playlist_tracks(spotify_id: str) -> list[dict]:
     return sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
 
 def get_spotify_track(spotify_id: str) -> dict:
-    return None
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=keys[0], client_secret=keys[1]))
+    return sp.track(track_id=spotify_id, market=market)
 
 def search_youtube(title: str, artists: str) -> str:
     # Search for the top few videos---searching with "{Title} {1st artist}"
@@ -80,7 +81,7 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
         score = score - 3
     
     if "audio" in video_title or "lyrics" in video_title:
-        score = score + 2
+        score = score + 3
     
     if index == 0:
         score = score + 2
@@ -97,8 +98,6 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
     return score
 
 if __name__ == "__main__":
-    keys = ["1c41bf31426e46a6a4c44d3f9bac1424", "bb9d381f22204bdabbf0418767ca3aaf"]
-    market = "US"
     # tracks = None
     # tracks = get_spotify_playlist_tracks("https://open.spotify.com/playlist/1zUUwGZh02drh2M13yNcVD?si=fe3a24a9e483426b")
     # print(tracks)
