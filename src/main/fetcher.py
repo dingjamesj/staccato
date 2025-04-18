@@ -1,41 +1,46 @@
 # Fetches Spotify information
 
+import platform
+
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 import yt_dlp
 
-SETTINGS_FILE_LOCATION = ""
-NUM_ACCEPTED_SEARCHES = 5
+SETTINGS_FILE_LOCATION = "staccatoapikeys.txt"
+NUM_ACCEPTED_SEARCHES = 3
 
-keys: list[str] = ["you are not getting my KEYS", "NO"]
-market: str = "US"
+api_keys: list[str] = []
+market: str = ""
 
-def update_settings():
+def read_api_settings():
     try:
         file = open(SETTINGS_FILE_LOCATION, "r")
-        keys.clear()
-        keys.append(file.readline())
-        keys.append(file.readline())
-        market = file.readline()
+        api_keys.clear()
+        api_keys.append(file.readline().strip())
+        api_keys.append(file.readline().strip())
+        market = file.readline().strip()
         file.close()
     except IOError as e:
         print(e)
 
-def set_spotify_api_keys(client_id: str, client_secret: str):
+def change_api_settings(client_id: str, client_secret: str, market: str):
     try:
         file = open(SETTINGS_FILE_LOCATION, "w")
-        file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
+        if platform.system().lower() == "windows":
+            file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
+        else:
+            file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
         file.close()
     except IOError as e:
         print(e)
 
 def get_spotify_playlist_tracks(spotify_id: str) -> list[dict]:
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=keys[0], client_secret=keys[1]))
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
     return sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
 
 def get_spotify_track(spotify_id: str) -> dict:
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=keys[0], client_secret=keys[1]))
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
     return sp.track(track_id=spotify_id, market=market)
 
 def search_youtube(title: str, artists: str) -> str:
@@ -84,9 +89,6 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
         score = score + 3
     
     if index == 0:
-        score = score + 2
-    
-    if index != 0 and index < 3:
         score = score + 1
     
     if target_artists in video_channel:
@@ -117,4 +119,6 @@ if __name__ == "__main__":
     # print(send_tracks_to_java("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=c3ad19f5390b4aa1"))
     # print(send_tracks_to_java("https://open.spotify.com/track/5SIvP6TdWc9DNvKbENjnYc?si=1da78ef172254cf1", True))
 
+    read_api_settings()
+    print(api_keys)
     pass

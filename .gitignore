@@ -38,7 +38,7 @@ buildNumber.properties
 .classpath
 
 # Local Files
-/staccatoapikeys.dat
+/staccatoapikeys.txt
 *.mp3
 temp/
 .cache

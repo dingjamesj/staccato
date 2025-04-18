@@ -61,6 +61,7 @@ class PythonLink(object):
         implements = ["main.JavaLink.IPythonLink"]
 
 if __name__ == "__main__":
+    fetcher.read_api_settings()
     entry_point = PythonLink()
     gateway = ClientServer(
         java_parameters=JavaParameters(),
