@@ -1,6 +1,6 @@
 package main;
 
-public class SpotipyException extends RuntimeException {
+public class SpotipyException extends Exception {
     
     private int httpStatus;
 

@@ -17,7 +17,7 @@ public class CurrentTrackInfoPanel extends JPanel {
     private static final Font ARTISTS_FONT = new Font("Segoe UI", Font.BOLD, 36);
     private static final Font ALBUM_FONT = new Font("Segoe UI", Font.ITALIC, 36);
     private static final Font AUDIO_FORMAT_FONT = new Font("Segoe UI", Font.BOLD, 36);
-    private static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 36);
+    private static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 18);
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
 
     private JLabel titleLabel;

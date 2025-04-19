@@ -1,6 +1,5 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -19,7 +18,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -99,34 +97,41 @@ public class StaccatoWindow extends JFrame {
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
-		constraints.fill = GridBagConstraints.BOTH;
+		constraints.weightx = 0;
+		constraints.weighty = 1;
+		constraints.fill = GridBagConstraints.VERTICAL;
 		add(queuePanel, constraints);
 
 		TracklistPanel tracklistPanel = new TracklistPanel();
 		tracklistPanel.setBackground(Color.red);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
-		constraints.gridwidth = 1;
+		constraints.gridwidth = 2;
 		constraints.gridheight = 1;
+		constraints.weightx = 1;
+		constraints.weighty = 1;
 		constraints.fill = GridBagConstraints.BOTH;
 		add(tracklistPanel, constraints);
 
 		CurrentTrackInfoPanel currentTrackInfoPanel = new CurrentTrackInfoPanel();
 		currentTrackInfoPanel.setBackground(Color.magenta);
-		constraints.gridx = 2;
+		constraints.gridx = 3;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
-		constraints.fill = GridBagConstraints.BOTH;
+		constraints.weightx = 0;
+		constraints.weighty = 1;
+		constraints.fill = GridBagConstraints.VERTICAL;
 		add(currentTrackInfoPanel, constraints);
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();
 		playbarPanel.setBackground(Color.cyan);
 		constraints.gridx = 0;
 		constraints.gridy = 1;
-		constraints.gridwidth = 3;
+		constraints.gridwidth = 4;
 		constraints.gridheight = 1;
-		constraints.fill = GridBagConstraints.BOTH;
+		constraints.weighty = 0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
 		add(playbarPanel, constraints);
 		
 		//--------END PANEL PLACEMENT-------

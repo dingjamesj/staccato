@@ -1,13 +1,10 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.net.URL;
 
-import javax.sound.midi.Track;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -107,6 +104,8 @@ public class TracklistPanel extends JPanel {
         constraints.gridy = 2;
         constraints.gridwidth = 5;
         constraints.gridheight = 1;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
         add(scrollPane, constraints);
 

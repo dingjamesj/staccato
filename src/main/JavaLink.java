@@ -60,11 +60,35 @@ public class JavaLink {
     public static void main(String[] args) {
 
         System.out.println("1");
-        Set<Track> tracks;
-        // tracks = getTracks("tps://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", false);
+        Set<Track> tracks = null;
+
+        try {
+
+            tracks = getTracks("tps://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", false);
+
+        } catch(SpotipyException e) {
+
+            e.printStackTrace();
+
+        }
+
         // tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", false);
         // tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", true);
-        tracks = getTracks("https://open.spotify.com/track/0rx7xu0RmZLpJjKNVZjSVv?si=f4edb873a32e4629", false);
+        try {
+
+            tracks = getTracks("https://open.spotify.com/track/0rx7xu0RmZLpJjKNVZjSVv?si=f4edb873a32e4629", false);
+
+        } catch (SpotipyException e) {
+
+            e.printStackTrace();
+
+        }
+
+        if(tracks == null) {
+
+            return;
+
+        }
 
         int i = 0;
         for(Track track: tracks) {

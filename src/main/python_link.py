@@ -14,6 +14,7 @@ class PythonLink(object):
         self._gateway = gateway
         pass
     
+    # Method to be called from JavaLink.java
     def send_tracks_to_java(self, spotify_id: str, is_playlist: bool) -> list[dict[str, str]]:
         spotify_tracks: list[dict]
         try: 
