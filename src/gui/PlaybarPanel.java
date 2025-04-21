@@ -19,12 +19,16 @@ public class PlaybarPanel extends JPanel {
     private static final ImageIcon PAUSE_ICON = createImageIcon("src/main/resources/pause.png");
     private static final ImageIcon SKIP_ICON = createImageIcon("src/main/resources/skip.png");
     private static final ImageIcon GO_BACK_ICON = createImageIcon("src/main/resources/go back.png");
+    private static final int PROGRESSBAR_TO_SCREEN_BOTTOM_GAP = 20;
+    private static final int PROGRESSBAR_TO_SCREEN_SIDES_GAP = 250;
 
     private JLabel timeElapsedLabel;
     private JLabel timeRemainingLabel;
     private JProgressBar progressBar;
 
     public static PlaybarPanel playbarPanel;
+
+    private boolean isPlaying = false;
 
     public PlaybarPanel() {
 
@@ -52,7 +56,7 @@ public class PlaybarPanel extends JPanel {
 
         //------END PLAY/PAUSE, SKIP/GO-BACK BUTTONS PANEL------
 
-        //-----BEGIN PROGRESS BAR PANEL-----
+        //---------------BEGIN PROGRESS BAR PANEL---------------
 
         JPanel progressbarPanel = new JPanel();
         progressbarPanel.setLayout(new BoxLayout(progressbarPanel, BoxLayout.Y_AXIS));
@@ -75,11 +79,38 @@ public class PlaybarPanel extends JPanel {
         progressBar.setAlignmentX(CENTER_ALIGNMENT);
         progressbarPanel.add(progressBar);
         
-        add(progressbarPanel);
+        //Wrapper for the progress bar panel (allows gap between screen edges)
+        JPanel wrapperPanel = new JPanel();
+        wrapperPanel.setLayout(new BoxLayout(wrapperPanel, BoxLayout.X_AXIS));
+        wrapperPanel.add(Box.createHorizontalStrut(PROGRESSBAR_TO_SCREEN_SIDES_GAP));
+        wrapperPanel.add(progressbarPanel);
+        wrapperPanel.add(Box.createHorizontalStrut(PROGRESSBAR_TO_SCREEN_SIDES_GAP));
+        add(wrapperPanel);
+        add(Box.createVerticalStrut(PROGRESSBAR_TO_SCREEN_BOTTOM_GAP));
 
-        //------END PROGRESS BAR PANEL------
+        //----------------END PROGRESS BAR PANEL----------------
 
         PlaybarPanel.playbarPanel = this;
+
+        //----------------START ACTION LISTENERS----------------
+
+        playPauseButton.addActionListener((e) -> {
+
+            if(isPlaying) {
+
+                isPlaying = false;
+                playPauseButton.setIcon(PLAY_ICON);
+
+            } else {
+
+                isPlaying = true;
+                playPauseButton.setIcon(PAUSE_ICON);
+
+            }
+
+        });
+
+        //-----------------END ACTION LISTENERS-----------------
 
     }
 
