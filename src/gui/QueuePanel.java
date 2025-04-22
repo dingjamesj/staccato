@@ -23,7 +23,7 @@ public class QueuePanel extends JPanel {
     private static final int NUMBER_COLUMN_WIDTH = 30;
     private static final int TITLE_COLUMN_WIDTH = 100;
     private static final int ARTISTS_COLUMN_WIDTH = 60;
-    private static final Insets QUEUE_LABEL_INSETS = new Insets(10, 5, 8, 0);
+    private static final Insets QUEUE_LABEL_INSETS = new Insets(20, 5, 8, 0);
 
     private DefaultTableModel tableModel;
 

@@ -3,6 +3,7 @@ package gui;
 import java.awt.Font;
 import java.net.URL;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -19,6 +20,9 @@ public class CurrentTrackInfoPanel extends JPanel {
     private static final Font AUDIO_FORMAT_FONT = new Font("Segoe UI", Font.BOLD, 36);
     private static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 18);
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
+
+    private static final int GUI_GAP = 10;
+    private static final int GUI_SECTIONS_GAP = 30;
 
     private JLabel titleLabel;
     private JLabel albumArtLabel;
@@ -57,14 +61,20 @@ public class CurrentTrackInfoPanel extends JPanel {
         youtubeLinkButton.setFont(BUTTON_FONT);
         openFileLocationButton.setFont(BUTTON_FONT);
 
+        add(Box.createVerticalStrut(GUI_GAP));
         add(titleLabel);
+        add(Box.createVerticalStrut(GUI_GAP));
         add(albumArtLabel);
+        add(Box.createVerticalStrut(GUI_GAP));
         add(artistsLabel);
         add(albumLabel);
+        add(Box.createVerticalStrut(GUI_SECTIONS_GAP));
         add(mp3Button);
         add(aacButton);
         add(wavButton);
+        add(Box.createVerticalStrut(GUI_SECTIONS_GAP));
         add(youtubeLinkButton);
+        add(Box.createVerticalStrut(GUI_GAP));
         add(openFileLocationButton);
 
     }

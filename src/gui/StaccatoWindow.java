@@ -95,7 +95,7 @@ public class StaccatoWindow extends JFrame {
 		add(queuePanel, constraints);
 
 		TracklistPanel tracklistPanel = new TracklistPanel();
-		tracklistPanel.setBackground(Color.red);
+		// tracklistPanel.setBackground(Color.red);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;

@@ -3,8 +3,10 @@ package gui;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.net.URL;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,6 +24,9 @@ public class TracklistPanel extends JPanel {
     private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
+
+    private static final int INFO_PANEL_SPACING = 7;
+    private static final int INFO_PANEL_TABLE_GAP = 0;
 
     private DefaultTableModel tableModel;
 
@@ -51,43 +56,46 @@ public class TracklistPanel extends JPanel {
         JLabel playlistDescriptionLabel = new JLabel(createDescription(playlist));
         JButton refreshDirectoryButton = new JButton(REFRESH_ICON);
         JButton resyncToOriginButton = new JButton(RESYNC_ICON);
+        JPanel playlistTextPanel = new JPanel();
 
         playlistTitleLabel.setFont(PLAYLIST_TITLE_FONT);
+        playlistTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
+        playlistTitleLabel.setText("saco");
         playlistDescriptionLabel.setFont(PLAYLIST_DESCRIPTION_FONT);
+        playlistDescriptionLabel.setAlignmentX(LEFT_ALIGNMENT);
+        playlistTextPanel.setLayout(new BoxLayout(playlistTextPanel, BoxLayout.Y_AXIS));
 
-        constraints.anchor = GridBagConstraints.CENTER;
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.gridwidth = 2;
-        constraints.gridheight = 2;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.anchor = GridBagConstraints.CENTER;
         add(playlistCoverButton, constraints);
 
-        constraints.anchor = GridBagConstraints.LAST_LINE_START; //(this is just SOUTH-EAST)
+        playlistTextPanel.add(playlistTitleLabel);
+        playlistTextPanel.add(playlistDescriptionLabel);
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
+        constraints.anchor = GridBagConstraints.LAST_LINE_START;
+        add(playlistTextPanel, constraints);
+
         constraints.gridx = 2;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
-        add(playlistTitleLabel, constraints);
-
-        constraints.anchor = GridBagConstraints.LINE_START;
-        constraints.gridx = 2;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        add(playlistDescriptionLabel, constraints);
-
-        constraints.anchor = GridBagConstraints.PAGE_END;
-        constraints.gridx = 3;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
+        constraints.anchor = GridBagConstraints.LAST_LINE_START;
+        constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
         add(refreshDirectoryButton, constraints);
 
-        constraints.anchor = GridBagConstraints.PAGE_END;
-        constraints.gridx = 4;
-        constraints.gridy = 1;
+        constraints.gridx = 3;
+        constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
+        constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
+        constraints.anchor = GridBagConstraints.LAST_LINE_START;
         add(resyncToOriginButton, constraints);
 
         //------END BUILDING PLAYLIST INFO PANEL------
@@ -99,13 +107,14 @@ public class TracklistPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(tracklistTable);
         tracklistTable.setFillsViewportHeight(true);
 
-        constraints.anchor = GridBagConstraints.CENTER;
         constraints.gridx = 0;
-        constraints.gridy = 2;
-        constraints.gridwidth = 5;
+        constraints.gridy = 1;
+        constraints.gridwidth = 4;
         constraints.gridheight = 1;
         constraints.weightx = 1;
         constraints.weighty = 1;
+        constraints.insets = new Insets(INFO_PANEL_TABLE_GAP, 0, 0, 0);
+        constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.BOTH;
         add(scrollPane, constraints);
 
@@ -131,7 +140,15 @@ public class TracklistPanel extends JPanel {
 
     private static String createDescription(Playlist playlist) {
 
-        return "<html>" + playlist.getDirectory() + "<br></br>" + playlist.getSize() + ", " + playlist.getDuration() + " </html>";
+        if(playlist.getSize() == 1) {
+
+            return "<html>" + playlist.getDirectory() + "<br></br><b>" + playlist.getSize() + " song:</b> " + playlist.getDuration() + " </html>";
+
+        } else{
+
+            return "<html>" + playlist.getDirectory() + "<br></br><b>" + playlist.getSize() + " songs:</b> " + playlist.getDuration() + " </html>";
+
+        }
         
     }
 
