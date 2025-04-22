@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -14,24 +15,23 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
-import py4j.GatewayServer;
-
 public class StaccatoWindow extends JFrame {
 	
 	private static final int WIDTH = 1500;
-	public static final int HEIGHT = 900;
+	private static final int HEIGHT = 900;
+	private static final int PLAYBAR_TO_SCREEN_BOTTOM_GAP = 12;
+    private static final int PLAYBAR_TO_SCREEN_SIDES_GAP = 75;
+	private static final int PLAYBAR_TO_TRACKLIST_GAP = 10;
+	private static final int CURRENTLY_PLAYING_PANEL_INSETS = 10;
+
 	public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
 	public static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
 	public static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 12);
@@ -59,14 +59,6 @@ public class StaccatoWindow extends JFrame {
 			staccatoWindow.setLocationRelativeTo(null);
 		
 			//------------END GUI BUILDING------------
-
-			//-------START PYTHON COMMUNICATION-------
-			
-			GatewayServer pythonGatewayServer = new GatewayServer(staccatoWindow);
-			pythonGatewayServer.start();
-			System.out.println("[Java] Py4J Gateway Server Started");
-
-			//--------END PYTHON COMMUNICATION--------
 			
 		});
 
@@ -92,11 +84,11 @@ public class StaccatoWindow extends JFrame {
 		//-------START PANEL PLACEMENT------
 
 		QueuePanel queuePanel = new QueuePanel();
-		queuePanel.setBackground(Color.green);
+		// queuePanel.setBackground(Color.green);
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
-		constraints.gridheight = 1;
+		constraints.gridheight = 2;
 		constraints.weightx = 0;
 		constraints.weighty = 1;
 		constraints.fill = GridBagConstraints.VERTICAL;
@@ -106,7 +98,7 @@ public class StaccatoWindow extends JFrame {
 		tracklistPanel.setBackground(Color.red);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
-		constraints.gridwidth = 2;
+		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
 		constraints.weightx = 1;
 		constraints.weighty = 1;
@@ -114,23 +106,25 @@ public class StaccatoWindow extends JFrame {
 		add(tracklistPanel, constraints);
 
 		CurrentTrackInfoPanel currentTrackInfoPanel = new CurrentTrackInfoPanel();
-		currentTrackInfoPanel.setBackground(Color.magenta);
-		constraints.gridx = 3;
+		// currentTrackInfoPanel.setBackground(Color.magenta);
+		constraints.gridx = 2;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
-		constraints.gridheight = 1;
+		constraints.gridheight = 2;
 		constraints.weightx = 0;
 		constraints.weighty = 1;
+		constraints.insets = new Insets(CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS);
 		constraints.fill = GridBagConstraints.VERTICAL;
 		add(currentTrackInfoPanel, constraints);
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();
-		playbarPanel.setBackground(Color.cyan);
-		constraints.gridx = 0;
+		// playbarPanel.setBackground(Color.cyan);
+		constraints.gridx = 1;
 		constraints.gridy = 1;
-		constraints.gridwidth = 4;
+		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
 		constraints.weighty = 0;
+		constraints.insets = new Insets(PLAYBAR_TO_TRACKLIST_GAP, PLAYBAR_TO_SCREEN_SIDES_GAP, PLAYBAR_TO_SCREEN_BOTTOM_GAP, PLAYBAR_TO_SCREEN_SIDES_GAP);
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		add(playbarPanel, constraints);
 		
@@ -138,23 +132,23 @@ public class StaccatoWindow extends JFrame {
 		
 		//-----START MODIFYING MENU BAR-----
 
-		UIManager.put("TitlePane.embeddedForeground", new Color(0x1a1a1a));
-		UIManager.put("TitlePane.inactiveForeground", new Color(0x1a1a1a));
-		JMenuBar menuBar = new JMenuBar();
-		JMenu settingsMenu = new JMenu("Settings");
-		JMenuItem setSpotifyAPIKeysItem = new JMenuItem("Set Spotify API Keys");
-		settingsMenu.add(setSpotifyAPIKeysItem);
-		menuBar.add(settingsMenu);
-		setSpotifyAPIKeysItem.addActionListener((e) -> {
+		// UIManager.put("TitlePane.embeddedForeground", new Color(0x1a1a1a));
+		// UIManager.put("TitlePane.inactiveForeground", new Color(0x1a1a1a));
+		// JMenuBar menuBar = new JMenuBar();
+		// JMenu settingsMenu = new JMenu("Settings");
+		// JMenuItem setSpotifyAPIKeysItem = new JMenuItem("Set Spotify API Keys");
+		// settingsMenu.add(setSpotifyAPIKeysItem);
+		// menuBar.add(settingsMenu);
+		// setSpotifyAPIKeysItem.addActionListener((e) -> {
 			
-			// APIKeysStorage.openSetAPIKeysDialog(false);
+		// 	// APIKeysStorage.openSetAPIKeysDialog(false);
 			
-		});
-		setJMenuBar(menuBar);
+		// });
+		// setJMenuBar(menuBar);
 		
-		revalidate();
-		repaint();
-		SwingUtilities.updateComponentTreeUI(this);
+		// revalidate();
+		// repaint();
+		// SwingUtilities.updateComponentTreeUI(this);
 
 		//------END MODIFYING MENU BAR------
 		//-------------------END GUI BUILDING-------------------

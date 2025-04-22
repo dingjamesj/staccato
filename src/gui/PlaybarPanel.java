@@ -19,8 +19,9 @@ public class PlaybarPanel extends JPanel {
     private static final ImageIcon PAUSE_ICON = createImageIcon("src/main/resources/pause.png");
     private static final ImageIcon SKIP_ICON = createImageIcon("src/main/resources/skip.png");
     private static final ImageIcon GO_BACK_ICON = createImageIcon("src/main/resources/go back.png");
-    private static final int PROGRESSBAR_TO_SCREEN_BOTTOM_GAP = 20;
-    private static final int PROGRESSBAR_TO_SCREEN_SIDES_GAP = 250;
+    
+    //GUI spacing constants
+    private static final int BUTTONS_TO_PROGRESSBAR_GAP = 0;
 
     private JLabel timeElapsedLabel;
     private JLabel timeRemainingLabel;
@@ -52,7 +53,7 @@ public class PlaybarPanel extends JPanel {
         playbackButtonsPanel.add(Box.createHorizontalStrut(20));
         playbackButtonsPanel.add(skipButton);
         add(playbackButtonsPanel);
-        add(Box.createVerticalStrut(10));
+        add(Box.createVerticalStrut(BUTTONS_TO_PROGRESSBAR_GAP));
 
         //------END PLAY/PAUSE, SKIP/GO-BACK BUTTONS PANEL------
 
@@ -77,16 +78,14 @@ public class PlaybarPanel extends JPanel {
 
         progressBar = new JProgressBar();
         progressBar.setAlignmentX(CENTER_ALIGNMENT);
+        progressBar.putClientProperty("JProgressBar.largeHeight", true);
         progressbarPanel.add(progressBar);
         
         //Wrapper for the progress bar panel (allows gap between screen edges)
         JPanel wrapperPanel = new JPanel();
         wrapperPanel.setLayout(new BoxLayout(wrapperPanel, BoxLayout.X_AXIS));
-        wrapperPanel.add(Box.createHorizontalStrut(PROGRESSBAR_TO_SCREEN_SIDES_GAP));
         wrapperPanel.add(progressbarPanel);
-        wrapperPanel.add(Box.createHorizontalStrut(PROGRESSBAR_TO_SCREEN_SIDES_GAP));
         add(wrapperPanel);
-        add(Box.createVerticalStrut(PROGRESSBAR_TO_SCREEN_BOTTOM_GAP));
 
         //----------------END PROGRESS BAR PANEL----------------
 
