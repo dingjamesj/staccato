@@ -26,7 +26,7 @@ public class TracklistPanel extends JPanel {
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
 
     private static final int INFO_PANEL_SPACING = 7;
-    private static final int INFO_PANEL_TABLE_GAP = 0;
+    private static final int INFO_PANEL_TABLE_GAP = 3;
 
     private DefaultTableModel tableModel;
 

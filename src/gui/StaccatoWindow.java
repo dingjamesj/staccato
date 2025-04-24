@@ -31,6 +31,9 @@ public class StaccatoWindow extends JFrame {
     private static final int PLAYBAR_TO_SCREEN_SIDES_GAP = 75;
 	private static final int PLAYBAR_TO_TRACKLIST_GAP = 10;
 	private static final int CURRENTLY_PLAYING_PANEL_INSETS = 10;
+	private static final double QUEUE_PANEL_WIDTH_PROPORTION = 0.12;
+	private static final double TRACKLIST_PANEL_WIDTH_PROPORTION = 0.76;
+	private static final double CURRENT_TRACK_INFO_WIDTH_PROPORTION = 0.12;
 
 	public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
 	public static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
@@ -84,37 +87,37 @@ public class StaccatoWindow extends JFrame {
 		//-------START PANEL PLACEMENT------
 
 		QueuePanel queuePanel = new QueuePanel();
-		// queuePanel.setBackground(Color.green);
+		queuePanel.setBackground(Color.green);
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 2;
-		constraints.weightx = 0;
+		constraints.weightx = QUEUE_PANEL_WIDTH_PROPORTION;
 		constraints.weighty = 1;
-		constraints.fill = GridBagConstraints.VERTICAL;
+		constraints.fill = GridBagConstraints.BOTH;
 		add(queuePanel, constraints);
 
 		TracklistPanel tracklistPanel = new TracklistPanel();
-		// tracklistPanel.setBackground(Color.red);
+		tracklistPanel.setBackground(Color.red);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
-		constraints.weightx = 1;
+		constraints.weightx = TRACKLIST_PANEL_WIDTH_PROPORTION;
 		constraints.weighty = 1;
 		constraints.fill = GridBagConstraints.BOTH;
 		add(tracklistPanel, constraints);
 
 		CurrentTrackInfoPanel currentTrackInfoPanel = new CurrentTrackInfoPanel();
-		// currentTrackInfoPanel.setBackground(Color.magenta);
+		currentTrackInfoPanel.setBackground(Color.magenta);
 		constraints.gridx = 2;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 2;
-		constraints.weightx = 0;
+		constraints.weightx = CURRENT_TRACK_INFO_WIDTH_PROPORTION;
 		constraints.weighty = 1;
 		constraints.insets = new Insets(CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS);
-		constraints.fill = GridBagConstraints.VERTICAL;
+		constraints.fill = GridBagConstraints.BOTH;
 		add(currentTrackInfoPanel, constraints);
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();

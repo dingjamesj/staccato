@@ -1,14 +1,11 @@
 package gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,9 +15,9 @@ import javax.swing.table.TableColumnModel;
 
 public class QueuePanel extends JPanel {
     
-    private static final Font QUEUE_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 24);
+    private static final Font QUEUE_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 30);
 
-    private static final int NUMBER_COLUMN_WIDTH = 30;
+    private static final int NUMBER_COLUMN_WIDTH = 5;
     private static final int TITLE_COLUMN_WIDTH = 100;
     private static final int ARTISTS_COLUMN_WIDTH = 60;
     private static final Insets QUEUE_LABEL_INSETS = new Insets(20, 5, 8, 0);
@@ -69,7 +66,8 @@ public class QueuePanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(queueTable);
 
         queueLabel.setFont(QUEUE_LABEL_FONT);
-        queueTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        queueLabel.setOpaque(true);
+        // queueTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         queueTable.setFillsViewportHeight(true);
         TableColumnModel columnModel = queueTable.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(NUMBER_COLUMN_WIDTH);
@@ -84,15 +82,17 @@ public class QueuePanel extends JPanel {
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.gridwidth = 1;
+        constraints.weightx = 1;
         constraints.weighty = 0;
         constraints.insets = QUEUE_LABEL_INSETS;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.LINE_START;
+        constraints.fill = GridBagConstraints.BOTH;
         add(queueLabel, constraints);
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         constraints.gridwidth = 1;
+        constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.insets = new Insets(0, 0, 0, 0);
         constraints.anchor = GridBagConstraints.CENTER;
