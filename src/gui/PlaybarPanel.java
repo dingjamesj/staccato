@@ -1,7 +1,11 @@
 package gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.net.URL;
 
 import javax.swing.Box;
@@ -21,7 +25,8 @@ public class PlaybarPanel extends JPanel {
     private static final ImageIcon GO_BACK_ICON = createImageIcon("src/main/resources/go back.png");
     
     //GUI spacing constants
-    private static final int BUTTONS_TO_PROGRESSBAR_GAP = 0;
+    private static final int BUTTONS_TO_PROGRESSBAR_GAP = 9;
+    private static final int BUTTONS_SPACING = 9;
 
     private JLabel timeElapsedLabel;
     private JLabel timeRemainingLabel;
@@ -33,59 +38,73 @@ public class PlaybarPanel extends JPanel {
 
     public PlaybarPanel() {
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
 
         //-----BEGIN PLAY/PAUSE, SKIP/GO-BACK BUTTONS PANEL-----
 
-        JPanel playbackButtonsPanel = new JPanel();
         JButton goBackButton = new JButton(GO_BACK_ICON);
         JButton playPauseButton = new JButton(PLAY_ICON);
         JButton skipButton = new JButton(SKIP_ICON);
+        timeElapsedLabel = new JLabel("0:00");
+        timeRemainingLabel = new JLabel("-:--");
+        progressBar = new JProgressBar();
 
-        playbackButtonsPanel.setLayout(new BoxLayout(playbackButtonsPanel, BoxLayout.X_AXIS));
-        goBackButton.setPreferredSize(new Dimension(45, 45));
-        playPauseButton.setPreferredSize(new Dimension(45, 45));
-        skipButton.setPreferredSize(new Dimension(45, 45));
+        timeElapsedLabel.setFont(TIME_FONT);
+        timeRemainingLabel.setFont(TIME_FONT);
+        progressBar.setAlignmentX(CENTER_ALIGNMENT);
+        progressBar.putClientProperty("JProgressBar.largeHeight", true);
 
-        playbackButtonsPanel.add(goBackButton);
-        playbackButtonsPanel.add(Box.createHorizontalStrut(20));
-        playbackButtonsPanel.add(playPauseButton);
-        playbackButtonsPanel.add(Box.createHorizontalStrut(20));
-        playbackButtonsPanel.add(skipButton);
-        add(playbackButtonsPanel);
-        add(Box.createVerticalStrut(BUTTONS_TO_PROGRESSBAR_GAP));
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.weightx = 1;
+        constraints.anchor = GridBagConstraints.LAST_LINE_START;
+        constraints.fill = GridBagConstraints.NONE;
+        add(timeElapsedLabel, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.weightx = 0;
+        constraints.anchor = GridBagConstraints.CENTER;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(0, 0, 0, BUTTONS_SPACING);
+        add(goBackButton, constraints);
+        constraints.gridx = 2;
+        add(playPauseButton, constraints);
+        constraints.gridx = 3;
+        constraints.insets = new Insets(0, 0, 0, 0);
+        add(skipButton, constraints);
+
+        constraints.gridx = 4;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.weightx = 1;
+        constraints.anchor = GridBagConstraints.LAST_LINE_END;
+        constraints.fill = GridBagConstraints.NONE;
+        add(timeRemainingLabel, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 5;
+        constraints.gridheight = 1;
+        constraints.weightx = 1;
+        constraints.anchor = GridBagConstraints.CENTER;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(BUTTONS_TO_PROGRESSBAR_GAP, 0, 0, 0);
+        add(progressBar, constraints);
 
         //------END PLAY/PAUSE, SKIP/GO-BACK BUTTONS PANEL------
 
         //---------------BEGIN PROGRESS BAR PANEL---------------
 
-        JPanel progressbarPanel = new JPanel();
-        progressbarPanel.setLayout(new BoxLayout(progressbarPanel, BoxLayout.Y_AXIS));
-
         //Time panel
-        JPanel timePanel = new JPanel();
-        timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.X_AXIS));
-        timeElapsedLabel = new JLabel("0:00");
-        timeRemainingLabel = new JLabel("-:--");
 
-        timeElapsedLabel.setFont(TIME_FONT);
-        timeRemainingLabel.setFont(TIME_FONT);
-
-        timePanel.add(timeElapsedLabel);
-        timePanel.add(Box.createHorizontalGlue());
-        timePanel.add(timeRemainingLabel);
-        progressbarPanel.add(timePanel);
-
-        progressBar = new JProgressBar();
-        progressBar.setAlignmentX(CENTER_ALIGNMENT);
-        progressBar.putClientProperty("JProgressBar.largeHeight", true);
-        progressbarPanel.add(progressBar);
         
-        //Wrapper for the progress bar panel (allows gap between screen edges)
-        JPanel wrapperPanel = new JPanel();
-        wrapperPanel.setLayout(new BoxLayout(wrapperPanel, BoxLayout.X_AXIS));
-        wrapperPanel.add(progressbarPanel);
-        add(wrapperPanel);
 
         //----------------END PROGRESS BAR PANEL----------------
 

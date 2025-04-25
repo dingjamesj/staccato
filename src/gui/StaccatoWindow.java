@@ -42,7 +42,7 @@ public class StaccatoWindow extends JFrame {
 	public static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 13);
 	public static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 13);
 	public static final Color ERROR_STATUS_COLOR = new Color(0xff4545);
-		
+	
 	private boolean isDownloading = false;
 	private final ImageIcon windowIcon = new ImageIcon(getClass().getResource("/staccatoicon.png"));
 
