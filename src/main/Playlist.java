@@ -18,18 +18,24 @@ import javax.swing.ImageIcon;
 */
 public class Playlist implements Serializable {
 
-    //Remember that staccato tracks where files were sourced from and where they are located.
-    //Hence we need to store the Track set---each track contains where they're sourced from and where they're located.
-    private Set<Track> tracks;
-    private String title;
+    private static final long serialVersionUID = 0L;
+
+    //Staccato only tracks the name, directory, and cover art of a playlist.
+    //Everything else is 
+    private String name;
     private String directory;
     private ImageIcon coverArt;
-    private int duration = -1;
 
-    public Playlist(String directory) {
+    private transient Set<Track> tracks;
+    private transient int duration;
 
-        tracks = new HashSet<Track>();
+    public Playlist(String name, String directory, ImageIcon coverArt) {
+
+        this.name = name;
         this.directory = directory;
+        this.coverArt = coverArt;
+        duration = -1;
+        tracks = new HashSet<Track>();
 
     }
 
@@ -39,9 +45,9 @@ public class Playlist implements Serializable {
 
     }
 
-    public String getTitle() {
+    public String getName() {
 
-        return title;
+        return name;
 
     }
 
@@ -109,12 +115,60 @@ public class Playlist implements Serializable {
         return tracks.size();
 
     }
+
+    @Override
+    public String toString() {
+
+        return name + " @ " + directory;
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return directory.hashCode();
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if(obj == null) {
+
+            return false;
+
+        }
+
+        if(getClass() != obj.getClass()) {
+
+            return false;
+
+        }
+
+        //Windows isn't case sensitive, while Unix-based/Unix-like are (e.g. MacOS and Linux)
+        if(System.getProperty("os.name").toLowerCase().contains("windows")) {
+
+            return directory.equalsIgnoreCase(((Playlist) obj).directory);
+
+        } else {
+
+            return directory.equals(((Playlist) obj).directory);
+
+        }
+
+    }
     
     private static String formatHoursMinutesSeconds(int seconds) {
 
         int hours = seconds /= 3600;
         int minutes = seconds /= 60;
         return hours + " hr, " + minutes + " min, " + seconds + " s";
+
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(System.getProperty("os.name"));
 
     }
 

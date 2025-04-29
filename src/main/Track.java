@@ -22,29 +22,27 @@ import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
-public class Track implements Serializable {
+public class Track {
 
 	//Remember that staccato only...
 	//  1. Tracks where audio files are sourced from and where they are located.
 	//  2. Reads the audio files.
 	//In other words, we only store the file location and the YouTube ID.
-	private String fileLocation;
-	private String youtubeID;
 
 	//Properties shown on the playlist and current track viewer
+	private transient String fileLocation;
 	private transient String title = null;
 	private transient String artists = null;
 	private transient String album = null;
 	private transient int duration = -1;
 	private transient String artworkURL;
 	
-	public Track(String title, String artists, String album, String artworkURL, String youtubeID) {
+	public Track(String title, String artists, String album, String artworkURL) {
 		
 		this.title = title;
 		this.artists = artists;
 		this.album = album;
 		this.artworkURL = artworkURL;
-		this.youtubeID = youtubeID;
 		this.fileLocation = "";
 		
 	}
@@ -119,12 +117,6 @@ public class Track implements Serializable {
 		
 	}
 	
-	public String getYouTubeID() {
-		
-		return youtubeID;
-		
-	}
-	
 	public String getArtworkURL() {
 		
 		return artworkURL;
@@ -158,12 +150,6 @@ public class Track implements Serializable {
 	public void setAlbum(String album) {
 		
 		this.album = album;
-		
-	}
-	
-	public void setYouTubeID(String youtubeID) {
-		
-		this.youtubeID = youtubeID;
 		
 	}
 
@@ -254,9 +240,16 @@ public class Track implements Serializable {
 	}
 
 	@Override
+	public int hashCode() {
+
+		return fileLocation.hashCode() + title.hashCode() + artists.hashCode() + album.hashCode() + artworkURL.hashCode();
+
+	}
+
+	@Override
 	public String toString() {
 		
-		return "\"" + title + "\" by " + artists + " @ " + youtubeID;
+		return "\"" + title + "\" by " + artists;
 		
 	}
 
@@ -277,97 +270,6 @@ public class Track implements Serializable {
 
 		return fileLocation.equalsIgnoreCase(((Track) obj).getFileLocation());
 
-	}
-
-	/**
-	 * Downloads an mp3 given a YouTube URL.
-	 * 
-	 * @param url YouTube video URL
-	 * @param dir Directory to put the mp3
-	 * @return The directory of where the file is located
-	 */
-	@Deprecated
-	public int download(String dirStr) {
-		
-		//Make the file name
-		String fileName = (title + " " + artists + " " + youtubeID).replace("\\", "").replace("/", "").replace(":", "").replace("*", "").replace("?", "").replace("\"", "")
-				.replace("<", "").replace(">", "").replace("|", "");
-		
-		//Check if the specified directory exists
-		File dir = new File(dirStr);
-		if(!dir.exists()) {
-			
-			return -1;
-			
-		}
-		
-		//This is the "(number)" at the end of a file (for example, "FileName (1).mp3")
-		int uniqueNumber = countRepeatedFileNames(dirStr, fileName);
-		
-		//Write out the command
-		String[] command;
-		if(uniqueNumber > 0) {
-			
-			command = new String[] {
-					"yt-dlp", 
-					"--audio-format", "mp3", 
-					"-o", "\"" + fileName + " (" + uniqueNumber + ").%(ext)s\"",
-					"--extract-audio",
-					"--no-playlist",
-					"\"https://www.youtube.com/watch?v=" + youtubeID + "\""
-			};
-			
-		} else {
-			
-			command = new String[] {
-					"yt-dlp", 
-					"--audio-format", "mp3", 
-					"-o", "\"" + fileName + ".%(ext)s\"",
-					"--extract-audio",
-					"--no-playlist",
-					"\"https://www.youtube.com/watch?v=" + youtubeID + "\""
-			};
-			
-		}
-		
-		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		processBuilder.directory(dir);
-		processBuilder.inheritIO();
-		try {
-			
-			Process downloadProcess = processBuilder.start();
-			downloadProcess.waitFor();
-			if(uniqueNumber > 0) {
-				
-				fileLocation = dirStr + "\\" + fileName + " (" + uniqueNumber + ").mp3";
-				
-			} else {
-				
-				fileLocation = dirStr + "\\" + fileName + ".mp3";
-				
-			}
-			
-			return 0;
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			String message = e.getMessage();
-			
-			if(message.toLowerCase().contains("cannot run program \"yt-dlp\"")) {
-				
-				e.printStackTrace();
-				
-			}
-						
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-			
-		}
-		
-		return -1;
-		
 	}
 	
 }

@@ -22,16 +22,12 @@ public class JavaLink {
 
         ClientServer clientServer = new ClientServer(null);
         IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
-        System.out.println("1.1");
         List<Map<String, String>> pythonData = pythonLink.send_tracks_to_java(spotifyID, isPlaylist);
-        System.out.println("1.2");
         clientServer.shutdown();
-        System.out.println("1.3");
 
         //Spotipy exception handling
         if(pythonData.size() == 1 && pythonData.get(0).containsKey("httpStatus")) {
 
-            System.out.println("1.3.1");
             throw new SpotipyException(Integer.parseInt(pythonData.get(0).get("httpStatus")), pythonData.get(0).get("msg"));
 
         }
@@ -40,26 +36,21 @@ public class JavaLink {
         Set<Track> tracks = new HashSet<Track>();
         for(int i = 0; i < pythonData.size(); i++) {
 
-            System.out.println("1.4." + i);
-
             tracks.add(new Track(
                 pythonData.get(i).get("title"),
                 pythonData.get(i).get("artists"),
                 pythonData.get(i).get("album"),
-                pythonData.get(i).get("artworkURL"),
-                pythonData.get(i).get("youtubeID")
+                pythonData.get(i).get("artworkURL")
             ));
 
         }
 
-        System.out.println("1.5");
         return tracks;
 
     }
 
     public static void main(String[] args) {
 
-        System.out.println("1");
         Set<Track> tracks = null;
 
         try {
