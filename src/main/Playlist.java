@@ -160,9 +160,10 @@ public class Playlist implements Serializable {
     
     private static String formatHoursMinutesSeconds(int seconds) {
 
-        int hours = seconds /= 3600;
-        int minutes = seconds /= 60;
-        return hours + " hr, " + minutes + " min, " + seconds + " s";
+        String hoursStr = String.format("%02d", seconds / 3600);
+        String minutesStr = String.format("%02d", (seconds % 3600) / 60);
+        String secondsStr = String.format("%02d", (seconds % 3600) % 60);
+        return hoursStr + ":" + minutesStr + ":" + secondsStr;
 
     }
 

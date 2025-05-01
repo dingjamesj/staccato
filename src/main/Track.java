@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -35,6 +34,7 @@ public class Track {
 	private transient String artists = null;
 	private transient String album = null;
 	private transient int duration = -1;
+	private transient byte[] artworkByteArray;
 	private transient String artworkURL;
 	
 	public Track(String title, String artists, String album, String artworkURL) {
@@ -53,7 +53,40 @@ public class Track {
 		if(!new File(fileLocation).exists()) {
 
 			throw new FileNotFoundException();
-			//Execution stops here
+
+		}
+
+		setAttributesFromFileMetadata();
+
+	}
+
+	public Track(File file) throws FileNotFoundException {
+
+		try{
+
+			this.fileLocation = file.getCanonicalPath();
+
+		} catch(IOException e) {
+
+			try {
+
+				this.fileLocation = file.getAbsolutePath();
+
+			} catch(SecurityException e1) {
+
+				this.fileLocation = file.getPath();
+
+			}
+
+		} catch(SecurityException e) {
+
+			this.fileLocation = file.getPath();
+
+		}
+
+		if(!file.exists()) {
+
+			throw new FileNotFoundException();
 
 		}
 
@@ -117,9 +150,9 @@ public class Track {
 		
 	}
 	
-	public String getArtworkURL() {
+	public byte[] getArtworkByteArray() {
 		
-		return artworkURL;
+		return artworkByteArray;
 		
 	}
 	
@@ -173,6 +206,7 @@ public class Track {
 		AudioFile audioFile;
 		try {
 
+			AudioFileIO.logger = null;
 			audioFile = AudioFileIO.read(new File(fileLocation));
 
 		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
@@ -188,6 +222,7 @@ public class Track {
 		artists = tag.getFirst(FieldKey.ARTIST);
 		album = tag.getFirst(FieldKey.ALBUM);
 		duration = header.getTrackLength();
+		artworkByteArray = tag.getFirstArtwork().getBinaryData();
 
 	}
 
@@ -242,14 +277,14 @@ public class Track {
 	@Override
 	public int hashCode() {
 
-		return fileLocation.hashCode() + title.hashCode() + artists.hashCode() + album.hashCode() + artworkURL.hashCode();
+		return fileLocation.hashCode() + title.hashCode() + artists.hashCode() + album.hashCode();
 
 	}
 
 	@Override
 	public String toString() {
 		
-		return "\"" + title + "\" by " + artists;
+		return "\"" + title + "\" [" + formatHoursMinutesSeconds(duration) + "] from \"" + album + "\" by " + artists;
 		
 	}
 
@@ -271,5 +306,13 @@ public class Track {
 		return fileLocation.equalsIgnoreCase(((Track) obj).getFileLocation());
 
 	}
+
+	private static String formatHoursMinutesSeconds(int seconds) {
+
+        String minutesStr = String.format("%02d", (seconds % 3600) / 60);
+        String secondsStr = String.format("%02d", (seconds % 3600) % 60);
+        return minutesStr + ":" + secondsStr;
+
+    }
 	
 }
