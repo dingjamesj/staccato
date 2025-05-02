@@ -30,10 +30,10 @@ public class StaccatoWindow extends JFrame {
 	private static final int PLAYBAR_TO_SCREEN_BOTTOM_GAP = 12;
     private static final int PLAYBAR_TO_SCREEN_SIDES_GAP = 75;
 	private static final int PLAYBAR_TO_TRACKLIST_GAP = 10;
-	private static final int CURRENTLY_PLAYING_PANEL_INSETS = 10;
-	private static final double QUEUE_PANEL_WIDTH_PROPORTION = 0.12;
-	private static final double TRACKLIST_PANEL_WIDTH_PROPORTION = 0.76;
-	private static final double CURRENT_TRACK_INFO_WIDTH_PROPORTION = 0.12;
+	private static final int CURRENTLY_PLAYING_PANEL_INSETS = 12;
+	private static final double QUEUE_PANEL_WIDTH_PROPORTION = 0.20;
+	private static final double TRACKLIST_PANEL_WIDTH_PROPORTION = 0.75;
+	private static final double CURRENT_TRACK_INFO_WIDTH_PROPORTION = 0.20;
 
 	public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
 	public static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
@@ -126,8 +126,10 @@ public class StaccatoWindow extends JFrame {
 		constraints.gridy = 1;
 		constraints.gridwidth = 1;
 		constraints.gridheight = 1;
+		constraints.weightx = TRACKLIST_PANEL_WIDTH_PROPORTION;
 		constraints.weighty = 0;
 		constraints.insets = new Insets(PLAYBAR_TO_TRACKLIST_GAP, PLAYBAR_TO_SCREEN_SIDES_GAP, PLAYBAR_TO_SCREEN_BOTTOM_GAP, PLAYBAR_TO_SCREEN_SIDES_GAP);
+		constraints.ipadx = 0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		add(playbarPanel, constraints);
 		

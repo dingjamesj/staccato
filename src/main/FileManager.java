@@ -142,42 +142,41 @@ public abstract class FileManager {
 
     public static void main(String[] args) {
 
-        // try {
-
-        //     System.out.println(addPlaylist(new Playlist("my goooning playlist", "D:\\gooning", null)));
-        //     System.out.println(addPlaylist(new Playlist("my goooning playlist", "D:\\gooning", null)));
-        //     System.out.println(addPlaylist(new Playlist("saco", "D:/saco", null)));
-        //     Set<Playlist> playlists = readPlaylists();
-        //     System.out.println(playlists.size());
-        //     for(Playlist playlist: playlists) {
-
-        //         System.out.println(playlist);
-
-        //     }
-
-        // } catch (FileNotFoundException e) {
-
-        //     e.printStackTrace();
-
-        // } catch (IOException e) {
-
-        //     e.printStackTrace();
-
-        // }
-
         try {
-            Set<Track> tracks = readTracksFromDirectory("C:\\Users\\James\\Music\\saco");
 
-            for(Track track: tracks) {
+            System.out.println(addPlaylist(new Playlist("saco", "C:\\Users\\James\\Music\\saco", null)));
+            Set<Playlist> playlists = readPlaylists();
+            System.out.println(playlists.size());
+            for(Playlist playlist: playlists) {
 
-                System.out.println(track);
-    
+                System.out.println(playlist);
+
             }
 
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
         }
+
+        // try {
+            
+        //     Set<Track> tracks = readTracksFromDirectory("C:\\Users\\James\\Music\\saco");
+
+        //     for(Track track: tracks) {
+
+        //         System.out.println(track);
+    
+        //     }
+
+        // } catch (FileNotFoundException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
     }
 

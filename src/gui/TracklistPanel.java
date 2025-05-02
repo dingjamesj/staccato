@@ -1,10 +1,15 @@
 package gui;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -15,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import main.FileManager;
 import main.Playlist;
 
 public class TracklistPanel extends JPanel {
@@ -25,21 +31,55 @@ public class TracklistPanel extends JPanel {
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
 
+    private static final int PLAYLIST_SELECTION_HSPACING = 10;
+    private static final int PLAYLIST_SELECTION_VSPACING = 10;
+    private static final int PLAYLIST_SELECTION_ICON_SIZE = 200;
     private static final int INFO_PANEL_SPACING = 7;
     private static final int INFO_PANEL_TABLE_GAP = 3;
+    private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
 
     private DefaultTableModel tableModel;
 
-    public static TracklistPanel tracklistPanel;
+    private static TracklistPanel tracklistPanel;
 
     public TracklistPanel() {
 
         //you would say initHomePage()
         //the home page would just have recently opened playlists
 
-        initPlaylistPage(new Playlist("saco", "C:\\Users\\James\\Music\\saco", null));
+        initHomePage();
+
+        // initPlaylistPage(new Playlist("saco", "C:\\Users\\James\\Music\\saco", null));
 
         TracklistPanel.tracklistPanel = this;
+
+    }
+
+    private void initHomePage() {
+
+        removeAll();
+        setLayout(new FlowLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
+
+        Set<Playlist> playlists;
+        try {
+
+            playlists = FileManager.readPlaylists();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+            return;
+
+        }
+
+        for(Playlist playlist: playlists) {
+
+            add(createPlaylistButton(playlist));
+
+        }
+
+        revalidate();
+        repaint();
 
     }
 
@@ -51,13 +91,17 @@ public class TracklistPanel extends JPanel {
 
         //-----BEGIN BUILDING PLAYLIST INFO PANEL-----
 
-        JButton playlistCoverButton = new JButton(playlist.getCoverArt() == null ? PLACEHOLDER_ART_ICON : playlist.getCoverArt());
+        ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
+        JButton playlistCoverButton = new JButton();
         JLabel playlistTitleLabel = new JLabel(playlist.getName());
         JLabel playlistDescriptionLabel = new JLabel(createDescription(playlist));
         JButton refreshDirectoryButton = new JButton(REFRESH_ICON);
         JButton resyncToOriginButton = new JButton(RESYNC_ICON);
         JPanel playlistTextPanel = new JPanel();
 
+        playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
+        playlistCoverImageIcon = new ImageIcon(playlistCoverImageIcon.getImage().getScaledInstance(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH));
+        playlistCoverButton.setIcon(playlistCoverImageIcon);
         playlistTitleLabel.setFont(PLAYLIST_TITLE_FONT);
         playlistTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
         playlistTitleLabel.setText("saco");
@@ -69,6 +113,7 @@ public class TracklistPanel extends JPanel {
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
+        constraints.insets = new Insets(INFO_PANEL_TABLE_GAP, INFO_PANEL_TABLE_GAP, 0, 0);
         constraints.anchor = GridBagConstraints.CENTER;
         add(playlistCoverButton, constraints);
 
@@ -122,6 +167,57 @@ public class TracklistPanel extends JPanel {
 
         revalidate();
         repaint();
+
+    }
+
+    public static void setHomePage() {
+
+        tracklistPanel.initHomePage();
+
+    }
+
+    public static void setPlaylist(Playlist playlist) {
+
+        tracklistPanel.initPlaylistPage(playlist);
+
+    }
+
+    private static JPanel createPlaylistButton(Playlist playlist) {
+
+        JPanel panelButton = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+
+        ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
+        JLabel playlistCoverLabel = new JLabel(playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON);
+        JLabel playlistNameLabel = new JLabel(playlist.getName());
+        JLabel playlistDirectoryLabel = new JLabel(playlist.getDirectory().substring(0, 5) + "..." + playlist.getDirectory().substring(playlist.getDirectory().length() - 5));
+
+        playlistCoverLabel.setPreferredSize(new Dimension(PLAYLIST_SELECTION_ICON_SIZE, PLAYLIST_SELECTION_ICON_SIZE));
+        playlistCoverImageIcon = new ImageIcon(playlistCoverImageIcon.getImage().getScaledInstance(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH));
+        playlistCoverLabel.setIcon(playlistCoverImageIcon);
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 2;
+        constraints.gridheight = 2;
+        constraints.anchor = GridBagConstraints.CENTER;
+        panelButton.add(playlistCoverLabel, constraints);
+
+        constraints.gridx = 2;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.anchor = GridBagConstraints.LINE_START;
+        panelButton.add(playlistNameLabel, constraints);
+
+        constraints.gridx = 2;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.anchor = GridBagConstraints.LINE_START;
+        panelButton.add(playlistDirectoryLabel, constraints);
+
+        return panelButton;
 
     }
 

@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.swing.ImageIcon;
-
 /**
  * Contains info about a playlist: 
  * <i>
@@ -21,19 +19,18 @@ public class Playlist implements Serializable {
     private static final long serialVersionUID = 0L;
 
     //Staccato only tracks the name, directory, and cover art of a playlist.
-    //Everything else is 
     private String name;
     private String directory;
-    private ImageIcon coverArt;
+    private byte[] coverArtByteArray;
 
     private transient Set<Track> tracks;
     private transient int duration;
 
-    public Playlist(String name, String directory, ImageIcon coverArt) {
+    public Playlist(String name, String directory, byte[] coverArtByteArray) {
 
         this.name = name;
         this.directory = directory;
-        this.coverArt = coverArt;
+        this.coverArtByteArray = coverArtByteArray;
         duration = -1;
         tracks = new HashSet<Track>();
 
@@ -57,9 +54,9 @@ public class Playlist implements Serializable {
 
     }
 
-    public ImageIcon getCoverArt() {
+    public byte[] getCoverArtByteArray() {
 
-        return coverArt;
+        return coverArtByteArray;
 
     }
 
