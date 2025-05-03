@@ -22,14 +22,16 @@
 	    <version>3.5.4</version>
 	</dependency>
 	<dependency>
-		<groupId>com.google.code.gson</groupId>
-		<artifactId>gson</artifactId>
-		<version>2.11.0</version>
-	</dependency>
-	<dependency>
   		<groupId>se.michaelthelin.spotify</groupId>
   		<artifactId>spotify-web-api-java</artifactId>
   		<version>9.1.1</version>
+
+		<exclusions>
+			<exclusion>
+				<artifactId>slf4j-api</artifactId>
+				<groupId>org.slf4j</groupId>
+			</exclusion>
+		</exclusions>
 	</dependency>
 	<dependency>
     	<groupId>net.jthink</groupId>
@@ -40,6 +42,11 @@
 		<groupId>net.sf.py4j</groupId>
 		<artifactId>py4j</artifactId>
 		<version>0.10.9.9</version>
+	</dependency>
+	<dependency>
+		<groupId>com.miglayout</groupId>
+		<artifactId>miglayout-swing</artifactId>
+		<version>11.4.2</version>
 	</dependency>
   </dependencies>
 </project>

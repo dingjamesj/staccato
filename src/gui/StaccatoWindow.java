@@ -23,17 +23,17 @@ import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
+import net.miginfocom.swing.MigLayout;
+
 public class StaccatoWindow extends JFrame {
 	
 	private static final int WIDTH = 1500;
 	private static final int HEIGHT = 900;
-	private static final int PLAYBAR_TO_SCREEN_BOTTOM_GAP = 12;
-    private static final int PLAYBAR_TO_SCREEN_SIDES_GAP = 75;
-	private static final int PLAYBAR_TO_TRACKLIST_GAP = 10;
-	private static final int CURRENTLY_PLAYING_PANEL_INSETS = 12;
+    private static final int PLAYBAR_TO_SIDES_GAP = 10;
+	private static final int PLAYBAR_TO_SCREEN_BOTTOM_GAP = 6;
 	private static final double QUEUE_PANEL_WIDTH_PROPORTION = 0.20;
-	private static final double TRACKLIST_PANEL_WIDTH_PROPORTION = 0.75;
 	private static final double CURRENT_TRACK_INFO_WIDTH_PROPORTION = 0.20;
+	private static final double PLAYBAR_PANEL_HEIGHT_PROPORTION = 0.105;
 
 	public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 45);
 	public static final Font PARAM_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 16);
@@ -75,88 +75,35 @@ public class StaccatoWindow extends JFrame {
 		
 		getContentPane().removeAll();
 		
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); //We have a custom closing function
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); //Do nothing because we have a custom closing function
 		setSize(WIDTH, HEIGHT);
 		setTitle("staccato");
 		setIconImage(windowIcon.getImage());
-		setLayout(new GridBagLayout());
-		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.anchor = GridBagConstraints.CENTER;
+		setLayout(new MigLayout(
+			"insets 0", 
+			"[" + (int) (QUEUE_PANEL_WIDTH_PROPORTION * 100) + "%][" + (int) ((1.0 - QUEUE_PANEL_WIDTH_PROPORTION - CURRENT_TRACK_INFO_WIDTH_PROPORTION) * 100) + "%][" + (int) (CURRENT_TRACK_INFO_WIDTH_PROPORTION * 100) + "%]",
+			"[" + (int) ((1.0 - PLAYBAR_PANEL_HEIGHT_PROPORTION) * 100) + "%][" + (int) (PLAYBAR_PANEL_HEIGHT_PROPORTION * 100) + "%]"
+		));
 		
-		//-------------------START GUI BUILDING-------------------
 		//-------START PANEL PLACEMENT------
 
 		QueuePanel queuePanel = new QueuePanel();
 		queuePanel.setBackground(Color.green);
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		constraints.gridwidth = 1;
-		constraints.gridheight = 2;
-		constraints.weightx = QUEUE_PANEL_WIDTH_PROPORTION;
-		constraints.weighty = 1;
-		constraints.fill = GridBagConstraints.BOTH;
-		add(queuePanel, constraints);
+		add(queuePanel, "cell 0 0, span 1 2,grow");
 
 		TracklistPanel tracklistPanel = new TracklistPanel();
 		tracklistPanel.setBackground(Color.red);
-		constraints.gridx = 1;
-		constraints.gridy = 0;
-		constraints.gridwidth = 1;
-		constraints.gridheight = 1;
-		constraints.weightx = TRACKLIST_PANEL_WIDTH_PROPORTION;
-		constraints.weighty = 1;
-		constraints.fill = GridBagConstraints.BOTH;
-		add(tracklistPanel, constraints);
+		add(tracklistPanel, "cell 1 0, span 1 1, grow");
 
 		CurrentTrackInfoPanel currentTrackInfoPanel = new CurrentTrackInfoPanel();
 		currentTrackInfoPanel.setBackground(Color.magenta);
-		constraints.gridx = 2;
-		constraints.gridy = 0;
-		constraints.gridwidth = 1;
-		constraints.gridheight = 2;
-		constraints.weightx = CURRENT_TRACK_INFO_WIDTH_PROPORTION;
-		constraints.weighty = 1;
-		constraints.insets = new Insets(CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS, CURRENTLY_PLAYING_PANEL_INSETS);
-		constraints.fill = GridBagConstraints.BOTH;
-		add(currentTrackInfoPanel, constraints);
+		add(currentTrackInfoPanel, "cell 2 0, span 1 2, grow");
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();
 		// playbarPanel.setBackground(Color.cyan);
-		constraints.gridx = 1;
-		constraints.gridy = 1;
-		constraints.gridwidth = 1;
-		constraints.gridheight = 1;
-		constraints.weightx = TRACKLIST_PANEL_WIDTH_PROPORTION;
-		constraints.weighty = 0;
-		constraints.insets = new Insets(PLAYBAR_TO_TRACKLIST_GAP, PLAYBAR_TO_SCREEN_SIDES_GAP, PLAYBAR_TO_SCREEN_BOTTOM_GAP, PLAYBAR_TO_SCREEN_SIDES_GAP);
-		constraints.ipadx = 0;
-		constraints.fill = GridBagConstraints.HORIZONTAL;
-		add(playbarPanel, constraints);
+		add(playbarPanel, "cell 1 1, span 1 1, pad 0 " + PLAYBAR_TO_SIDES_GAP + " -" + PLAYBAR_TO_SCREEN_BOTTOM_GAP + " -" + PLAYBAR_TO_SIDES_GAP + " 0, grow");
 		
 		//--------END PANEL PLACEMENT-------
-		
-		//-----START MODIFYING MENU BAR-----
-
-		// UIManager.put("TitlePane.embeddedForeground", new Color(0x1a1a1a));
-		// UIManager.put("TitlePane.inactiveForeground", new Color(0x1a1a1a));
-		// JMenuBar menuBar = new JMenuBar();
-		// JMenu settingsMenu = new JMenu("Settings");
-		// JMenuItem setSpotifyAPIKeysItem = new JMenuItem("Set Spotify API Keys");
-		// settingsMenu.add(setSpotifyAPIKeysItem);
-		// menuBar.add(settingsMenu);
-		// setSpotifyAPIKeysItem.addActionListener((e) -> {
-			
-		// 	// APIKeysStorage.openSetAPIKeysDialog(false);
-			
-		// });
-		// setJMenuBar(menuBar);
-		
-		// revalidate();
-		// repaint();
-		// SwingUtilities.updateComponentTreeUI(this);
-
-		//------END MODIFYING MENU BAR------
-		//-------------------END GUI BUILDING-------------------
 		
 		addWindowListener(new WindowAdapter() {
 		
@@ -176,12 +123,6 @@ public class StaccatoWindow extends JFrame {
 			}
 		
 		});
-		
-		// if(APIKeysStorage.getIDandSecret() == null) {
-			
-		// 	APIKeysStorage.openSetAPIKeysDialog(true);
-			
-		// }
 		
 		StaccatoWindow.staccatoWindow = this;
 		

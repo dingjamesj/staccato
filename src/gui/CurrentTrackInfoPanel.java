@@ -133,17 +133,4 @@ public class CurrentTrackInfoPanel extends JPanel {
 
     }
 
-    private static ImageIcon createImageIcon(String urlStr) {
-
-        URL url = PlaybarPanel.class.getResource(urlStr);
-        if(url != null) {
-
-            return new ImageIcon(url);
-
-        }
-
-        return new ImageIcon(new ImageIcon(urlStr).getImage().getScaledInstance(ALBUM_ART_ICON_SIZE, ALBUM_ART_ICON_SIZE, Image.SCALE_SMOOTH));
-
-    }
-
 }
