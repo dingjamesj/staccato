@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
@@ -14,7 +15,9 @@ import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,6 +28,7 @@ import main.Playlist;
 
 public class TracklistPanel extends JPanel {
     
+    private static final Font PANEL_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 72);
     private static final Font PLAYLIST_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 100);
     private static final Font PLAYLIST_DESCRIPTION_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
@@ -58,8 +62,18 @@ public class TracklistPanel extends JPanel {
     private void initHomePage() {
 
         removeAll();
-        setLayout(new FlowLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
 
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        // setAlignmentX(LEFT_ALIGNMENT);
+        
+        JLabel titleLabel = new JLabel("Your Playlists");
+        JPanel playlistSelectionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
+        JScrollPane playlistSelectionScrollPane = new JScrollPane(playlistSelectionPanel);
+        JButton addPlaylistButton = new JButton("add");
+
+        titleLabel.setFont(PANEL_TITLE_FONT);
+        titleLabel.setAlignmentX(CENTER_ALIGNMENT);
+        playlistSelectionPanel.setAlignmentX(CENTER_ALIGNMENT);
         Set<Playlist> playlists;
         try {
 
@@ -71,15 +85,37 @@ public class TracklistPanel extends JPanel {
             return;
 
         }
-
+        
+        add(titleLabel);
+        playlistSelectionPanel.add(addPlaylistButton);
         for(Playlist playlist: playlists) {
 
-            add(createPlaylistButton(playlist));
+            playlistSelectionPanel.add(createPlaylistButton(playlist));
 
         }
+        add(playlistSelectionScrollPane);
 
         revalidate();
         repaint();
+
+        //-----------------------------END GUI BUILDING-----------------------------
+        //-------------------------START LISTENERS ADDITION-------------------------
+
+        addPlaylistButton.addActionListener((e) -> {
+
+            String playlistDirectory = JOptionPane.showInputDialog(this, "Enter in the playlist's directory:");
+            File directory = new File(playlistDirectory);
+            if(!directory.isDirectory()) {
+
+                JOptionPane.showMessageDialog(this, "Invalid directory.");
+
+            } else {
+
+                //Add playlist
+
+            }
+
+        });
 
     }
 
