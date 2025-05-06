@@ -125,7 +125,7 @@ public class StaccatoWindow extends JFrame {
 		
 	}
 	
-	public void createPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
+	private void createPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
 		
 		JDialog dialog = new JDialog(this, true);
 		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -163,6 +163,12 @@ public class StaccatoWindow extends JFrame {
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
 		
+	}
+
+	public static void showDialogPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
+
+		staccatoWindow.createPopup(title, message, icon);
+
 	}
 	
 	public void setIsDownloading(boolean isDownloading) {

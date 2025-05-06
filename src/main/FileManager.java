@@ -144,7 +144,7 @@ public abstract class FileManager {
 
         try {
 
-            System.out.println(addPlaylist(new Playlist("saco", "C:\\Users\\James\\Music\\saco", null)));
+            System.out.println(addPlaylist(new Playlist("C:\\Users\\James\\Music\\saco")));
             Set<Playlist> playlists = readPlaylists();
             System.out.println(playlists.size());
             for(Playlist playlist: playlists) {

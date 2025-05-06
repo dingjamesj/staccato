@@ -1,5 +1,7 @@
 package main;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,11 +28,16 @@ public class Playlist implements Serializable {
     private transient Set<Track> tracks;
     private transient int duration;
 
-    public Playlist(String name, String directory, byte[] coverArtByteArray) {
+    public Playlist(String directory) {
 
-        this.name = name;
+        this.name = new File(directory).getName();
+        if(this.name.isEmpty()) {
+
+            this.name = "New Playlist";
+
+        }
         this.directory = directory;
-        this.coverArtByteArray = coverArtByteArray;
+        this.coverArtByteArray = null;
         duration = -1;
         tracks = new HashSet<Track>();
 
@@ -93,6 +100,20 @@ public class Playlist implements Serializable {
         //Find the playlist duration if isn't already cached
         if(duration == -1) {
 
+            if(tracks == null) {
+
+                try {
+
+                    tracks = FileManager.readTracksFromDirectory(directory);
+
+                } catch(FileNotFoundException e) {
+
+                    return "[Directory Not Found]";
+
+                }
+
+            }
+
             Iterator<Track> iterator = tracks.iterator();
             duration = 0;
             while(iterator.hasNext()) {
@@ -108,6 +129,20 @@ public class Playlist implements Serializable {
     }
 
     public int getSize() {
+
+        if(tracks == null) {
+
+            try {
+
+                tracks = FileManager.readTracksFromDirectory(directory);
+
+            } catch (FileNotFoundException e) {
+
+                return 0;
+
+            }
+
+        }
 
         return tracks.size();
 
