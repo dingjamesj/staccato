@@ -13,10 +13,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -26,31 +24,44 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
 import main.FileManager;
 import main.Playlist;
+import main.Track;
+import net.miginfocom.swing.MigLayout;
 
 public class MainPanel extends JPanel {
     
+    //Playlist selection view
     private static final Font PANEL_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 72);
+
+    //Tracklist view
     private static final Font PLAYLIST_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 100);
     private static final Font PLAYLIST_DESCRIPTION_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final Font PLAYLIST_LOADING_FONT = new Font("Segoe UI", Font.ITALIC, 15);
+    private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
+    private static final Font TRACK_ARTISTS_FONT = new Font("Segoe UI", Font.PLAIN, 16);
+    private static final Font TRACK_ALBUM_FONT = new Font("Segoe UI", Font.PLAIN, 18);
+
     private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
 
+    //Playlist selection view
     private static final int PLAYLIST_SELECTION_HSPACING = 10;
     private static final int PLAYLIST_SELECTION_VSPACING = 10;
     private static final int PLAYLIST_SELECTION_ICON_SIZE = 200;
+    //Tracklist view
     private static final int INFO_PANEL_SPACING = 7;
     private static final int INFO_PANEL_TABLE_GAP = 3;
     private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
+    private static final int TRACKLIST_ROWS_SPACING = 2;
+    private static final int TRACK_ARTWORK_WIDTH_PX = 64;
+    private static final double TRACK_ALBUM_COLUMN_WIDTH_PROPORTION = 0.4;
+    private static final int TRACK_EDIT_COLUMN_WIDTH_PX = 10;
 
     private static MainPanel mainPanel;
 
@@ -294,17 +305,32 @@ public class MainPanel extends JPanel {
 
         boolean loadWasSuccessful = playlist.loadTracks();
         
+        //The tracks may not have loaded successfully if the loading process was interrupted by a user event.
         if(!loadWasSuccessful) {
 
             return;
 
         }
 
-        SwingUtilities.invokeLater(() -> {
+        playlistDescriptionLabel.setText(createDescription(playlist));
 
-            playlistDescriptionLabel.setText(createDescription(playlist));
+        Track[] tracks = playlist.getTracks();
+        tracklistPanel.removeAll();
+        for(int i = 0; i < tracks.length; i++) {
 
-        });
+            JPanel trackPanel = createTrackEntry(tracks[i]);
+            tracklistPanel.add(trackPanel);
+            
+            if(i % 2 == 0) {
+
+                trackPanel.setBackground(Color.red);
+
+            }
+
+        }
+
+        tracklistPanel.revalidate();
+        tracklistPanel.repaint();
 
     }
 
@@ -380,6 +406,45 @@ public class MainPanel extends JPanel {
         });
 
         return panelButton;
+
+    }
+
+    private JPanel createTrackEntry(Track track) {
+
+        JPanel trackPanel = new JPanel(new MigLayout(
+            "insets 0 0 " + TRACKLIST_ROWS_SPACING + " 0",
+            "[" + TRACK_ARTWORK_WIDTH_PX + "][" + (int) ((1.0 - TRACK_ALBUM_COLUMN_WIDTH_PROPORTION) * 100) + "%][" + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%][" + TRACK_EDIT_COLUMN_WIDTH_PX + "]"
+        ));
+
+        ImageIcon artworkIcon = track.getArtworkByteArray() != null ? new ImageIcon(track.getArtworkByteArray()) : PLACEHOLDER_ART_ICON;
+        JLabel artworkLabel = new JLabel();
+        JPanel titleAndArtistsPanel = new JPanel();
+        JLabel titleLabel = new JLabel(track.getTitle() == null || !track.getTitle().isBlank() ? track.getTitle() : "[No Title]");
+        JLabel artistsLabel = new JLabel(track.getArtists() == null || !track.getArtists().isBlank() ? track.getArtists() : "[Unknown Artists]");
+        JLabel albumLabel = new JLabel(track.getAlbum() == null || !track.getAlbum().isBlank() ? track.getAlbum() : "[No Album]");
+        JButton editTrackButton = new JButton(REFRESH_ICON);
+
+        titleAndArtistsPanel.setLayout(new BoxLayout(titleAndArtistsPanel, BoxLayout.Y_AXIS));
+        artworkLabel.setPreferredSize(new Dimension(TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX));
+        artworkIcon = new ImageIcon(artworkIcon.getImage().getScaledInstance(TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX, Image.SCALE_SMOOTH));
+        artworkLabel.setIcon(artworkIcon);
+        titleLabel.setAlignmentX(LEFT_ALIGNMENT);
+        titleLabel.setFont(TRACK_TITLE_FONT);
+        artistsLabel.setAlignmentX(LEFT_ALIGNMENT);
+        artistsLabel.setFont(TRACK_ARTISTS_FONT);
+        albumLabel.setAlignmentX(LEFT_ALIGNMENT);
+        albumLabel.setFont(TRACK_ALBUM_FONT);
+        albumLabel.setOpaque(true);
+        albumLabel.setBackground(Color.cyan);
+
+        trackPanel.add(artworkLabel, "cell 0 0");
+        titleAndArtistsPanel.add(titleLabel);
+        titleAndArtistsPanel.add(artistsLabel);
+        trackPanel.add(titleAndArtistsPanel, "cell 1 0");
+        trackPanel.add(albumLabel, "cell 2 0");
+        trackPanel.add(editTrackButton, "cell 3 0");
+
+        return trackPanel;
 
     }
 

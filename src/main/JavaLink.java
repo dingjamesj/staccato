@@ -36,12 +36,15 @@ public class JavaLink {
         Set<Track> tracks = new HashSet<Track>();
         for(int i = 0; i < pythonData.size(); i++) {
 
-            tracks.add(new Track(
+            Track track = new Track(
+                pythonData.get(i).get("fileLocation"),
                 pythonData.get(i).get("title"),
                 pythonData.get(i).get("artists"),
                 pythonData.get(i).get("album"),
                 pythonData.get(i).get("artworkURL")
-            ));
+            );
+            tracks.add(track);
+            track.writeMetadata();
 
         }
 

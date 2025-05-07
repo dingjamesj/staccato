@@ -37,16 +37,28 @@ public class Track {
 	private transient byte[] artworkByteArray;
 	private transient String artworkURL;
 	
-	public Track(String title, String artists, String album, String artworkURL) {
+	/**
+	 * For reading a track from python fetcher
+	 * @param title
+	 * @param artists
+	 * @param album
+	 * @param artworkURL
+	 */
+	public Track(String fileLocation, String title, String artists, String album, String artworkURL) {
 		
+		this.fileLocation = fileLocation;
 		this.title = title;
 		this.artists = artists;
 		this.album = album;
 		this.artworkURL = artworkURL;
-		this.fileLocation = "";
 		
 	}
 
+	/**
+	 * For reading a track from a mp3 file
+	 * @param fileLocation
+	 * @throws FileNotFoundException
+	 */
 	public Track(String fileLocation) throws FileNotFoundException {
 
 		this.fileLocation = fileLocation;
@@ -195,7 +207,7 @@ public class Track {
 	/**
 	 * Reads the track file's metadata and stores it in this track object. 
 	 */
-	public void setAttributesFromFileMetadata() {
+	private void setAttributesFromFileMetadata() {
 
 		if(!fileExists()) {
 
@@ -222,7 +234,15 @@ public class Track {
 		artists = tag.getFirst(FieldKey.ARTIST);
 		album = tag.getFirst(FieldKey.ALBUM);
 		duration = header.getTrackLength();
-		artworkByteArray = tag.getFirstArtwork().getBinaryData();
+		if(tag.getFirstArtwork() != null) {
+
+			artworkByteArray = tag.getFirstArtwork().getBinaryData();
+
+		} else {
+
+			artworkByteArray = null;
+
+		}
 
 	}
 
@@ -245,13 +265,17 @@ public class Track {
 			Artwork coverImage = null;
 			if(artworkURL != null) {
 				
+				//Get the artwork byte array from online
 				URL url = new URI(artworkURL).toURL();
 				ByteArrayOutputStream coverImageURLByteArrayStream = new ByteArrayOutputStream();
 				url.openStream().transferTo(coverImageURLByteArrayStream);
-				coverImageURLByteArrayStream.toByteArray();
-				coverImage = ArtworkFactory.getNew();
-				coverImage.setBinaryData(coverImageURLByteArrayStream.toByteArray());
+				byte[] artworkByteArray = coverImageURLByteArrayStream.toByteArray();
 				coverImageURLByteArrayStream.close();
+
+				//Write the artwork byte array to the mp3 file and to memory
+				coverImage = ArtworkFactory.getNew();
+				coverImage.setBinaryData(artworkByteArray);
+				this.artworkByteArray = artworkByteArray;
 				
 			}
 			
