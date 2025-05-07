@@ -13,9 +13,12 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
@@ -31,11 +35,12 @@ import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 import main.FileManager;
 import main.Playlist;
 
-public class TracklistPanel extends JPanel {
+public class MainPanel extends JPanel {
     
     private static final Font PANEL_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 72);
     private static final Font PLAYLIST_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 100);
     private static final Font PLAYLIST_DESCRIPTION_FONT = new Font("Segoe UI", Font.PLAIN, 16);
+    private static final Font PLAYLIST_LOADING_FONT = new Font("Segoe UI", Font.ITALIC, 15);
     private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
@@ -47,11 +52,13 @@ public class TracklistPanel extends JPanel {
     private static final int INFO_PANEL_TABLE_GAP = 3;
     private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
 
-    private DefaultTableModel tableModel;
+    private static MainPanel mainPanel;
 
-    private static TracklistPanel tracklistPanel;
+    private JPanel tracklistPanel;
+    private JLabel loadingLabel;
+    private JLabel playlistDescriptionLabel;
 
-    public TracklistPanel() {
+    public MainPanel() {
 
         //you would say initHomePage()
         //the home page would just have recently opened playlists
@@ -60,13 +67,14 @@ public class TracklistPanel extends JPanel {
 
         // initPlaylistPage(new Playlist("saco", "C:\\Users\\James\\Music\\saco", null));
 
-        TracklistPanel.tracklistPanel = this;
+        MainPanel.mainPanel = this;
 
     }
 
     private void initHomePage() {
 
         removeAll();
+        FileManager.stopReadingTracks();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         // setAlignmentX(LEFT_ALIGNMENT);
@@ -131,7 +139,11 @@ public class TracklistPanel extends JPanel {
 
                     Playlist newPlaylist = new Playlist(playlistDirectory);
                     FileManager.addPlaylist(newPlaylist);
-                    initPlaylistPage(newPlaylist);
+                    SwingUtilities.invokeLater(() -> {
+
+                        initTracklistPage(newPlaylist);
+
+                    });
 
                 } catch (FileNotFoundException e) {
 
@@ -151,7 +163,7 @@ public class TracklistPanel extends JPanel {
 
     }
 
-    private void initPlaylistPage(Playlist playlist) {
+    private void initTracklistPage(Playlist playlist) {
 
         removeAll();
         setLayout(new GridBagLayout());
@@ -162,7 +174,7 @@ public class TracklistPanel extends JPanel {
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JButton playlistCoverButton = new JButton();
         JLabel playlistTitleLabel = new JLabel(playlist.getName());
-        JLabel playlistDescriptionLabel = new JLabel(createDescription(playlist));
+        playlistDescriptionLabel = new JLabel(createDescription(playlist));
         JButton returnToHomeButton = new JButton(REFRESH_ICON);
         JButton refreshDirectoryButton = new JButton(REFRESH_ICON);
         JButton resyncToOriginButton = new JButton(RESYNC_ICON);
@@ -234,10 +246,19 @@ public class TracklistPanel extends JPanel {
         
         //-------BEGIN BUILDING TRACKLIST PANEL-------
 
-        tableModel = new DefaultTableModel(new String[] {"No.", "", "Title", "Artists", "Album", "Length"}, 0);
-        JTable tracklistTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(tracklistTable);
-        tracklistTable.setFillsViewportHeight(true);
+        tracklistPanel = new JPanel();
+        loadingLabel = new JLabel("Loading tracklist...");
+        JScrollPane scrollPane = new JScrollPane(tracklistPanel);
+
+        tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
+        loadingLabel.setFont(PLAYLIST_LOADING_FONT);
+        loadingLabel.setAlignmentX(CENTER_ALIGNMENT);
+        // tracklistPanel.setFillsViewportHeight(true);
+
+        tracklistPanel.add(Box.createVerticalGlue());
+        tracklistPanel.add(loadingLabel);
+        tracklistPanel.add(Box.createVerticalStrut(30));
+        tracklistPanel.add(Box.createVerticalGlue());
 
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -259,21 +280,31 @@ public class TracklistPanel extends JPanel {
         
         returnToHomeButton.addActionListener((unused) -> {
 
-            initHomePage();
+            SwingUtilities.invokeLater(() -> {
+
+                initHomePage();
+
+            });
 
         });
 
     }
 
-    public static void setHomePage() {
+    private void loadTracklistInfo(Playlist playlist) {
 
-        tracklistPanel.initHomePage();
+        boolean loadWasSuccessful = playlist.loadTracks();
+        
+        if(!loadWasSuccessful) {
 
-    }
+            return;
 
-    public static void setPlaylist(Playlist playlist) {
+        }
 
-        tracklistPanel.initPlaylistPage(playlist);
+        SwingUtilities.invokeLater(() -> {
+
+            playlistDescriptionLabel.setText(createDescription(playlist));
+
+        });
 
     }
 
@@ -325,9 +356,24 @@ public class TracklistPanel extends JPanel {
         panelButton.addMouseListener(new MouseAdapter() {
             
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mousePressed(MouseEvent unused) {
 
-                initPlaylistPage(playlist);
+                SwingUtilities.invokeLater(() -> {
+
+                    initTracklistPage(playlist);
+
+                    if(playlist.getTracks() == null) {
+
+                        Thread trackLoadingThread = new Thread(() -> {
+    
+                            loadTracklistInfo(playlist);
+    
+                        });
+                        trackLoadingThread.start();
+    
+                    }
+
+                });
 
             }
 
@@ -352,13 +398,19 @@ public class TracklistPanel extends JPanel {
 
     private static String createDescription(Playlist playlist) {
 
+        if(playlist.getTracks() == null) {
+
+            return "<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>";
+
+        }
+
         if(playlist.getSize() == 1) {
 
-            return "<html>" + playlist.getDirectory() + "<br></br><b>" + playlist.getSize() + " song:</b> " + playlist.getDuration() + " </html>";
+            return "<html>" + playlist.getDirectory() + "<br></br><b>" + playlist.getSize() + " song</b> " + playlist.getDuration() + " </html>";
 
         } else{
 
-            return "<html>" + playlist.getDirectory() + "<br></br><b>" + playlist.getSize() + " songs:</b> " + playlist.getDuration() + " </html>";
+            return "<html>" + playlist.getDirectory() + "<br></br><b>" + playlist.getSize() + " songs</b> " + playlist.getDuration() + " </html>";
 
         }
         

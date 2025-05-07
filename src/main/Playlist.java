@@ -38,14 +38,6 @@ public class Playlist implements Serializable {
         }
         this.directory = directory;
         this.coverArtByteArray = null;
-        duration = -1;
-        tracks = new HashSet<Track>();
-
-    }
-
-    public Track[] getTracks() {
-
-        return (Track[]) tracks.toArray();
 
     }
 
@@ -102,15 +94,7 @@ public class Playlist implements Serializable {
 
             if(tracks == null) {
 
-                try {
-
-                    tracks = FileManager.readTracksFromDirectory(directory);
-
-                } catch(FileNotFoundException e) {
-
-                    return "[Directory Not Found]";
-
-                }
+                return "--:--:--";
 
             }
 
@@ -132,19 +116,65 @@ public class Playlist implements Serializable {
 
         if(tracks == null) {
 
-            try {
-
-                tracks = FileManager.readTracksFromDirectory(directory);
-
-            } catch (FileNotFoundException e) {
-
-                return 0;
-
-            }
+            return 0;
 
         }
 
         return tracks.size();
+
+    }
+
+    public Track[] getTracks() {
+
+        if(tracks == null) {
+
+            return null;
+
+        }
+
+        Track[] tracksArray = new Track[tracks.size()];
+        Iterator<Track> iterator = tracks.iterator();
+        for(int i = 0; iterator.hasNext(); i++) {
+
+            tracksArray[i] = iterator.next();
+
+        }
+
+        return tracksArray;
+
+    }
+
+    /**
+     * Load track info from this playlist's directory.
+     * @return True if tracks were successfully loaded, false otherwise (e.g. if the track reading was interrupted)
+     */
+    public boolean loadTracks() {
+
+        try {
+
+            tracks = FileManager.readTracksFromDirectory(directory);
+            if(tracks == null) {
+
+                return false;
+
+            }
+
+            duration = 0;
+            Iterator<Track> iterator = tracks.iterator();
+            while(iterator.hasNext()) {
+
+                duration += iterator.next().getDuration();
+
+            }
+
+        } catch (FileNotFoundException e) {
+
+            tracks.clear();
+            return false;
+
+        }
+
+        return true;
 
     }
 

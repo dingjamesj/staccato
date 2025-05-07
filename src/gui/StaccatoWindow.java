@@ -85,15 +85,15 @@ public class StaccatoWindow extends JFrame {
 		//-------START PANEL PLACEMENT------
 
 		QueuePanel queuePanel = new QueuePanel();
-		queuePanel.setBackground(Color.green);
+		// queuePanel.setBackground(Color.green);
 		add(queuePanel, "cell 0 0, span 1 2,grow");
 
-		TracklistPanel tracklistPanel = new TracklistPanel();
-		tracklistPanel.setBackground(Color.red);
+		MainPanel tracklistPanel = new MainPanel();
+		// tracklistPanel.setBackground(Color.red);
 		add(tracklistPanel, "cell 1 0, span 1 1, grow");
 
 		CurrentTrackInfoPanel currentTrackInfoPanel = new CurrentTrackInfoPanel();
-		currentTrackInfoPanel.setBackground(Color.magenta);
+		// currentTrackInfoPanel.setBackground(Color.magenta);
 		add(currentTrackInfoPanel, "cell 2 0, span 1 2, grow");
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();

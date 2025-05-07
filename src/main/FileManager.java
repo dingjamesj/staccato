@@ -10,11 +10,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.LogManager;
 
 public abstract class FileManager {
 
     private static final String PLAYLIST_DATA_LOCATION = "playlists.dat";
+
+    private static AtomicBoolean isReadingTracks = new AtomicBoolean(false);
 
     /**
      * Returns the HashSet<Playlist> stored in the playlist data file
@@ -93,7 +96,15 @@ public abstract class FileManager {
 
     }
 
+    /**
+     * 
+     * @param dirStr
+     * @return The Track set found from reading the directory. Null if the reading was interrupted.
+     * @throws FileNotFoundException
+     */
     public static Set<Track> readTracksFromDirectory(String dirStr) throws FileNotFoundException {
+
+        isReadingTracks.set(true);
 
         File[] files = new File(dirStr).listFiles();
 
@@ -106,6 +117,13 @@ public abstract class FileManager {
         Set<Track> tracks = new HashSet<Track>();
         for(int i = 0; i < files.length; i++) {
 
+            if(!isReadingTracks.get()) {
+
+                System.out.println("I am a really homosexual");
+                return null;
+
+            }
+
             if(files[i].isDirectory() || !files[i].getName().endsWith(".mp3")) {
 
                 continue;
@@ -117,6 +135,12 @@ public abstract class FileManager {
         }
 
         return tracks;
+
+    }
+
+    public static void stopReadingTracks() {
+
+        isReadingTracks.set(false);
 
     }
 
