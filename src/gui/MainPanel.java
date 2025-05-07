@@ -34,7 +34,7 @@ import main.Track;
 import net.miginfocom.swing.MigLayout;
 
 public class MainPanel extends JPanel {
-    
+
     //Playlist selection view
     private static final Font PANEL_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 72);
 
@@ -50,6 +50,8 @@ public class MainPanel extends JPanel {
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
 
+    private static final int SCROLL_SPEED = 12;
+
     //Playlist selection view
     private static final int PLAYLIST_SELECTION_HSPACING = 10;
     private static final int PLAYLIST_SELECTION_VSPACING = 10;
@@ -60,7 +62,8 @@ public class MainPanel extends JPanel {
     private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
     private static final int TRACKLIST_ROWS_SPACING = 2;
     private static final int TRACK_ARTWORK_WIDTH_PX = 64;
-    private static final double TRACK_ALBUM_COLUMN_WIDTH_PROPORTION = 0.4;
+    private static final double TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION = 0.5;
+    private static final double TRACK_ALBUM_COLUMN_WIDTH_PROPORTION = 0.3;
     private static final int TRACK_EDIT_COLUMN_WIDTH_PX = 10;
 
     private static MainPanel mainPanel;
@@ -264,7 +267,7 @@ public class MainPanel extends JPanel {
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
         loadingLabel.setFont(PLAYLIST_LOADING_FONT);
         loadingLabel.setAlignmentX(CENTER_ALIGNMENT);
-        // tracklistPanel.setFillsViewportHeight(true);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         tracklistPanel.add(Box.createVerticalGlue());
         tracklistPanel.add(loadingLabel);
@@ -320,12 +323,7 @@ public class MainPanel extends JPanel {
 
             JPanel trackPanel = createTrackEntry(tracks[i]);
             tracklistPanel.add(trackPanel);
-            
-            if(i % 2 == 0) {
-
-                trackPanel.setBackground(Color.red);
-
-            }
+            tracklistPanel.add(Box.createVerticalStrut(TRACKLIST_ROWS_SPACING));
 
         }
 
@@ -412,14 +410,16 @@ public class MainPanel extends JPanel {
     private JPanel createTrackEntry(Track track) {
 
         JPanel trackPanel = new JPanel(new MigLayout(
-            "insets 0 0 " + TRACKLIST_ROWS_SPACING + " 0",
-            "[" + TRACK_ARTWORK_WIDTH_PX + "][" + (int) ((1.0 - TRACK_ALBUM_COLUMN_WIDTH_PROPORTION) * 100) + "%][" + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%][" + TRACK_EDIT_COLUMN_WIDTH_PX + "]"
+            "insets 0 0 0 0",
+            "[" + TRACK_ARTWORK_WIDTH_PX + "][" + (int) (TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%][" + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%][" + TRACK_EDIT_COLUMN_WIDTH_PX + "]"
         ));
 
         ImageIcon artworkIcon = track.getArtworkByteArray() != null ? new ImageIcon(track.getArtworkByteArray()) : PLACEHOLDER_ART_ICON;
         JLabel artworkLabel = new JLabel();
         JPanel titleAndArtistsPanel = new JPanel();
-        JLabel titleLabel = new JLabel(track.getTitle() == null || !track.getTitle().isBlank() ? track.getTitle() : "[No Title]");
+        JLabel titleLabel = new JLabel(
+            track.getTitle() == null || !track.getTitle().isBlank() ? track.getTitle() : "[No Title]"
+        );
         JLabel artistsLabel = new JLabel(track.getArtists() == null || !track.getArtists().isBlank() ? track.getArtists() : "[Unknown Artists]");
         JLabel albumLabel = new JLabel(track.getAlbum() == null || !track.getAlbum().isBlank() ? track.getAlbum() : "[No Album]");
         JButton editTrackButton = new JButton(REFRESH_ICON);
@@ -435,13 +435,13 @@ public class MainPanel extends JPanel {
         albumLabel.setAlignmentX(LEFT_ALIGNMENT);
         albumLabel.setFont(TRACK_ALBUM_FONT);
         albumLabel.setOpaque(true);
-        albumLabel.setBackground(Color.cyan);
+        // albumLabel.setBackground(Color.cyan);
 
         trackPanel.add(artworkLabel, "cell 0 0");
         titleAndArtistsPanel.add(titleLabel);
         titleAndArtistsPanel.add(artistsLabel);
-        trackPanel.add(titleAndArtistsPanel, "cell 1 0");
-        trackPanel.add(albumLabel, "cell 2 0");
+        trackPanel.add(titleAndArtistsPanel, "cell 1 0, pushx, wmax " + (int) (TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%");
+        trackPanel.add(albumLabel, "cell 2 0, wmax " + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(editTrackButton, "cell 3 0");
 
         return trackPanel;
