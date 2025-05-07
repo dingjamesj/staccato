@@ -1,82 +1,46 @@
 package gui;
 
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
+
+import main.Track;
+import net.miginfocom.swing.MigLayout;
 
 public class QueuePanel extends JPanel {
     
-    private static final Font QUEUE_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 30);
+    private static final Font PANEL_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 30);
+    private static final Font TRACK_NUMBER_FONT = new Font("Segoe UI", Font.PLAIN, 16);
+    private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 16);
+    private static final Font TRACK_ARTISTS_FONT = new Font("Segoe UI", Font.PLAIN, 16);
 
-    private static final int NUMBER_COLUMN_WIDTH = 5;
-    private static final int TITLE_COLUMN_WIDTH = 100;
-    private static final int ARTISTS_COLUMN_WIDTH = 60;
-    private static final Insets QUEUE_LABEL_INSETS = new Insets(20, 5, 8, 0);
+    private static final int ROW_SPACING = 3;
+    private static final double NUMBER_COLUMN_WIDTH_PROPORTION = 0.05;
+    private static final double TITLE_COLUMN_WIDTH_PROPORTION = 0.6;
+    private static final double ARTISTS_COLUMN_WIDTH_PROPORTION = 0.2;
+    private static final Insets PANEL_TITLE_LABEL_INSETS = new Insets(16, 0, 4, 0);
 
-    private DefaultTableModel tableModel;
+    private JPanel tracklistPanel;
 
     public static QueuePanel queuePanel;
 
     public QueuePanel() {
 
-        /*
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        JLabel queueLabel = new JLabel("Queue");
-        tableModel = new DefaultTableModel(new String[] {"No.", "Title", "Artists"}, 0);
-        JTable queueTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(queueTable);
-
-        queueLabel.setFont(QUEUE_LABEL_FONT);
-        queueLabel.setBackground(Color.orange);
-        queueLabel.setOpaque(true);
-        queueTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        queueTable.setFillsViewportHeight(true);
-        TableColumnModel columnModel = queueTable.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(NUMBER_COLUMN_WIDTH);
-        columnModel.getColumn(1).setPreferredWidth(TITLE_COLUMN_WIDTH);
-        columnModel.getColumn(2).setPreferredWidth(ARTISTS_COLUMN_WIDTH);
-        Dimension preferredDimension = new Dimension(NUMBER_COLUMN_WIDTH + TITLE_COLUMN_WIDTH + ARTISTS_COLUMN_WIDTH, Integer.MAX_VALUE);
-        queueTable.setPreferredScrollableViewportSize(preferredDimension);
-        scrollPane.setPreferredSize(preferredDimension);
-        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-        
-        add(queueLabel);
-        add(Box.createVerticalStrut(12));
-        add(scrollPane);
-
-        */
-
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        JLabel queueLabel = new JLabel("Queue");
-        tableModel = new DefaultTableModel(new String[] {"No.", "Title", "Artists"}, 0);
-        JTable queueTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(queueTable);
+        JLabel panelTitleLabel = new JLabel("Queue");
+        tracklistPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(tracklistPanel);
 
-        queueLabel.setFont(QUEUE_LABEL_FONT);
-        queueLabel.setOpaque(true);
-        // queueTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        queueTable.setFillsViewportHeight(true);
-        TableColumnModel columnModel = queueTable.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(NUMBER_COLUMN_WIDTH);
-        columnModel.getColumn(1).setPreferredWidth(TITLE_COLUMN_WIDTH);
-        columnModel.getColumn(2).setPreferredWidth(ARTISTS_COLUMN_WIDTH);
-        Dimension preferredDimension = new Dimension(NUMBER_COLUMN_WIDTH + TITLE_COLUMN_WIDTH + ARTISTS_COLUMN_WIDTH, 100);
-        queueTable.setPreferredScrollableViewportSize(preferredDimension);
-        scrollPane.setPreferredSize(preferredDimension);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        panelTitleLabel.setFont(PANEL_TITLE_FONT);
+        tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -84,10 +48,10 @@ public class QueuePanel extends JPanel {
         constraints.gridwidth = 1;
         constraints.weightx = 1;
         constraints.weighty = 0;
-        constraints.insets = QUEUE_LABEL_INSETS;
+        constraints.insets = PANEL_TITLE_LABEL_INSETS;
         constraints.anchor = GridBagConstraints.LINE_START;
         constraints.fill = GridBagConstraints.BOTH;
-        add(queueLabel, constraints);
+        add(panelTitleLabel, constraints);
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
@@ -100,6 +64,38 @@ public class QueuePanel extends JPanel {
         add(scrollPane, constraints);
 
         QueuePanel.queuePanel = this;
+
+    }
+
+    public void setTracksInQueue(Track[] tracks) {
+
+        tracklistPanel.removeAll();
+
+        for(int i = 0; i < tracks.length; i++) {
+
+            JPanel trackPanel = new JPanel(new MigLayout(
+                "insets " + ROW_SPACING + " 0 " + ROW_SPACING + " 0",
+                "[" + (int) (NUMBER_COLUMN_WIDTH_PROPORTION * 100) + "%][" + (int) (TITLE_COLUMN_WIDTH_PROPORTION * 100) + "%][" + (int) (ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%]"
+            ));
+
+            JLabel numberLabel = new JLabel("" + i);
+            JLabel titleLabel = new JLabel(tracks[i].getTitle() != null && !tracks[i].getTitle().isBlank() ? tracks[i].getTitle() : "[No Title]");
+            JLabel artistsLabel = new JLabel(tracks[i].getArtists() != null && !tracks[i].getArtists().isBlank() ? tracks[i].getArtists() : "[Unknown Artists]");
+
+            numberLabel.setFont(TRACK_NUMBER_FONT);
+            titleLabel.setFont(TRACK_TITLE_FONT);
+            artistsLabel.setFont(TRACK_ARTISTS_FONT);
+
+            trackPanel.add(numberLabel, "cell 0 0");
+            trackPanel.add(titleLabel, "cell 1 0, pushx, wmax " + (int) (TITLE_COLUMN_WIDTH_PROPORTION * 100) + "%");
+            trackPanel.add(artistsLabel, "cell 2 0, wmax " + (int) (ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%");
+
+            tracklistPanel.add(trackPanel);
+
+        }
+
+        tracklistPanel.revalidate();
+        tracklistPanel.repaint();
 
     }
 

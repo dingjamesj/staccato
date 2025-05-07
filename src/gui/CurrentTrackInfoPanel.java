@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -32,7 +31,7 @@ public class CurrentTrackInfoPanel extends JPanel {
     private JButton youtubeLinkButton;
     private JButton openFileLocationButton;
 
-    private static CurrentTrackInfoPanel currentTrackInfoPanel;
+    public static CurrentTrackInfoPanel currentTrackInfoPanel;
 
     public CurrentTrackInfoPanel() {
 

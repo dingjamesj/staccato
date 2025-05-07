@@ -26,8 +26,8 @@ public class StaccatoWindow extends JFrame {
 	
 	private static final int WIDTH = 1500;
 	private static final int HEIGHT = 900;
-    private static final int PLAYBAR_TO_SIDES_GAP = 10;
-	private static final int PLAYBAR_TO_SCREEN_BOTTOM_GAP = 6;
+    private static final int GUI_TO_WINDOW_SIDES_GAP = 6;
+	private static final int GUI_TO_WINDOW_BOTTOM_GAP = 6;
 	private static final double QUEUE_PANEL_WIDTH_PROPORTION = 0.20;
 	private static final double CURRENT_TRACK_INFO_WIDTH_PROPORTION = 0.20;
 	private static final double PLAYBAR_PANEL_HEIGHT_PROPORTION = 0.105;
@@ -86,7 +86,7 @@ public class StaccatoWindow extends JFrame {
 
 		QueuePanel queuePanel = new QueuePanel();
 		// queuePanel.setBackground(Color.green);
-		add(queuePanel, "cell 0 0, span 1 2,grow");
+		add(queuePanel, "cell 0 0, span 1 2, grow, pad 0 " + GUI_TO_WINDOW_SIDES_GAP + " -" + GUI_TO_WINDOW_BOTTOM_GAP + " 0 0");
 
 		MainPanel tracklistPanel = new MainPanel();
 		// tracklistPanel.setBackground(Color.red);
@@ -98,7 +98,7 @@ public class StaccatoWindow extends JFrame {
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();
 		// playbarPanel.setBackground(Color.cyan);
-		add(playbarPanel, "cell 1 1, span 1 1, pad 0 " + PLAYBAR_TO_SIDES_GAP + " -" + PLAYBAR_TO_SCREEN_BOTTOM_GAP + " -" + PLAYBAR_TO_SIDES_GAP + " 0, grow");
+		add(playbarPanel, "cell 1 1, span 1 1, grow, pad 0 " + GUI_TO_WINDOW_SIDES_GAP + " -" + GUI_TO_WINDOW_BOTTOM_GAP + " -" + GUI_TO_WINDOW_SIDES_GAP + " 0");
 		
 		//--------END PANEL PLACEMENT-------
 		
