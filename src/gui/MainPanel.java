@@ -418,7 +418,6 @@ public class MainPanel extends JPanel {
                     Thread trackLoadingThread = new Thread(() -> {
     
                         loadTracklistInfo(playlist);
-                        QueuePanel.queuePanel.setTracksInQueue(playlist.getTracks());
 
                     });
                     trackLoadingThread.start();
@@ -467,6 +466,32 @@ public class MainPanel extends JPanel {
         trackPanel.add(titleAndArtistsPanel, "cell 1 0, pushx, wmax " + (int) (TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(albumLabel, "cell 2 0, wmax " + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(editTrackButton, "cell 3 0");
+
+        trackPanel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+
+                if(mouseEvent.getClickCount() < 2) {
+
+                    return;
+
+                }
+
+                System.out.println(track.getFileLocation());
+                try {
+
+                    PlaybarPanel.playbarPanel.playTrack(track);
+
+                } catch (FileNotFoundException e) {
+
+                    e.printStackTrace();
+                    
+                }
+
+            }
+
+        });
 
         return trackPanel;
 

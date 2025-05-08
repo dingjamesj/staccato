@@ -4,6 +4,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -11,6 +13,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import main.Track;
 
 public class PlaybarPanel extends JPanel {
 
@@ -31,13 +38,14 @@ public class PlaybarPanel extends JPanel {
     public static PlaybarPanel playbarPanel;
 
     private boolean isPlaying = false;
+    private Track currentTrack = null;
 
     public PlaybarPanel() {
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        //-----BEGIN PLAY/PAUSE, SKIP/GO-BACK BUTTONS PANEL-----
+        //------------------BEGIN GUI BUILDING------------------
 
         JButton goBackButton = new JButton(GO_BACK_ICON);
         JButton playPauseButton = new JButton(PLAY_ICON);
@@ -50,6 +58,9 @@ public class PlaybarPanel extends JPanel {
         timeRemainingLabel.setFont(TIME_FONT);
         progressBar.setAlignmentX(CENTER_ALIGNMENT);
         progressBar.putClientProperty("JProgressBar.largeHeight", true);
+        playPauseButton.setEnabled(false);
+        goBackButton.setEnabled(false);
+        skipButton.setEnabled(false);
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -94,21 +105,19 @@ public class PlaybarPanel extends JPanel {
         constraints.insets = new Insets(BUTTONS_TO_PROGRESSBAR_GAP, 0, 0, 0);
         add(progressBar, constraints);
 
-        //------END PLAY/PAUSE, SKIP/GO-BACK BUTTONS PANEL------
-
-        //---------------BEGIN PROGRESS BAR PANEL---------------
-
-        //Time panel
-
-        
-
-        //----------------END PROGRESS BAR PANEL----------------
+        //-------------------END GUI BUILDING-------------------
 
         PlaybarPanel.playbarPanel = this;
 
         //----------------START ACTION LISTENERS----------------
 
         playPauseButton.addActionListener((e) -> {
+
+            if(currentTrack == null) {
+
+                return;
+
+            }
 
             if(isPlaying) {
 
@@ -128,6 +137,47 @@ public class PlaybarPanel extends JPanel {
 
     }
 
+    /**
+     * Play a track's audio
+     * @param track
+     * @return true if the track was successfully located, false if the track was not
+     */
+    public void playTrack(Track track) throws FileNotFoundException {
+
+        //First see if we can access the track file
+        if(track.getFileLocation() == null) {
+
+            throw new FileNotFoundException();
+
+        }
+
+        File trackFile = new File(track.getFileLocation());
+        if(!trackFile.isFile()) {
+
+            throw new FileNotFoundException();
+
+        }
+
+        try {
+
+            if(!trackFile.canRead()) { //Will throw security exception if no
+
+                throw new FileNotFoundException();
+
+            }
+
+        } catch(SecurityException e) {
+
+            throw new FileNotFoundException();
+
+        }
+
+        Media media = new Media(trackFile.toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.play();
+
+    }
+
     private static ImageIcon createImageIcon(String urlStr) {
 
         URL url = PlaybarPanel.class.getResource(urlStr);
@@ -138,6 +188,13 @@ public class PlaybarPanel extends JPanel {
         }
 
         return new ImageIcon(urlStr);
+
+    }
+
+    static {
+
+        //Initialize JavaFX so that it can play audio
+        new JFXPanel();
 
     }
 
