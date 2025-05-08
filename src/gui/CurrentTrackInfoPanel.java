@@ -108,7 +108,7 @@ public class CurrentTrackInfoPanel extends JPanel {
 
     }
 
-    private void initWithTrack(Track track) {
+    public void setTrack(Track track) {
 
         titleLabel.setText(track.getTitle());
         artistsLabel.setText(track.getArtists());
@@ -123,12 +123,6 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         revalidate();
         repaint();
-
-    }
-
-    public static void setTrack(Track track) {
-
-        currentTrackInfoPanel.initWithTrack(track);
 
     }
 

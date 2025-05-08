@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import main.Track;
+import main.TracklistPlayer;
 
 public class PlaybarPanel extends JPanel {
 
@@ -34,11 +36,11 @@ public class PlaybarPanel extends JPanel {
     private JLabel timeElapsedLabel;
     private JLabel timeRemainingLabel;
     private JProgressBar progressBar;
+    private JButton goBackButton;
+    private JButton playPauseButton;
+    private JButton skipButton;
 
     public static PlaybarPanel playbarPanel;
-
-    private boolean isPlaying = false;
-    private Track currentTrack = null;
 
     public PlaybarPanel() {
 
@@ -47,9 +49,9 @@ public class PlaybarPanel extends JPanel {
 
         //------------------BEGIN GUI BUILDING------------------
 
-        JButton goBackButton = new JButton(GO_BACK_ICON);
-        JButton playPauseButton = new JButton(PLAY_ICON);
-        JButton skipButton = new JButton(SKIP_ICON);
+        goBackButton = new JButton(GO_BACK_ICON);
+        playPauseButton = new JButton(PLAY_ICON);
+        skipButton = new JButton(SKIP_ICON);
         timeElapsedLabel = new JLabel("0:00");
         timeRemainingLabel = new JLabel("-:--");
         progressBar = new JProgressBar();
@@ -113,20 +115,14 @@ public class PlaybarPanel extends JPanel {
 
         playPauseButton.addActionListener((e) -> {
 
-            if(currentTrack == null) {
+            if(TracklistPlayer.isPlaying()) {
 
-                return;
-
-            }
-
-            if(isPlaying) {
-
-                isPlaying = false;
+                TracklistPlayer.pausePlayback();
                 playPauseButton.setIcon(PLAY_ICON);
 
             } else {
 
-                isPlaying = true;
+                TracklistPlayer.resumePlayback();
                 playPauseButton.setIcon(PAUSE_ICON);
 
             }
@@ -137,44 +133,25 @@ public class PlaybarPanel extends JPanel {
 
     }
 
-    /**
-     * Play a track's audio
-     * @param track
-     * @return true if the track was successfully located, false if the track was not
-     */
-    public void playTrack(Track track) throws FileNotFoundException {
+    public void setButtonsEnabled(boolean enabled) {
 
-        //First see if we can access the track file
-        if(track.getFileLocation() == null) {
+        playPauseButton.setEnabled(enabled);
+        goBackButton.setEnabled(enabled);
+        skipButton.setEnabled(enabled);
 
-            throw new FileNotFoundException();
+    }
 
-        }
+    public void setIsPlaying(boolean isPlaying) {
 
-        File trackFile = new File(track.getFileLocation());
-        if(!trackFile.isFile()) {
+        if(isPlaying) {
 
-            throw new FileNotFoundException();
+            playPauseButton.setIcon(PAUSE_ICON);
 
-        }
+        } else {
 
-        try {
-
-            if(!trackFile.canRead()) { //Will throw security exception if no
-
-                throw new FileNotFoundException();
-
-            }
-
-        } catch(SecurityException e) {
-
-            throw new FileNotFoundException();
+            playPauseButton.setIcon(PLAY_ICON);
 
         }
-
-        Media media = new Media(trackFile.toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.play();
 
     }
 
@@ -188,13 +165,6 @@ public class PlaybarPanel extends JPanel {
         }
 
         return new ImageIcon(urlStr);
-
-    }
-
-    static {
-
-        //Initialize JavaFX so that it can play audio
-        new JFXPanel();
 
     }
 

@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
+import main.TracklistPlayer;
 import main.FileManager;
 import main.Playlist;
 import main.Track;
@@ -479,15 +480,9 @@ public class MainPanel extends JPanel {
                 }
 
                 System.out.println(track.getFileLocation());
-                try {
-
-                    PlaybarPanel.playbarPanel.playTrack(track);
-
-                } catch (FileNotFoundException e) {
-
-                    e.printStackTrace();
-                    
-                }
+                PlaybarPanel.playbarPanel.setButtonsEnabled(true);
+                PlaybarPanel.playbarPanel.setIsPlaying(true);
+                TracklistPlayer.playTracks(track);
 
             }
 
