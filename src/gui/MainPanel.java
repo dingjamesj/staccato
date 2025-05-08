@@ -320,6 +320,14 @@ public class MainPanel extends JPanel {
 
         });
 
+        playlistCoverButton.addActionListener((unused) -> {
+
+            TracklistPlayer.playTracks(playlist.getTracks());
+            PlaybarPanel.playbarPanel.setButtonsEnabled(true);
+            PlaybarPanel.playbarPanel.setIsPlaying(true);
+
+        });
+
     }
 
     /**
@@ -479,7 +487,6 @@ public class MainPanel extends JPanel {
 
                 }
 
-                System.out.println(track.getFileLocation());
                 PlaybarPanel.playbarPanel.setButtonsEnabled(true);
                 PlaybarPanel.playbarPanel.setIsPlaying(true);
                 TracklistPlayer.playTracks(track);

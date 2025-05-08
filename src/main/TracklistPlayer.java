@@ -1,8 +1,8 @@
 package main;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.embed.swing.JFXPanel;
@@ -13,7 +13,7 @@ public abstract class TracklistPlayer {
     
     public static ArrayList<Runnable> nextTrackActions;
 
-    private static MediaPlayer mediaPlayer;
+    private static MediaPlayer activeMediaPlayer;
     private static Thread currentPlaybackThread;
     private static AtomicBoolean killCurrentPlaybackThreadFlag = new AtomicBoolean(false);
     private static AtomicBoolean isPlaying = new AtomicBoolean(false);
@@ -22,112 +22,81 @@ public abstract class TracklistPlayer {
 
         //Initialize JavaFX so that it can play audio
         new JFXPanel();
+        nextTrackActions = new ArrayList<Runnable>();
 
     }
 
     /**
-     * Kills the current track playback thread and starts a new one with this track list.
-     * @param tracks
+     * Puts all the tracks in a queue and plays them in the given order.
+     * @param tracks Array of tracks to be played in order
+     * @return A List of the tracks successfully put in the queue
      */
-    public static void playTracks(Track... tracks) {
+    public static List<Track> playTracks(Track... tracks) {
 
-        //Kill the current thread and wait for it to be completely killed.
-        killCurrentPlaybackThread();
+        //Stop playback
+        if(activeMediaPlayer != null) {
 
-        //Start a new thread
-        currentPlaybackThread = new Thread(() -> {
+            activeMediaPlayer.stop();
 
-            if(mediaPlayer != null) {
+        }
 
-                mediaPlayer.stop();
-                mediaPlayer = null;
-    
+        if(tracks == null || tracks.length == 0) {
+
+            return new ArrayList<Track>(0);
+
+        }
+
+        //Keeping track of 
+        List<Track> queuedTracks = new ArrayList<Track>();
+        MediaPlayer prevMediaPlayer = null;
+        for(int i = 0; i < tracks.length; i++) {
+
+            //First see if we can access the track file
+            if(!tracks[i].canRead()) {
+
+                continue;
+
             }
-    
-            isPlaying.set(true);
-            for(int i = 0; i < tracks.length; i++) {
+            
+            Media media = new Media(new File(tracks[i].getFileLocation()).toURI().toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(media);
 
-                try {
-    
-                    playTrack(tracks[i]);
-    
-                } catch (FileNotFoundException e) {
-                    
-                    //Move onto the next track
-                    e.printStackTrace();
-    
-                } finally {
-    
-                    //Run all the callback functions
+            //If this isn't the first track, then make it play after the previous track ends.
+            //If this is the first track, then assign it to activeMediaPlayer, which will be played right after this for-loop.
+            if(prevMediaPlayer != null) {
+
+                prevMediaPlayer.setOnEndOfMedia(() -> {
+
+                    mediaPlayer.play();
                     for(int a = 0; a < nextTrackActions.size(); a++) {
-    
+
                         nextTrackActions.get(a).run();
-    
+
                     }
-    
-                }
 
-                //Stop executing this thread if the kill flag is on
-                if(killCurrentPlaybackThreadFlag.get()) {
+                });
 
-                    isPlaying.set(false);
-                    return;
+            } else {
 
-                }
-    
-            }
-
-        });
-
-        currentPlaybackThread.start();
-
-    }
-
-    private static void playTrack(Track track) throws FileNotFoundException {
-
-        //First see if we can access the track file
-        if(track.getFileLocation() == null) {
-
-            throw new FileNotFoundException();
-
-        }
-
-        File trackFile = new File(track.getFileLocation());
-        if(!trackFile.isFile()) {
-
-            throw new FileNotFoundException();
-
-        }
-
-        try {
-
-            if(!trackFile.canRead()) { //The canRead method can throw a SecurityException
-
-                throw new FileNotFoundException();
+                activeMediaPlayer = mediaPlayer;
 
             }
+            
+            mediaPlayer.setOnPlaying(() -> {
 
-        } catch(SecurityException e) {
+                activeMediaPlayer = mediaPlayer;
 
-            throw new FileNotFoundException();
+            });
+
+            prevMediaPlayer = mediaPlayer;
 
         }
-        
-        Media media = new Media(trackFile.toURI().toString());
-        mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.play();
-        
-        AtomicBoolean trackHasEnded = new AtomicBoolean(false);
-        mediaPlayer.setOnEndOfMedia(() -> {
 
-            trackHasEnded.set(true);
-            mediaPlayer = null;
+        activeMediaPlayer.play();
+        isPlaying.set(true);
 
-        });
+        return queuedTracks;
 
-        //Wait for the track to finish playing
-        while(!trackHasEnded.get() && !killCurrentPlaybackThreadFlag.get()) {}
-        
     }
 
     /**
@@ -145,6 +114,7 @@ public abstract class TracklistPlayer {
         killCurrentPlaybackThreadFlag.set(true);
         try {
 
+            //Wait for the thread to end
             currentPlaybackThread.join();
 
         } catch (InterruptedException e) {
@@ -166,13 +136,13 @@ public abstract class TracklistPlayer {
      */
     public static void pausePlayback() {
 
-        if(mediaPlayer == null) {
+        if(activeMediaPlayer == null) {
 
             return;
 
         }
 
-        mediaPlayer.pause();
+        activeMediaPlayer.pause();
         isPlaying.set(false);
 
     }
@@ -182,13 +152,13 @@ public abstract class TracklistPlayer {
      */
     public static void resumePlayback() {
 
-        if(mediaPlayer == null) {
+        if(activeMediaPlayer == null) {
 
             return;
 
         }
 
-        mediaPlayer.play();
+        activeMediaPlayer.play();
         isPlaying.set(true);
 
     }
@@ -198,14 +168,14 @@ public abstract class TracklistPlayer {
      */
     public static void stopPlayback() {
 
-        if(mediaPlayer != null) {
+        if(activeMediaPlayer != null) {
 
-            mediaPlayer.stop();
-            mediaPlayer = null;
+            activeMediaPlayer.stop();
+            activeMediaPlayer = null;
 
         }
 
-        killCurrentPlaybackThread();
+        // killCurrentPlaybackThread();
         isPlaying.set(false);
 
     }

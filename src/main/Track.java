@@ -106,9 +106,35 @@ public class Track {
 
 	}
 	
-	public boolean fileExists() {
+	/**
+	 * Checks if the track file can be read
+	 * @return True if can be read, false otherwise
+	 */
+	public boolean canRead() {
 		
-		return fileLocation == null || new File(fileLocation).exists();
+		if(fileLocation == null) {
+
+			return false;
+			
+		}
+
+		try {
+
+			//(says if we can read the track file)
+			//Note that the canRead() method throws SecurityException if we don't have perms to read it.
+			if(!(new File(fileLocation).canRead())) {
+
+				return false;
+
+			}
+
+		} catch(SecurityException e) {
+
+			return false;
+
+		}
+
+		return true;
 		
 	}
 	
@@ -209,7 +235,7 @@ public class Track {
 	 */
 	private void setAttributesFromFileMetadata() {
 
-		if(!fileExists()) {
+		if(!canRead()) {
 
 			return;
 
@@ -251,7 +277,7 @@ public class Track {
 	 */
 	public void writeMetadata() {
 		
-		if(!fileExists()) {
+		if(!canRead()) {
 			
 			return;
 			
