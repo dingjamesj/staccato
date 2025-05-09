@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -67,11 +68,17 @@ public class QueuePanel extends JPanel {
 
     }
 
-    public void setTracksInQueue(Track[] tracks) {
+    public void setTracksInQueue(List<Track> tracks) {
 
         tracklistPanel.removeAll();
 
-        for(int i = 0; i < tracks.length; i++) {
+        if(tracks == null) {
+
+            return;
+
+        }
+
+        for(int i = 0; i < tracks.size(); i++) {
 
             JPanel trackPanel = new JPanel(new MigLayout(
                 "insets " + ROW_SPACING + " 0 " + ROW_SPACING + " 0",
@@ -79,7 +86,7 @@ public class QueuePanel extends JPanel {
             ));
 
             JLabel numberLabel = new JLabel("" + (i + 1));
-            JLabel titleLabel = new JLabel(tracks[i].getTitle() != null && !tracks[i].getTitle().isBlank() ? tracks[i].getTitle() : "[No Title]");
+            JLabel titleLabel = new JLabel(tracks.get(i).getTitle() != null && !tracks.get(i).getTitle().isBlank() ? tracks.get(i).getTitle() : "[No Title]");
 
             numberLabel.setFont(TRACK_NUMBER_FONT);
             titleLabel.setFont(TRACK_TITLE_FONT);

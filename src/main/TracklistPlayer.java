@@ -3,7 +3,6 @@ package main;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
@@ -15,8 +14,8 @@ public abstract class TracklistPlayer {
 
     private static MediaPlayer activeMediaPlayer;
     private static Thread currentPlaybackThread;
-    private static AtomicBoolean killCurrentPlaybackThreadFlag = new AtomicBoolean(false);
-    private static AtomicBoolean isPlaying = new AtomicBoolean(false);
+    private static boolean isPlaying = false;
+    private static Track currentlyPlayingTrack;
 
     static {
 
@@ -51,14 +50,18 @@ public abstract class TracklistPlayer {
         MediaPlayer prevMediaPlayer = null;
         for(int i = 0; i < tracks.length; i++) {
 
+            Track track = tracks[i];
+
             //First see if we can access the track file
-            if(!tracks[i].canRead()) {
+            if(!track.canRead()) {
 
                 continue;
 
             }
             
-            Media media = new Media(new File(tracks[i].getFileLocation()).toURI().toString());
+            queuedTracks.add(track);
+
+            Media media = new Media(new File(track.getFileLocation()).toURI().toString());
             MediaPlayer mediaPlayer = new MediaPlayer(media);
 
             //If this isn't the first track, then make it play after the previous track ends.
@@ -85,6 +88,7 @@ public abstract class TracklistPlayer {
             mediaPlayer.setOnPlaying(() -> {
 
                 activeMediaPlayer = mediaPlayer;
+                currentlyPlayingTrack = track;
 
             });
 
@@ -93,41 +97,9 @@ public abstract class TracklistPlayer {
         }
 
         activeMediaPlayer.play();
-        isPlaying.set(true);
+        isPlaying = true;
 
         return queuedTracks;
-
-    }
-
-    /**
-     * Kills the current playback thread and waits for it to completely end.
-     */
-    private static void killCurrentPlaybackThread() {
-
-        //Don't execute the rest of the method if there's no thread to kill
-        if(currentPlaybackThread == null || !currentPlaybackThread.isAlive()) {
-
-            return;
-
-        }
-
-        killCurrentPlaybackThreadFlag.set(true);
-        try {
-
-            //Wait for the thread to end
-            currentPlaybackThread.join();
-
-        } catch (InterruptedException e) {
-            
-            //Do nothing
-            e.printStackTrace();
-
-        } finally {
-
-            killCurrentPlaybackThreadFlag.set(false);
-            isPlaying.set(false);
-
-        }
 
     }
 
@@ -143,7 +115,7 @@ public abstract class TracklistPlayer {
         }
 
         activeMediaPlayer.pause();
-        isPlaying.set(false);
+        isPlaying = false;
 
     }
 
@@ -159,7 +131,7 @@ public abstract class TracklistPlayer {
         }
 
         activeMediaPlayer.play();
-        isPlaying.set(true);
+        isPlaying = true;
 
     }
 
@@ -176,13 +148,25 @@ public abstract class TracklistPlayer {
         }
 
         // killCurrentPlaybackThread();
-        isPlaying.set(false);
+        isPlaying = false;
+
+    }
+
+    public static void skipTrack() {
+
+
 
     }
 
     public static boolean isPlaying() {
 
-        return isPlaying.get();
+        return isPlaying;
+
+    }
+
+    public static Track getCurrentlyPlayingTrack() {
+
+        return currentlyPlayingTrack;
 
     }
 

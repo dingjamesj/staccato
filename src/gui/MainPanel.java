@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -28,10 +29,10 @@ import javax.swing.SwingUtilities;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
-import main.TracklistPlayer;
 import main.FileManager;
 import main.Playlist;
 import main.Track;
+import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
 
 public class MainPanel extends JPanel {
@@ -322,9 +323,7 @@ public class MainPanel extends JPanel {
 
         playlistCoverButton.addActionListener((unused) -> {
 
-            TracklistPlayer.playTracks(playlist.getTracks());
-            PlaybarPanel.playbarPanel.setButtonsEnabled(true);
-            PlaybarPanel.playbarPanel.setIsPlaying(true);
+            playTracksAction(playlist.getTracks());
 
         });
 
@@ -367,6 +366,15 @@ public class MainPanel extends JPanel {
 
         tracklistPanel.revalidate();
         tracklistPanel.repaint();
+
+    }
+
+    private void playTracksAction(Track... tracks) {
+
+        List<Track> queuedTracks = TracklistPlayer.playTracks(tracks);
+        PlaybarPanel.playbarPanel.setButtonsEnabled(true);
+        PlaybarPanel.playbarPanel.setIsPlaying(true);
+        QueuePanel.queuePanel.setTracksInQueue(queuedTracks);
 
     }
 
@@ -467,7 +475,6 @@ public class MainPanel extends JPanel {
         artistsLabel.setFont(TRACK_ARTISTS_FONT);
         albumLabel.setAlignmentX(LEFT_ALIGNMENT);
         albumLabel.setFont(TRACK_ALBUM_FONT);
-        // albumLabel.setBackground(Color.cyan);
 
         trackPanel.add(artworkLabel, "cell 0 0");
         titleAndArtistsPanel.add(titleLabel);
@@ -487,9 +494,7 @@ public class MainPanel extends JPanel {
 
                 }
 
-                PlaybarPanel.playbarPanel.setButtonsEnabled(true);
-                PlaybarPanel.playbarPanel.setIsPlaying(true);
-                TracklistPlayer.playTracks(track);
+                playTracksAction(track);
 
             }
 
