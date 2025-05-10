@@ -68,7 +68,7 @@ public class QueuePanel extends JPanel {
 
     }
 
-    public void setTracksInQueue(List<Track> tracks) {
+    public void setTracksInQueue(Track[] tracks) {
 
         tracklistPanel.removeAll();
 
@@ -78,7 +78,7 @@ public class QueuePanel extends JPanel {
 
         }
 
-        for(int i = 0; i < tracks.size(); i++) {
+        for(int i = 0; i < tracks.length; i++) {
 
             JPanel trackPanel = new JPanel(new MigLayout(
                 "insets " + ROW_SPACING + " 0 " + ROW_SPACING + " 0",
@@ -86,7 +86,7 @@ public class QueuePanel extends JPanel {
             ));
 
             JLabel numberLabel = new JLabel("" + (i + 1));
-            JLabel titleLabel = new JLabel(tracks.get(i).getTitle() != null && !tracks.get(i).getTitle().isBlank() ? tracks.get(i).getTitle() : "[No Title]");
+            JLabel titleLabel = new JLabel(tracks[i].getTitle() != null && !tracks[i].getTitle().isBlank() ? tracks[i].getTitle() : "[No Title]");
 
             numberLabel.setFont(TRACK_NUMBER_FONT);
             titleLabel.setFont(TRACK_TITLE_FONT);

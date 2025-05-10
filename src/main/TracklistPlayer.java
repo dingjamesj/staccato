@@ -3,6 +3,7 @@ package main;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
@@ -13,15 +14,17 @@ public abstract class TracklistPlayer {
     public static ArrayList<Runnable> nextTrackActions;
 
     private static MediaPlayer activeMediaPlayer;
-    private static Thread currentPlaybackThread;
     private static boolean isPlaying = false;
-    private static Track currentlyPlayingTrack;
+    private static AtomicInteger currentTrackNum;
+    private static List<Track> queuedTracks;
 
     static {
 
         //Initialize JavaFX so that it can play audio
         new JFXPanel();
+        currentTrackNum = new AtomicInteger(0);
         nextTrackActions = new ArrayList<Runnable>();
+        queuedTracks = new ArrayList<Track>();
 
     }
 
@@ -30,9 +33,11 @@ public abstract class TracklistPlayer {
      * @param tracks Array of tracks to be played in order
      * @return A List of the tracks successfully put in the queue
      */
-    public static List<Track> playTracks(Track... tracks) {
+    public static void playTracks(Track... tracks) {
 
-        //Stop playback
+        //Stop playback and clear queue
+        queuedTracks.clear();
+        currentTrackNum.set(0);
         if(activeMediaPlayer != null) {
 
             activeMediaPlayer.stop();
@@ -41,13 +46,10 @@ public abstract class TracklistPlayer {
 
         if(tracks == null || tracks.length == 0) {
 
-            return new ArrayList<Track>(0);
+            return;
 
         }
 
-        //Keeping track of 
-        List<Track> queuedTracks = new ArrayList<Track>();
-        MediaPlayer prevMediaPlayer = null;
         for(int i = 0; i < tracks.length; i++) {
 
             Track track = tracks[i];
@@ -61,45 +63,48 @@ public abstract class TracklistPlayer {
             
             queuedTracks.add(track);
 
-            Media media = new Media(new File(track.getFileLocation()).toURI().toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(media);
-
-            //If this isn't the first track, then make it play after the previous track ends.
-            //If this is the first track, then assign it to activeMediaPlayer, which will be played right after this for-loop.
-            if(prevMediaPlayer != null) {
-
-                prevMediaPlayer.setOnEndOfMedia(() -> {
-
-                    mediaPlayer.play();
-                    for(int a = 0; a < nextTrackActions.size(); a++) {
-
-                        nextTrackActions.get(a).run();
-
-                    }
-
-                });
-
-            } else {
-
-                activeMediaPlayer = mediaPlayer;
-
-            }
-            
-            mediaPlayer.setOnPlaying(() -> {
-
-                activeMediaPlayer = mediaPlayer;
-                currentlyPlayingTrack = track;
-
-            });
-
-            prevMediaPlayer = mediaPlayer;
-
         }
 
+        Media media = new Media(new File(queuedTracks.get(0).getFileLocation()).toURI().toString());
+        activeMediaPlayer = new MediaPlayer(media);
+        activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
         activeMediaPlayer.play();
         isPlaying = true;
 
-        return queuedTracks;
+    }
+
+    /**
+     * Stops the current media player
+     * ... TODO finish documentation for waht this does
+     */
+    private static void playNextTrack() {
+
+        isPlaying = false;
+        if(activeMediaPlayer != null) {
+
+            activeMediaPlayer.stop();
+
+        }
+
+        for(Runnable action: nextTrackActions) {
+
+            action.run();
+
+        }
+
+        if(currentTrackNum.incrementAndGet() >= queuedTracks.size()) {
+
+            //isPlaying remains false
+            return;
+
+        }
+
+        Media nextMedia = new Media(new File(queuedTracks.get(currentTrackNum.get()).getFileLocation()).toURI().toString());
+        activeMediaPlayer = new MediaPlayer(nextMedia);
+        activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
+
+        activeMediaPlayer.play();
+        isPlaying = true;
 
     }
 
@@ -135,26 +140,9 @@ public abstract class TracklistPlayer {
 
     }
 
-    /**
-     * Stops audio playback and kills the current playback thread
-     */
-    public static void stopPlayback() {
-
-        if(activeMediaPlayer != null) {
-
-            activeMediaPlayer.stop();
-            activeMediaPlayer = null;
-
-        }
-
-        // killCurrentPlaybackThread();
-        isPlaying = false;
-
-    }
-
     public static void skipTrack() {
 
-
+        
 
     }
 
@@ -166,7 +154,21 @@ public abstract class TracklistPlayer {
 
     public static Track getCurrentlyPlayingTrack() {
 
-        return currentlyPlayingTrack;
+        return queuedTracks.get(currentTrackNum.get());
+
+    }
+
+    public static Track[] getQueue() {
+
+        Track[] trackArray = new Track[queuedTracks.size()];
+
+        for(int i = 0; i < queuedTracks.size(); i++) {
+
+            trackArray[i] = queuedTracks.get(i);
+
+        }
+
+        return trackArray;
 
     }
 

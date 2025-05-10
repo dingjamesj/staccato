@@ -371,10 +371,10 @@ public class MainPanel extends JPanel {
 
     private void playTracksAction(Track... tracks) {
 
-        List<Track> queuedTracks = TracklistPlayer.playTracks(tracks);
+        TracklistPlayer.playTracks(tracks);
         PlaybarPanel.playbarPanel.setButtonsEnabled(true);
         PlaybarPanel.playbarPanel.setIsPlaying(true);
-        QueuePanel.queuePanel.setTracksInQueue(queuedTracks);
+        QueuePanel.queuePanel.setTracksInQueue(TracklistPlayer.getQueue());
 
     }
 
