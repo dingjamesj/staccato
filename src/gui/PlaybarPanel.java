@@ -106,7 +106,7 @@ public class PlaybarPanel extends JPanel {
 
         //----------------START ACTION LISTENERS----------------
 
-        playPauseButton.addActionListener((e) -> {
+        playPauseButton.addActionListener((unused) -> {
 
             if(TracklistPlayer.isPlaying()) {
 
@@ -119,6 +119,18 @@ public class PlaybarPanel extends JPanel {
                 playPauseButton.setIcon(PAUSE_ICON);
 
             }
+
+        });
+
+        skipButton.addActionListener((unused) -> {
+
+            TracklistPlayer.skipTrack();
+
+        });
+
+        goBackButton.addActionListener((unused) -> {
+
+            TracklistPlayer.rewindTrack();
 
         });
 

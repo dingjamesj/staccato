@@ -2,20 +2,31 @@ package main;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 public abstract class TracklistPlayer {
     
-    public static ArrayList<Runnable> nextTrackActions;
+    /**
+     * After this amount of seconds from the start of the song, calling rewind() 
+     * will start the track again instead of going back to the previous track.
+     */
+    private static final int GO_TO_PREVIOUS_TIME_LIMIT = 3;
+
+    public static Set<Runnable> switchTrackActions;
 
     private static MediaPlayer activeMediaPlayer;
-    private static boolean isPlaying = false;
     private static AtomicInteger currentTrackNum;
+    private static AtomicBoolean isPlaying;
+    private static AtomicBoolean isOnRepeat;
     private static List<Track> queuedTracks;
 
     static {
@@ -23,7 +34,9 @@ public abstract class TracklistPlayer {
         //Initialize JavaFX so that it can play audio
         new JFXPanel();
         currentTrackNum = new AtomicInteger(0);
-        nextTrackActions = new ArrayList<Runnable>();
+        isPlaying = new AtomicBoolean(false);
+        isOnRepeat = new AtomicBoolean(false);
+        switchTrackActions = new HashSet<Runnable>();
         queuedTracks = new ArrayList<Track>();
 
     }
@@ -69,24 +82,28 @@ public abstract class TracklistPlayer {
         activeMediaPlayer = new MediaPlayer(media);
         activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
         activeMediaPlayer.play();
-        isPlaying = true;
+        isPlaying.set(true);
 
     }
 
     /**
-     * Stops the current media player
-     * ... TODO finish documentation for waht this does
+     * Stops the current media player, <br></br>
+     * Runs the next track actions, <br></br>
+     * Tries to increment the current track number if there are more tracks, and if that's the case... <br></br>
+     * Plays the music with MediaPlayer and 
+     * <b>
+     * assigns setOnEndOfMedia to repeat this process for the next track.
+     * </b>
      */
     private static void playNextTrack() {
 
-        isPlaying = false;
         if(activeMediaPlayer != null) {
 
             activeMediaPlayer.stop();
 
         }
 
-        for(Runnable action: nextTrackActions) {
+        for(Runnable action: switchTrackActions) {
 
             action.run();
 
@@ -94,8 +111,14 @@ public abstract class TracklistPlayer {
 
         if(currentTrackNum.incrementAndGet() >= queuedTracks.size()) {
 
-            //isPlaying remains false
-            return;
+            if(!isOnRepeat.get()) {
+
+                //isPlaying remains false here
+                return;
+
+            }
+            
+            currentTrackNum.set(currentTrackNum.get() % queuedTracks.size());
 
         }
 
@@ -104,7 +127,7 @@ public abstract class TracklistPlayer {
         activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
 
         activeMediaPlayer.play();
-        isPlaying = true;
+        isPlaying.set(true);
 
     }
 
@@ -120,7 +143,7 @@ public abstract class TracklistPlayer {
         }
 
         activeMediaPlayer.pause();
-        isPlaying = false;
+        isPlaying.set(false);
 
     }
 
@@ -136,19 +159,81 @@ public abstract class TracklistPlayer {
         }
 
         activeMediaPlayer.play();
-        isPlaying = true;
+        isPlaying.set(true);
 
     }
 
     public static void skipTrack() {
 
-        
+        if(activeMediaPlayer == null) {
+
+            return;
+            
+        }
+
+        playNextTrack();
 
     }
 
-    public static boolean isPlaying() {
+    /**
+     * If is called <code>GO_TO_PREVIOUS_TIME_LIMIT</code> amount of seconds after the start of the track, this will restart the track. <br></br>
+     * Otherwise, it will go to the previous track.
+     */
+    public static void rewindTrack() {
 
-        return isPlaying;
+        if(activeMediaPlayer == null) {
+
+            return;
+
+        }
+
+        if(activeMediaPlayer.getCurrentTime().toSeconds() > GO_TO_PREVIOUS_TIME_LIMIT) {
+
+            activeMediaPlayer.seek(Duration.millis(0));
+
+        } else if(currentTrackNum.get() == 0) {
+
+            if(!isOnRepeat.get()) {
+
+                activeMediaPlayer.seek(Duration.millis(0));
+
+            } else {
+
+                currentTrackNum.set(queuedTracks.size() - 2);
+                playNextTrack();
+
+            }
+
+        } else {
+
+            currentTrackNum.addAndGet(-2);
+            playNextTrack();
+
+        }
+
+    }
+
+    public static void setIsOnRepeat(boolean isOnRepeat) {
+
+        TracklistPlayer.isOnRepeat.set(isOnRepeat);
+
+    }
+
+    public static void addSwitchTrackAction(Runnable action) {
+
+        switchTrackActions.add(action);
+
+    }
+
+    public static void removeSwitchTrackAction(Runnable action) {
+
+        switchTrackActions.remove(action);
+
+    }
+
+    public static void clearSwitchTrackActions() {
+
+        switchTrackActions.clear();
 
     }
 
@@ -169,6 +254,40 @@ public abstract class TracklistPlayer {
         }
 
         return trackArray;
+
+    }
+
+    /**
+     * The active media player's current time divided by the track's total duration.
+     * @return How much of the current track has been played, as a percent of the total track duration.
+     */
+    public static double getProgressProportion() {
+
+        if(activeMediaPlayer == null) {
+
+            return 0;
+
+        }
+
+        return activeMediaPlayer.getCurrentTime().toMillis() / activeMediaPlayer.getTotalDuration().toMillis();
+
+    }
+
+    /**
+     * @return True if the player is playing something, false otherwise.
+     */
+    public static boolean isPlaying() {
+
+        return isPlaying.get();
+
+    }
+
+    /**
+     * @return True if the player is on repeat, false otherwise.
+     */
+    public static boolean isOnRepeat() {
+
+        return isOnRepeat.get();
 
     }
 
