@@ -280,6 +280,8 @@ public class MainPanel extends JPanel {
         //-------BEGIN BUILDING TRACKLIST PANEL-------
 
         tracklistPanel = new JPanel();
+        //This will essentially be a track entry panel but with just a label that says "Loading..."
+        JPanel loadingLabelPanel = new JPanel(new MigLayout("insets " + TRACKLIST_ROWS_SPACING + " 0 " + TRACKLIST_ROWS_SPACING + " 0"));
         JLabel loadingLabel = new JLabel("Loading tracklist...");
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
@@ -291,13 +293,15 @@ public class MainPanel extends JPanel {
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         //DEBUG
-        loadingLabel.setOpaque(true);
-        loadingLabel.setBackground(Color.cyan);
-        tracklistPanel.setBackground(Color.red);
-        wrapperPanel.setBackground(Color.green);
+        // loadingLabel.setOpaque(true);
+        // loadingLabel.setBackground(Color.cyan);
+        // tracklistPanel.setBackground(Color.red);
+        // wrapperPanel.setBackground(Color.green);
         //-------------------
 
-        tracklistPanel.add(loadingLabel);
+        loadingLabelPanel.add(loadingLabel);
+
+        tracklistPanel.add(loadingLabelPanel);
 
         wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
@@ -363,18 +367,18 @@ public class MainPanel extends JPanel {
 
             System.out.println(i);
             JPanel trackPanel = createTrackEntry(tracks[i]);
-            tracklistPanel.add(trackPanel, tracklistPanel.getComponentCount() - 1);
             if(i % 2 == 0) {
 
                 trackPanel.setBackground(ALTERNATE_TRACKLIST_ROW_COLOR);
 
             }
 
+            tracklistPanel.add(trackPanel, tracklistPanel.getComponentCount() - 1);
+            tracklistPanel.revalidate();
+            tracklistPanel.repaint();
+
         }
         tracklistPanel.remove(tracklistPanel.getComponentCount() - 1);
-
-        tracklistPanel.revalidate();
-        tracklistPanel.repaint();
 
     }
 
