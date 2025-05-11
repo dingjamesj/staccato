@@ -4,7 +4,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import main.Track;
+import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
 
 public class QueuePanel extends JPanel {
@@ -27,8 +28,19 @@ public class QueuePanel extends JPanel {
     private static final Insets PANEL_TITLE_LABEL_INSETS = new Insets(16, 0, 4, 0);
 
     private JPanel tracklistPanel;
+    private final AtomicInteger currentTrackNum = new AtomicInteger(0);
 
     public static QueuePanel queuePanel;
+
+    static {
+
+        TracklistPlayer.addSwitchTrackAction(() -> {
+
+            queuePanel.updateQueue();
+
+        });
+
+    }
 
     public QueuePanel() {
 
@@ -68,10 +80,37 @@ public class QueuePanel extends JPanel {
 
     }
 
-    public void setTracksInQueue(Track[] tracks) {
+    /**
+     * If the current track number is one BEHIND the TracklistPlayer, then just remove the first track in the queue GUI. <br></br>
+     * If the current track number is one AHEAD the TracklistPlayer, then add the currently playing track to the front of the queue GUI. <br></br>
+     * If the current track number is MORE THAN ONE ahead/behind the TracklistPlayer, then just reset the queue GUI.
+     */
+    private synchronized void updateQueue() {
+
+        if(currentTrackNum.get() == TracklistPlayer.getCurrentlyPlayingTrackNumber() - 1) {
+
+            currentTrackNum.incrementAndGet();
+            removeFirstTrack();
+
+        } else if(currentTrackNum.get() == TracklistPlayer.getCurrentlyPlayingTrackNumber() + 1) {
+
+            currentTrackNum.decrementAndGet();
+            addTrackToFront(TracklistPlayer.getCurrentlyPlayingTrack());
+
+        } else {
+
+            currentTrackNum.set(TracklistPlayer.getCurrentlyPlayingTrackNumber());
+            setTracksInQueue();
+
+        }
+
+    }
+
+    public synchronized void setTracksInQueue() {
 
         tracklistPanel.removeAll();
 
+        Track[] tracks = TracklistPlayer.getQueue();
         if(tracks == null) {
 
             return;
@@ -80,26 +119,59 @@ public class QueuePanel extends JPanel {
 
         for(int i = 0; i < tracks.length; i++) {
 
-            JPanel trackPanel = new JPanel(new MigLayout(
-                "insets " + ROW_SPACING + " 0 " + ROW_SPACING + " 0",
-                "[" + (int) (NUMBER_COLUMN_WIDTH_PROPORTION * 100) + "%][" + (int) (TITLE_COLUMN_WIDTH_PROPORTION * 100) + "%]"
-            ));
-
-            JLabel numberLabel = new JLabel("" + (i + 1));
-            JLabel titleLabel = new JLabel(tracks[i].getTitle() != null && !tracks[i].getTitle().isBlank() ? tracks[i].getTitle() : "[No Title]");
-
-            numberLabel.setFont(TRACK_NUMBER_FONT);
-            titleLabel.setFont(TRACK_TITLE_FONT);
-
-            trackPanel.add(numberLabel, "cell 0 0, align center");
-            trackPanel.add(titleLabel, "cell 1 0, pushx, wmax " + (int) (TITLE_COLUMN_WIDTH_PROPORTION * 100) + "%");
-
-            tracklistPanel.add(trackPanel);
+            tracklistPanel.add(createQueueEntryPanel(tracks[i], i));
 
         }
 
         tracklistPanel.revalidate();
         tracklistPanel.repaint();
+
+    }
+
+    private synchronized void removeFirstTrack() {
+
+        try {
+
+            tracklistPanel.remove(0);
+
+        } catch(ArrayIndexOutOfBoundsException e) {
+
+            //Do nothing
+
+        }
+
+
+        revalidate();
+        repaint();
+
+    }
+
+    private synchronized void addTrackToFront(Track track) {
+
+        tracklistPanel.add(createQueueEntryPanel(track, currentTrackNum.get()), 0);
+
+        revalidate();
+        repaint();
+
+    }
+
+    private JPanel createQueueEntryPanel(Track track, int trackNum) {
+
+        JPanel trackPanel = new JPanel(new MigLayout(
+            "insets " + ROW_SPACING + " 0 " + ROW_SPACING + " 0",
+            "[" + (int) (NUMBER_COLUMN_WIDTH_PROPORTION * 100) + "%][" + (int) (TITLE_COLUMN_WIDTH_PROPORTION * 100) + "%]"
+        ));
+
+        JLabel numberLabel = new JLabel("" + (trackNum + 1));
+        JLabel titleLabel = new JLabel(track.getTitle() != null && !track.getTitle().isBlank() ? track.getTitle() : "[No Title]");
+
+        numberLabel.setFont(TRACK_NUMBER_FONT);
+        titleLabel.setFont(TRACK_TITLE_FONT);
+
+        trackPanel.add(numberLabel, "cell 0 0, align center");
+        trackPanel.add(titleLabel, "cell 1 0, pushx, wmax " + (int) (TITLE_COLUMN_WIDTH_PROPORTION * 100) + "%");
+
+        return trackPanel;
 
     }
 

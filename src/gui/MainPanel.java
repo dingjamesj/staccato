@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -374,7 +373,7 @@ public class MainPanel extends JPanel {
         TracklistPlayer.playTracks(tracks);
         PlaybarPanel.playbarPanel.setButtonsEnabled(true);
         PlaybarPanel.playbarPanel.setIsPlaying(true);
-        QueuePanel.queuePanel.setTracksInQueue(TracklistPlayer.getQueue());
+        QueuePanel.queuePanel.setTracksInQueue();
 
     }
 

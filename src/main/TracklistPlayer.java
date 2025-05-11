@@ -21,23 +21,19 @@ public abstract class TracklistPlayer {
      */
     private static final int GO_TO_PREVIOUS_TIME_LIMIT = 3;
 
-    public static Set<Runnable> switchTrackActions;
+    public static Set<Runnable> startTrackActions = new HashSet<Runnable>();
+    public static Set<Runnable> switchTrackActions = new HashSet<Runnable>();
 
     private static MediaPlayer activeMediaPlayer;
-    private static AtomicInteger currentTrackNum;
-    private static AtomicBoolean isPlaying;
-    private static AtomicBoolean isOnRepeat;
-    private static List<Track> queuedTracks;
+    private static final AtomicInteger currentTrackNum = new AtomicInteger(0);
+    private static final AtomicBoolean isPlaying = new AtomicBoolean(false);
+    private static final AtomicBoolean isOnRepeat = new AtomicBoolean(false);
+    private static List<Track> queuedTracks = new ArrayList<Track>();
 
     static {
 
         //Initialize JavaFX so that it can play audio
         new JFXPanel();
-        currentTrackNum = new AtomicInteger(0);
-        isPlaying = new AtomicBoolean(false);
-        isOnRepeat = new AtomicBoolean(false);
-        switchTrackActions = new HashSet<Runnable>();
-        queuedTracks = new ArrayList<Track>();
 
     }
 
@@ -46,7 +42,7 @@ public abstract class TracklistPlayer {
      * @param tracks Array of tracks to be played in order
      * @return A List of the tracks successfully put in the queue
      */
-    public static void playTracks(Track... tracks) {
+    public synchronized static void playTracks(Track... tracks) {
 
         //Stop playback and clear queue
         queuedTracks.clear();
@@ -84,6 +80,12 @@ public abstract class TracklistPlayer {
         activeMediaPlayer.play();
         isPlaying.set(true);
 
+        for(Runnable action: startTrackActions) {
+
+            action.run();
+
+        }
+
     }
 
     /**
@@ -95,17 +97,11 @@ public abstract class TracklistPlayer {
      * assigns setOnEndOfMedia to repeat this process for the next track.
      * </b>
      */
-    private static void playNextTrack() {
+    private synchronized static void playNextTrack() {
 
         if(activeMediaPlayer != null) {
 
             activeMediaPlayer.stop();
-
-        }
-
-        for(Runnable action: switchTrackActions) {
-
-            action.run();
 
         }
 
@@ -129,12 +125,18 @@ public abstract class TracklistPlayer {
         activeMediaPlayer.play();
         isPlaying.set(true);
 
+        for(Runnable action: switchTrackActions) {
+
+            action.run();
+
+        }
+
     }
 
     /**
      * Pauses audio playback
      */
-    public static void pausePlayback() {
+    public synchronized static void pausePlayback() {
 
         if(activeMediaPlayer == null) {
 
@@ -150,7 +152,7 @@ public abstract class TracklistPlayer {
     /**
      * Resumes audio playback
      */
-    public static void resumePlayback() {
+    public synchronized static void resumePlayback() {
 
         if(activeMediaPlayer == null) {
 
@@ -163,7 +165,7 @@ public abstract class TracklistPlayer {
 
     }
 
-    public static void skipTrack() {
+    public synchronized static void skipTrack() {
 
         if(activeMediaPlayer == null) {
 
@@ -171,6 +173,7 @@ public abstract class TracklistPlayer {
             
         }
 
+        //Note we don't need to increment currentTrackNum (is incremented in playNextTrack())
         playNextTrack();
 
     }
@@ -179,7 +182,7 @@ public abstract class TracklistPlayer {
      * If is called <code>GO_TO_PREVIOUS_TIME_LIMIT</code> amount of seconds after the start of the track, this will restart the track. <br></br>
      * Otherwise, it will go to the previous track.
      */
-    public static void rewindTrack() {
+    public synchronized static void rewindTrack() {
 
         if(activeMediaPlayer == null) {
 
@@ -225,15 +228,27 @@ public abstract class TracklistPlayer {
 
     }
 
-    public static void removeSwitchTrackAction(Runnable action) {
-
-        switchTrackActions.remove(action);
-
-    }
-
     public static void clearSwitchTrackActions() {
 
         switchTrackActions.clear();
+
+    }
+
+    public static void addStartTrackAction(Runnable action) {
+
+        startTrackActions.add(action);
+
+    }
+
+    public static void clearStartTrackActions() {
+
+        startTrackActions.clear();
+
+    }
+
+    public static int getCurrentlyPlayingTrackNumber() {
+
+        return currentTrackNum.get();
 
     }
 
