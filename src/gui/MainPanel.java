@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -78,7 +79,6 @@ public class MainPanel extends JPanel {
     public static MainPanel mainPanel;
 
     private JPanel tracklistPanel;
-    private JLabel loadingLabel;
     private JLabel playlistDescriptionLabel;
 
     public MainPanel() {
@@ -121,6 +121,7 @@ public class MainPanel extends JPanel {
             return;
 
         }
+        playlistSelectionScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         
         add(titleLabel);
         playlistSelectionPanel.add(addPlaylistButton);
@@ -213,7 +214,7 @@ public class MainPanel extends JPanel {
         JPanel playlistTextPanel = new JPanel();
 
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
-        playlistCoverImageIcon = new ImageIcon(playlistCoverImageIcon.getImage().getScaledInstance(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH));
+        playlistCoverImageIcon = createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
         playlistCoverButton.setIcon(playlistCoverImageIcon);
         playlistTitleLabel.setFont(PLAYLIST_TITLE_FONT);
         playlistTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -279,18 +280,26 @@ public class MainPanel extends JPanel {
         //-------BEGIN BUILDING TRACKLIST PANEL-------
 
         tracklistPanel = new JPanel();
-        loadingLabel = new JLabel("Loading tracklist...");
-        JScrollPane scrollPane = new JScrollPane(tracklistPanel);
+        JLabel loadingLabel = new JLabel("Loading tracklist...");
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
 
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
         loadingLabel.setFont(PLAYLIST_LOADING_FONT);
         loadingLabel.setAlignmentX(CENTER_ALIGNMENT);
+        loadingLabel.setHorizontalAlignment(JLabel.CENTER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
-        tracklistPanel.add(Box.createVerticalGlue());
+        //DEBUG
+        loadingLabel.setOpaque(true);
+        loadingLabel.setBackground(Color.cyan);
+        tracklistPanel.setBackground(Color.red);
+        wrapperPanel.setBackground(Color.green);
+        //-------------------
+
         tracklistPanel.add(loadingLabel);
-        tracklistPanel.add(Box.createVerticalStrut(30));
-        tracklistPanel.add(Box.createVerticalGlue());
+
+        wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -350,11 +359,11 @@ public class MainPanel extends JPanel {
         playlistDescriptionLabel.setText(createDescription(playlist));
 
         Track[] tracks = playlist.getTracks();
-        tracklistPanel.removeAll();
         for(int i = 0; i < tracks.length; i++) {
 
+            System.out.println(i);
             JPanel trackPanel = createTrackEntry(tracks[i]);
-            tracklistPanel.add(trackPanel);
+            tracklistPanel.add(trackPanel, tracklistPanel.getComponentCount() - 1);
             if(i % 2 == 0) {
 
                 trackPanel.setBackground(ALTERNATE_TRACKLIST_ROW_COLOR);
@@ -362,6 +371,7 @@ public class MainPanel extends JPanel {
             }
 
         }
+        tracklistPanel.remove(tracklistPanel.getComponentCount() - 1);
 
         tracklistPanel.revalidate();
         tracklistPanel.repaint();
@@ -397,7 +407,7 @@ public class MainPanel extends JPanel {
         }
 
         playlistCoverLabel.setPreferredSize(new Dimension(PLAYLIST_SELECTION_ICON_SIZE, PLAYLIST_SELECTION_ICON_SIZE));
-        playlistCoverImageIcon = new ImageIcon(playlistCoverImageIcon.getImage().getScaledInstance(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH));
+        playlistCoverImageIcon = createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
         playlistCoverLabel.setIcon(playlistCoverImageIcon);
 
         constraints.gridx = 0;
@@ -466,7 +476,7 @@ public class MainPanel extends JPanel {
         titleAndArtistsPanel.setLayout(new BoxLayout(titleAndArtistsPanel, BoxLayout.Y_AXIS));
         titleAndArtistsPanel.setOpaque(false);
         artworkLabel.setPreferredSize(new Dimension(TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX));
-        artworkIcon = new ImageIcon(artworkIcon.getImage().getScaledInstance(TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX, Image.SCALE_SMOOTH));
+        artworkIcon = createResizedIcon(artworkIcon, TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX, Image.SCALE_SMOOTH);
         artworkLabel.setIcon(artworkIcon);
         titleLabel.setAlignmentX(LEFT_ALIGNMENT);
         titleLabel.setFont(TRACK_TITLE_FONT);
@@ -513,6 +523,12 @@ public class MainPanel extends JPanel {
         }
 
         return new ImageIcon(urlStr);
+
+    }
+
+    private static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
+
+        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, rescalingAlgorithm));
 
     }
 

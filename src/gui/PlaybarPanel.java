@@ -125,12 +125,14 @@ public class PlaybarPanel extends JPanel {
         skipButton.addActionListener((unused) -> {
 
             TracklistPlayer.skipTrack();
+            playPauseButton.setIcon(PAUSE_ICON);
 
         });
 
         goBackButton.addActionListener((unused) -> {
 
             TracklistPlayer.rewindTrack();
+            playPauseButton.setIcon(PAUSE_ICON);
 
         });
 

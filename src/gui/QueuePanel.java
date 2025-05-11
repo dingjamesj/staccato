@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -49,11 +50,14 @@ public class QueuePanel extends JPanel {
 
         JLabel panelTitleLabel = new JLabel("Queue");
         tracklistPanel = new JPanel();
-        JScrollPane scrollPane = new JScrollPane(tracklistPanel);
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
 
         panelTitleLabel.setFont(PANEL_TITLE_FONT);
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
+
+        wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
         constraints.gridx = 0;
         constraints.gridy = 0;

@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import main.Track;
+import main.TracklistPlayer;
 
 public class CurrentTrackInfoPanel extends JPanel {
     
@@ -32,6 +33,19 @@ public class CurrentTrackInfoPanel extends JPanel {
     private JButton openFileLocationButton;
 
     public static CurrentTrackInfoPanel currentTrackInfoPanel;
+
+    static {
+
+        Runnable updateTrackInfoAction = () -> {
+
+            currentTrackInfoPanel.setTrack(TracklistPlayer.getCurrentlyPlayingTrack());
+
+        };
+
+        TracklistPlayer.addSwitchTrackAction(updateTrackInfoAction);
+        TracklistPlayer.addStartTrackAction(updateTrackInfoAction);
+
+    }
 
     public CurrentTrackInfoPanel() {
 
@@ -106,6 +120,8 @@ public class CurrentTrackInfoPanel extends JPanel {
         youtubeLinkButton.setVisible(false);
         openFileLocationButton.setVisible(false);
 
+        currentTrackInfoPanel = this;
+
     }
 
     public void setTrack(Track track) {
@@ -114,8 +130,7 @@ public class CurrentTrackInfoPanel extends JPanel {
         artistsLabel.setText(track.getArtists());
         albumLabel.setText(track.getAlbum());
         
-        ImageIcon albumArtImageIcon = new ImageIcon(track.getArtworkByteArray());
-        albumArtImageIcon = new ImageIcon(albumArtImageIcon.getImage().getScaledInstance(getWidth(), getWidth(), Image.SCALE_SMOOTH));
+        ImageIcon albumArtImageIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE, ALBUM_ART_ICON_SIZE, Image.SCALE_SMOOTH);
         albumArtLabel.setIcon(albumArtImageIcon);
 
         youtubeLinkButton.setVisible(true);
@@ -123,6 +138,12 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         revalidate();
         repaint();
+
+    }
+
+    private static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
+
+        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, rescalingAlgorithm));
 
     }
 
