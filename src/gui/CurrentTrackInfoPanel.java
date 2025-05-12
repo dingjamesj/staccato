@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -24,20 +25,21 @@ import net.miginfocom.swing.MigLayout;
 
 public class CurrentTrackInfoPanel extends JPanel {
 
-    private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 36);
-    private static final Font ARTISTS_FONT = new Font("Segoe UI", Font.BOLD, 36);
-    private static final Font ALBUM_FONT = new Font("Segoe UI", Font.ITALIC, 36);
-    private static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 18);
+    private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
+    private static final Font ARTISTS_FONT = new Font("Segoe UI", Font.BOLD, 18);
+    private static final Font ALBUM_FONT = new Font("Segoe UI", Font.ITALIC, 18);
 
     private static final ImageIcon EDIT_METADATA_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon REDOWNLOAD_ICON = createImageIcon("src/main/resources/refresh.png");
 
+    private static final int GUI_TO_WINDOW_TOP_GAP = 70;
     private static final int GUI_GAP = 10;
-    private static final int GUI_SECTIONS_GAP = 30;
-    private static final int ALBUM_ART_ICON_SIZE_PX = 200;
+    private static final int GUI_SECTIONS_GAP = 45;
+    private static final int ALBUM_ART_ICON_SIZE_PX = 256;
     private static final int TRACK_OPTIONS_BUTTON_SIZE_PX = 60;
     private static final int TRACK_OPTIONS_BUTTON_SPACING = 38;
 
+    private JScrollPane[] trackInfoScrollPanes;
     private JLabel titleLabel;
     private JLabel albumArtLabel;
     private JLabel artistsLabel;
@@ -76,6 +78,7 @@ public class CurrentTrackInfoPanel extends JPanel {
         JScrollPane titleLabelScrollPane = new JScrollPane(titleLabel);
         JScrollPane artistsLabelScrollPane = new JScrollPane(artistsLabel);
         JScrollPane albumLabelScrollPane = new JScrollPane(albumLabel);
+        trackInfoScrollPanes = new JScrollPane[] {titleLabelScrollPane, artistsLabelScrollPane, albumLabelScrollPane};
         buttonsPanel = new JPanel();
 
         titleLabel.setFont(TITLE_FONT);
@@ -97,7 +100,8 @@ public class CurrentTrackInfoPanel extends JPanel {
             + "align left center, "
             + "growx, "
             + "pushx, "
-            + "wmax 100%"
+            + "wmax 100%, "
+            + "gaptop " + GUI_TO_WINDOW_TOP_GAP
         );
 
         add(
@@ -122,7 +126,7 @@ public class CurrentTrackInfoPanel extends JPanel {
             + "growx, "
             + "pushx, "
             + "wmax 100%, "
-            + "gaptop " + GUI_GAP
+            + "gaptop " + GUI_SECTIONS_GAP
         );
 
         add(
@@ -160,14 +164,24 @@ public class CurrentTrackInfoPanel extends JPanel {
     public void setTrack(Track track) {
 
         titleLabel.setText(track.getTitle());
+        artistsLabel.setOpaque(true);
         artistsLabel.setText(track.getArtists());
         albumLabel.setText(track.getAlbum());
-        
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
+        artistsLabel.setHorizontalAlignment(JLabel.CENTER);
+        albumLabel.setHorizontalAlignment(JLabel.CENTER);
+
         ImageIcon albumArtImageIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE_PX, ALBUM_ART_ICON_SIZE_PX, Image.SCALE_SMOOTH);
         albumArtLabel.setIcon(albumArtImageIcon);
 
         buttonsPanel.setVisible(true);
 
+        for(JScrollPane scrollpane: trackInfoScrollPanes) {
+
+            scrollpane.getVerticalScrollBar().setValue(0);
+            scrollpane.getHorizontalScrollBar().setValue(0);
+
+        }
         
         revalidate();
         repaint();

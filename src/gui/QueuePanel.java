@@ -2,9 +2,6 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;

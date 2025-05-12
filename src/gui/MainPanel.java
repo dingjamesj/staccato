@@ -53,7 +53,8 @@ public class MainPanel extends JPanel {
 
     private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
-    private static final ImageIcon HOME_ICON = createImageIcon("src/main/resources/resync.png");
+    private static final ImageIcon HOME_ICON = createImageIcon("src/main/resources/home.png");
+    private static final ImageIcon MORE_OPTIONS_ICON = createImageIcon("src/main/resources/more options.png");
 
     private static final Color ALTERNATE_TRACKLIST_ROW_COLOR = new Color(0x151515);
 
@@ -401,7 +402,6 @@ public class MainPanel extends JPanel {
         Track[] tracks = playlist.getTracks();
         for(int i = 0; i < tracks.length; i++) {
 
-            System.out.println(i);
             if(killTracklistLoadingThreadFlag.get()) {
 
                 killTracklistLoadingThreadFlag.set(false);
@@ -519,7 +519,7 @@ public class MainPanel extends JPanel {
         JLabel titleLabel = new JLabel(track.getTitle() != null && !track.getTitle().isBlank() ? track.getTitle() : "[No Title]");
         JLabel artistsLabel = new JLabel(track.getArtists() != null && !track.getArtists().isBlank() ? track.getArtists() : "[Unknown Artists]");
         JLabel albumLabel = new JLabel(track.getAlbum() != null && !track.getAlbum().isBlank() ? track.getAlbum() : "[No Album]");
-        JButton editTrackButton = new JButton(REFRESH_ICON);
+        JButton editTrackButton = new JButton(MORE_OPTIONS_ICON);
 
         titleAndArtistsPanel.setLayout(new BoxLayout(titleAndArtistsPanel, BoxLayout.Y_AXIS));
         titleAndArtistsPanel.setOpaque(false);
@@ -539,6 +539,7 @@ public class MainPanel extends JPanel {
         trackPanel.add(titleAndArtistsPanel, "cell 1 0, pushx, wmax " + (int) (TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(albumLabel, "cell 2 0, wmax " + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(editTrackButton, "cell 3 0");
+        trackPanel.add(new JPanel(), "cell 4 0");
 
         trackPanel.addMouseListener(new MouseAdapter() {
 
