@@ -119,7 +119,6 @@ public abstract class FileManager {
 
             if(!isReadingTracks.get()) {
 
-                System.out.println("I am a really homosexual");
                 return null;
 
             }

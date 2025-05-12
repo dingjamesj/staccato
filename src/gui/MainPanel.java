@@ -2,9 +2,11 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -26,7 +28,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.text.Caret;
+import javax.swing.text.DefaultCaret;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
@@ -42,6 +47,7 @@ public class MainPanel extends JPanel {
 
     //Playlist selection view
     private static final Font PANEL_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 72);
+    private static final Font PLAYLIST_SELECTION_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 48);
 
     //Tracklist view
     private static final Font PLAYLIST_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 100);
@@ -53,6 +59,7 @@ public class MainPanel extends JPanel {
 
     private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
+    private static final ImageIcon EDIT_ICON = createImageIcon("src/main/resources/edit.png");
     private static final ImageIcon HOME_ICON = createImageIcon("src/main/resources/home.png");
     private static final ImageIcon MORE_OPTIONS_ICON = createImageIcon("src/main/resources/more options.png");
 
@@ -112,7 +119,7 @@ public class MainPanel extends JPanel {
         // setAlignmentX(LEFT_ALIGNMENT);
         
         JLabel titleLabel = new JLabel("Your Playlists");
-        JPanel playlistSelectionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
+        JPanel playlistSelectionPanel = new JPanel(new WrapLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
         JScrollPane playlistSelectionScrollPane = new JScrollPane(playlistSelectionPanel);
         JButton addPlaylistButton = new JButton("add");
 
@@ -224,8 +231,7 @@ public class MainPanel extends JPanel {
         JLabel playlistTitleLabel = new JLabel(playlist.getName());
         playlistDescriptionLabel = new JLabel(createDescription(playlist));
         JButton returnToHomeButton = new JButton(createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton refreshDirectoryButton = new JButton(createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton resyncToOriginButton = new JButton(createResizedIcon(RESYNC_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton editPlaylistButton = new JButton(createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JPanel playlistTextPanel = new JPanel();
 
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
@@ -272,17 +278,9 @@ public class MainPanel extends JPanel {
         constraints.weightx = 0;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
-        playlistInfoPanel.add(refreshDirectoryButton, constraints);
+        playlistInfoPanel.add(editPlaylistButton, constraints);
 
         constraints.gridx = 4;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.anchor = GridBagConstraints.LAST_LINE_START;
-        constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
-        playlistInfoPanel.add(resyncToOriginButton, constraints);
-
-        constraints.gridx = 5;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
@@ -442,20 +440,28 @@ public class MainPanel extends JPanel {
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JLabel playlistCoverLabel = new JLabel(playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON);
         JLabel playlistNameLabel = new JLabel(playlist.getName());
-        JLabel playlistDirectoryLabel;
-        try {
-
-            playlistDirectoryLabel = new JLabel(playlist.getDirectory().substring(0, 5) + "..." + playlist.getDirectory().substring(playlist.getDirectory().length() - 5));
-
-        } catch(StringIndexOutOfBoundsException e) {
-
-            playlistDirectoryLabel = new JLabel(playlist.getDirectory().isEmpty() ? "[No Directory]" : playlist.getDirectory());
-
-        }
+        JTextArea playlistDirectoryText = new JTextArea(playlist.getDirectory().isEmpty() ? "[No Directory]" : playlist.getDirectory());
 
         playlistCoverLabel.setPreferredSize(new Dimension(PLAYLIST_SELECTION_ICON_SIZE, PLAYLIST_SELECTION_ICON_SIZE));
         playlistCoverImageIcon = createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
         playlistCoverLabel.setIcon(playlistCoverImageIcon);
+        playlistNameLabel.setFont(PLAYLIST_SELECTION_TITLE_FONT);
+        playlistDirectoryText.setFont(PLAYLIST_DESCRIPTION_FONT);
+        playlistDirectoryText.setLineWrap(true);
+        playlistDirectoryText.setWrapStyleWord(true);
+        playlistDirectoryText.setEditable(false);
+        playlistDirectoryText.setFocusable(false);
+        playlistDirectoryText.setForeground(Color.gray);
+        playlistDirectoryText.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                panelButton.dispatchEvent(SwingUtilities.convertMouseEvent(playlistDirectoryText, e, panelButton));
+
+            }
+
+        });
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -476,13 +482,13 @@ public class MainPanel extends JPanel {
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.anchor = GridBagConstraints.LINE_START;
-        panelButton.add(playlistDirectoryLabel, constraints);
+        panelButton.add(playlistDirectoryText, constraints);
 
         //---------------------------------START MOUSE LISTENER---------------------------------
         panelButton.addMouseListener(new MouseAdapter() {
             
             @Override
-            public void mousePressed(MouseEvent unused) {
+            public void mouseClicked(MouseEvent unused) {
 
                 SwingUtilities.invokeLater(() -> {
 
