@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import main.Track;
 import main.TracklistPlayer;
+import net.miginfocom.swing.MigLayout;
 
 public class CurrentTrackInfoPanel extends JPanel {
     
@@ -23,7 +24,7 @@ public class CurrentTrackInfoPanel extends JPanel {
 
     private static final int GUI_GAP = 10;
     private static final int GUI_SECTIONS_GAP = 30;
-    private static final int ALBUM_ART_ICON_SIZE = 200;
+    private static final int ALBUM_ART_ICON_SIZE_PX = 200;
 
     private JLabel titleLabel;
     private JLabel albumArtLabel;
@@ -49,6 +50,15 @@ public class CurrentTrackInfoPanel extends JPanel {
 
     public CurrentTrackInfoPanel() {
 
+        setLayout(new MigLayout(
+            "insets 0 0 0 0",
+            "",
+            "[]"
+        ));
+
+        
+
+        /*
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
@@ -120,6 +130,8 @@ public class CurrentTrackInfoPanel extends JPanel {
         youtubeLinkButton.setVisible(false);
         openFileLocationButton.setVisible(false);
 
+        */
+
         currentTrackInfoPanel = this;
 
     }
@@ -130,7 +142,7 @@ public class CurrentTrackInfoPanel extends JPanel {
         artistsLabel.setText(track.getArtists());
         albumLabel.setText(track.getAlbum());
         
-        ImageIcon albumArtImageIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE, ALBUM_ART_ICON_SIZE, Image.SCALE_SMOOTH);
+        ImageIcon albumArtImageIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE_PX, ALBUM_ART_ICON_SIZE_PX, Image.SCALE_SMOOTH);
         albumArtLabel.setIcon(albumArtImageIcon);
 
         youtubeLinkButton.setVisible(true);

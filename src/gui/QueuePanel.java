@@ -26,7 +26,8 @@ public class QueuePanel extends JPanel {
     private static final int ROW_SPACING = 3;
     private static final double NUMBER_COLUMN_WIDTH_PROPORTION = 0.12;
     private static final double TITLE_COLUMN_WIDTH_PROPORTION = 0.6;
-    private static final Insets PANEL_TITLE_LABEL_INSETS = new Insets(16, 0, 4, 0);
+    private static final double QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION = 0.9;
+    private static final String PANEL_TITLE_LABEL_INSETS = "16 0 4 0";
 
     private JPanel tracklistPanel;
     private final AtomicInteger currentTrackNum = new AtomicInteger(0);
@@ -45,42 +46,27 @@ public class QueuePanel extends JPanel {
 
     public QueuePanel() {
 
-        setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        setLayout(new MigLayout(
+            "insets 0 0 0 0",
+            "",
+            "[" + (int) ((1.0 - QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION) * 100) + "%][" + (int) (QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION * 100) + "%]"
+        ));
 
         JLabel panelTitleLabel = new JLabel("Queue");
         tracklistPanel = new JPanel();
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
-
+        
         panelTitleLabel.setFont(PANEL_TITLE_FONT);
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridwidth = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 0;
-        constraints.insets = PANEL_TITLE_LABEL_INSETS;
-        constraints.anchor = GridBagConstraints.LINE_START;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(panelTitleLabel, constraints);
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.gridwidth = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.insets = new Insets(0, 0, 0, 0);
-        constraints.anchor = GridBagConstraints.CENTER;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(scrollPane, constraints);
+        add(panelTitleLabel, "cell 0 0, span 1 1, grow, pushx, align left center, hmax " + (int) ((1.0 - QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION) * 100) + "%, pad " + PANEL_TITLE_LABEL_INSETS);
+        add(scrollPane, "cell 0 1, span 1 1, grow, push, align center center, hmax " + (int) (QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION * 100) + "%");
 
-        QueuePanel.queuePanel = this;
+        queuePanel = this;
 
     }
 

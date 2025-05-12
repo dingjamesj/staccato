@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -45,7 +46,7 @@ public class MainPanel extends JPanel {
     //Tracklist view
     private static final Font PLAYLIST_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 100);
     private static final Font PLAYLIST_DESCRIPTION_FONT = new Font("Segoe UI", Font.PLAIN, 16);
-    private static final Font PLAYLIST_LOADING_FONT = new Font("Segoe UI", Font.ITALIC, 15);
+    private static final Font PLAYLIST_LOADING_FONT = new Font("Segoe UI", Font.PLAIN, 20);
     private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
     private static final Font TRACK_ARTISTS_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final Font TRACK_ALBUM_FONT = new Font("Segoe UI", Font.PLAIN, 18);
@@ -80,6 +81,8 @@ public class MainPanel extends JPanel {
 
     private JPanel tracklistPanel;
     private JLabel playlistDescriptionLabel;
+
+    private AtomicBoolean killTracklistLoadingThreadFlag = new AtomicBoolean(false);
 
     public MainPanel() {
 
@@ -280,16 +283,10 @@ public class MainPanel extends JPanel {
         //-------BEGIN BUILDING TRACKLIST PANEL-------
 
         tracklistPanel = new JPanel();
-        //This will essentially be a track entry panel but with just a label that says "Loading..."
-        JPanel loadingLabelPanel = new JPanel(new MigLayout("insets " + TRACKLIST_ROWS_SPACING + " 0 " + TRACKLIST_ROWS_SPACING + " 0"));
-        JLabel loadingLabel = new JLabel("Loading tracklist...");
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
 
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
-        loadingLabel.setFont(PLAYLIST_LOADING_FONT);
-        loadingLabel.setAlignmentX(CENTER_ALIGNMENT);
-        loadingLabel.setHorizontalAlignment(JLabel.CENTER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         //DEBUG
@@ -298,10 +295,6 @@ public class MainPanel extends JPanel {
         // tracklistPanel.setBackground(Color.red);
         // wrapperPanel.setBackground(Color.green);
         //-------------------
-
-        loadingLabelPanel.add(loadingLabel);
-
-        tracklistPanel.add(loadingLabelPanel);
 
         wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
@@ -327,6 +320,7 @@ public class MainPanel extends JPanel {
 
             SwingUtilities.invokeLater(() -> {
 
+                killTracklistLoadingThreadFlag.set(true);
                 initHomePage();
 
             });
@@ -345,7 +339,22 @@ public class MainPanel extends JPanel {
      * Loads the tracklist info
      * @param playlist
      */
-    private void loadTracklistInfo(Playlist playlist) {
+    private synchronized void loadTracklistInfo(Playlist playlist) {
+
+        //This will essentially be a track entry panel but with just a label that says "Loading..."
+        JPanel loadingLabelPanel = new JPanel(new MigLayout("insets " + TRACKLIST_ROWS_SPACING + " " + TRACKLIST_ROWS_SPACING + " " + TRACKLIST_ROWS_SPACING + " 0"));
+        JLabel loadingLabel = new JLabel("<html><i><b>Loading tracklist...</b></i></html>");
+
+        loadingLabel.setFont(PLAYLIST_LOADING_FONT);
+        loadingLabel.setAlignmentX(CENTER_ALIGNMENT);
+        loadingLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        tracklistPanel.removeAll();
+        loadingLabelPanel.add(loadingLabel);
+        tracklistPanel.add(loadingLabelPanel);
+        tracklistPanel.revalidate();
+        tracklistPanel.repaint();
+
 
         if(playlist.getTracks() == null) {
 
@@ -362,10 +371,18 @@ public class MainPanel extends JPanel {
 
         playlistDescriptionLabel.setText(createDescription(playlist));
 
+        killTracklistLoadingThreadFlag.set(false); //Reset the kill flag
         Track[] tracks = playlist.getTracks();
         for(int i = 0; i < tracks.length; i++) {
 
             System.out.println(i);
+            if(killTracklistLoadingThreadFlag.get()) {
+
+                killTracklistLoadingThreadFlag.set(false);
+                return;
+
+            }
+
             JPanel trackPanel = createTrackEntry(tracks[i]);
             if(i % 2 == 0) {
 
@@ -373,12 +390,12 @@ public class MainPanel extends JPanel {
 
             }
 
-            tracklistPanel.add(trackPanel, tracklistPanel.getComponentCount() - 1);
+            tracklistPanel.add(trackPanel);
             tracklistPanel.revalidate();
             tracklistPanel.repaint();
 
         }
-        tracklistPanel.remove(tracklistPanel.getComponentCount() - 1);
+        tracklistPanel.remove(0);
 
     }
 
@@ -447,6 +464,7 @@ public class MainPanel extends JPanel {
 
                     Thread trackLoadingThread = new Thread(() -> {
     
+                        killTracklistLoadingThreadFlag.set(true);
                         loadTracklistInfo(playlist);
 
                     });
