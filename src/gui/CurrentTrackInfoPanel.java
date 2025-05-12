@@ -1,37 +1,48 @@
 package gui;
 
+import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Insets;
+import java.awt.Rectangle;
+import java.net.URL;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import main.Track;
 import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
 
 public class CurrentTrackInfoPanel extends JPanel {
-    
+
     private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 36);
     private static final Font ARTISTS_FONT = new Font("Segoe UI", Font.BOLD, 36);
     private static final Font ALBUM_FONT = new Font("Segoe UI", Font.ITALIC, 36);
     private static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 18);
 
+    private static final ImageIcon EDIT_METADATA_ICON = createImageIcon("src/main/resources/refresh.png");
+    private static final ImageIcon REDOWNLOAD_ICON = createImageIcon("src/main/resources/refresh.png");
+
     private static final int GUI_GAP = 10;
     private static final int GUI_SECTIONS_GAP = 30;
     private static final int ALBUM_ART_ICON_SIZE_PX = 200;
+    private static final int TRACK_OPTIONS_BUTTON_SIZE_PX = 60;
+    private static final int TRACK_OPTIONS_BUTTON_SPACING = 38;
 
     private JLabel titleLabel;
     private JLabel albumArtLabel;
     private JLabel artistsLabel;
     private JLabel albumLabel;
-    private JButton youtubeLinkButton;
-    private JButton openFileLocationButton;
+    private JPanel buttonsPanel;
 
     public static CurrentTrackInfoPanel currentTrackInfoPanel;
 
@@ -56,81 +67,91 @@ public class CurrentTrackInfoPanel extends JPanel {
             "[]"
         ));
 
-        
-
-        /*
-        setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-
         titleLabel = new JLabel();
         albumArtLabel = new JLabel();
         artistsLabel = new JLabel();
         albumLabel = new JLabel();
-        youtubeLinkButton = new JButton("Edit YouTube source");
-        openFileLocationButton = new JButton("Open file location");
+        JButton editMetadataButton = new JButton(createResizedIcon(EDIT_METADATA_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+        JButton redownloadButton = new JButton(createResizedIcon(REDOWNLOAD_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+        JScrollPane titleLabelScrollPane = new JScrollPane(titleLabel);
+        JScrollPane artistsLabelScrollPane = new JScrollPane(artistsLabel);
+        JScrollPane albumLabelScrollPane = new JScrollPane(albumLabel);
+        buttonsPanel = new JPanel();
 
         titleLabel.setFont(TITLE_FONT);
         artistsLabel.setFont(ARTISTS_FONT);
         albumLabel.setFont(ALBUM_FONT);
-        youtubeLinkButton.setFont(BUTTON_FONT);
-        openFileLocationButton.setFont(BUTTON_FONT);
+        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+        buttonsPanel.setVisible(false);
+        titleLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
+        titleLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
+        artistsLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
+        artistsLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
+        albumLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
+        albumLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
 
-        constraints.anchor = GridBagConstraints.LINE_START;
+        add(
+            titleLabelScrollPane, 
+            "cell 0 0, "
+            + "span 1 1, "
+            + "align left center, "
+            + "growx, "
+            + "pushx, "
+            + "wmax 100%"
+        );
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, GUI_GAP, 0);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        add(titleLabel, constraints);
+        add(
+            albumArtLabel,
+            "cell 0 1, "
+            + "span 1 1, "
+            + "align center, "
+            + "grow, "
+            + "pushx, "
+            + "wmax 100%, "
+            + "hmax 100%, "
+            + "wmax " + ALBUM_ART_ICON_SIZE_PX + ", "
+            + "hmax " + ALBUM_ART_ICON_SIZE_PX + ", "
+            + "gaptop " + GUI_GAP
+        );
 
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, GUI_GAP, 0);
-        constraints.fill = GridBagConstraints.BOTH;
-        add(albumArtLabel, constraints);
+        add(
+            artistsLabelScrollPane,
+            "cell 0 2, "
+            + "span 1 1, "
+            + "align left center, "
+            + "growx, "
+            + "pushx, "
+            + "wmax 100%, "
+            + "gaptop " + GUI_GAP
+        );
 
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, GUI_GAP, 0);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        add(artistsLabel, constraints);
-        
-        constraints.gridx = 0;
-        constraints.gridy = 3;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, GUI_SECTIONS_GAP, 0);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        add(albumLabel, constraints);
-        
-        constraints.anchor = GridBagConstraints.CENTER;
+        add(
+            albumLabelScrollPane,
+            "cell 0 3, "
+            + "span 1 1, "
+            + "align left center, "
+            + "growx, "
+            + "pushx, "
+            + "wmax 100%, "
+            + "gaptop " + GUI_GAP
+        );
 
-        constraints.gridx = 0;
-        constraints.gridy = 4;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, GUI_GAP, 0);
-        constraints.fill = GridBagConstraints.NONE;
-        add(youtubeLinkButton, constraints);
+        buttonsPanel.add(Box.createHorizontalGlue());
+        buttonsPanel.add(editMetadataButton);
+        buttonsPanel.add(Box.createHorizontalStrut(TRACK_OPTIONS_BUTTON_SPACING));
+        buttonsPanel.add(redownloadButton);
+        buttonsPanel.add(Box.createHorizontalGlue());
 
-        constraints.gridx = 0;
-        constraints.gridy = 5;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, GUI_GAP, 0);
-        constraints.fill = GridBagConstraints.NONE;
-        add(openFileLocationButton, constraints);
-
-        youtubeLinkButton.setVisible(false);
-        openFileLocationButton.setVisible(false);
-
-        */
+        add(
+            buttonsPanel,
+            "cell 0 4, "
+            + "span 1 1, "
+            + "alignx center, "
+            + "growx, "
+            + "pushx, "
+            + "wmax 100%, "
+            + "gaptop " + GUI_SECTIONS_GAP
+        );
 
         currentTrackInfoPanel = this;
 
@@ -145,9 +166,9 @@ public class CurrentTrackInfoPanel extends JPanel {
         ImageIcon albumArtImageIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE_PX, ALBUM_ART_ICON_SIZE_PX, Image.SCALE_SMOOTH);
         albumArtLabel.setIcon(albumArtImageIcon);
 
-        youtubeLinkButton.setVisible(true);
-        openFileLocationButton.setVisible(true);
+        buttonsPanel.setVisible(true);
 
+        
         revalidate();
         repaint();
 
@@ -156,6 +177,77 @@ public class CurrentTrackInfoPanel extends JPanel {
     private static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
 
         return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, rescalingAlgorithm));
+
+    }
+
+    private static ImageIcon createImageIcon(String urlStr) {
+
+        URL url = PlaybarPanel.class.getResource(urlStr);
+        if(url != null) {
+
+            return new ImageIcon(url);
+
+        }
+
+        return new ImageIcon(urlStr);
+
+    }
+
+    private static class JInvisibleScrollBar extends JScrollBar {
+
+        public JInvisibleScrollBar(int orientation) {
+
+            super(orientation);
+
+            setOpaque(false);
+            setPreferredSize(new Dimension(0, 0));
+            setMinimumSize(new Dimension(0, 0));
+            setMaximumSize(new Dimension(0, 0));
+
+            setUI(new BasicScrollBarUI() {
+
+                @Override
+                protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+
+                    //Do nothing for no track
+
+                }
+
+                @Override
+                protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+
+                    // Do nothing for no track
+
+                }
+
+                @Override
+                protected JButton createDecreaseButton(int orientation) {
+
+                    return createInvisibleButton();
+
+                }
+
+                @Override
+                protected JButton createIncreaseButton(int orientation) {
+
+                    return createInvisibleButton();
+                
+                }
+
+                private JButton createInvisibleButton() {
+                    
+                    JButton invisibleButton = new JButton();
+                    invisibleButton.setPreferredSize(new Dimension(0, 0));
+                    invisibleButton.setMinimumSize(new Dimension(0, 0));
+                    invisibleButton.setMaximumSize(new Dimension(0, 0));
+                    invisibleButton.setVisible(false);
+
+                    return invisibleButton;
+
+                }
+            });
+
+        }
 
     }
 

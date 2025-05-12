@@ -50,8 +50,11 @@ public class MainPanel extends JPanel {
     private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
     private static final Font TRACK_ARTISTS_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final Font TRACK_ALBUM_FONT = new Font("Segoe UI", Font.PLAIN, 18);
+
     private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
+    private static final ImageIcon HOME_ICON = createImageIcon("src/main/resources/resync.png");
+
     private static final Color ALTERNATE_TRACKLIST_ROW_COLOR = new Color(0x151515);
 
     //---------------------------------------- /\ VISUALS /\ ----------------------------------------
@@ -69,10 +72,12 @@ public class MainPanel extends JPanel {
     private static final int INFO_PANEL_SPACING = 7;
     private static final int INFO_PANEL_TABLE_GAP = 3;
     private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
+    private static final int INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE = 55;
     private static final int TRACKLIST_ROWS_SPACING = 3;
     private static final int TRACK_ARTWORK_WIDTH_PX = 64;
     private static final double TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION = 0.5;
     private static final double TRACK_ALBUM_COLUMN_WIDTH_PROPORTION = 0.3;
+    private static final double PLAYLIST_INFO_PANEL_HEIGHT_PROPORTION = 0.27;
     private static final int TRACK_EDIT_COLUMN_WIDTH_PX = 10;
 
     //--------------------------------------- \/ VARIABLES \/ ---------------------------------------
@@ -202,18 +207,24 @@ public class MainPanel extends JPanel {
     private void initTracklistPage(Playlist playlist) {
 
         removeAll();
-        setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        setLayout(new MigLayout(
+            "insets 0 0 0 0", 
+            "", 
+            "[" + (int) (PLAYLIST_INFO_PANEL_HEIGHT_PROPORTION * 100) + "%][" + (int) ((1 - PLAYLIST_INFO_PANEL_HEIGHT_PROPORTION) * 100) + "%]"
+        ));
 
         //-----BEGIN BUILDING PLAYLIST INFO PANEL-----
+
+        JPanel playlistInfoPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
 
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JButton playlistCoverButton = new JButton();
         JLabel playlistTitleLabel = new JLabel(playlist.getName());
         playlistDescriptionLabel = new JLabel(createDescription(playlist));
-        JButton returnToHomeButton = new JButton(REFRESH_ICON);
-        JButton refreshDirectoryButton = new JButton(REFRESH_ICON);
-        JButton resyncToOriginButton = new JButton(RESYNC_ICON);
+        JButton returnToHomeButton = new JButton(createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton refreshDirectoryButton = new JButton(createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton resyncToOriginButton = new JButton(createResizedIcon(RESYNC_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JPanel playlistTextPanel = new JPanel();
 
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
@@ -231,7 +242,7 @@ public class MainPanel extends JPanel {
         constraints.gridheight = 1;
         constraints.insets = new Insets(INFO_PANEL_TABLE_GAP, INFO_PANEL_TABLE_GAP, 0, 0);
         constraints.anchor = GridBagConstraints.CENTER;
-        add(playlistCoverButton, constraints);
+        playlistInfoPanel.add(playlistCoverButton, constraints);
 
         playlistTextPanel.add(playlistTitleLabel);
         playlistTextPanel.add(playlistDescriptionLabel);
@@ -241,7 +252,7 @@ public class MainPanel extends JPanel {
         constraints.gridheight = 1;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
-        add(playlistTextPanel, constraints);
+        playlistInfoPanel.add(playlistTextPanel, constraints);
 
         //Glue to separate the playlist info and the buttons
         constraints.gridx = 2;
@@ -251,7 +262,7 @@ public class MainPanel extends JPanel {
         constraints.weightx = 1;
         constraints.insets = new Insets(0, 0, 0, 0);
         constraints.anchor = GridBagConstraints.CENTER;
-        add(new JPanel(), constraints);
+        playlistInfoPanel.add(new JPanel(), constraints);
 
         constraints.gridx = 3;
         constraints.gridy = 0;
@@ -260,7 +271,7 @@ public class MainPanel extends JPanel {
         constraints.weightx = 0;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
-        add(refreshDirectoryButton, constraints);
+        playlistInfoPanel.add(refreshDirectoryButton, constraints);
 
         constraints.gridx = 4;
         constraints.gridy = 0;
@@ -268,7 +279,7 @@ public class MainPanel extends JPanel {
         constraints.gridheight = 1;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
-        add(resyncToOriginButton, constraints);
+        playlistInfoPanel.add(resyncToOriginButton, constraints);
 
         constraints.gridx = 5;
         constraints.gridy = 0;
@@ -276,7 +287,14 @@ public class MainPanel extends JPanel {
         constraints.gridheight = 1;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, INFO_PANEL_SPACING);
-        add(returnToHomeButton, constraints);
+        playlistInfoPanel.add(returnToHomeButton, constraints);
+
+        add(playlistInfoPanel,
+            "cell 0 0, "
+            + "span 1 1, "
+            + "growx, "
+            + "pushx"
+        );
 
         //------END BUILDING PLAYLIST INFO PANEL------
         
@@ -298,16 +316,24 @@ public class MainPanel extends JPanel {
 
         wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 6;
-        constraints.gridheight = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.insets = new Insets(INFO_PANEL_TABLE_GAP, 0, 0, 0);
-        constraints.anchor = GridBagConstraints.CENTER;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(scrollPane, constraints);
+        add(scrollPane,
+            "cell 0 1, "
+            + "span 1 1, "
+            + "grow, "
+            + "pushx, "
+            + "pushy"
+        );
+
+        // constraints.gridx = 0;
+        // constraints.gridy = 1;
+        // constraints.gridwidth = 6;
+        // constraints.gridheight = 1;
+        // constraints.weightx = 1;
+        // constraints.weighty = 1;
+        // constraints.insets = new Insets(INFO_PANEL_TABLE_GAP, 0, 0, 0);
+        // constraints.anchor = GridBagConstraints.CENTER;
+        // constraints.fill = GridBagConstraints.BOTH;
+        // add(scrollPane, constraints);
 
         //--------END BUILDING TRACKLIST PANEL--------
 
