@@ -4,13 +4,15 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
+import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 
 import main.TracklistPlayer;
@@ -24,13 +26,13 @@ public class PlaybarPanel extends JPanel {
     private static final ImageIcon GO_BACK_ICON = createImageIcon("src/main/resources/go back.png");
     
     //GUI spacing constants
-    private static final int BUTTONS_TO_PROGRESSBAR_GAP = 9;
+    private static final int BUTTONS_TO_PROGRESSBAR_GAP = 0;
     private static final int BUTTONS_SPACING = 9;
-    private static final int PROGRESS_BAR_MAX_VALUE = 2000;
+    private static final int PROGRESS_BAR_MAX_VALUE = 1000;
 
     private JLabel timeElapsedLabel;
     private JLabel timeRemainingLabel;
-    private JProgressBar progressBar;
+    private JSlider progressSlider;
     private JButton goBackButton;
     private JButton playPauseButton;
     private JButton skipButton;
@@ -47,15 +49,14 @@ public class PlaybarPanel extends JPanel {
         goBackButton = new JButton(GO_BACK_ICON);
         playPauseButton = new JButton(PLAY_ICON);
         skipButton = new JButton(SKIP_ICON);
-        timeElapsedLabel = new JLabel("0:00");
+        timeElapsedLabel = new JLabel("-:--");
         timeRemainingLabel = new JLabel("-:--");
-        progressBar = new JProgressBar();
+        progressSlider = new JSlider(JSlider.HORIZONTAL, 0, PROGRESS_BAR_MAX_VALUE, 0);
 
         timeElapsedLabel.setFont(TIME_FONT);
         timeRemainingLabel.setFont(TIME_FONT);
-        progressBar.setAlignmentX(CENTER_ALIGNMENT);
-        progressBar.putClientProperty("JProgressBar.largeHeight", true);
-        progressBar.setMaximum(PROGRESS_BAR_MAX_VALUE);
+        progressSlider.setEnabled(false);
+        progressSlider.setAlignmentX(CENTER_ALIGNMENT);
         playPauseButton.setEnabled(false);
         goBackButton.setEnabled(false);
         skipButton.setEnabled(false);
@@ -65,6 +66,7 @@ public class PlaybarPanel extends JPanel {
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.weightx = 1;
+        constraints.weighty = 1;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.fill = GridBagConstraints.NONE;
         add(timeElapsedLabel, constraints);
@@ -74,6 +76,7 @@ public class PlaybarPanel extends JPanel {
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.weightx = 0;
+        constraints.weighty = 1;
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.NONE;
         constraints.insets = new Insets(0, 0, 0, BUTTONS_SPACING);
@@ -89,6 +92,7 @@ public class PlaybarPanel extends JPanel {
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.weightx = 1;
+        constraints.weighty = 1;
         constraints.anchor = GridBagConstraints.LAST_LINE_END;
         constraints.fill = GridBagConstraints.NONE;
         add(timeRemainingLabel, constraints);
@@ -98,10 +102,11 @@ public class PlaybarPanel extends JPanel {
         constraints.gridwidth = 5;
         constraints.gridheight = 1;
         constraints.weightx = 1;
+        constraints.weighty = 0;
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(BUTTONS_TO_PROGRESSBAR_GAP, 0, 0, 0);
-        add(progressBar, constraints);
+        add(progressSlider, constraints);
 
         //-------------------END GUI BUILDING-------------------
 
@@ -139,22 +144,34 @@ public class PlaybarPanel extends JPanel {
 
         });
 
-        TracklistPlayer.addPlaybackUpdateAction(() -> {
+        progressSlider.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
 
-            System.out.println("--------------------------------------------------------");
-            System.out.println(TracklistPlayer.getCurrentTrackTimeProportion());
-            System.out.println(TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE);
-            System.out.println((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
-            System.out.println("--------------------------------------------------------");
+                System.out.println((int) (((double) progressSlider.getValue() / PROGRESS_BAR_MAX_VALUE) * TracklistPlayer.getCurrentTrackTotalDuration()));
+                TracklistPlayer.seekTrack((int) ((progressSlider.getValue() * 1000.0 / PROGRESS_BAR_MAX_VALUE) * TracklistPlayer.getCurrentTrackTotalDuration()));
+
+            }
+
+        });
+
+        TracklistPlayer.addPlaybackUpdateAction(() -> {
 
             SwingUtilities.invokeLater(() -> {
                 
                 timeElapsedLabel.setText(formatMinutesSeconds(TracklistPlayer.getCurrentTrackTime()));
                 timeRemainingLabel.setText("-" + formatMinutesSeconds(TracklistPlayer.getCurrentTrackTotalDuration() - TracklistPlayer.getCurrentTrackTime()));
-                progressBar.setValue((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
-                progressBar.repaint();
+                progressSlider.setValue((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
+                progressSlider.repaint();
                 
             });
+
+        });
+
+        TracklistPlayer.addStartTrackAction(() -> {
+
+            progressSlider.setEnabled(true);
 
         });
 

@@ -225,6 +225,26 @@ public abstract class TracklistPlayer {
 
     }
 
+    public synchronized static void seekTrack(int milliseconds) {
+
+        if(activeMediaPlayer == null) {
+
+            return;
+
+        }
+
+        if(
+            activeMediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && 
+            activeMediaPlayer.getTotalDuration().greaterThanOrEqualTo(Duration.millis(milliseconds))
+        ) {
+
+            System.out.println("Pooping");
+            activeMediaPlayer.seek(Duration.millis(milliseconds));
+
+        }
+
+    }
+
     public static void setIsOnRepeat(boolean isOnRepeat) {
 
         TracklistPlayer.isOnRepeat.set(isOnRepeat);
