@@ -20,15 +20,21 @@ public abstract class TracklistPlayer {
      * will start the track again instead of going back to the previous track.
      */
     private static final int GO_TO_PREVIOUS_TIME_LIMIT = 3;
+    /**
+     * The number of milliseconds between each time playbackUpdateActions are run
+     */
+    private static final int PLAYBACK_UPDATE_LOOP_PERIOD = 250;
 
     public static Set<Runnable> startTrackActions = new HashSet<Runnable>();
     public static Set<Runnable> switchTrackActions = new HashSet<Runnable>();
+    public static Set<Runnable> playbackUpdateActions = new HashSet<Runnable>();
 
     private static MediaPlayer activeMediaPlayer;
     private static final AtomicInteger currentTrackNum = new AtomicInteger(0);
     private static final AtomicBoolean isPlaying = new AtomicBoolean(false);
     private static final AtomicBoolean isOnRepeat = new AtomicBoolean(false);
     private static List<Track> queuedTracks = new ArrayList<Track>();
+    private static Thread playbackUpdateThread;
 
     static {
 
@@ -79,6 +85,7 @@ public abstract class TracklistPlayer {
         activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
         activeMediaPlayer.play();
         isPlaying.set(true);
+        startPlaybackUpdateThread();
 
         for(Runnable action: startTrackActions) {
 
@@ -124,6 +131,7 @@ public abstract class TracklistPlayer {
 
         activeMediaPlayer.play();
         isPlaying.set(true);
+        startPlaybackUpdateThread();
 
         for(Runnable action: switchTrackActions) {
 
@@ -162,6 +170,7 @@ public abstract class TracklistPlayer {
 
         activeMediaPlayer.play();
         isPlaying.set(true);
+        startPlaybackUpdateThread();
 
     }
 
@@ -246,6 +255,18 @@ public abstract class TracklistPlayer {
 
     }
 
+    public static void addPlaybackUpdateAction(Runnable action) {
+
+        playbackUpdateActions.add(action);
+
+    }
+
+    public static void clearPlaybackUpdateActions() {
+
+        playbackUpdateActions.clear();
+
+    }
+
     public static int getCurrentlyPlayingTrackNumber() {
 
         return currentTrackNum.get();
@@ -276,7 +297,7 @@ public abstract class TracklistPlayer {
      * The active media player's current time divided by the track's total duration.
      * @return How much of the current track has been played, as a percent of the total track duration.
      */
-    public static double getProgressProportion() {
+    public static double getCurrentTrackTimeProportion() {
 
         if(activeMediaPlayer == null) {
 
@@ -285,6 +306,38 @@ public abstract class TracklistPlayer {
         }
 
         return activeMediaPlayer.getCurrentTime().toMillis() / activeMediaPlayer.getTotalDuration().toMillis();
+
+    }
+
+    /**
+     * The currently playing track's progress in seconds
+     * @return The active media player's current time
+     */
+    public static int getCurrentTrackTime() {
+
+        if(activeMediaPlayer == null) {
+
+            return 0;
+
+        }
+
+        return (int) activeMediaPlayer.getCurrentTime().toSeconds();
+
+    }
+
+    /**
+     * The currently playing track's total duration in seconds
+     * @return
+     */
+    public static int getCurrentTrackTotalDuration() {
+
+        if(activeMediaPlayer == null) {
+
+            return 0;
+
+        }
+
+        return (int) activeMediaPlayer.getTotalDuration().toSeconds();
 
     }
 
@@ -303,6 +356,45 @@ public abstract class TracklistPlayer {
     public static boolean isOnRepeat() {
 
         return isOnRepeat.get();
+
+    }
+
+    /**
+     * Starts the playback update thread.
+     */
+    private static void startPlaybackUpdateThread() {
+
+        if(playbackUpdateThread != null && playbackUpdateThread.isAlive()) {
+
+            return;
+
+        }
+
+        playbackUpdateThread = new Thread(() -> {
+
+            while(isPlaying.get()) {
+
+                for(Runnable action: playbackUpdateActions) {
+
+                    action.run();
+
+                }
+
+                try {
+
+                    Thread.sleep(PLAYBACK_UPDATE_LOOP_PERIOD);
+
+                } catch (InterruptedException e) {
+
+                    //Do nothing
+
+                }
+
+            }
+
+        });
+
+        playbackUpdateThread.start();
 
     }
 

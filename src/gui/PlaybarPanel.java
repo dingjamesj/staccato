@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
 import main.TracklistPlayer;
 
@@ -25,6 +26,7 @@ public class PlaybarPanel extends JPanel {
     //GUI spacing constants
     private static final int BUTTONS_TO_PROGRESSBAR_GAP = 9;
     private static final int BUTTONS_SPACING = 9;
+    private static final int PROGRESS_BAR_MAX_VALUE = 2000;
 
     private JLabel timeElapsedLabel;
     private JLabel timeRemainingLabel;
@@ -53,6 +55,7 @@ public class PlaybarPanel extends JPanel {
         timeRemainingLabel.setFont(TIME_FONT);
         progressBar.setAlignmentX(CENTER_ALIGNMENT);
         progressBar.putClientProperty("JProgressBar.largeHeight", true);
+        progressBar.setMaximum(PROGRESS_BAR_MAX_VALUE);
         playPauseButton.setEnabled(false);
         goBackButton.setEnabled(false);
         skipButton.setEnabled(false);
@@ -136,6 +139,25 @@ public class PlaybarPanel extends JPanel {
 
         });
 
+        TracklistPlayer.addPlaybackUpdateAction(() -> {
+
+            System.out.println("--------------------------------------------------------");
+            System.out.println(TracklistPlayer.getCurrentTrackTimeProportion());
+            System.out.println(TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE);
+            System.out.println((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
+            System.out.println("--------------------------------------------------------");
+
+            SwingUtilities.invokeLater(() -> {
+                
+                timeElapsedLabel.setText(formatMinutesSeconds(TracklistPlayer.getCurrentTrackTime()));
+                timeRemainingLabel.setText("-" + formatMinutesSeconds(TracklistPlayer.getCurrentTrackTotalDuration() - TracklistPlayer.getCurrentTrackTime()));
+                progressBar.setValue((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
+                progressBar.repaint();
+                
+            });
+
+        });
+
         //-----------------END ACTION LISTENERS-----------------
 
     }
@@ -172,6 +194,14 @@ public class PlaybarPanel extends JPanel {
         }
 
         return new ImageIcon(urlStr);
+
+    }
+
+    private static String formatMinutesSeconds(int seconds) {
+
+        String minutesStr = String.format("%d", seconds / 60);
+        String secondsStr = String.format("%02d", seconds % 60);
+        return minutesStr + ":" + secondsStr;
 
     }
 

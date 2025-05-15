@@ -84,13 +84,17 @@ public class CurrentTrackInfoPanel extends JPanel {
         artistsLabel.setFont(ARTISTS_FONT);
         albumLabel.setFont(ALBUM_FONT);
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
-        buttonsPanel.setVisible(false);
         titleLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
         titleLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
         artistsLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
         artistsLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
         albumLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
         albumLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
+        titleLabelScrollPane.setVisible(false);
+        albumArtLabel.setVisible(false);
+        artistsLabelScrollPane.setVisible(false);
+        albumLabelScrollPane.setVisible(false);
+        buttonsPanel.setVisible(false);
 
         add(
             titleLabelScrollPane, 
@@ -162,8 +166,15 @@ public class CurrentTrackInfoPanel extends JPanel {
 
     public void setTrack(Track track) {
 
+        for(JScrollPane scrollpane: trackInfoScrollPanes) {
+
+            scrollpane.setVisible(true);
+
+        }
+        albumArtLabel.setVisible(true);
+        buttonsPanel.setVisible(true);
+        
         titleLabel.setText(track.getTitle());
-        artistsLabel.setOpaque(true);
         artistsLabel.setText(track.getArtists());
         albumLabel.setText(track.getAlbum());
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -172,8 +183,6 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         ImageIcon albumArtImageIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE_PX, ALBUM_ART_ICON_SIZE_PX, Image.SCALE_SMOOTH);
         albumArtLabel.setIcon(albumArtImageIcon);
-
-        buttonsPanel.setVisible(true);
 
         for(JScrollPane scrollpane: trackInfoScrollPanes) {
 
