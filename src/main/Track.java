@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Random;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -353,9 +354,67 @@ public class Track {
 
 		}
 
-		return fileLocation.equalsIgnoreCase(((Track) obj).getFileLocation());
+		if(System.getProperty("os.name").toLowerCase().contains("windows")) {
+
+			return fileLocation.equalsIgnoreCase(((Track) obj).getFileLocation());
+
+		} else {
+
+			return fileLocation.equals(((Track) obj).getFileLocation());
+
+		}
 
 	}
+
+	public static void shuffleTracklist(Track[] tracks, Track beginningTrack) {
+
+		if(tracks == null) {
+
+			return;
+
+		}
+
+		int beginningTrackIndex = -1;
+		Random random = new Random();
+        for(int i = tracks.length - 1; i > 0; i--) {
+
+			int j = random.nextInt(i + 1);
+			Track temp = tracks[j];
+			tracks[j] = tracks[i];
+			tracks[i] = temp;
+			if(beginningTrackIndex == -1 && tracks[i].equals(beginningTrack)) {
+
+				beginningTrackIndex = i;
+
+			}
+
+		}
+
+		Track temp = tracks[beginningTrackIndex];
+		tracks[beginningTrackIndex] = tracks[0];
+		tracks[0] = temp;
+
+    }
+
+    public static void shuffleTracklist(Track[] tracks) {
+
+		if(tracks == null) {
+
+			return;
+
+		}
+
+		Random random = new Random();
+        for(int i = tracks.length - 1; i > 0; i--) {
+
+			int j = random.nextInt(i + 1);
+			Track temp = tracks[j];
+			tracks[j] = tracks[i];
+			tracks[i] = temp;
+
+		}
+
+    }
 
 	private static String formatHoursMinutesSeconds(int seconds) {
 

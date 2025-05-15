@@ -92,6 +92,7 @@ public class MainPanel extends JPanel {
     private JLabel playlistDescriptionLabel;
 
     private AtomicBoolean killTracklistLoadingThreadFlag = new AtomicBoolean(false);
+    private Track[] currentTracklist = null;
 
     public MainPanel() {
 
@@ -108,8 +109,10 @@ public class MainPanel extends JPanel {
 
     private void initHomePage() {
 
-        removeAll();
         FileManager.stopReadingTracks();
+        currentTracklist = null;
+
+        removeAll();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         // setAlignmentX(LEFT_ALIGNMENT);
@@ -390,8 +393,11 @@ public class MainPanel extends JPanel {
 
         }
 
+        currentTracklist = playlist.getTracks();
+
         playlistDescriptionLabel.setText(createDescription(playlist));
 
+        //Load the track entry GUIs
         killTracklistLoadingThreadFlag.set(false); //Reset the kill flag
         Track[] tracks = playlist.getTracks();
         for(int i = 0; i < tracks.length; i++) {
@@ -554,7 +560,8 @@ public class MainPanel extends JPanel {
 
                 }
 
-                playTracksAction(track);
+                Track.shuffleTracklist(currentTracklist, track);
+                playTracksAction(currentTracklist);
 
             }
 
