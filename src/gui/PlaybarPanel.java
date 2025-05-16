@@ -84,7 +84,7 @@ public class PlaybarPanel extends JPanel {
         playPauseButton = new JButton(PLAY_ICON);
         skipButton = new JButton(SKIP_ICON);
         timeElapsedLabel = new JLabel("-:--");
-        timeRemainingLabel = new JLabel("-:--");
+        timeRemainingLabel = new JLabel("--:--");
         progressSlider = new JSlider(JSlider.HORIZONTAL, 0, PROGRESS_BAR_MAX_VALUE, 0);
 
         timeElapsedLabel.setFont(TIME_FONT);
