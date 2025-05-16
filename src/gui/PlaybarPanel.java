@@ -37,6 +37,8 @@ public class PlaybarPanel extends JPanel {
     private JButton playPauseButton;
     private JButton skipButton;
 
+    private boolean isProgressSliderBeingPressed = false;
+
     public static PlaybarPanel playbarPanel;
 
     public PlaybarPanel() {
@@ -147,9 +149,16 @@ public class PlaybarPanel extends JPanel {
         progressSlider.addMouseListener(new MouseAdapter() {
             
             @Override
+            public void mousePressed(MouseEvent e) {
+
+                isProgressSliderBeingPressed = true;
+
+            }
+
+            @Override
             public void mouseReleased(MouseEvent e) {
 
-                System.out.println((int) (((double) progressSlider.getValue() / PROGRESS_BAR_MAX_VALUE) * TracklistPlayer.getCurrentTrackTotalDuration()));
+                isProgressSliderBeingPressed = false;
                 TracklistPlayer.seekTrack((int) ((progressSlider.getValue() * 1000.0 / PROGRESS_BAR_MAX_VALUE) * TracklistPlayer.getCurrentTrackTotalDuration()));
 
             }
@@ -158,11 +167,17 @@ public class PlaybarPanel extends JPanel {
 
         TracklistPlayer.addPlaybackUpdateAction(() -> {
 
+            if(isProgressSliderBeingPressed) {
+
+                return;
+
+            }
+
             SwingUtilities.invokeLater(() -> {
-                
+
                 timeElapsedLabel.setText(formatMinutesSeconds(TracklistPlayer.getCurrentTrackTime()));
                 timeRemainingLabel.setText("-" + formatMinutesSeconds(TracklistPlayer.getCurrentTrackTotalDuration() - TracklistPlayer.getCurrentTrackTime()));
-                progressSlider.setValue((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
+                setProgressSliderValue((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
                 progressSlider.repaint();
                 
             });
@@ -198,6 +213,22 @@ public class PlaybarPanel extends JPanel {
             playPauseButton.setIcon(PLAY_ICON);
 
         }
+
+    }
+
+    private synchronized void setProgressSliderValue(int value) {
+
+        System.out.println("---------------------------------");
+        System.out.println(value);
+        progressSlider.setValue(value);
+
+    }
+
+    private synchronized void incrementProgressSliderValue(int value) {
+
+        System.out.println("---------------------------------");
+        System.out.println(progressSlider.getValue() + value);
+        progressSlider.setValue(progressSlider.getValue() + value);
 
     }
 
