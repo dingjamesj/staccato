@@ -2,9 +2,13 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.Image;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,15 +23,22 @@ public class QueuePanel extends JPanel {
     private static final Font TRACK_NUMBER_FONT = new Font("Segoe UI", Font.BOLD, 16);
     private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.PLAIN, 16);
 
+    private static final ImageIcon LOOP_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
+
     private static final int SCROLL_SPEED = 11;
     private static final int ROW_SPACING = 3;
     private static final double NUMBER_COLUMN_WIDTH_PROPORTION = 0.12;
     private static final double TITLE_COLUMN_WIDTH_PROPORTION = 0.6;
-    private static final double QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION = 0.9;
-    private static final String PANEL_TITLE_LABEL_INSETS = "16 0 4 0";
+    private static final double QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION = 0.925;
+    private static final int PANEL_TITLE_WINDOW_EDGE_GAP_PX = 2;
+    private static final int QUEUE_OPTIONS_BUTTON_SIZE = 35;
+    private static final int TITLE_LABEL_TO_BUTTONS_GAP_PX = 12;
+    private static final int BUTTONS_GAP_PX = 0;
 
     private JPanel tracklistPanel;
     private final AtomicInteger currentTrackNum = new AtomicInteger(0);
+    private final AtomicBoolean shuffleIsOn = new AtomicBoolean(true);
+    private final AtomicBoolean loopIsOn = new AtomicBoolean(true);
 
     public static QueuePanel queuePanel;
 
@@ -49,21 +60,33 @@ public class QueuePanel extends JPanel {
             "[" + (int) ((1.0 - QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION) * 100) + "%][" + (int) (QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION * 100) + "%]"
         ));
 
+        JPanel headerPanel = new JPanel();
         JLabel panelTitleLabel = new JLabel("Queue");
+        JButton loopButton = new JButton(GUIUtil.createResizedIcon(LOOP_ICON, QUEUE_OPTIONS_BUTTON_SIZE, QUEUE_OPTIONS_BUTTON_SIZE, Image.SCALE_SMOOTH));
         tracklistPanel = new JPanel();
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
         
+        headerPanel.setLayout(new MigLayout("insets 0 0 0 0"));
         panelTitleLabel.setFont(PANEL_TITLE_FONT);
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
+        headerPanel.add(panelTitleLabel, "cell 0 0, span 1 1, pushy, align left bottom, gapleft " + PANEL_TITLE_WINDOW_EDGE_GAP_PX);
+        headerPanel.add(loopButton, "cell 1 0, span 1 1, pushy, gapleft " + BUTTONS_GAP_PX + ", align left bottom");
         wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
-
-        add(panelTitleLabel, "cell 0 0, span 1 1, grow, pushx, align left center, hmax " + (int) ((1.0 - QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION) * 100) + "%, pad " + PANEL_TITLE_LABEL_INSETS);
+        add(headerPanel, "cell 0 0, span 1 1, grow, push, align center center, hmax " + (int) ((1.0 - QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION) * 100) + "%");
         add(scrollPane, "cell 0 1, span 1 1, grow, push, align center center, hmax " + (int) (QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION * 100) + "%");
 
         queuePanel = this;
+
+        //--------------------------START ACTION LISTENERS--------------------------
+
+        loopButton.addActionListener((unused) -> {
+
+            loopIsOn.set(!loopIsOn.get());
+
+        });
 
     }
 
@@ -87,15 +110,16 @@ public class QueuePanel extends JPanel {
         } else {
 
             currentTrackNum.set(TracklistPlayer.getCurrentlyPlayingTrackNumber());
-            setTracksInQueue();
+            addTracksToGUI(0);
 
         }
 
     }
 
-    public synchronized void setTracksInQueue() {
+    public synchronized void addTracksToGUI(int startingTrackIndex) {
 
         tracklistPanel.removeAll();
+        currentTrackNum.set(startingTrackIndex);
 
         Track[] tracks = TracklistPlayer.getQueue();
         if(tracks == null) {
@@ -104,7 +128,7 @@ public class QueuePanel extends JPanel {
 
         }
 
-        for(int i = 0; i < tracks.length; i++) {
+        for(int i = startingTrackIndex; i < tracks.length; i++) {
 
             tracklistPanel.add(createQueueEntryPanel(tracks[i], i));
 
@@ -126,7 +150,6 @@ public class QueuePanel extends JPanel {
             //Do nothing
 
         }
-
 
         revalidate();
         repaint();

@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.net.URL;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,8 +27,8 @@ public class CurrentTrackInfoPanel extends JPanel {
     private static final Font ARTISTS_FONT = new Font("Segoe UI", Font.BOLD, 18);
     private static final Font ALBUM_FONT = new Font("Segoe UI", Font.ITALIC, 18);
 
-    private static final ImageIcon EDIT_METADATA_ICON = createImageIcon("src/main/resources/refresh.png");
-    private static final ImageIcon REDOWNLOAD_ICON = createImageIcon("src/main/resources/refresh.png");
+    private static final ImageIcon EDIT_METADATA_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
+    private static final ImageIcon REDOWNLOAD_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
 
     private static final int GUI_TO_WINDOW_TOP_GAP = 70;
     private static final int GUI_GAP = 10;
@@ -72,8 +71,8 @@ public class CurrentTrackInfoPanel extends JPanel {
         albumArtLabel = new JLabel();
         artistsLabel = new JLabel();
         albumLabel = new JLabel();
-        JButton editMetadataButton = new JButton(createResizedIcon(EDIT_METADATA_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
-        JButton redownloadButton = new JButton(createResizedIcon(REDOWNLOAD_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+        JButton editMetadataButton = new JButton(GUIUtil.createResizedIcon(EDIT_METADATA_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+        JButton redownloadButton = new JButton(GUIUtil.createResizedIcon(REDOWNLOAD_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
         JScrollPane titleLabelScrollPane = new JScrollPane(titleLabel);
         JScrollPane artistsLabelScrollPane = new JScrollPane(artistsLabel);
         JScrollPane albumLabelScrollPane = new JScrollPane(albumLabel);
@@ -181,7 +180,7 @@ public class CurrentTrackInfoPanel extends JPanel {
         artistsLabel.setHorizontalAlignment(JLabel.CENTER);
         albumLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        ImageIcon albumArtImageIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE_PX, ALBUM_ART_ICON_SIZE_PX, Image.SCALE_SMOOTH);
+        ImageIcon albumArtImageIcon = GUIUtil.createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE_PX, ALBUM_ART_ICON_SIZE_PX, Image.SCALE_SMOOTH);
         albumArtLabel.setIcon(albumArtImageIcon);
 
         for(JScrollPane scrollpane: trackInfoScrollPanes) {
@@ -193,25 +192,6 @@ public class CurrentTrackInfoPanel extends JPanel {
         
         revalidate();
         repaint();
-
-    }
-
-    private static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
-
-        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, rescalingAlgorithm));
-
-    }
-
-    private static ImageIcon createImageIcon(String urlStr) {
-
-        URL url = PlaybarPanel.class.getResource(urlStr);
-        if(url != null) {
-
-            return new ImageIcon(url);
-
-        }
-
-        return new ImageIcon(urlStr);
 
     }
 

@@ -32,7 +32,7 @@ public abstract class TracklistPlayer {
     private static MediaPlayer activeMediaPlayer;
     private static final AtomicInteger currentTrackNum = new AtomicInteger(0);
     private static final AtomicBoolean isPlaying = new AtomicBoolean(false);
-    private static final AtomicBoolean isOnRepeat = new AtomicBoolean(false);
+    private static final AtomicBoolean loopIsOn = new AtomicBoolean(false);
     private static List<Track> queuedTracks = new ArrayList<Track>();
     private static Thread playbackUpdateThread;
 
@@ -44,15 +44,27 @@ public abstract class TracklistPlayer {
     }
 
     /**
-     * Puts all the tracks in a queue and plays them in the given order.
+     * Puts all the tracks in a queue and plays them in the given order <b><i>from the start.</b></i>
      * @param tracks Array of tracks to be played in order
      * @return A List of the tracks successfully put in the queue
      */
-    public synchronized static void playTracks(Track... tracks) {
+    public synchronized static void playTracks(Track[] tracks) {
+
+        playTracks(tracks, 0);
+
+    }
+
+    /**
+     * Puts all the tracks in a queue and plays them in the given order from the given track number.
+     * @param startingTrackIndex The track number to start playback on
+     * @param tracks Array of tracks to be played in order
+     * @return A List of the tracks successfully put in the queue
+     */
+    public synchronized static void playTracks(Track[] tracks, int startingTrackIndex) {
 
         //Stop playback and clear queue
         queuedTracks.clear();
-        currentTrackNum.set(0);
+        currentTrackNum.set(startingTrackIndex);
         if(activeMediaPlayer != null) {
 
             activeMediaPlayer.stop();
@@ -80,7 +92,7 @@ public abstract class TracklistPlayer {
 
         }
 
-        Media media = new Media(new File(queuedTracks.get(0).getFileLocation()).toURI().toString());
+        Media media = new Media(new File(queuedTracks.get(startingTrackIndex).getFileLocation()).toURI().toString());
         activeMediaPlayer = new MediaPlayer(media);
         activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
         activeMediaPlayer.play();
@@ -114,7 +126,7 @@ public abstract class TracklistPlayer {
 
         if(currentTrackNum.incrementAndGet() >= queuedTracks.size()) {
 
-            if(!isOnRepeat.get()) {
+            if(!loopIsOn.get()) {
 
                 //isPlaying remains false here
                 return;
@@ -205,7 +217,7 @@ public abstract class TracklistPlayer {
 
         } else if(currentTrackNum.get() == 0) {
 
-            if(!isOnRepeat.get()) {
+            if(!loopIsOn.get()) {
 
                 activeMediaPlayer.seek(Duration.millis(0));
 
@@ -238,16 +250,15 @@ public abstract class TracklistPlayer {
             activeMediaPlayer.getTotalDuration().greaterThanOrEqualTo(Duration.millis(milliseconds))
         ) {
 
-            System.out.println("Pooping");
             activeMediaPlayer.seek(Duration.millis(milliseconds));
 
         }
 
     }
 
-    public static void setIsOnRepeat(boolean isOnRepeat) {
+    public static void setIsLooping(boolean isLooping) {
 
-        TracklistPlayer.isOnRepeat.set(isOnRepeat);
+        loopIsOn.set(isLooping);
 
     }
 
@@ -373,9 +384,9 @@ public abstract class TracklistPlayer {
     /**
      * @return True if the player is on repeat, false otherwise.
      */
-    public static boolean isOnRepeat() {
+    public static boolean isLooping() {
 
-        return isOnRepeat.get();
+        return loopIsOn.get();
 
     }
 

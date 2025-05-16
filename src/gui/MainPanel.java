@@ -14,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -39,8 +38,6 @@ import net.miginfocom.swing.MigLayout;
 
 public class MainPanel extends JPanel {
 
-    private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
-
     //Playlist selection view
     private static final Font PANEL_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 72);
     private static final Font PLAYLIST_SELECTION_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 48);
@@ -53,11 +50,13 @@ public class MainPanel extends JPanel {
     private static final Font TRACK_ARTISTS_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final Font TRACK_ALBUM_FONT = new Font("Segoe UI", Font.PLAIN, 18);
 
-    private static final ImageIcon REFRESH_ICON = createImageIcon("src/main/resources/refresh.png");
-    private static final ImageIcon RESYNC_ICON = createImageIcon("src/main/resources/resync.png");
-    private static final ImageIcon EDIT_ICON = createImageIcon("src/main/resources/edit.png");
-    private static final ImageIcon HOME_ICON = createImageIcon("src/main/resources/home.png");
-    private static final ImageIcon MORE_OPTIONS_ICON = createImageIcon("src/main/resources/more options.png");
+    private static final ImageIcon PLACEHOLDER_ART_ICON = GUIUtil.createImageIcon("src/main/resources/placeholder art.png");
+    private static final ImageIcon REFRESH_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
+    private static final ImageIcon RESYNC_ICON = GUIUtil.createImageIcon("src/main/resources/resync.png");
+    private static final ImageIcon EDIT_ICON = GUIUtil.createImageIcon("src/main/resources/edit.png");
+    private static final ImageIcon HOME_ICON = GUIUtil.createImageIcon("src/main/resources/home.png");
+    private static final ImageIcon MORE_OPTIONS_ICON = GUIUtil.createImageIcon("src/main/resources/more options.png");
+    private static final ImageIcon SHUFFLE_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
 
     private static final Color ALTERNATE_TRACKLIST_ROW_COLOR = new Color(0x151515);
 
@@ -91,17 +90,13 @@ public class MainPanel extends JPanel {
     private JPanel tracklistPanel;
     private JLabel playlistDescriptionLabel;
 
-    private AtomicBoolean killTracklistLoadingThreadFlag = new AtomicBoolean(false);
+    private final AtomicBoolean killTracklistLoadingThreadFlag = new AtomicBoolean(false);
+    private final AtomicBoolean shuffleIsOn = new AtomicBoolean(false);
     private Track[] currentTracklist = null;
 
     public MainPanel() {
 
-        //you would say initHomePage()
-        //the home page would just have recently opened playlists
-
         initHomePage();
-
-        // initPlaylistPage(new Playlist("saco", "C:\\Users\\James\\Music\\saco", null));
 
         MainPanel.mainPanel = this;
 
@@ -229,12 +224,13 @@ public class MainPanel extends JPanel {
         JButton playlistCoverButton = new JButton();
         JLabel playlistTitleLabel = new JLabel(playlist.getName());
         playlistDescriptionLabel = new JLabel(createDescription(playlist));
-        JButton returnToHomeButton = new JButton(createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton editPlaylistButton = new JButton(createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton editPlaylistButton = new JButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton shuffleButton = new JButton(GUIUtil.createResizedIcon(SHUFFLE_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JPanel playlistTextPanel = new JPanel();
 
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
-        playlistCoverImageIcon = createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
+        playlistCoverImageIcon = GUIUtil.createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
         playlistCoverButton.setIcon(playlistCoverImageIcon);
         playlistTitleLabel.setFont(PLAYLIST_TITLE_FONT);
         playlistTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -277,9 +273,18 @@ public class MainPanel extends JPanel {
         constraints.weightx = 0;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
-        playlistInfoPanel.add(editPlaylistButton, constraints);
+        playlistInfoPanel.add(shuffleButton, constraints);
 
         constraints.gridx = 4;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.weightx = 0;
+        constraints.anchor = GridBagConstraints.LAST_LINE_START;
+        constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
+        playlistInfoPanel.add(editPlaylistButton, constraints);
+
+        constraints.gridx = 5;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
@@ -305,13 +310,6 @@ public class MainPanel extends JPanel {
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
-        //DEBUG
-        // loadingLabel.setOpaque(true);
-        // loadingLabel.setBackground(Color.cyan);
-        // tracklistPanel.setBackground(Color.red);
-        // wrapperPanel.setBackground(Color.green);
-        //-------------------
-
         wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
         add(scrollPane,
@@ -321,17 +319,6 @@ public class MainPanel extends JPanel {
             + "pushx, "
             + "pushy"
         );
-
-        // constraints.gridx = 0;
-        // constraints.gridy = 1;
-        // constraints.gridwidth = 6;
-        // constraints.gridheight = 1;
-        // constraints.weightx = 1;
-        // constraints.weighty = 1;
-        // constraints.insets = new Insets(INFO_PANEL_TABLE_GAP, 0, 0, 0);
-        // constraints.anchor = GridBagConstraints.CENTER;
-        // constraints.fill = GridBagConstraints.BOTH;
-        // add(scrollPane, constraints);
 
         //--------END BUILDING TRACKLIST PANEL--------
 
@@ -353,8 +340,29 @@ public class MainPanel extends JPanel {
 
         playlistCoverButton.addActionListener((unused) -> {
 
-            playTracksAction(playlist.getTracks());
+            if(shuffleIsOn.get()) {
 
+                Track.shuffleTracklist(currentTracklist);
+
+            }
+
+            playTracksAction(currentTracklist, 0);
+
+        });
+
+        shuffleButton.addActionListener((unused) -> {
+
+            if(shuffleIsOn.get()) {
+
+                shuffleIsOn.set(false);
+                currentTracklist = playlist.getTracks();
+
+            } else {
+
+                shuffleIsOn.set(true);
+
+            }
+            
         });
 
     }
@@ -409,7 +417,7 @@ public class MainPanel extends JPanel {
 
             }
 
-            JPanel trackPanel = createTrackEntry(tracks[i]);
+            JPanel trackPanel = createTrackEntry(tracks[i], i);
             if(i % 2 == 0) {
 
                 trackPanel.setBackground(ALTERNATE_TRACKLIST_ROW_COLOR);
@@ -425,12 +433,12 @@ public class MainPanel extends JPanel {
 
     }
 
-    private void playTracksAction(Track... tracks) {
+    private void playTracksAction(Track[] tracks, int startingTrackIndex) {
 
-        TracklistPlayer.playTracks(tracks);
+        TracklistPlayer.playTracks(tracks, startingTrackIndex);
         PlaybarPanel.playbarPanel.setButtonsEnabled(true);
         PlaybarPanel.playbarPanel.setIsPlaying(true);
-        QueuePanel.queuePanel.setTracksInQueue();
+        QueuePanel.queuePanel.addTracksToGUI(startingTrackIndex);
 
     }
 
@@ -445,7 +453,7 @@ public class MainPanel extends JPanel {
         JTextArea playlistDirectoryText = new JTextArea(playlist.getDirectory().isEmpty() ? "[No Directory]" : playlist.getDirectory());
 
         playlistCoverLabel.setPreferredSize(new Dimension(PLAYLIST_SELECTION_ICON_SIZE, PLAYLIST_SELECTION_ICON_SIZE));
-        playlistCoverImageIcon = createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
+        playlistCoverImageIcon = GUIUtil.createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
         playlistCoverLabel.setIcon(playlistCoverImageIcon);
         playlistNameLabel.setFont(PLAYLIST_SELECTION_TITLE_FONT);
         playlistDirectoryText.setFont(PLAYLIST_DESCRIPTION_FONT);
@@ -514,7 +522,7 @@ public class MainPanel extends JPanel {
 
     }
 
-    private JPanel createTrackEntry(Track track) {
+    private JPanel createTrackEntry(Track track, int trackIndex) {
 
         JPanel trackPanel = new JPanel(new MigLayout(
             "insets " + TRACKLIST_ROWS_SPACING + " 0 " + TRACKLIST_ROWS_SPACING + " 0",
@@ -532,7 +540,7 @@ public class MainPanel extends JPanel {
         titleAndArtistsPanel.setLayout(new BoxLayout(titleAndArtistsPanel, BoxLayout.Y_AXIS));
         titleAndArtistsPanel.setOpaque(false);
         artworkLabel.setPreferredSize(new Dimension(TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX));
-        artworkIcon = createResizedIcon(artworkIcon, TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX, Image.SCALE_SMOOTH);
+        artworkIcon = GUIUtil.createResizedIcon(artworkIcon, TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX, Image.SCALE_SMOOTH);
         artworkLabel.setIcon(artworkIcon);
         titleLabel.setAlignmentX(LEFT_ALIGNMENT);
         titleLabel.setFont(TRACK_TITLE_FONT);
@@ -560,33 +568,23 @@ public class MainPanel extends JPanel {
 
                 }
 
-                Track.shuffleTracklist(currentTracklist, track);
-                playTracksAction(currentTracklist);
+                if(shuffleIsOn.get()) {
+
+                    Track.shuffleTracklist(currentTracklist, track);
+                    playTracksAction(currentTracklist, 0);
+
+                } else {
+
+                    System.out.println(trackIndex);
+                    playTracksAction(currentTracklist, trackIndex);
+                    
+                }
 
             }
 
         });
 
         return trackPanel;
-
-    }
-
-    private static ImageIcon createImageIcon(String urlStr) {
-
-        URL url = PlaybarPanel.class.getResource(urlStr);
-        if(url != null) {
-
-            return new ImageIcon(url);
-
-        }
-
-        return new ImageIcon(urlStr);
-
-    }
-
-    private static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
-
-        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, rescalingAlgorithm));
 
     }
 

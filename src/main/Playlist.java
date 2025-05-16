@@ -147,7 +147,7 @@ public class Playlist implements Serializable {
      * Load track info from this playlist's directory.
      * @return True if tracks were successfully loaded, false otherwise (e.g. if the track reading was interrupted)
      */
-    public boolean loadTracks() {
+    public synchronized boolean loadTracks() {
 
         try {
 

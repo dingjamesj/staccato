@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,10 +19,10 @@ import main.TracklistPlayer;
 public class PlaybarPanel extends JPanel {
 
 	private static final Font TIME_FONT = new Font("Segoe UI", Font.PLAIN, 15);
-    private static final ImageIcon PLAY_ICON = createImageIcon("src/main/resources/play.png");
-    private static final ImageIcon PAUSE_ICON = createImageIcon("src/main/resources/pause.png");
-    private static final ImageIcon SKIP_ICON = createImageIcon("src/main/resources/skip.png");
-    private static final ImageIcon GO_BACK_ICON = createImageIcon("src/main/resources/go back.png");
+    private static final ImageIcon PLAY_ICON = GUIUtil.createImageIcon("src/main/resources/play.png");
+    private static final ImageIcon PAUSE_ICON = GUIUtil.createImageIcon("src/main/resources/pause.png");
+    private static final ImageIcon SKIP_ICON = GUIUtil.createImageIcon("src/main/resources/skip.png");
+    private static final ImageIcon GO_BACK_ICON = GUIUtil.createImageIcon("src/main/resources/go back.png");
     
     //GUI spacing constants
     private static final int BUTTONS_TO_PROGRESSBAR_GAP = 0;
@@ -218,30 +217,13 @@ public class PlaybarPanel extends JPanel {
 
     private synchronized void setProgressSliderValue(int value) {
 
-        System.out.println("---------------------------------");
-        System.out.println(value);
         progressSlider.setValue(value);
 
     }
 
     private synchronized void incrementProgressSliderValue(int value) {
 
-        System.out.println("---------------------------------");
-        System.out.println(progressSlider.getValue() + value);
         progressSlider.setValue(progressSlider.getValue() + value);
-
-    }
-
-    private static ImageIcon createImageIcon(String urlStr) {
-
-        URL url = PlaybarPanel.class.getResource(urlStr);
-        if(url != null) {
-
-            return new ImageIcon(url);
-
-        }
-
-        return new ImageIcon(urlStr);
 
     }
 
