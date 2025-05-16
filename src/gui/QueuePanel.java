@@ -38,7 +38,6 @@ public class QueuePanel extends JPanel {
     private JPanel tracklistPanel;
     private final AtomicInteger currentTrackNum = new AtomicInteger(0);
     private final AtomicBoolean shuffleIsOn = new AtomicBoolean(true);
-    private final AtomicBoolean loopIsOn = new AtomicBoolean(true);
 
     public static QueuePanel queuePanel;
 
@@ -47,6 +46,14 @@ public class QueuePanel extends JPanel {
         TracklistPlayer.addSwitchTrackAction(() -> {
 
             queuePanel.updateQueue();
+
+        });
+
+        TracklistPlayer.addEndTrackActions(() -> {
+
+            queuePanel.tracklistPanel.removeAll();
+            queuePanel.tracklistPanel.revalidate();
+            queuePanel.tracklistPanel.repaint();
 
         });
 
@@ -84,7 +91,7 @@ public class QueuePanel extends JPanel {
 
         loopButton.addActionListener((unused) -> {
 
-            loopIsOn.set(!loopIsOn.get());
+            TracklistPlayer.setIsLooping(!TracklistPlayer.isLooping());
 
         });
 
@@ -151,8 +158,8 @@ public class QueuePanel extends JPanel {
 
         }
 
-        revalidate();
-        repaint();
+        tracklistPanel.revalidate();
+        tracklistPanel.repaint();
 
     }
 
@@ -160,8 +167,8 @@ public class QueuePanel extends JPanel {
 
         tracklistPanel.add(createQueueEntryPanel(track, currentTrackNum.get()), 0);
 
-        revalidate();
-        repaint();
+        tracklistPanel.revalidate();
+        tracklistPanel.repaint();
 
     }
 

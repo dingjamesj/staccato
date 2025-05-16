@@ -57,6 +57,12 @@ public class CurrentTrackInfoPanel extends JPanel {
         TracklistPlayer.addSwitchTrackAction(updateTrackInfoAction);
         TracklistPlayer.addStartTrackAction(updateTrackInfoAction);
 
+        TracklistPlayer.addEndTrackActions(() -> {
+
+            currentTrackInfoPanel.clearTrackInfo();
+
+        });
+
     }
 
     public CurrentTrackInfoPanel() {
@@ -190,6 +196,27 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         }
         
+        revalidate();
+        repaint();
+
+    }
+
+    public void clearTrackInfo() {
+
+        for(JScrollPane scrollpane: trackInfoScrollPanes) {
+
+            scrollpane.setVisible(false);
+
+        }
+        albumArtLabel.setVisible(false);
+        buttonsPanel.setVisible(false);
+
+        titleLabel.setText("");
+        artistsLabel.setText("");
+        albumLabel.setText("");
+
+        albumArtLabel.setIcon(null);
+
         revalidate();
         repaint();
 

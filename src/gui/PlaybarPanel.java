@@ -40,6 +40,39 @@ public class PlaybarPanel extends JPanel {
 
     public static PlaybarPanel playbarPanel;
 
+    static {
+
+        TracklistPlayer.addEndTrackActions(() -> {
+
+            playbarPanel.setButtonsEnabled(false);
+            playbarPanel.setIsPlaying(false);
+            playbarPanel.setProgressSliderValue(0);
+            playbarPanel.timeElapsedLabel.setText("-:--");
+            playbarPanel.timeRemainingLabel.setText("-:--");
+
+        });
+
+        TracklistPlayer.addPlaybackUpdateAction(() -> {
+
+            if(playbarPanel.isProgressSliderBeingPressed) {
+
+                return;
+
+            }
+
+            SwingUtilities.invokeLater(() -> {
+
+                playbarPanel.timeElapsedLabel.setText(formatMinutesSeconds(TracklistPlayer.getCurrentTrackTime()));
+                playbarPanel.timeRemainingLabel.setText("-" + formatMinutesSeconds(TracklistPlayer.getCurrentTrackTotalDuration() - TracklistPlayer.getCurrentTrackTime()));
+                playbarPanel.setProgressSliderValue((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
+                playbarPanel.progressSlider.repaint();
+                
+            });
+
+        });
+
+    }
+
     public PlaybarPanel() {
 
         setLayout(new GridBagLayout());
@@ -164,31 +197,6 @@ public class PlaybarPanel extends JPanel {
 
         });
 
-        TracklistPlayer.addPlaybackUpdateAction(() -> {
-
-            if(isProgressSliderBeingPressed) {
-
-                return;
-
-            }
-
-            SwingUtilities.invokeLater(() -> {
-
-                timeElapsedLabel.setText(formatMinutesSeconds(TracklistPlayer.getCurrentTrackTime()));
-                timeRemainingLabel.setText("-" + formatMinutesSeconds(TracklistPlayer.getCurrentTrackTotalDuration() - TracklistPlayer.getCurrentTrackTime()));
-                setProgressSliderValue((int) (TracklistPlayer.getCurrentTrackTimeProportion() * PROGRESS_BAR_MAX_VALUE));
-                progressSlider.repaint();
-                
-            });
-
-        });
-
-        TracklistPlayer.addStartTrackAction(() -> {
-
-            progressSlider.setEnabled(true);
-
-        });
-
         //-----------------END ACTION LISTENERS-----------------
 
     }
@@ -198,6 +206,7 @@ public class PlaybarPanel extends JPanel {
         playPauseButton.setEnabled(enabled);
         goBackButton.setEnabled(enabled);
         skipButton.setEnabled(enabled);
+        progressSlider.setEnabled(enabled);
 
     }
 

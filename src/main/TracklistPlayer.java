@@ -28,6 +28,7 @@ public abstract class TracklistPlayer {
     public static Set<Runnable> startTrackActions = new HashSet<Runnable>();
     public static Set<Runnable> switchTrackActions = new HashSet<Runnable>();
     public static Set<Runnable> playbackUpdateActions = new HashSet<Runnable>();
+    public static Set<Runnable> endTrackActions = new HashSet<Runnable>();
 
     private static MediaPlayer activeMediaPlayer;
     private static final AtomicInteger currentTrackNum = new AtomicInteger(0);
@@ -128,7 +129,13 @@ public abstract class TracklistPlayer {
 
             if(!loopIsOn.get()) {
 
-                //isPlaying remains false here
+                isPlaying.set(false);
+                for(Runnable action: endTrackActions) {
+
+                    action.run();
+
+                }
+                
                 return;
 
             }
@@ -283,6 +290,18 @@ public abstract class TracklistPlayer {
     public static void clearStartTrackActions() {
 
         startTrackActions.clear();
+
+    }
+
+    public static void addEndTrackActions(Runnable action) {
+
+        endTrackActions.add(action);
+
+    }
+
+    public static void clearEndTrackActions() {
+
+        endTrackActions.clear();
 
     }
 
