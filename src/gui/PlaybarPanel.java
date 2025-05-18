@@ -2,8 +2,6 @@ package gui;
 
 import java.awt.Font;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -15,6 +13,7 @@ import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 
 import main.TracklistPlayer;
+import net.miginfocom.swing.MigLayout;
 
 public class PlaybarPanel extends JPanel {
 
@@ -75,8 +74,9 @@ public class PlaybarPanel extends JPanel {
 
     public PlaybarPanel() {
 
-        setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        setLayout(new MigLayout(
+            "insets 0 0 0 0"
+        ));
 
         //------------------BEGIN GUI BUILDING------------------
 
@@ -84,7 +84,7 @@ public class PlaybarPanel extends JPanel {
         playPauseButton = new JButton(PLAY_ICON);
         skipButton = new JButton(SKIP_ICON);
         timeElapsedLabel = new JLabel("-:--");
-        timeRemainingLabel = new JLabel("--:--");
+        timeRemainingLabel = new JLabel("-:--");
         progressSlider = new JSlider(JSlider.HORIZONTAL, 0, PROGRESS_BAR_MAX_VALUE, 0);
 
         timeElapsedLabel.setFont(TIME_FONT);
@@ -95,52 +95,12 @@ public class PlaybarPanel extends JPanel {
         goBackButton.setEnabled(false);
         skipButton.setEnabled(false);
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.anchor = GridBagConstraints.LAST_LINE_START;
-        constraints.fill = GridBagConstraints.NONE;
-        add(timeElapsedLabel, constraints);
-
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.weightx = 0;
-        constraints.weighty = 1;
-        constraints.anchor = GridBagConstraints.CENTER;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(0, 0, 0, BUTTONS_SPACING);
-        add(goBackButton, constraints);
-        constraints.gridx = 2;
-        add(playPauseButton, constraints);
-        constraints.gridx = 3;
-        constraints.insets = new Insets(0, 0, 0, 0);
-        add(skipButton, constraints);
-
-        constraints.gridx = 4;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.anchor = GridBagConstraints.LAST_LINE_END;
-        constraints.fill = GridBagConstraints.NONE;
-        add(timeRemainingLabel, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 5;
-        constraints.gridheight = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 0;
-        constraints.anchor = GridBagConstraints.CENTER;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(BUTTONS_TO_PROGRESSBAR_GAP, 0, 0, 0);
-        add(progressSlider, constraints);
+        add(timeElapsedLabel, "cell 0 0, span 1 1, pushx, pushy, align left bottom");
+        add(goBackButton, "cell 1 0, span 1 1, pushy, align center center");
+        add(playPauseButton, "cell 2 0, span 1 1, pushy, align center center, gapleft " + BUTTONS_SPACING);
+        add(skipButton, "cell 3 0, span 1 1, pushy, align center center, gapleft " + BUTTONS_SPACING);
+        add(timeRemainingLabel, "cell 4 0, span 1 1, pushx, pushy, align right bottom");
+        add(progressSlider, "cell 0 1, span 5 1, pushx, align center center, growx, gaptop " + BUTTONS_TO_PROGRESSBAR_GAP);
 
         //-------------------END GUI BUILDING-------------------
 
