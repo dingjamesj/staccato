@@ -1,7 +1,7 @@
 package gui;
 
 import java.awt.Font;
-import java.awt.GridBagConstraints;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
+
+import com.formdev.flatlaf.ui.FlatSliderUI;
 
 import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
@@ -24,9 +26,8 @@ public class PlaybarPanel extends JPanel {
     private static final ImageIcon GO_BACK_ICON = GUIUtil.createImageIcon("src/main/resources/go back.png");
     
     //GUI spacing constants
-    private static final int BUTTONS_TO_PROGRESSBAR_GAP = 0;
-    private static final int BUTTONS_SPACING = 9;
     private static final int PROGRESS_BAR_MAX_VALUE = 1000;
+    private static final int TIMESTAMP_LABEL_WIDTH = 100;
 
     private JLabel timeElapsedLabel;
     private JLabel timeRemainingLabel;
@@ -89,18 +90,40 @@ public class PlaybarPanel extends JPanel {
 
         timeElapsedLabel.setFont(TIME_FONT);
         timeRemainingLabel.setFont(TIME_FONT);
-        progressSlider.setEnabled(false);
-        progressSlider.setAlignmentX(CENTER_ALIGNMENT);
+        timeRemainingLabel.setHorizontalAlignment(JLabel.RIGHT);
         playPauseButton.setEnabled(false);
         goBackButton.setEnabled(false);
         skipButton.setEnabled(false);
+        progressSlider.setEnabled(false);
+        progressSlider.setAlignmentX(CENTER_ALIGNMENT);
+        //Only show the slider's thumb button when the slider is being pressed on
+        progressSlider.setUI(new FlatSliderUI() {
 
-        add(timeElapsedLabel, "cell 0 0, span 1 1, pushx, pushy, align left bottom");
-        add(goBackButton, "cell 1 0, span 1 1, pushy, align center center");
-        add(playPauseButton, "cell 2 0, span 1 1, pushy, align center center, gapleft " + BUTTONS_SPACING);
-        add(skipButton, "cell 3 0, span 1 1, pushy, align center center, gapleft " + BUTTONS_SPACING);
-        add(timeRemainingLabel, "cell 4 0, span 1 1, pushx, pushy, align right bottom");
-        add(progressSlider, "cell 0 1, span 5 1, pushx, align center center, growx, gaptop " + BUTTONS_TO_PROGRESSBAR_GAP);
+            @Override
+            public void paintThumb(Graphics g) {
+
+                if(isProgressSliderBeingPressed && progressSlider.isEnabled()) {
+
+                    super.paintThumb(g);
+
+                }
+
+                //Otherwise do nothing
+
+            }
+
+        });
+
+        // progressSlider.setOpaque(true);
+        // progressSlider.setBackground(Color.red);
+        // setBackground(Color.cyan);
+
+        add(timeElapsedLabel, "cell 0 0, span 1 1, pushx, pushy, align left bottom, gapleft 9" + ", wmin " + TIMESTAMP_LABEL_WIDTH + ", wmax " + TIMESTAMP_LABEL_WIDTH);
+        add(goBackButton, "cell 1 0, span 1 1, pushy, align center bottom");
+        add(playPauseButton, "cell 2 0, span 1 1, pushy, align center bottom");
+        add(skipButton, "cell 3 0, span 1 1, pushy, align center bottom");
+        add(timeRemainingLabel, "cell 4 0, span 1 1, pushx, pushy, align right bottom, gapright 9" + ", wmin " + TIMESTAMP_LABEL_WIDTH + ", wmax " + TIMESTAMP_LABEL_WIDTH);
+        add(progressSlider, "cell 0 1, span 5 1, pushx, align center center, growx");
 
         //-------------------END GUI BUILDING-------------------
 

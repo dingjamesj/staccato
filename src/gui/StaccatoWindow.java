@@ -98,7 +98,7 @@ public class StaccatoWindow extends JFrame {
 
 		PlaybarPanel playbarPanel = new PlaybarPanel();
 		// playbarPanel.setBackground(Color.cyan);
-		add(playbarPanel, "cell 1 1, span 1 1, grow, pad 0 " + GUI_TO_WINDOW_SIDES_GAP + " -" + GUI_TO_WINDOW_BOTTOM_GAP + " -" + GUI_TO_WINDOW_SIDES_GAP + " 0");
+		add(playbarPanel, "cell 1 1, span 1 1, grow, pad 0 0 " + -GUI_TO_WINDOW_BOTTOM_GAP + " 0");
 		
 		//--------END PANEL PLACEMENT-------
 		
