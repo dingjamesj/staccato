@@ -62,6 +62,12 @@ public class QueuePanel extends JPanel {
 
         });
 
+        TracklistPlayer.addStartTrackAction(() -> {
+
+            queuePanel.setTracksInGUI(TracklistPlayer.getCurrentlyPlayingTrackNumber());
+            
+        });
+
     }
 
     public QueuePanel() {

@@ -45,10 +45,24 @@ public class PlaybarPanel extends JPanel {
 
     static {
 
+        TracklistPlayer.addStartTrackAction(() -> {
+
+            playbarPanel.setButtonsEnabled(true);
+            playbarPanel.setButtonsMode(true);
+
+        });
+        
+        TracklistPlayer.addSwitchTrackAction(() -> {
+
+            playbarPanel.setButtonsEnabled(true);
+            playbarPanel.setButtonsMode(true);
+            
+        });
+
         TracklistPlayer.addEndTrackActions(() -> {
 
             playbarPanel.setButtonsEnabled(false);
-            playbarPanel.setIsPlaying(false);
+            playbarPanel.setButtonsMode(false);
             playbarPanel.setProgressSliderValue(0);
             playbarPanel.timeElapsedLabel.setText("-:--");
             playbarPanel.timeRemainingLabel.setText("-:--");
@@ -249,7 +263,7 @@ public class PlaybarPanel extends JPanel {
 
     }
 
-    public void setIsPlaying(boolean isPlaying) {
+    public void setButtonsMode(boolean isPlaying) {
 
         if(isPlaying) {
 

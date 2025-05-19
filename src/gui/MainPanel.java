@@ -444,9 +444,6 @@ public class MainPanel extends JPanel {
     private void playTracksAction(Track[] tracks, int startingTrackIndex) {
 
         TracklistPlayer.playTracks(tracks, startingTrackIndex);
-        PlaybarPanel.playbarPanel.setButtonsEnabled(true);
-        PlaybarPanel.playbarPanel.setIsPlaying(true);
-        QueuePanel.queuePanel.setTracksInGUI(startingTrackIndex);
 
     }
 
