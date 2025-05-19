@@ -1,8 +1,11 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,6 +37,8 @@ public class QueuePanel extends JPanel {
     private static final int QUEUE_OPTIONS_BUTTON_SIZE = 35;
     private static final int TITLE_LABEL_TO_BUTTONS_GAP_PX = 12;
     private static final int BUTTONS_GAP_PX = 0;
+    
+    private static final Color HIGHLIGHTED_ROW_COLOR = new Color(0x272727);
 
     private JPanel tracklistPanel;
     private final AtomicInteger currentTrackNum = new AtomicInteger(0);
@@ -187,6 +192,24 @@ public class QueuePanel extends JPanel {
 
         trackPanel.add(numberLabel, "cell 0 0, align center");
         trackPanel.add(titleLabel, "cell 1 0, pushx, wmax " + (int) (TITLE_COLUMN_WIDTH_PROPORTION * 100) + "%");
+
+        trackPanel.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                trackPanel.setBackground(HIGHLIGHTED_ROW_COLOR);
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                trackPanel.setBackground(getBackground());
+
+            }
+
+        });
 
         return trackPanel;
 

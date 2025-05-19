@@ -59,6 +59,7 @@ public class MainPanel extends JPanel {
     private static final ImageIcon SHUFFLE_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
 
     private static final Color ALTERNATE_TRACKLIST_ROW_COLOR = new Color(0x151515);
+    private static final Color HIGHLIGHTED_TRACKLIST_ROW_COLOR = new Color(0x303030);
 
     //---------------------------------------- /\ VISUALS /\ ----------------------------------------
     //-----------------------------------------------------------------------------------------------
@@ -82,6 +83,7 @@ public class MainPanel extends JPanel {
     private static final double TRACK_ALBUM_COLUMN_WIDTH_PROPORTION = 0.3;
     private static final double PLAYLIST_INFO_PANEL_HEIGHT_PROPORTION = 0.27;
     private static final int TRACK_EDIT_COLUMN_WIDTH_PX = 10;
+    private static final int TRACKLIST_ROW_TO_PANEL_EDGE_SPACING_PX = 9;
 
     //--------------------------------------- \/ VARIABLES \/ ---------------------------------------
 
@@ -264,7 +266,8 @@ public class MainPanel extends JPanel {
         constraints.weightx = 1;
         constraints.insets = new Insets(0, 0, 0, 0);
         constraints.anchor = GridBagConstraints.CENTER;
-        playlistInfoPanel.add(new JPanel(), constraints);
+        JPanel gluePanel = new JPanel(); gluePanel.setOpaque(false);
+        playlistInfoPanel.add(gluePanel, constraints);
 
         constraints.gridx = 3;
         constraints.gridy = 0;
@@ -417,11 +420,16 @@ public class MainPanel extends JPanel {
 
             }
 
-            JPanel trackPanel = createTrackEntry(tracks[i], i);
+            JPanel trackPanel;
             if(i % 2 == 0) {
 
+                trackPanel = createTrackEntry(tracks[i], i, ALTERNATE_TRACKLIST_ROW_COLOR);
                 trackPanel.setBackground(ALTERNATE_TRACKLIST_ROW_COLOR);
 
+            } else {
+
+                trackPanel = createTrackEntry(tracks[i], i, getBackground());
+                
             }
 
             tracklistPanel.add(trackPanel);
@@ -522,7 +530,7 @@ public class MainPanel extends JPanel {
 
     }
 
-    private JPanel createTrackEntry(Track track, int trackIndex) {
+    private JPanel createTrackEntry(Track track, int trackIndex, Color defaultBackgroundColor) {
 
         JPanel trackPanel = new JPanel(new MigLayout(
             "insets " + TRACKLIST_ROWS_SPACING + " 0 " + TRACKLIST_ROWS_SPACING + " 0",
@@ -554,15 +562,16 @@ public class MainPanel extends JPanel {
         titleAndArtistsPanel.add(artistsLabel);
         trackPanel.add(titleAndArtistsPanel, "cell 1 0, pushx, wmax " + (int) (TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(albumLabel, "cell 2 0, wmax " + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%");
-        trackPanel.add(editTrackButton, "cell 3 0");
-        trackPanel.add(new JPanel(), "cell 4 0");
+        trackPanel.add(editTrackButton, "cell 3 0, gapright " + TRACKLIST_ROW_TO_PANEL_EDGE_SPACING_PX);
 
         trackPanel.addMouseListener(new MouseAdapter() {
 
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
+            private Color _defaultBackgroundColor = defaultBackgroundColor;
 
-                if(mouseEvent.getClickCount() < 2) {
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+                if(e.getClickCount() < 2) {
 
                     return;
 
@@ -579,6 +588,20 @@ public class MainPanel extends JPanel {
                     playTracksAction(currentTracklist, trackIndex);
                     
                 }
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                trackPanel.setBackground(HIGHLIGHTED_TRACKLIST_ROW_COLOR);
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                trackPanel.setBackground(_defaultBackgroundColor);
 
             }
 
