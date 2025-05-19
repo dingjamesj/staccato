@@ -22,8 +22,10 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -541,6 +543,9 @@ public class MainPanel extends JPanel {
         JLabel artistsLabel = new JLabel(track.getArtists() != null && !track.getArtists().isBlank() ? track.getArtists() : "[Unknown Artists]");
         JLabel albumLabel = new JLabel(track.getAlbum() != null && !track.getAlbum().isBlank() ? track.getAlbum() : "[No Album]");
         JButton editTrackButton = new JButton(MORE_OPTIONS_ICON);
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem redownloadTrackMenuItem = new JMenuItem("Redownload Track");
+        JMenuItem editMetadataMenuItem = new JMenuItem("Edit Track Info");
 
         titleAndArtistsPanel.setLayout(new BoxLayout(titleAndArtistsPanel, BoxLayout.Y_AXIS));
         titleAndArtistsPanel.setOpaque(false);
@@ -560,6 +565,8 @@ public class MainPanel extends JPanel {
         trackPanel.add(titleAndArtistsPanel, "cell 1 0, pushx, wmax " + (int) (TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(albumLabel, "cell 2 0, wmax " + (int) (TRACK_ALBUM_COLUMN_WIDTH_PROPORTION * 100) + "%");
         trackPanel.add(editTrackButton, "cell 3 0, gapright " + TRACKLIST_ROW_TO_PANEL_EDGE_SPACING_PX);
+        popupMenu.add(redownloadTrackMenuItem);
+        popupMenu.add(editMetadataMenuItem);
 
         trackPanel.addMouseListener(new MouseAdapter() {
 
@@ -597,6 +604,17 @@ public class MainPanel extends JPanel {
             public void mouseExited(MouseEvent e) {
 
                 trackPanel.setBackground(defaultBackgroundColor);
+
+            }
+
+        });
+
+        editTrackButton.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                popupMenu.show(editTrackButton, e.getX(), e.getY());
 
             }
 
