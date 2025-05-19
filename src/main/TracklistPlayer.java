@@ -109,23 +109,27 @@ public abstract class TracklistPlayer {
     }
 
     /**
-     * Stops the current media player, <br></br>
-     * Runs the next track actions, <br></br>
-     * Tries to increment the current track number if there are more tracks, and if that's the case... <br></br>
-     * Plays the music with MediaPlayer and 
-     * <b>
-     * assigns setOnEndOfMedia to repeat this process for the next track.
-     * </b>
+     * Calls 
+     * <code>
+     * advanceTrackQueue(1);
+     * </code>
      */
-    private synchronized static void playNextTrack() {
+    public synchronized static void playNextTrack() {
 
-        if(activeMediaPlayer != null) {
+        advanceTrackQueue(1);
 
-            activeMediaPlayer.stop();
+    }
 
-        }
+    /**
+     * Advances the queue by <code>numAdvance</code>. <br></br>
+     * If the queue goes out of bounds and if looping is on, then the queue wraps back from the beginning. <br></br>
+     * Otherwise, playback stops.
+     */
+    public synchronized static void advanceTrackQueue(int numAdvance) {
 
-        if(currentTrackNum.incrementAndGet() >= queuedTracks.size()) {
+        int newTrackNum = currentTrackNum.get() + numAdvance;
+        //Wrap the track number if it went over the queue size and if looping is on
+        if(newTrackNum >= queuedTracks.size()) {
 
             if(!loopIsOn.get()) {
 
@@ -140,11 +144,51 @@ public abstract class TracklistPlayer {
 
             }
             
-            currentTrackNum.set(currentTrackNum.get() % queuedTracks.size());
+            newTrackNum %= queuedTracks.size();
+
+        } else if(newTrackNum < 0) {
+
+            if(!loopIsOn.get()) {
+
+                newTrackNum = 0;
+
+            } else {
+
+                while(newTrackNum < 0) {
+
+                    newTrackNum += queuedTracks.size();
+
+                }
+
+            }
 
         }
 
-        Media nextMedia = new Media(new File(queuedTracks.get(currentTrackNum.get()).getFileLocation()).toURI().toString());
+        skipToTrack(newTrackNum);
+
+    }
+
+    /**
+     * Stops the current media player, <br></br>
+     * Runs the next track actions, <br></br>
+     * Skips to the specified track index, <br></br>
+     * And plays the music with MediaPlayer and 
+     * <b>
+     * assigns setOnEndOfMedia to repeat this process for the next track.
+     * </b>
+     * @param queueIndex
+     */
+    public synchronized static void skipToTrack(int queueIndex) {
+
+        if(activeMediaPlayer != null) {
+
+            activeMediaPlayer.stop();
+
+        }
+
+        currentTrackNum.set(queueIndex);
+
+        Media nextMedia = new Media(new File(queuedTracks.get(queueIndex).getFileLocation()).toURI().toString());
         activeMediaPlayer = new MediaPlayer(nextMedia);
         activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
 
@@ -193,19 +237,6 @@ public abstract class TracklistPlayer {
 
     }
 
-    public synchronized static void skipTrack() {
-
-        if(activeMediaPlayer == null) {
-
-            return;
-            
-        }
-
-        //Note we don't need to increment currentTrackNum (is incremented in playNextTrack())
-        playNextTrack();
-
-    }
-
     /**
      * If is called <code>GO_TO_PREVIOUS_TIME_LIMIT</code> amount of seconds after the start of the track, this will restart the track. <br></br>
      * Otherwise, it will go to the previous track.
@@ -222,23 +253,9 @@ public abstract class TracklistPlayer {
 
             activeMediaPlayer.seek(Duration.millis(0));
 
-        } else if(currentTrackNum.get() == 0) {
-
-            if(!loopIsOn.get()) {
-
-                activeMediaPlayer.seek(Duration.millis(0));
-
-            } else {
-
-                currentTrackNum.set(queuedTracks.size() - 2);
-                playNextTrack();
-
-            }
-
         } else {
 
-            currentTrackNum.addAndGet(-2);
-            playNextTrack();
+            advanceTrackQueue(-1);
 
         }
 

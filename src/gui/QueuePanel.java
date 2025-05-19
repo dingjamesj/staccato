@@ -50,7 +50,7 @@ public class QueuePanel extends JPanel {
 
         TracklistPlayer.addSwitchTrackAction(() -> {
 
-            queuePanel.updateQueue();
+            queuePanel.updateQueueGUI();
 
         });
 
@@ -107,28 +107,28 @@ public class QueuePanel extends JPanel {
      * If the current track number is one AHEAD the TracklistPlayer, then add the currently playing track to the front of the queue GUI. <br></br>
      * If the current track number is MORE THAN ONE ahead/behind the TracklistPlayer, then just reset the queue GUI.
      */
-    private synchronized void updateQueue() {
+    private synchronized void updateQueueGUI() {
 
         if(currentTrackNum.get() == TracklistPlayer.getCurrentlyPlayingTrackNumber() - 1) {
 
             currentTrackNum.incrementAndGet();
-            removeFirstTrack();
+            removeGUIFirstTrack();
 
         } else if(currentTrackNum.get() == TracklistPlayer.getCurrentlyPlayingTrackNumber() + 1) {
 
             currentTrackNum.decrementAndGet();
-            addTrackToFront(TracklistPlayer.getCurrentlyPlayingTrack());
+            addTrackToGUIFront(TracklistPlayer.getCurrentlyPlayingTrack());
 
         } else {
 
             currentTrackNum.set(TracklistPlayer.getCurrentlyPlayingTrackNumber());
-            addTracksToGUI(0);
+            setTracksInGUI(currentTrackNum.get());
 
         }
 
     }
 
-    public synchronized void addTracksToGUI(int startingTrackIndex) {
+    public synchronized void setTracksInGUI(int startingTrackIndex) {
 
         tracklistPanel.removeAll();
         currentTrackNum.set(startingTrackIndex);
@@ -151,7 +151,7 @@ public class QueuePanel extends JPanel {
 
     }
 
-    private synchronized void removeFirstTrack() {
+    private synchronized void removeGUIFirstTrack() {
 
         try {
 
@@ -168,7 +168,7 @@ public class QueuePanel extends JPanel {
 
     }
 
-    private synchronized void addTrackToFront(Track track) {
+    private synchronized void addTrackToGUIFront(Track track) {
 
         tracklistPanel.add(createQueueEntryPanel(track, currentTrackNum.get()), 0);
 
@@ -206,6 +206,19 @@ public class QueuePanel extends JPanel {
             public void mouseExited(MouseEvent e) {
 
                 trackPanel.setBackground(getBackground());
+
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                if(e.getClickCount() < 2) {
+
+                    return;
+
+                }
+
+                TracklistPlayer.skipToTrack(trackNum);
 
             }
 

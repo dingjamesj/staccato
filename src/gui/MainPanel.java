@@ -446,7 +446,7 @@ public class MainPanel extends JPanel {
         TracklistPlayer.playTracks(tracks, startingTrackIndex);
         PlaybarPanel.playbarPanel.setButtonsEnabled(true);
         PlaybarPanel.playbarPanel.setIsPlaying(true);
-        QueuePanel.queuePanel.addTracksToGUI(startingTrackIndex);
+        QueuePanel.queuePanel.setTracksInGUI(startingTrackIndex);
 
     }
 
@@ -566,8 +566,6 @@ public class MainPanel extends JPanel {
 
         trackPanel.addMouseListener(new MouseAdapter() {
 
-            private Color _defaultBackgroundColor = defaultBackgroundColor;
-
             @Override
             public void mousePressed(MouseEvent e) {
 
@@ -601,7 +599,7 @@ public class MainPanel extends JPanel {
             @Override
             public void mouseExited(MouseEvent e) {
 
-                trackPanel.setBackground(_defaultBackgroundColor);
+                trackPanel.setBackground(defaultBackgroundColor);
 
             }
 
