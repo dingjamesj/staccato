@@ -1,4 +1,4 @@
-# Fetches Spotify information
+# Fetches Spotify and YouTube information
 
 import platform
 
@@ -13,25 +13,27 @@ NUM_ACCEPTED_SEARCHES = 3
 api_keys: list[str] = []
 market: str = ""
 
+# In the order of client id, client secret, and market
 def read_api_settings():
+    global market
     try:
-        file = open(SETTINGS_FILE_LOCATION, "r")
-        api_keys.clear()
-        api_keys.append(file.readline().strip())
-        api_keys.append(file.readline().strip())
-        market = file.readline().strip()
-        file.close()
+        with open(SETTINGS_FILE_LOCATION, "r") as file:
+            api_keys.clear()
+            api_keys.append(file.readline().strip())
+            api_keys.append(file.readline().strip())
+            market = file.readline().strip()
     except IOError as e:
         print(e)
+    if market == "":
+        market = "US"
 
 def change_api_settings(client_id: str, client_secret: str, market: str):
     try:
-        file = open(SETTINGS_FILE_LOCATION, "w")
-        if platform.system().lower() == "windows":
-            file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
-        else:
-            file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
-        file.close()
+        with open(SETTINGS_FILE_LOCATION, "w") as file:
+            if platform.system().lower() == "windows":
+                file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
+            else:
+                file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
     except IOError as e:
         print(e)
 
@@ -47,7 +49,8 @@ def search_youtube(title: str, artists: str) -> str:
     # Search for the top few videos---searching with "{Title} {1st artist}"
     # e.g. "née-nah 21 Savage"
     ydl_opts: dict = {
-        "ignoreerrors": True
+        "ignoreerrors": True,
+        "quiet": True
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info: dict = ydl.extract_info(url=f"ytsearch{NUM_ACCEPTED_SEARCHES}:{title} {artists}", download=False)
@@ -100,25 +103,4 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
     return score
 
 if __name__ == "__main__":
-    # tracks = None
-    # tracks = get_spotify_playlist_tracks("https://open.spotify.com/playlist/1zUUwGZh02drh2M13yNcVD?si=fe3a24a9e483426b")
-    # print(tracks)
-    # print("\n")
-    # print(type(tracks))
-    # print(type(tracks[0]))
-
-    # tracks_java_data = send_tracks_to_java("https://open.spotify.com/playlist/1zUUwGZh02drh2M13yNcVD?si=fe3a24a9e483426b")
-    # for data in tracks_java_data:
-    #     print(data["title"])
-    #     print(data["artists"])
-    #     print(data["album"])
-    #     print(data["artworkURL"])
-    #     print(data["youtubeID"])
-    #     print()
-    
-    # print(send_tracks_to_java("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=c3ad19f5390b4aa1"))
-    # print(send_tracks_to_java("https://open.spotify.com/track/5SIvP6TdWc9DNvKbENjnYc?si=1da78ef172254cf1", True))
-
-    read_api_settings()
-    print(api_keys)
-    pass
+    pass    

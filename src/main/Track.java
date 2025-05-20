@@ -1,13 +1,15 @@
 package main;
 
-import java.io.ByteArrayOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URLConnection;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -194,6 +196,12 @@ public class Track {
 		return artworkByteArray;
 		
 	}
+
+	public String getArtworkURL() {
+
+		return artworkURL;
+
+	}
 	
 	public int getDuration() {
 
@@ -225,6 +233,12 @@ public class Track {
 		
 	}
 
+	public void setArtworkByteArray(byte[] artworkByteArray) {
+
+		this.artworkByteArray = artworkByteArray;
+
+	}
+
 	public void setArtworkURL(String artworkURL) {
 		
 		this.artworkURL = artworkURL;
@@ -234,7 +248,7 @@ public class Track {
 	/**
 	 * Reads the track file's metadata and stores it in this track object. 
 	 */
-	private void setAttributesFromFileMetadata() {
+	private synchronized void setAttributesFromFileMetadata() {
 
 		if(!canRead()) {
 
@@ -276,7 +290,7 @@ public class Track {
 	/**
 	 * Writes this track object's attributes onto the track file
 	 */
-	public void writeMetadata() {
+	public synchronized void writeMetadata() {
 		
 		if(!canRead()) {
 			
@@ -290,19 +304,38 @@ public class Track {
 			Tag tag = audioFile.getTag();
 			
 			Artwork coverImage = null;
-			if(artworkURL != null) {
-				
-				//Get the artwork byte array from online
-				URL url = new URI(artworkURL).toURL();
-				ByteArrayOutputStream coverImageURLByteArrayStream = new ByteArrayOutputStream();
-				url.openStream().transferTo(coverImageURLByteArrayStream);
-				byte[] artworkByteArray = coverImageURLByteArrayStream.toByteArray();
-				coverImageURLByteArrayStream.close();
+			if(artworkURL != null || artworkByteArray != null) {
+
+				byte[] newArtworkByteArray;
+				if(artworkURL != null) {
+
+					newArtworkByteArray = FileManager.readByteArray(artworkURL);
+
+				} else {
+
+					newArtworkByteArray = artworkByteArray;
+
+				}
+
+				//Validate the byte array and get the MIME type (png, jpg, or jpeg)
+				BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(newArtworkByteArray));
+				if(bufferedImage == null) {
+
+					throw new IOException("Image from URL " + artworkURL + " cannot be decoded.");
+
+				}
+				String mime = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(newArtworkByteArray));
+				if(mime == null) {
+
+					throw new IOException("Cannot determine image type from URL " + artworkURL);
+
+				}
 
 				//Write the artwork byte array to the mp3 file and to memory
 				coverImage = ArtworkFactory.getNew();
-				coverImage.setBinaryData(artworkByteArray);
-				this.artworkByteArray = artworkByteArray;
+				coverImage.setMimeType(mime);
+				coverImage.setBinaryData(newArtworkByteArray);
+				this.artworkByteArray = newArtworkByteArray;
 				
 			}
 			
@@ -311,6 +344,7 @@ public class Track {
 			tag.setField(FieldKey.ALBUM, album);
 			if(coverImage != null) {
 				
+				tag.deleteArtworkField();
 				tag.setField(coverImage);
 				
 			}
@@ -328,15 +362,45 @@ public class Track {
 	@Override
 	public int hashCode() {
 
-		return fileLocation.hashCode() + title.hashCode() + artists.hashCode() + album.hashCode();
+		int hashCode = 0;
+		if(fileLocation != null) {
+
+			hashCode += fileLocation.hashCode();
+
+		}
+		if(title != null) {
+
+			hashCode += title.hashCode();
+
+		}
+		if(artists != null) {
+
+			hashCode += artists.hashCode();
+
+		}
+		if(album != null) {
+
+			hashCode += album.hashCode();
+
+		}
+
+		return hashCode;
 
 	}
 
 	@Override
 	public String toString() {
 		
-		return "\"" + title + "\" [" + formatHoursMinutesSeconds(duration) + "] from \"" + album + "\" by " + artists;
+		String toString = "\"" + null + "\" [" + formatHoursMinutesSeconds(duration) + "] from \"" + album + "\" by " + artists;
 		
+		if(artworkURL != null && !artworkURL.isBlank()) {
+
+			toString += " (artwork @ " + artworkURL + ")";
+
+		}
+
+		return toString;
+
 	}
 
 	@Override
@@ -417,6 +481,12 @@ public class Track {
     }
 
 	private static String formatHoursMinutesSeconds(int seconds) {
+
+		if(seconds < 0) {
+
+			return "--:--";
+
+		}
 
         String minutesStr = String.format("%02d", (seconds % 3600) / 60);
         String secondsStr = String.format("%02d", (seconds % 3600) % 60);

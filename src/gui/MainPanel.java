@@ -628,7 +628,7 @@ public class MainPanel extends JPanel {
 
         editMetadataMenuItem.addActionListener((unused) -> {
 
-            GUIUtil.createEditMetadataDialog();
+            GUIUtil.createEditMetadataDialog(track);
 
         });
 

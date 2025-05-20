@@ -58,12 +58,18 @@ public class JavaLink {
 
         try {
 
-            tracks = getTracks("tps://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", false);
+            tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", true);
 
         } catch(SpotipyException e) {
 
             e.printStackTrace();
 
+        }
+
+        for(Track track: tracks) {
+
+            System.out.println(track);
+            
         }
 
         // tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", false);
@@ -84,11 +90,7 @@ public class JavaLink {
 
         }
 
-        int i = 0;
         for(Track track: tracks) {
-
-            System.out.println("2." + i);
-            i++;
 
             System.out.println(track);
             

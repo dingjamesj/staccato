@@ -3,6 +3,10 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.Box;
@@ -10,23 +14,33 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 
+import main.FileManager;
+import main.Track;
 import net.miginfocom.swing.MigLayout;
 
 public abstract class GUIUtil {
     
     private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
-    private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 500);
+    private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
     private static final int REDOWNLOAD_FIELD_GAPRIGHT_PX = 55;
     private static final int REDOWNLOAD_PROGRESSBAR_GAPTOP_PX = 10;
+    private static final int EDIT_METADATA_BOTTOM_BUTTONS_GAP_PX = 5;
+    private static final int EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX = 64;
+    private static final int EDIT_METADATA_ARTWORK_BUTTON_TO_LABEL_GAP_PX = 3;
+    private static final int EDIT_METADATA_ARTWORK_URL_LABEL_MAX_WIDTH_PX = 240;
+    private static final int EDIT_METADATA_MIN_VERTICAL_GAP_PX = 5;
 
+    private static final ImageIcon EDIT_METADATA_ADD_ARTWORK_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final Font POPUP_TITLE_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 24);
 
     public static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
@@ -103,7 +117,7 @@ public abstract class GUIUtil {
         JTextField urlField = new JTextField();
         JProgressBar downloadProgressBar = new JProgressBar();
         JButton downloadButton = new JButton("Download");
-        JButton okayButton = new JButton("OK");
+        JButton okButton = new JButton("OK");
 
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
 
@@ -140,12 +154,22 @@ public abstract class GUIUtil {
         );
 
         dialog.add(
-            okayButton, ""
+            okButton, ""
             + "cell 1 3, "
             + "span 1 1, "
             + "align right bottom, "
             + "pushy"
         );
+
+        //--------------------------START ADDING ACTION LISTENERS--------------------------
+
+        okButton.addActionListener((unused) -> {
+
+            dialog.dispose();
+
+        });
+
+        //---------------------------END ADDING ACTION LISTENERS---------------------------
 
         dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
         dialog.setVisible(true);
@@ -154,12 +178,12 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createEditMetadataDialog() {
+    public static JDialog createEditMetadataDialog(Track track) {
 
-        JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
+        EditMetadataJDialog dialog = new EditMetadataJDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         dialog.setTitle("Edit Metadata");
-        dialog.setLayout(new MigLayout());
+        dialog.setLayout(new MigLayout("gap 0 " + EDIT_METADATA_MIN_VERTICAL_GAP_PX));
         dialog.setResizable(false);
         dialog.setSize(EDIT_METADATA_WINDOW_SIZE);
 
@@ -171,11 +195,30 @@ public abstract class GUIUtil {
         JTextField titleField = new JTextField();
         JTextField artistsField = new JTextField();
         JTextField albumField = new JTextField();
+        JPanel artworkOptionsPanel = new JPanel();
         JButton artworkButton = new JButton();
+        JLabel artworkURLLabel = new JLabel();
+        JPanel bottomButtonPanel = new JPanel();
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
 
         popupTitleLabel.setFont(POPUP_TITLE_LABEL_FONT);
+        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
+        titleField.setText(track.getTitle());
+        artistsField.setText(track.getArtists());
+        albumField.setText(track.getAlbum());
+        artworkOptionsPanel.setLayout(new MigLayout("insets 0, gap 0"));
+        ImageIcon artworkIcon;
+        if(track.getArtworkByteArray() == null) {
+
+            artworkIcon = EDIT_METADATA_ADD_ARTWORK_ICON;
+
+        } else {
+
+            artworkIcon = createResizedIcon(new ImageIcon(track.getArtworkByteArray()), EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX, EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX, Image.SCALE_SMOOTH);
+
+        }
+        artworkButton.setIcon(artworkIcon);
 
         dialog.add(
             popupTitleLabel, ""
@@ -186,65 +229,156 @@ public abstract class GUIUtil {
         dialog.add(
             titleLabel, ""
             + "cell 0 1, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "align left center, "
         );
 
         dialog.add(
             titleField, ""
             + "cell 1 1, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "pushx, growx"
         );
 
         dialog.add(
             artistsLabel, ""
             + "cell 0 2, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "align left center, "
         );
 
         dialog.add(
             artistsField, ""
             + "cell 1 2, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "pushx, growx"
         );
 
         dialog.add(
             albumLabel, ""
             + "cell 0 3, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "align left center, "
         );
 
         dialog.add(
             albumField, ""
             + "cell 1 3, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "pushx, growx"
         );
 
         dialog.add(
             artworkLabel, ""
             + "cell 0 4, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "align left center, "
         );
 
+        artworkOptionsPanel.add(artworkButton, "cell 0 0, align left center, gapright " + EDIT_METADATA_ARTWORK_BUTTON_TO_LABEL_GAP_PX);
+        artworkOptionsPanel.add(artworkURLLabel, "cell 1 0, align left center, growx 0, wmax " + EDIT_METADATA_ARTWORK_URL_LABEL_MAX_WIDTH_PX);
         dialog.add(
-            artworkButton, ""
+            artworkOptionsPanel, ""
             + "cell 1 4, "
-            + "span 1 1"
+            + "span 1 1, "
+            + "pushx"
         );
 
+        bottomButtonPanel.add(Box.createHorizontalGlue());
+        bottomButtonPanel.add(saveButton);
+        bottomButtonPanel.add(Box.createHorizontalStrut(EDIT_METADATA_BOTTOM_BUTTONS_GAP_PX));
+        bottomButtonPanel.add(cancelButton);
         dialog.add(
-            saveButton, ""
+            bottomButtonPanel, ""
             + "cell 1 5, "
             + "span 1 1, "
-            + "split 2, "
-            + "pushy"
+            + "pushx, pushy, "
+            + "align right bottom"
         );
 
-        dialog.add(cancelButton);
+        //--------------------------START ADDING ACTION LISTENERS--------------------------
+        
+        cancelButton.addActionListener((unused) -> {
+
+            dialog.dispose();
+
+        });
+
+        saveButton.addActionListener((unused) -> {
+
+            track.setTitle(titleField.getText());
+            track.setArtists(artistsField.getText());
+            track.setAlbum(albumField.getText());
+            if(dialog.getArtworkByteArray() != null) {
+
+                track.setArtworkByteArray(dialog.getArtworkByteArray());
+
+            }
+            track.writeMetadata();
+            dialog.dispose();
+
+        });
+
+        artworkButton.addActionListener((unused) -> {
+
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(dialog);
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Images (*.jpg, *.png, *.jpeg)", "jpg", "png", "jpeg"));
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+
+            if(result == JFileChooser.APPROVE_OPTION) {
+
+                File selectedFile = fileChooser.getSelectedFile();
+                try {
+
+                    byte[] artworkByteArray = FileManager.readByteArray(selectedFile);
+                    artworkButton.setIcon(createResizedIcon(new ImageIcon(artworkByteArray), EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX, EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+                    dialog.setArtworkByteArray(artworkByteArray);
+
+                } catch (IOException e) {
+
+                    e.printStackTrace();
+
+                }
+
+            }
+
+        });
+
+        //---------------------------END ADDING ACTION LISTENERS---------------------------
 
         dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
         dialog.setVisible(true);
 
         return dialog;
+
+    }
+
+    /**
+     * Just JDialog with a field to store an artwork byte array
+     */
+    private static class EditMetadataJDialog extends JDialog {
+
+        private byte[] artworkByteArray = null;
+
+        public EditMetadataJDialog(Frame owner, boolean modal) {
+
+            super(owner, modal);
+
+        }
+
+        public byte[] getArtworkByteArray() {
+
+            return artworkByteArray;
+
+        }
+
+        public void setArtworkByteArray(byte[] artworkByteArray) {
+
+            this.artworkByteArray = artworkByteArray;
+
+        }
 
     }
 
