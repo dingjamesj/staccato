@@ -626,6 +626,12 @@ public class MainPanel extends JPanel {
 
         });
 
+        editMetadataMenuItem.addActionListener((unused) -> {
+
+            GUIUtil.createEditMetadataDialog();
+
+        });
+
         return trackPanel;
 
     }

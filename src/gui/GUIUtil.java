@@ -23,10 +23,11 @@ import net.miginfocom.swing.MigLayout;
 public abstract class GUIUtil {
     
     private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
+    private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 500);
     private static final int REDOWNLOAD_FIELD_GAPRIGHT_PX = 55;
     private static final int REDOWNLOAD_PROGRESSBAR_GAPTOP_PX = 10;
 
-    private static final Font REDOWNLOAD_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
+    private static final Font POPUP_TITLE_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 24);
 
     public static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
 
@@ -98,16 +99,16 @@ public abstract class GUIUtil {
         dialog.setResizable(false);
         dialog.setSize(REDOWNLOAD_DIALOG_WINDOW_SIZE);
 
-        JLabel messageLabel = new JLabel("New YouTube URL:");
+        JLabel titleLabel = new JLabel("New YouTube URL:");
         JTextField urlField = new JTextField();
         JProgressBar downloadProgressBar = new JProgressBar();
         JButton downloadButton = new JButton("Download");
         JButton okayButton = new JButton("OK");
 
-        messageLabel.setFont(REDOWNLOAD_TITLE_FONT);
+        titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
 
         dialog.add(
-            messageLabel, ""
+            titleLabel, ""
             + "cell 0 0, "
             + "span 2 1, "
             + "growx"
@@ -145,6 +146,100 @@ public abstract class GUIUtil {
             + "align right bottom, "
             + "pushy"
         );
+
+        dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
+        dialog.setVisible(true);
+
+        return dialog;
+
+    }
+
+    public static JDialog createEditMetadataDialog() {
+
+        JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        dialog.setTitle("Edit Metadata");
+        dialog.setLayout(new MigLayout());
+        dialog.setResizable(false);
+        dialog.setSize(EDIT_METADATA_WINDOW_SIZE);
+
+        JLabel popupTitleLabel = new JLabel("Edit Track Information");
+        JLabel titleLabel = new JLabel("Title: ");
+        JLabel artistsLabel = new JLabel("Artists: ");
+        JLabel albumLabel = new JLabel("Album: ");
+        JLabel artworkLabel = new JLabel("Artwork: ");
+        JTextField titleField = new JTextField();
+        JTextField artistsField = new JTextField();
+        JTextField albumField = new JTextField();
+        JButton artworkButton = new JButton();
+        JButton saveButton = new JButton("Save");
+        JButton cancelButton = new JButton("Cancel");
+
+        popupTitleLabel.setFont(POPUP_TITLE_LABEL_FONT);
+
+        dialog.add(
+            popupTitleLabel, ""
+            + "cell 0 0, "
+            + "span 2 1"
+        );
+
+        dialog.add(
+            titleLabel, ""
+            + "cell 0 1, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            titleField, ""
+            + "cell 1 1, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            artistsLabel, ""
+            + "cell 0 2, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            artistsField, ""
+            + "cell 1 2, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            albumLabel, ""
+            + "cell 0 3, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            albumField, ""
+            + "cell 1 3, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            artworkLabel, ""
+            + "cell 0 4, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            artworkButton, ""
+            + "cell 1 4, "
+            + "span 1 1"
+        );
+
+        dialog.add(
+            saveButton, ""
+            + "cell 1 5, "
+            + "span 1 1, "
+            + "split 2, "
+            + "pushy"
+        );
+
+        dialog.add(cancelButton);
 
         dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
         dialog.setVisible(true);
