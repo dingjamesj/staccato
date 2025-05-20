@@ -187,7 +187,7 @@ public class MainPanel extends JPanel {
                 } catch (FileNotFoundException e) {
 
                     //Dialog box that tells the user to ensure the staccato folder is clear of extraneous files
-                    StaccatoWindow.showDialogPopup("Cannot create playlist file", "<html>Cannot create playlist file.<br></br>Please make sure that the staccato program directory is clear of any extraneous files.</html>", new FlatOptionPaneErrorIcon());
+                    GUIUtil.createPopup("Cannot create playlist file", "<html>Cannot create playlist file.<br></br>Please make sure that the staccato program directory is clear of any extraneous files.</html>", new FlatOptionPaneErrorIcon());
                     e.printStackTrace();
 
                 } catch (IOException e) {
@@ -617,6 +617,12 @@ public class MainPanel extends JPanel {
                 popupMenu.show(editTrackButton, e.getX(), e.getY());
 
             }
+
+        });
+
+        redownloadTrackMenuItem.addActionListener((unused) -> {
+
+            GUIUtil.createRedownloadPopup();
 
         });
 

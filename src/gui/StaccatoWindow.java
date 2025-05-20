@@ -5,19 +5,12 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
 import net.miginfocom.swing.MigLayout;
@@ -113,7 +106,7 @@ public class StaccatoWindow extends JFrame {
 					
 				} else {
 					
-					createPopup("Download In Progress", "Cannot exit program: download is in progress.", new FlatOptionPaneErrorIcon());
+					GUIUtil.createPopup("Download In Progress", "Cannot exit program: download is in progress.", new FlatOptionPaneErrorIcon());
 					
 				}
 				
@@ -123,52 +116,6 @@ public class StaccatoWindow extends JFrame {
 		
 		StaccatoWindow.staccatoWindow = this;
 		
-	}
-	
-	private void createPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
-		
-		JDialog dialog = new JDialog(this, true);
-		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		dialog.setTitle(title);
-		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
-		dialog.setResizable(false);
-		
-		JPanel topPanel = new JPanel();
-		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-		topPanel.add(Box.createHorizontalStrut(15));
-		topPanel.add(new JLabel(icon));
-		topPanel.add(Box.createHorizontalStrut(12));
-		topPanel.add(new JLabel(message));
-		topPanel.add(Box.createHorizontalStrut(15));
-		
-		dialog.add(Box.createVerticalStrut(10));
-		dialog.add(topPanel);
-		
-		JPanel bottomPanel = new JPanel();
-		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-		JButton okayButton = new JButton("OK");
-		okayButton.setBackground(new Color(0x80005d));
-		okayButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		okayButton.addActionListener((e) -> {
-			
-			dialog.dispose();
-			
-		});
-		bottomPanel.add(okayButton);
-		
-		dialog.add(Box.createVerticalStrut(15));
-		dialog.add(bottomPanel);
-		dialog.add(Box.createVerticalStrut(15));
-		dialog.pack();
-		dialog.setLocationRelativeTo(this);
-		dialog.setVisible(true);
-		
-	}
-
-	public static void showDialogPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
-
-		staccatoWindow.createPopup(title, message, icon);
-
 	}
 	
 	public void setIsDownloading(boolean isDownloading) {
