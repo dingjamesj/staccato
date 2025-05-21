@@ -379,6 +379,12 @@ public class MainPanel extends JPanel {
             
         });
 
+        editPlaylistButton.addActionListener((unused) -> {
+
+            GUIUtil.createPlaylistEditorPopup(playlist);
+
+        });
+
     }
 
     /**

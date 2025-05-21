@@ -69,11 +69,10 @@ public abstract class FileManager {
     }
 
     /**
-     * Adds a playlist to the playlists data file. <br></br>
-     * Returns true if was successful (i.e. playlist's directory isn't already taken )
+     * Adds a playlist to the playlists data file.
      * @param playlist
-     * @return If the playlist was added
-     * @throws FileNotFoundException
+     * @return True if the playlist was successfully added
+     * @throws FileNotFoundException If the playlist file can't be created
      * @throws IOException
      */
     public static boolean addPlaylist(Playlist playlist) throws FileNotFoundException, IOException {
@@ -90,14 +89,95 @@ public abstract class FileManager {
 
         }
 
-        boolean writeWasSuccess = storedPlaylists.add(playlist);
+        if(!storedPlaylists.add(playlist)) {
+
+            return false;
+
+        }
 
         ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(PLAYLIST_DATA_LOCATION));
         outputStream.writeObject(storedPlaylists);
         outputStream.flush();
         outputStream.close();
 
-        return writeWasSuccess;
+        return true;
+
+    }
+
+    /**
+     * Removes a playlist from the playlists data file.
+     * @param playlist
+     * @return True if the playlist was successfully found and removed
+     * @throws IOException
+     */
+    public static boolean removePlaylist(Playlist playlist) throws IOException {
+
+        Set<Playlist> storedPlaylists;
+        File playlistFile = new File(PLAYLIST_DATA_LOCATION);
+        if(playlistFile.exists()) {
+
+            storedPlaylists = readPlaylists();
+
+        } else {
+
+            return false;
+
+        }
+
+        if(!storedPlaylists.remove(playlist)) {
+
+            return false;
+
+        }
+
+        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(PLAYLIST_DATA_LOCATION));
+        outputStream.writeObject(storedPlaylists);
+        outputStream.flush();
+        outputStream.close();
+
+        return true;
+
+    }
+
+    /**
+     * Removes <code>oldPlaylist</code> and adds <code>newPlaylist</code>.
+     * @param oldPlaylist The playlist to remove
+     * @param newPlaylist The playlist to add
+     * @return True if the old playlist was successfully found and removed and if the new playlist was successfully added.
+     * @throws IOException
+     */
+    public static boolean replacePlaylist(Playlist oldPlaylist, Playlist newPlaylist) throws IOException {
+
+        Set<Playlist> storedPlaylists;
+        File playlistFile = new File(PLAYLIST_DATA_LOCATION);
+        if(playlistFile.exists()) {
+
+            storedPlaylists = readPlaylists();
+
+        } else {
+
+            return false;
+            
+        }
+
+        if(!storedPlaylists.remove(oldPlaylist)) {
+
+            return false;
+
+        }
+
+        if(!storedPlaylists.add(newPlaylist)) {
+
+            return false;
+
+        }
+
+        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(PLAYLIST_DATA_LOCATION));
+        outputStream.writeObject(storedPlaylists);
+        outputStream.flush();
+        outputStream.close();
+
+        return true;
 
     }
 
