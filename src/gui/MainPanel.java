@@ -58,7 +58,6 @@ public class MainPanel extends JPanel {
     private static final ImageIcon EDIT_ICON = GUIUtil.createImageIcon("src/main/resources/edit.png");
     private static final ImageIcon HOME_ICON = GUIUtil.createImageIcon("src/main/resources/home.png");
     private static final ImageIcon MORE_OPTIONS_ICON = GUIUtil.createImageIcon("src/main/resources/more options.png");
-    private static final ImageIcon SHUFFLE_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
 
     private static final Color ALTERNATE_TRACKLIST_ROW_COLOR = new Color(0x151515);
     private static final Color HIGHLIGHTED_TRACKLIST_ROW_COLOR = new Color(0x303030);
@@ -95,8 +94,7 @@ public class MainPanel extends JPanel {
     private JLabel playlistDescriptionLabel;
 
     private final AtomicBoolean killTracklistLoadingThreadFlag = new AtomicBoolean(false);
-    private final AtomicBoolean shuffleIsOn = new AtomicBoolean(false);
-    private Track[] currentTracklist = null;
+    private Track[] currentTracklist;
 
     public MainPanel() {
 
@@ -230,7 +228,8 @@ public class MainPanel extends JPanel {
         playlistDescriptionLabel = new JLabel(createDescription(playlist));
         JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JButton editPlaylistButton = new JButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton shuffleButton = new JButton(GUIUtil.createResizedIcon(SHUFFLE_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton refreshButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton addTrackButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JPanel playlistTextPanel = new JPanel();
 
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
@@ -268,7 +267,8 @@ public class MainPanel extends JPanel {
         constraints.weightx = 1;
         constraints.insets = new Insets(0, 0, 0, 0);
         constraints.anchor = GridBagConstraints.CENTER;
-        JPanel gluePanel = new JPanel(); gluePanel.setOpaque(false);
+        JPanel gluePanel = new JPanel();
+        gluePanel.setOpaque(false);
         playlistInfoPanel.add(gluePanel, constraints);
 
         constraints.gridx = 3;
@@ -278,7 +278,7 @@ public class MainPanel extends JPanel {
         constraints.weightx = 0;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
-        playlistInfoPanel.add(shuffleButton, constraints);
+        playlistInfoPanel.add(addTrackButton, constraints);
 
         constraints.gridx = 4;
         constraints.gridy = 0;
@@ -287,9 +287,18 @@ public class MainPanel extends JPanel {
         constraints.weightx = 0;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
-        playlistInfoPanel.add(editPlaylistButton, constraints);
+        playlistInfoPanel.add(refreshButton, constraints);
 
         constraints.gridx = 5;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.weightx = 0;
+        constraints.anchor = GridBagConstraints.LAST_LINE_START;
+        constraints.insets = new Insets(0, INFO_PANEL_SPACING, 0, 0);
+        playlistInfoPanel.add(editPlaylistButton, constraints);
+
+        constraints.gridx = 6;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
@@ -345,28 +354,13 @@ public class MainPanel extends JPanel {
 
         playlistCoverButton.addActionListener((unused) -> {
 
-            if(shuffleIsOn.get()) {
-
-                Track.shuffleTracklist(currentTracklist);
-
-            }
-
-            playTracksAction(currentTracklist, 0);
+            TracklistPlayer.playTracks(currentTracklist);
 
         });
 
-        shuffleButton.addActionListener((unused) -> {
+        refreshButton.addActionListener((unused) -> {
 
-            if(shuffleIsOn.get()) {
-
-                shuffleIsOn.set(false);
-                currentTracklist = playlist.getTracks();
-
-            } else {
-
-                shuffleIsOn.set(true);
-
-            }
+            //Refresh
             
         });
 
@@ -440,12 +434,6 @@ public class MainPanel extends JPanel {
 
         }
         tracklistPanel.remove(0);
-
-    }
-
-    private void playTracksAction(Track[] tracks, int startingTrackIndex) {
-
-        TracklistPlayer.playTracks(tracks, startingTrackIndex);
 
     }
 
@@ -579,17 +567,7 @@ public class MainPanel extends JPanel {
 
                 }
 
-                if(shuffleIsOn.get()) {
-
-                    Track.shuffleTracklist(currentTracklist, track);
-                    playTracksAction(currentTracklist, 0);
-
-                } else {
-
-                    System.out.println(trackIndex);
-                    playTracksAction(currentTracklist, trackIndex);
-                    
-                }
+                TracklistPlayer.playTracks(currentTracklist, trackIndex);
 
             }
 

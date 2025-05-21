@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -27,6 +26,7 @@ public class QueuePanel extends JPanel {
     private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.PLAIN, 16);
 
     private static final ImageIcon LOOP_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
+    private static final ImageIcon SHUFFLE_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
 
     private static final int SCROLL_SPEED = 11;
     private static final int ROW_SPACING = 3;
@@ -42,7 +42,6 @@ public class QueuePanel extends JPanel {
 
     private JPanel tracklistPanel;
     private final AtomicInteger currentTrackNum = new AtomicInteger(0);
-    private final AtomicBoolean shuffleIsOn = new AtomicBoolean(true);
 
     public static QueuePanel queuePanel;
 
@@ -81,6 +80,7 @@ public class QueuePanel extends JPanel {
         JPanel headerPanel = new JPanel();
         JLabel panelTitleLabel = new JLabel("Queue");
         JButton loopButton = new JButton(GUIUtil.createResizedIcon(LOOP_ICON, QUEUE_OPTIONS_BUTTON_SIZE, QUEUE_OPTIONS_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton shuffleButton = new JButton(GUIUtil.createResizedIcon(SHUFFLE_ICON, QUEUE_OPTIONS_BUTTON_SIZE, QUEUE_OPTIONS_BUTTON_SIZE, Image.SCALE_SMOOTH));
         tracklistPanel = new JPanel();
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
@@ -92,6 +92,7 @@ public class QueuePanel extends JPanel {
 
         headerPanel.add(panelTitleLabel, "cell 0 0, span 1 1, pushy, align left bottom, gapleft " + PANEL_TITLE_WINDOW_EDGE_GAP_PX);
         headerPanel.add(loopButton, "cell 1 0, span 1 1, pushy, gapleft " + BUTTONS_GAP_PX + ", align left bottom");
+        headerPanel.add(shuffleButton, "cell 2 0, span 1 1, pushy, gapleft " + BUTTONS_GAP_PX + ", align left bottom");
         wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
         add(headerPanel, "cell 0 0, span 1 1, grow, push, align center center, hmax " + (int) ((1.0 - QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION) * 100) + "%");
         add(scrollPane, "cell 0 1, span 1 1, grow, push, align center center, hmax " + (int) (QUEUED_TRACKS_PANEL_HEIGHT_PROPORTION * 100) + "%");
@@ -103,6 +104,20 @@ public class QueuePanel extends JPanel {
         loopButton.addActionListener((unused) -> {
 
             TracklistPlayer.setIsLooping(!TracklistPlayer.isLooping());
+
+        });
+
+        shuffleButton.addActionListener((unused) -> {
+
+            if(TracklistPlayer.isShuffleOn()) {
+
+                TracklistPlayer.setShuffleMode(false);
+
+            } else {
+
+                TracklistPlayer.setShuffleMode(true);
+
+            }
 
         });
 

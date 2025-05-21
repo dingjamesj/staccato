@@ -34,6 +34,7 @@ public abstract class TracklistPlayer {
     private static final AtomicInteger currentTrackNum = new AtomicInteger(0);
     private static final AtomicBoolean isPlaying = new AtomicBoolean(false);
     private static final AtomicBoolean loopIsOn = new AtomicBoolean(false);
+    private static final AtomicBoolean shuffleIsOn = new AtomicBoolean(false);
     private static List<Track> queuedTracks = new ArrayList<Track>();
     private static Thread playbackUpdateThread;
 
@@ -51,21 +52,30 @@ public abstract class TracklistPlayer {
      */
     public synchronized static void playTracks(Track[] tracks) {
 
-        playTracks(tracks, 0);
+        //Simply forward it to the original playTracks method.
+        //By passing -1, we tell playTracks that if shuffle is on, they can start with any track.
+        if(shuffleIsOn.get()) {
+
+            playTracks(tracks, -1);
+
+        } else {
+
+            playTracks(tracks, 0);
+
+        }
 
     }
 
     /**
      * Puts all the tracks in a queue and plays them in the given order from the given track number.
-     * @param startingTrackIndex The track number to start playback on
      * @param tracks Array of tracks to be played in order
+     * @param startingTrackIndex The track number to start playback on. If < 0 and shuffle is on, playback starts with any track.
      * @return A List of the tracks successfully put in the queue
      */
     public synchronized static void playTracks(Track[] tracks, int startingTrackIndex) {
 
         //Stop playback and clear queue
         queuedTracks.clear();
-        currentTrackNum.set(startingTrackIndex);
         if(activeMediaPlayer != null) {
 
             activeMediaPlayer.stop();
@@ -78,9 +88,43 @@ public abstract class TracklistPlayer {
 
         }
 
-        for(int i = 0; i < tracks.length; i++) {
+        //Shuffle the tracklist if necessary.
+        //Note that if the starting track index >= 0, then the shuffled tracklist will still begin at the specified starting track.
+        Track[] orderedTracks;
+        if(shuffleIsOn.get()) {
 
-            Track track = tracks[i];
+            currentTrackNum.set(0);
+
+            orderedTracks = new Track[tracks.length];
+            for(int i = 0; i < tracks.length; i++) {
+
+                orderedTracks[i] = tracks[i];
+
+            }
+
+            if(startingTrackIndex >= 0) {
+
+                //If we are starting at a specific track...
+                Track.shuffleTracklist(orderedTracks, tracks[startingTrackIndex]);
+
+            } else {
+
+                Track.shuffleTracklist(orderedTracks);
+
+            }
+
+        } else {
+
+            currentTrackNum.set(Math.max(startingTrackIndex, 0));
+
+            orderedTracks = tracks;
+
+        }
+
+        //Queue and play the tracks
+        for(int i = 0; i < orderedTracks.length; i++) {
+
+            Track track = orderedTracks[i];
 
             //First see if we can access the track file
             if(!track.canRead()) {
@@ -93,7 +137,7 @@ public abstract class TracklistPlayer {
 
         }
 
-        Media media = new Media(new File(queuedTracks.get(startingTrackIndex).getFileLocation()).toURI().toString());
+        Media media = new Media(new File(queuedTracks.get(currentTrackNum.get()).getFileLocation()).toURI().toString());
         activeMediaPlayer = new MediaPlayer(media);
         activeMediaPlayer.setOnEndOfMedia(TracklistPlayer::playNextTrack);
         activeMediaPlayer.play();
@@ -286,6 +330,12 @@ public abstract class TracklistPlayer {
 
     }
 
+    public static void setShuffleMode(boolean isShuffling) {
+
+        shuffleIsOn.set(isShuffling);
+
+    }
+
     public static void addSwitchTrackAction(Runnable action) {
 
         switchTrackActions.add(action);
@@ -423,6 +473,15 @@ public abstract class TracklistPlayer {
     public static boolean isLooping() {
 
         return loopIsOn.get();
+
+    }
+
+    /**
+     * @return True if shuffle is on, false otherwise.
+     */
+    public static boolean isShuffleOn() {
+
+        return shuffleIsOn.get();
 
     }
 
