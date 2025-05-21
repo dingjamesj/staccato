@@ -58,6 +58,23 @@ public class Playlist implements Serializable {
 
     }
 
+    public void setName(String name) {
+
+        this.name = name;
+
+    }
+
+    public void setCoverArtByteArray(byte[] coverArtByteArray) {
+
+        this.coverArtByteArray = new byte[coverArtByteArray.length];
+        for(int i = 0; i < coverArtByteArray.length; i++) {
+
+            this.coverArtByteArray[i] = coverArtByteArray[i];
+
+        }
+
+    }
+
     public boolean removeTrack(Track track) {
 
         if(tracks.contains(track)) {
