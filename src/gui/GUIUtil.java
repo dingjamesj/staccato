@@ -178,7 +178,7 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createEditMetadataDialog(Track track) {
+    public static JDialog createEditMetadataDialog(Track track, JPanel trackPanel) {
 
         EditMetadataJDialog dialog = new EditMetadataJDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -315,6 +315,7 @@ public abstract class GUIUtil {
 
             }
             track.writeMetadata();
+            MainPanel.updateTrackPanel(trackPanel, track);
             dialog.dispose();
 
         });
@@ -334,6 +335,7 @@ public abstract class GUIUtil {
 
                     byte[] artworkByteArray = FileManager.readByteArray(selectedFile);
                     artworkButton.setIcon(createResizedIcon(new ImageIcon(artworkByteArray), EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX, EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+                    artworkURLLabel.setText(selectedFile.getCanonicalPath());
                     dialog.setArtworkByteArray(artworkByteArray);
 
                 } catch (IOException e) {

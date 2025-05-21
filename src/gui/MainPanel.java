@@ -90,6 +90,7 @@ public class MainPanel extends JPanel {
 
     public static MainPanel mainPanel;
 
+    private JButton refreshButton;
     private JPanel tracklistPanel;
     private JLabel playlistDescriptionLabel;
 
@@ -228,7 +229,7 @@ public class MainPanel extends JPanel {
         playlistDescriptionLabel = new JLabel(createDescription(playlist));
         JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JButton editPlaylistButton = new JButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton refreshButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        /*JButton*/ refreshButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JButton addTrackButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JPanel playlistTextPanel = new JPanel();
 
@@ -339,6 +340,14 @@ public class MainPanel extends JPanel {
         revalidate();
         repaint();
 
+        Thread trackLoadingThread = new Thread(() -> {
+
+            killTracklistLoadingThreadFlag.set(true);
+            loadTracklistInfo(playlist);
+
+        });
+        trackLoadingThread.start();
+
         //-------------------------BEGIN LISTENERS ADDITION-------------------------
         
         returnToHomeButton.addActionListener((unused) -> {
@@ -360,7 +369,13 @@ public class MainPanel extends JPanel {
 
         refreshButton.addActionListener((unused) -> {
 
-            //Refresh
+            Thread refreshTracksThread = new Thread(() -> {
+
+                killTracklistLoadingThreadFlag.set(true);
+                loadTracklistInfo(playlist);
+
+            });
+            refreshTracksThread.start();
             
         });
 
@@ -371,6 +386,8 @@ public class MainPanel extends JPanel {
      * @param playlist
      */
     private synchronized void loadTracklistInfo(Playlist playlist) {
+
+        refreshButton.setEnabled(false);
 
         //This will essentially be a track entry panel but with just a label that says "Loading..."
         JPanel loadingLabelPanel = new JPanel(new MigLayout("insets " + TRACKLIST_ROWS_SPACING + " " + TRACKLIST_ROWS_SPACING + " " + TRACKLIST_ROWS_SPACING + " 0"));
@@ -385,7 +402,6 @@ public class MainPanel extends JPanel {
         tracklistPanel.add(loadingLabelPanel);
         tracklistPanel.revalidate();
         tracklistPanel.repaint();
-
 
         if(playlist.getTracks() == null) {
 
@@ -433,7 +449,9 @@ public class MainPanel extends JPanel {
             tracklistPanel.repaint();
 
         }
-        tracklistPanel.remove(0);
+
+        tracklistPanel.remove(0); //Remove the "Loading..." panel
+        refreshButton.setEnabled(true);
 
     }
 
@@ -498,14 +516,6 @@ public class MainPanel extends JPanel {
                 SwingUtilities.invokeLater(() -> {
 
                     initTracklistPage(playlist);
-
-                    Thread trackLoadingThread = new Thread(() -> {
-    
-                        killTracklistLoadingThreadFlag.set(true);
-                        loadTracklistInfo(playlist);
-
-                    });
-                    trackLoadingThread.start();
                     
                 });
 
@@ -606,11 +616,37 @@ public class MainPanel extends JPanel {
 
         editMetadataMenuItem.addActionListener((unused) -> {
 
-            GUIUtil.createEditMetadataDialog(track);
+            GUIUtil.createEditMetadataDialog(track, trackPanel);
 
         });
 
         return trackPanel;
+
+    }
+
+    public static void updateTrackPanel(JPanel trackPanel, Track track) {
+
+        //Artwork label
+        ImageIcon artworkIcon;
+        if(track.getArtworkByteArray() == null) {
+
+            artworkIcon = GUIUtil.createResizedIcon(PLACEHOLDER_ART_ICON, TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX, Image.SCALE_SMOOTH);
+
+        } else {
+
+            artworkIcon = GUIUtil.createResizedIcon(new ImageIcon(track.getArtworkByteArray()), TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX, Image.SCALE_SMOOTH);
+
+        }
+        ((JLabel) trackPanel.getComponent(0)).setIcon(artworkIcon);
+
+        //Title label
+        ((JLabel) ((JPanel) trackPanel.getComponent(1)).getComponent(0)).setText(track.getTitle());
+
+        //Artists label
+        ((JLabel) ((JPanel) trackPanel.getComponent(1)).getComponent(1)).setText(track.getArtists());
+
+        //Album label
+        ((JLabel) trackPanel.getComponent(2)).setText(track.getAlbum());
 
     }
 
