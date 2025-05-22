@@ -1,10 +1,13 @@
 package gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -13,14 +16,18 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 
@@ -117,7 +124,7 @@ public abstract class GUIUtil {
         dialog.setResizable(false);
         dialog.setSize(PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE);
 
-        JLabel titleLabel = new JLabel("Edit " + playlist.getName());
+        JLabel titleLabel = new JLabel("<html>Edit " + playlist.getName() + "</html>");
         ImageIcon playlistCoverIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JButton playlistCoverButton = new JButton();
         JLabel nameLabel = new JLabel("Name: ");
@@ -127,6 +134,7 @@ public abstract class GUIUtil {
         JPanel bottomButtonPanel = new JPanel();
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
+        JScrollPane titleLabelScrollPane = new JInvisibleScrollPane(titleLabel);
 
         playlistCoverButton.setIcon(createResizedIcon(playlistCoverIcon, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
         nameField.setText(playlist.getName());
@@ -135,7 +143,7 @@ public abstract class GUIUtil {
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
 
         dialog.add(
-            titleLabel, ""
+            titleLabelScrollPane, ""
             + "cell 0 0, "
             + "span 2 1, "
         );
@@ -504,6 +512,79 @@ public abstract class GUIUtil {
         public void setByteArray(byte[] artworkByteArray) {
 
             this.artworkByteArray = artworkByteArray;
+
+        }
+
+    }
+
+    public static class JInvisibleScrollPane extends JScrollPane {
+
+        public JInvisibleScrollPane(Component view) {
+
+            super(view);
+            setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
+            setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
+            setBorder(null);
+            setOpaque(false);
+            getViewport().setOpaque(false);
+
+        }
+
+    }
+
+    private static class JInvisibleScrollBar extends JScrollBar {
+
+        public JInvisibleScrollBar(int orientation) {
+
+            super(orientation);
+
+            setOpaque(false);
+            setPreferredSize(new Dimension(0, 0));
+            setMinimumSize(new Dimension(0, 0));
+            setMaximumSize(new Dimension(0, 0));
+
+            setUI(new BasicScrollBarUI() {
+
+                @Override
+                protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+
+                    //Do nothing for no track
+
+                }
+
+                @Override
+                protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+
+                    // Do nothing for no track
+
+                }
+
+                @Override
+                protected JButton createDecreaseButton(int orientation) {
+
+                    return createInvisibleButton();
+
+                }
+
+                @Override
+                protected JButton createIncreaseButton(int orientation) {
+
+                    return createInvisibleButton();
+                
+                }
+
+                private JButton createInvisibleButton() {
+                    
+                    JButton invisibleButton = new JButton();
+                    invisibleButton.setPreferredSize(new Dimension(0, 0));
+                    invisibleButton.setMinimumSize(new Dimension(0, 0));
+                    invisibleButton.setMaximumSize(new Dimension(0, 0));
+                    invisibleButton.setVisible(false);
+
+                    return invisibleButton;
+
+                }
+            });
 
         }
 

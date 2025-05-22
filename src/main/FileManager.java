@@ -140,6 +140,51 @@ public abstract class FileManager {
     }
 
     /**
+     * Deletes a playlist's actual files on the computer.
+     * @param playlist
+     * @return True if the whole directory was deleted, false if some files were left undeleted (e.g. any non-mp3 files or subdirectories)
+     * @throws FileNotFoundException If the playlist's directory wasn't found
+     * @throws IOException
+     */
+    public static boolean deletePlaylist(Playlist playlist) throws FileNotFoundException, IOException {
+
+        boolean directoryIsAllMP3s = true;
+        File playlistDirectory = new File(playlist.getDirectory());
+        File[] files = playlistDirectory.listFiles();
+        if(files == null) {
+
+            throw new FileNotFoundException();
+
+        }
+        for(int i = 0; i < files.length; i++) {
+
+            if((files[i].isDirectory() || !files[i].getName().endsWith(".mp3")) && (!files[i].getName().equals("AlbumArtSmall.jpg") && !files[i].getName().equals("Folder.jpg"))) {
+
+                directoryIsAllMP3s = false;
+                continue;
+
+            }
+
+            if(!files[i].delete()) {
+
+                throw new IOException("File at " + files[i].getCanonicalPath() + " wasn't able to be deleted.");
+
+            }
+
+        }
+
+        //If the directory is now all empty, delete the directory.
+        if(directoryIsAllMP3s) {
+
+            playlistDirectory.delete();
+
+        }
+
+        return directoryIsAllMP3s;
+
+    }
+
+    /**
      * Removes <code>oldPlaylist</code> and adds <code>newPlaylist</code>.
      * @param oldPlaylist The playlist to remove
      * @param newPlaylist The playlist to add

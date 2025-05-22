@@ -1,21 +1,15 @@
 package gui;
 
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Rectangle;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import main.Track;
 import main.TracklistPlayer;
@@ -79,9 +73,9 @@ public class CurrentTrackInfoPanel extends JPanel {
         albumLabel = new JLabel();
         JButton editMetadataButton = new JButton(GUIUtil.createResizedIcon(EDIT_METADATA_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
         JButton redownloadButton = new JButton(GUIUtil.createResizedIcon(REDOWNLOAD_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
-        JScrollPane titleLabelScrollPane = new JScrollPane(titleLabel);
-        JScrollPane artistsLabelScrollPane = new JScrollPane(artistsLabel);
-        JScrollPane albumLabelScrollPane = new JScrollPane(albumLabel);
+        JScrollPane titleLabelScrollPane = new GUIUtil.JInvisibleScrollPane(titleLabel);
+        JScrollPane artistsLabelScrollPane = new GUIUtil.JInvisibleScrollPane(artistsLabel);
+        JScrollPane albumLabelScrollPane = new GUIUtil.JInvisibleScrollPane(albumLabel);
         trackInfoScrollPanes = new JScrollPane[] {titleLabelScrollPane, artistsLabelScrollPane, albumLabelScrollPane};
         buttonsPanel = new JPanel();
 
@@ -89,12 +83,6 @@ public class CurrentTrackInfoPanel extends JPanel {
         artistsLabel.setFont(ARTISTS_FONT);
         albumLabel.setFont(ALBUM_FONT);
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
-        titleLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
-        titleLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
-        artistsLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
-        artistsLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
-        albumLabelScrollPane.setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));
-        albumLabelScrollPane.setHorizontalScrollBar(new JInvisibleScrollBar(JScrollBar.HORIZONTAL));
         titleLabelScrollPane.setVisible(false);
         albumArtLabel.setVisible(false);
         artistsLabelScrollPane.setVisible(false);
@@ -219,64 +207,6 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         revalidate();
         repaint();
-
-    }
-
-    private static class JInvisibleScrollBar extends JScrollBar {
-
-        public JInvisibleScrollBar(int orientation) {
-
-            super(orientation);
-
-            setOpaque(false);
-            setPreferredSize(new Dimension(0, 0));
-            setMinimumSize(new Dimension(0, 0));
-            setMaximumSize(new Dimension(0, 0));
-
-            setUI(new BasicScrollBarUI() {
-
-                @Override
-                protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-
-                    //Do nothing for no track
-
-                }
-
-                @Override
-                protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
-
-                    // Do nothing for no track
-
-                }
-
-                @Override
-                protected JButton createDecreaseButton(int orientation) {
-
-                    return createInvisibleButton();
-
-                }
-
-                @Override
-                protected JButton createIncreaseButton(int orientation) {
-
-                    return createInvisibleButton();
-                
-                }
-
-                private JButton createInvisibleButton() {
-                    
-                    JButton invisibleButton = new JButton();
-                    invisibleButton.setPreferredSize(new Dimension(0, 0));
-                    invisibleButton.setMinimumSize(new Dimension(0, 0));
-                    invisibleButton.setMaximumSize(new Dimension(0, 0));
-                    invisibleButton.setVisible(false);
-
-                    return invisibleButton;
-
-                }
-            });
-
-        }
 
     }
 
