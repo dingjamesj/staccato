@@ -96,7 +96,46 @@ public abstract class GUIUtil {
         return "";
 
     }
-    
+
+    public static void resizeJLabelTextToFit(JLabel label) {
+
+        String labelText = label.getText();
+        Font originalFont = label.getFont();
+        int currentStringWidth = label.getFontMetrics(originalFont).stringWidth(labelText);
+        if(currentStringWidth <= label.getWidth()) {
+
+            return;
+
+        }
+
+        float testFontSize = originalFont.getSize() * label.getWidth() / (float) label.getFontMetrics(originalFont).stringWidth(labelText);
+        System.out.println("STARTING TEST: " + testFontSize);
+        if(label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) < label.getWidth()) {
+
+            //This increments the test font size until the label text will overflow
+            for(
+                testFontSize = testFontSize + 1; 
+                label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) < label.getWidth(); 
+                testFontSize++
+            ) {System.out.println("+: " + testFontSize);}
+
+            label.setFont(originalFont.deriveFont(testFontSize - 1.0f));
+
+        } else if(label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) > label.getWidth()) {
+
+            //This decrements the test font size until the label text doesn't overflow
+            for(
+                testFontSize = testFontSize - 1; 
+                label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) > label.getWidth(); 
+                testFontSize--
+            ) {System.out.println("-: " + testFontSize);}
+
+            label.setFont(originalFont.deriveFont(testFontSize));
+
+        }
+
+    }
+
     public static JDialog createPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
 		
 		JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
@@ -249,6 +288,12 @@ public abstract class GUIUtil {
         cancelButton.addActionListener((unused) -> {
 
             dialog.dispose();
+
+        });
+        
+        saveButton.addActionListener((unused) -> {
+
+            
 
         });
 
