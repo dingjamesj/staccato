@@ -58,6 +58,12 @@ public class Playlist implements Serializable {
 
     }
 
+    public boolean directoryExists() {
+
+        return new File(directory).exists();
+
+    }
+
     public void setName(String name) {
 
         this.name = name;
@@ -185,7 +191,7 @@ public class Playlist implements Serializable {
 
         } catch (FileNotFoundException e) {
 
-            tracks.clear();
+            tracks = null;
             return false;
 
         }

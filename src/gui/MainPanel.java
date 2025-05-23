@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -26,7 +25,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
@@ -76,7 +74,7 @@ public class MainPanel extends JPanel {
     private static final int PLAYLIST_SELECTION_HSPACING = 10;
     private static final int PLAYLIST_SELECTION_VSPACING = 10;
     private static final int PLAYLIST_SELECTION_ICON_SIZE = 128;
-    private static final int PLAYLIST_SELECTION_INFO_MIN_WIDTH_PX = 275;
+    private static final int PLAYLIST_SELECTION_INFO_MIN_WIDTH_PX = 260;
     //Tracklist view
     private static final int INFO_PANEL_SPACING = 7;
     private static final int INFO_PANEL_TABLE_GAP = 3;
@@ -142,8 +140,8 @@ public class MainPanel extends JPanel {
         playlistSelectionScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         ((JLabel) addPlaylistButtonPanel.getComponent(0)).setIcon(GUIUtil.createResizedIcon(ADD_ICON, PLAYLIST_SELECTION_ICON_SIZE, PLAYLIST_SELECTION_ICON_SIZE, Image.SCALE_SMOOTH));
         ((JLabel) ((JViewport) ((JScrollPane) addPlaylistButtonPanel.getComponent(1)).getComponent(0)).getComponent(0)).setText("Add Playlist");
-        ((JTextArea) addPlaylistButtonPanel.getComponent(2)).setText("Each playlist is associated with a folder of mp3 files on your computer.");
-        addPlaylistButtonPanel.remove(3);
+        ((JLabel) addPlaylistButtonPanel.getComponent(2)).setText("Each playlist is associated with a folder of mp3 files on your computer.");
+        addPlaylistButtonPanel.getComponent(3).setVisible(false);;
 
         add(titleLabel);
         playlistSelectionPanel.add(addPlaylistButtonPanel);
@@ -262,7 +260,8 @@ public class MainPanel extends JPanel {
         JButton playlistCoverButton = new JButton();
         JLabel playlistNameLabel = new JLabel(playlist.getName());
         JScrollPane playlistNameScrollPane = new GUIUtil.JInvisibleScrollPane(playlistNameLabel);
-        playlistDescriptionLabel = new JLabel(createDescription(playlist));
+        playlistDescriptionLabel = new JLabel("<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>");
+        JScrollPane playlistDescriptionScrollPane = new GUIUtil.JInvisibleScrollPane(playlistDescriptionLabel);
         JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JButton editPlaylistButton = new JButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         /*JButton*/ refreshButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
@@ -287,7 +286,7 @@ public class MainPanel extends JPanel {
         );
 
         playlistTextPanel.add(playlistNameScrollPane);
-        playlistTextPanel.add(playlistDescriptionLabel);
+        playlistTextPanel.add(playlistDescriptionScrollPane);
         playlistInfoPanel.add(
             playlistTextPanel, ""
             + "cell 1 0, "
@@ -446,6 +445,7 @@ public class MainPanel extends JPanel {
             boolean loadWasSuccessful = playlist.loadTracks();
         
             //The tracks may not have loaded successfully if the loading process was interrupted by a user event.
+            //Or if the playlist directory does not exist anymore.
             if(!loadWasSuccessful) {
 
                 return;
@@ -500,7 +500,7 @@ public class MainPanel extends JPanel {
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JLabel playlistCoverLabel = new JLabel(playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON);
         JLabel playlistNameLabel = new JLabel(playlist.getName());
-        JTextArea playlistDirectoryText = new JTextArea(playlist.getDirectory().isEmpty() ? "[No Directory]" : playlist.getDirectory());
+        JLabel playlistDirectoryText = new JLabel();
         JButton moreOptionsButton = new JButton(MORE_OPTIONS_ICON);
         JScrollPane playlistNameScrollPane = new GUIUtil.JInvisibleScrollPane(playlistNameLabel);
         JPopupMenu popupMenu = new JPopupMenu();
@@ -512,12 +512,16 @@ public class MainPanel extends JPanel {
         playlistNameLabel.setFont(PLAYLIST_SELECTION_TITLE_FONT);
         playlistDirectoryText.setOpaque(false);
         playlistDirectoryText.setFont(PLAYLIST_DESCRIPTION_FONT);
-        playlistDirectoryText.setLineWrap(true);
-        playlistDirectoryText.setWrapStyleWord(true);
-        playlistDirectoryText.setEditable(false);
+        playlistDirectoryText.setText(playlist.getDirectory() == null || playlist.getDirectory().isEmpty() 
+            ? "[No Directory]" 
+            : GUIUtil.truncateWithEllipsis(playlist.getDirectory(), playlistDirectoryText.getFontMetrics(PLAYLIST_DESCRIPTION_FONT), PLAYLIST_SELECTION_INFO_MIN_WIDTH_PX)
+        );
+        // playlistDirectoryText.setLineWrap(true);
+        // playlistDirectoryText.setWrapStyleWord(true);
+        // playlistDirectoryText.setEditable(false);
         playlistDirectoryText.setFocusable(false);
         playlistDirectoryText.setForeground(Color.gray);
-        playlistDirectoryText.setMargin(new Insets(0, 0, 0, 0));
+        // playlistDirectoryText.setMargin(new Insets(0, 0, 0, 0));
         playlistNameScrollPane.setOpaque(false);
 
         playlistPanel.add(
@@ -540,7 +544,7 @@ public class MainPanel extends JPanel {
         playlistPanel.add(
             playlistDirectoryText, ""
             + "cell 2 1, "
-            + "span 1 1, "
+            + "span 2 1, "
             + "align left center, "
             + "pushy 0.45, growy, "
             + "wmin " + PLAYLIST_SELECTION_INFO_MIN_WIDTH_PX + ", "
@@ -607,6 +611,13 @@ public class MainPanel extends JPanel {
             
             @Override
             public void mouseClicked(MouseEvent e) {
+
+                if(!playlist.directoryExists()) {
+
+                    GUIUtil.createPopup("Couldn't Find Playlist", "<html>" + playlist.getName() + " could not be found at<br></br><i>" + playlist.getDirectory() + "</i>", new FlatOptionPaneErrorIcon());
+                    return;
+
+                }
 
                 SwingUtilities.invokeLater(() -> {
 

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -73,6 +74,29 @@ public abstract class GUIUtil {
 
     }
 
+    public static String truncateWithEllipsis(String str, FontMetrics fontMetrics, int width) {
+
+        if(fontMetrics.stringWidth(str) <= width) {
+
+            return str;
+
+        }
+
+        for(int i = str.length(); i >= 0; i--) {
+
+            String subStr = str.substring(0, i) + "...";
+            if(fontMetrics.stringWidth(subStr) <= width) {
+
+                return subStr;
+
+            }
+
+        }
+
+        return "";
+
+    }
+    
     public static JDialog createPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
 		
 		JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
