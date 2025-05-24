@@ -97,19 +97,18 @@ public abstract class GUIUtil {
 
     }
 
-    public static void resizeJLabelTextToFit(JLabel label) {
+    public static int getFittingJLabelFontSize(JLabel label) {
 
         String labelText = label.getText();
         Font originalFont = label.getFont();
         int currentStringWidth = label.getFontMetrics(originalFont).stringWidth(labelText);
         if(currentStringWidth <= label.getWidth()) {
 
-            return;
+            return originalFont.getSize();
 
         }
 
         float testFontSize = originalFont.getSize() * label.getWidth() / (float) label.getFontMetrics(originalFont).stringWidth(labelText);
-        System.out.println("STARTING TEST: " + testFontSize);
         if(label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) < label.getWidth()) {
 
             //This increments the test font size until the label text will overflow
@@ -117,9 +116,7 @@ public abstract class GUIUtil {
                 testFontSize = testFontSize + 1; 
                 label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) < label.getWidth(); 
                 testFontSize++
-            ) {System.out.println("+: " + testFontSize);}
-
-            label.setFont(originalFont.deriveFont(testFontSize - 1.0f));
+            ) {}
 
         } else if(label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) > label.getWidth()) {
 
@@ -128,11 +125,11 @@ public abstract class GUIUtil {
                 testFontSize = testFontSize - 1; 
                 label.getFontMetrics(originalFont.deriveFont((float) testFontSize)).stringWidth(labelText) > label.getWidth(); 
                 testFontSize--
-            ) {System.out.println("-: " + testFontSize);}
-
-            label.setFont(originalFont.deriveFont(testFontSize));
+            ) {}
 
         }
+
+        return (int) testFontSize;
 
     }
 

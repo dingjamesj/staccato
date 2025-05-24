@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -43,7 +45,7 @@ public class MainPanel extends JPanel {
     private static final Font PLAYLIST_SELECTION_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 42);
 
     //Tracklist view
-    private static final Font PLAYLIST_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 100);
+    private static final Font PLAYLIST_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 84);
     private static final Font PLAYLIST_DESCRIPTION_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final Font PLAYLIST_LOADING_FONT = new Font("Segoe UI", Font.PLAIN, 20);
     private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
@@ -67,6 +69,7 @@ public class MainPanel extends JPanel {
     //---------------------------------------- \/ SPACING \/ ----------------------------------------
 
     private static final int SCROLL_SPEED = 11;
+    private static final int MIN_PLAYLIST_NAME_FONT_SIZE = 36;
 
     //Playlist selection view
     private static final int PANEL_TITLE_TO_PLAYLIST_SELECTION_PANEL_GAP = 5;
@@ -78,7 +81,7 @@ public class MainPanel extends JPanel {
     private static final int INFO_PANEL_SPACING = 7;
     private static final int INFO_PANEL_TABLE_GAP = 3;
     private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
-    private static final int INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE = 55;
+    private static final int INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE = 48;
     private static final int TRACKLIST_ROWS_SPACING = 3;
     private static final int TRACK_ARTWORK_WIDTH_PX = 64;
     private static final double TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION = 0.5;
@@ -257,7 +260,8 @@ public class MainPanel extends JPanel {
 
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JButton playlistCoverButton = new JButton();
-        JLabel playlistNameLabel = new JLabel(playlist.getName());
+        JLabel playlistNameLabel;
+        JPanel playlistNameWrapperPanel = new JPanel(new BorderLayout());
         playlistDescriptionLabel = new JLabel("<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>");
         JScrollPane playlistDescriptionScrollPane = new GUIUtil.JInvisibleScrollPane(playlistDescriptionLabel);
         JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
@@ -268,27 +272,31 @@ public class MainPanel extends JPanel {
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
         playlistCoverImageIcon = GUIUtil.createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
         playlistCoverButton.setIcon(playlistCoverImageIcon);
+        playlistNameLabel = new JLabel(playlist.getName());
         playlistNameLabel.setFont(PLAYLIST_TITLE_FONT);
         playlistNameLabel.setAlignmentX(LEFT_ALIGNMENT);
+        playlistNameLabel.setVerticalAlignment(JLabel.BOTTOM);
         playlistDescriptionLabel.setFont(PLAYLIST_DESCRIPTION_FONT);
         playlistDescriptionLabel.setAlignmentX(LEFT_ALIGNMENT);
+
+        // playlistNameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         playlistInfoPanel.add(
             playlistCoverButton, ""
             + "cell 0 0, "
             + "span 1 2, "
-            + "gaptop " + INFO_PANEL_TABLE_GAP + ", gapleft " + INFO_PANEL_TABLE_GAP + ", "
+            + "gaptop " + INFO_PANEL_TABLE_GAP + ", "
             + "align center center"
         );
 
+        playlistNameWrapperPanel.add(playlistNameLabel, BorderLayout.SOUTH);
         playlistInfoPanel.add(
-            playlistNameLabel, ""
+            playlistNameWrapperPanel, ""
             + "cell 1 0, "
             + "span 6 1, "
             + "align left bottom, "
-            + "pushy, "
-            + "pad 0 0 30 0, "
-            + "gapleft " + INFO_PANEL_SPACING + ", "
+            + "pushy, growy, "
+            + "gapleft " + INFO_PANEL_SPACING + ", gapbottom " + INFO_PANEL_SPACING + ", "
             + "wmax 70%, "
         );
 
@@ -375,10 +383,6 @@ public class MainPanel extends JPanel {
 
         revalidate();
         repaint();
-        System.out.println("WIDTH: " + playlistNameLabel.getWidth());
-        GUIUtil.resizeJLabelTextToFit(playlistNameLabel);
-        revalidate();
-        repaint();
 
         Thread trackLoadingThread = new Thread(() -> {
 
@@ -390,6 +394,26 @@ public class MainPanel extends JPanel {
 
         //-------------------------BEGIN LISTENERS ADDITION-------------------------
         
+        playlistNameLabel.addComponentListener(new ComponentAdapter() {
+            
+            @Override
+            public void componentResized(ComponentEvent e) {
+
+                int fittingFontSize = GUIUtil.getFittingJLabelFontSize(playlistNameLabel);
+                if(fittingFontSize >= MIN_PLAYLIST_NAME_FONT_SIZE) {
+
+                    playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) fittingFontSize));
+
+                } else {
+
+                    playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) MIN_PLAYLIST_NAME_FONT_SIZE));
+
+                }
+
+            }
+
+        });
+
         returnToHomeButton.addActionListener((unused) -> {
 
             SwingUtilities.invokeLater(() -> {
@@ -568,8 +592,6 @@ public class MainPanel extends JPanel {
         popupMenu.add(editPlaylistMenuItem);
         popupMenu.add(removePlaylistMenuItem);
         popupMenu.add(deleteFromDirectoryMenuItem);
-
-        GUIUtil.resizeJLabelTextToFit(playlistNameLabel);
 
         //---------------------------------START ADDING LISTENERS---------------------------------
 
