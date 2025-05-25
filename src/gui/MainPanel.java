@@ -6,8 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -68,7 +66,7 @@ public class MainPanel extends JPanel {
     //-----------------------------------------------------------------------------------------------
     //---------------------------------------- \/ SPACING \/ ----------------------------------------
 
-    private static final int SCROLL_SPEED = 11;
+    private static final int SCROLL_SPEED = 9;
     private static final int MIN_PLAYLIST_NAME_FONT_SIZE = 36;
 
     //Playlist selection view
@@ -77,16 +75,21 @@ public class MainPanel extends JPanel {
     private static final int PLAYLIST_SELECTION_VSPACING = 10;
     private static final int PLAYLIST_SELECTION_ICON_SIZE = 128;
     private static final int PLAYLIST_SELECTION_INFO_MIN_WIDTH_PX = 260;
-    //Tracklist view
+    
+    //Info panel sizing and spacing
+    private static final double INFO_PANEL_HEIGHT_PROPORTION = 0.27;
     private static final int INFO_PANEL_SPACING = 7;
     private static final int INFO_PANEL_TABLE_GAP = 3;
     private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
     private static final int INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE = 48;
+    //For resizing the playlist name label
+    private static final int INFO_PANEL_PLAYLIST_NAME_MIN_FONT_SIZE = 36;
+    private static final int INFO_PANEL_PLAYLIST_NAME_SUGGESTED_WIDTH_PX = 200;
+    //Tracklist sizing and spacing
     private static final int TRACKLIST_ROWS_SPACING = 3;
     private static final int TRACK_ARTWORK_WIDTH_PX = 64;
     private static final double TRACK_TITLE_ARTISTS_COLUMN_WIDTH_PROPORTION = 0.5;
     private static final double TRACK_ALBUM_COLUMN_WIDTH_PROPORTION = 0.3;
-    private static final double PLAYLIST_INFO_PANEL_HEIGHT_PROPORTION = 0.27;
     private static final int TRACK_EDIT_COLUMN_WIDTH_PX = 10;
     private static final int TRACKLIST_ROW_TO_PANEL_EDGE_SPACING_PX = 9;
 
@@ -117,7 +120,6 @@ public class MainPanel extends JPanel {
         removeAll();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        // setAlignmentX(LEFT_ALIGNMENT);
         
         JLabel titleLabel = new JLabel("Your Playlists");
         JPanel playlistSelectionPanel = new JPanel(new WrapLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
@@ -251,7 +253,7 @@ public class MainPanel extends JPanel {
         setLayout(new MigLayout(
             "insets 0 0 0 0", 
             "", 
-            "[" + (int) (PLAYLIST_INFO_PANEL_HEIGHT_PROPORTION * 100) + "%][" + (int) ((1 - PLAYLIST_INFO_PANEL_HEIGHT_PROPORTION) * 100) + "%]"
+            "[" + (int) (INFO_PANEL_HEIGHT_PROPORTION * 100) + "%][" + (int) ((1 - INFO_PANEL_HEIGHT_PROPORTION) * 100) + "%]"
         ));
 
         //-----BEGIN BUILDING PLAYLIST INFO PANEL-----
@@ -260,8 +262,8 @@ public class MainPanel extends JPanel {
 
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JButton playlistCoverButton = new JButton();
-        JLabel playlistNameLabel;
-        JPanel playlistNameWrapperPanel = new JPanel(new BorderLayout());
+        JLabel playlistNameLabel = new JLabel(playlist.getName());
+        JScrollPane playlistNameScrollPane = new GUIUtil.JInvisibleScrollPane(playlistNameLabel);
         playlistDescriptionLabel = new JLabel("<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>");
         JScrollPane playlistDescriptionScrollPane = new GUIUtil.JInvisibleScrollPane(playlistDescriptionLabel);
         JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
@@ -272,14 +274,19 @@ public class MainPanel extends JPanel {
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
         playlistCoverImageIcon = GUIUtil.createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
         playlistCoverButton.setIcon(playlistCoverImageIcon);
-        playlistNameLabel = new JLabel(playlist.getName());
         playlistNameLabel.setFont(PLAYLIST_TITLE_FONT);
         playlistNameLabel.setAlignmentX(LEFT_ALIGNMENT);
         playlistNameLabel.setVerticalAlignment(JLabel.BOTTOM);
+        //Shrink the playlist name label if the text is too long
+        int textWidth = GUIUtil.calculateTextWidth(playlistNameLabel);
+        if(GUIUtil.calculateTextWidth(playlistNameLabel) > INFO_PANEL_PLAYLIST_NAME_SUGGESTED_WIDTH_PX) {
+
+            float newFontSize = playlistNameLabel.getFont().getSize() * INFO_PANEL_PLAYLIST_NAME_SUGGESTED_WIDTH_PX / (float) textWidth;
+            playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont(Math.max(newFontSize, MIN_PLAYLIST_NAME_FONT_SIZE)));
+
+        }
         playlistDescriptionLabel.setFont(PLAYLIST_DESCRIPTION_FONT);
         playlistDescriptionLabel.setAlignmentX(LEFT_ALIGNMENT);
-
-        // playlistNameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         playlistInfoPanel.add(
             playlistCoverButton, ""
@@ -289,9 +296,8 @@ public class MainPanel extends JPanel {
             + "align center center"
         );
 
-        playlistNameWrapperPanel.add(playlistNameLabel, BorderLayout.SOUTH);
         playlistInfoPanel.add(
-            playlistNameWrapperPanel, ""
+            playlistNameScrollPane, ""
             + "cell 1 0, "
             + "span 6 1, "
             + "align left bottom, "
@@ -319,7 +325,7 @@ public class MainPanel extends JPanel {
         );
 
         playlistInfoPanel.add(
-            addTrackButton, ""
+            refreshButton, ""
             + "cell 3 1, "
             + "span 1 1, "
             + "align left bottom, "
@@ -327,7 +333,7 @@ public class MainPanel extends JPanel {
         );
 
         playlistInfoPanel.add(
-            refreshButton, ""
+            addTrackButton, ""
             + "cell 4 1, "
             + "span 1 1, "
             + "align left bottom, "
@@ -394,25 +400,27 @@ public class MainPanel extends JPanel {
 
         //-------------------------BEGIN LISTENERS ADDITION-------------------------
         
-        playlistNameLabel.addComponentListener(new ComponentAdapter() {
+        // playlistNameLabel.addComponentListener(new ComponentAdapter() {
             
-            @Override
-            public void componentResized(ComponentEvent e) {
+        //     @Override
+        //     public void componentResized(ComponentEvent e) {
 
-                int fittingFontSize = GUIUtil.getFittingJLabelFontSize(playlistNameLabel);
-                if(fittingFontSize >= MIN_PLAYLIST_NAME_FONT_SIZE) {
+        //         int fittingFontSize = GUIUtil.getFittingJLabelFontSize(playlistNameLabel);
+        //         if(fittingFontSize >= MIN_PLAYLIST_NAME_FONT_SIZE) {
 
-                    playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) fittingFontSize));
+        //             playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) fittingFontSize));
 
-                } else {
+        //         } else {
 
-                    playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) MIN_PLAYLIST_NAME_FONT_SIZE));
+        //             playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) MIN_PLAYLIST_NAME_FONT_SIZE));
 
-                }
+        //         }
 
-            }
+        //         playlistNameLabel.setVisible(true);
 
-        });
+        //     }
+
+        // });
 
         returnToHomeButton.addActionListener((unused) -> {
 

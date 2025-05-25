@@ -50,6 +50,7 @@ public abstract class GUIUtil {
     private static final int EDIT_METADATA_ARTWORK_URL_LABEL_MAX_WIDTH_PX = 240;
     private static final int MIN_VERTICAL_GAP_PX = 5;
     private static final int PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX = 200;
+    private static final int SCROLL_SPEED = 3;
 
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
     private static final ImageIcon EDIT_METADATA_ADD_ARTWORK_ICON = createImageIcon("src/main/resources/refresh.png");
@@ -94,6 +95,12 @@ public abstract class GUIUtil {
         }
 
         return "";
+
+    }
+
+    public static int calculateTextWidth(JLabel label) {
+
+        return label.getFontMetrics(label.getFont()).stringWidth(label.getText());
 
     }
 
@@ -593,6 +600,8 @@ public abstract class GUIUtil {
             setBorder(null);
             setOpaque(false);
             getViewport().setOpaque(false);
+            getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
+            getHorizontalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         }
 
