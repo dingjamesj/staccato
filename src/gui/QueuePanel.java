@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import gui.GUIUtil.HoverableButton;
 import main.Track;
 import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
@@ -79,8 +80,8 @@ public class QueuePanel extends JPanel {
 
         JPanel headerPanel = new JPanel();
         JLabel panelTitleLabel = new JLabel("Queue");
-        JButton loopButton = new JButton(GUIUtil.createResizedIcon(LOOP_ICON, QUEUE_OPTIONS_BUTTON_SIZE, QUEUE_OPTIONS_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton shuffleButton = new JButton(GUIUtil.createResizedIcon(SHUFFLE_ICON, QUEUE_OPTIONS_BUTTON_SIZE, QUEUE_OPTIONS_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton loopButton = new HoverableButton(GUIUtil.createResizedIcon(LOOP_ICON, QUEUE_OPTIONS_BUTTON_SIZE, QUEUE_OPTIONS_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton shuffleButton = new HoverableButton(GUIUtil.createResizedIcon(SHUFFLE_ICON, QUEUE_OPTIONS_BUTTON_SIZE, QUEUE_OPTIONS_BUTTON_SIZE, Image.SCALE_SMOOTH));
         tracklistPanel = new JPanel();
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);

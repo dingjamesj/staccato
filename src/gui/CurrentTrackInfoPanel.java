@@ -15,6 +15,9 @@ import main.Track;
 import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
 
+import gui.GUIUtil.InvisibleScrollPane;
+import gui.GUIUtil.HoverableButton;
+
 public class CurrentTrackInfoPanel extends JPanel {
 
     private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
@@ -71,11 +74,11 @@ public class CurrentTrackInfoPanel extends JPanel {
         albumArtLabel = new JLabel();
         artistsLabel = new JLabel();
         albumLabel = new JLabel();
-        JButton editMetadataButton = new JButton(GUIUtil.createResizedIcon(EDIT_METADATA_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
-        JButton redownloadButton = new JButton(GUIUtil.createResizedIcon(REDOWNLOAD_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
-        JScrollPane titleLabelScrollPane = new GUIUtil.JInvisibleScrollPane(titleLabel);
-        JScrollPane artistsLabelScrollPane = new GUIUtil.JInvisibleScrollPane(artistsLabel);
-        JScrollPane albumLabelScrollPane = new GUIUtil.JInvisibleScrollPane(albumLabel);
+        JButton editMetadataButton = new HoverableButton(GUIUtil.createResizedIcon(EDIT_METADATA_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+        JButton redownloadButton = new HoverableButton(GUIUtil.createResizedIcon(REDOWNLOAD_ICON, TRACK_OPTIONS_BUTTON_SIZE_PX, TRACK_OPTIONS_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+        JScrollPane titleLabelScrollPane = new InvisibleScrollPane(titleLabel);
+        JScrollPane artistsLabelScrollPane = new InvisibleScrollPane(artistsLabel);
+        JScrollPane albumLabelScrollPane = new InvisibleScrollPane(albumLabel);
         trackInfoScrollPanes = new JScrollPane[] {titleLabelScrollPane, artistsLabelScrollPane, albumLabelScrollPane};
         buttonsPanel = new JPanel();
 

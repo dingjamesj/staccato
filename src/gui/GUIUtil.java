@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -9,12 +10,16 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -201,7 +206,7 @@ public abstract class GUIUtil {
         JPanel bottomButtonPanel = new JPanel();
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
-        JScrollPane titleLabelScrollPane = new JInvisibleScrollPane(titleLabel);
+        JScrollPane titleLabelScrollPane = new InvisibleScrollPane(titleLabel);
 
         playlistCoverButton.setIcon(createResizedIcon(playlistCoverIcon, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
         nameField.setText(playlist.getName());
@@ -564,9 +569,151 @@ public abstract class GUIUtil {
     }
 
     /**
+     * 
+     */
+    public static class HoverableButton extends JButton {
+
+        public HoverableButton() {
+
+            super();
+            addMouseListener(new MouseAdapter() {
+                
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                    if(isEnabled()) {
+
+                        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                    }
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                    setCursor(Cursor.getDefaultCursor());
+
+                }
+
+            });
+
+        }
+
+        public HoverableButton(Icon icon) {
+
+            super(icon);
+            addMouseListener(new MouseAdapter() {
+                
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                    if(isEnabled()) {
+
+                        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                    }
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                    setCursor(Cursor.getDefaultCursor());
+
+                }
+
+            });
+
+        }
+
+        public HoverableButton(String string) {
+
+            super(string);
+            addMouseListener(new MouseAdapter() {
+                
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                    if(isEnabled()) {
+
+                        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                    }
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                    setCursor(Cursor.getDefaultCursor());
+
+                }
+
+            });
+
+        }
+
+        public HoverableButton(Action action) {
+
+            super(action);
+            addMouseListener(new MouseAdapter() {
+                
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                    if(isEnabled()) {
+
+                        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                    }
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                    setCursor(Cursor.getDefaultCursor());
+
+                }
+
+            });
+
+        }
+
+        public HoverableButton(String text, Icon icon) {
+
+            super(text, icon);
+            addMouseListener(new MouseAdapter() {
+                
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                    if(isEnabled()) {
+
+                        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                    }
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                    setCursor(Cursor.getDefaultCursor());
+
+                }
+
+            });
+
+        }
+
+    }
+
+    /**
      * Just JDialog with a field to store a byte array
      */
-    private static class BinaryDataDialog extends JDialog {
+    public static class BinaryDataDialog extends JDialog {
 
         private byte[] artworkByteArray = null;
 
@@ -590,9 +737,12 @@ public abstract class GUIUtil {
 
     }
 
-    public static class JInvisibleScrollPane extends JScrollPane {
+    /**
+     * JScrollPane that has no scroll bar and no borders
+     */
+    public static class InvisibleScrollPane extends JScrollPane {
 
-        public JInvisibleScrollPane(Component view) {
+        public InvisibleScrollPane(Component view) {
 
             super(view);
             setVerticalScrollBar(new JInvisibleScrollBar(JScrollBar.VERTICAL));

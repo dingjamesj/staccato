@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -35,6 +36,9 @@ import main.Playlist;
 import main.Track;
 import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
+
+import gui.GUIUtil.InvisibleScrollPane;
+import gui.GUIUtil.HoverableButton;
 
 public class MainPanel extends JPanel {
 
@@ -176,6 +180,11 @@ public class MainPanel extends JPanel {
             public void mouseEntered(MouseEvent e) {
 
                 addPlaylistButtonPanel.setBackground(HIGHLIGHTED_PLAYLIST_BUTTON_COLOR);
+                if(addPlaylistButtonPanel.isEnabled()) {
+
+                    addPlaylistButtonPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
 
             }
 
@@ -183,11 +192,18 @@ public class MainPanel extends JPanel {
             public void mouseExited(MouseEvent e) {
 
                 addPlaylistButtonPanel.setBackground(getBackground());
+                addPlaylistButtonPanel.setCursor(Cursor.getDefaultCursor());
 
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
+
+                if(e.getButton() != MouseEvent.BUTTON1) {
+
+                    return;
+
+                }
 
                 String playlistDirectory = JOptionPane.showInputDialog(
                     StaccatoWindow.staccatoWindow, 
@@ -262,15 +278,15 @@ public class MainPanel extends JPanel {
         JPanel playlistInfoPanel = new JPanel(new MigLayout("insets 0, gap 0"));
 
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
-        JButton playlistCoverButton = new JButton();
+        JButton playlistCoverButton = new HoverableButton();
         JLabel playlistNameLabel = new JLabel(playlist.getName());
-        JScrollPane playlistNameScrollPane = new GUIUtil.JInvisibleScrollPane(playlistNameLabel);
+        JScrollPane playlistNameScrollPane = new InvisibleScrollPane(playlistNameLabel);
         playlistDescriptionLabel = new JLabel("<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>");
-        JScrollPane playlistDescriptionScrollPane = new GUIUtil.JInvisibleScrollPane(playlistDescriptionLabel);
-        JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton playPlaylistButton = new JButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        /*JButton*/ refreshButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton addTrackButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JScrollPane playlistDescriptionScrollPane = new InvisibleScrollPane(playlistDescriptionLabel);
+        JButton returnToHomeButton = new HoverableButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton playPlaylistButton = new HoverableButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        /*JButton*/ refreshButton = new HoverableButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton addTrackButton = new HoverableButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
 
         playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
         playlistCoverImageIcon = GUIUtil.createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
@@ -423,7 +439,29 @@ public class MainPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                GUIUtil.createPlaylistEditorPopup(playlist);
+                if(e.getButton() == MouseEvent.BUTTON1) {
+
+                    GUIUtil.createPlaylistEditorPopup(playlist);
+
+                }
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                if(playlistNameScrollPane.isEnabled()) {
+
+                    playlistNameScrollPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                playlistNameScrollPane.setCursor(Cursor.getDefaultCursor());
 
             }
 
@@ -434,7 +472,29 @@ public class MainPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                GUIUtil.createPlaylistEditorPopup(playlist);
+                if(e.getButton() == MouseEvent.BUTTON1) {
+
+                    GUIUtil.createPlaylistEditorPopup(playlist);
+
+                }
+
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                if(playlistDescriptionScrollPane.isEnabled()) {
+
+                    playlistDescriptionScrollPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                playlistDescriptionScrollPane.setCursor(Cursor.getDefaultCursor());
 
             }
 
@@ -543,7 +603,7 @@ public class MainPanel extends JPanel {
         JLabel playlistCoverLabel = new JLabel(playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON);
         JLabel playlistNameLabel = new JLabel(playlist.getName());
         JLabel playlistDirectoryText = new JLabel();
-        JButton moreOptionsButton = new JButton(MORE_OPTIONS_ICON);
+        JButton moreOptionsButton = new HoverableButton(MORE_OPTIONS_ICON);
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem removePlaylistMenuItem = new JMenuItem("Remove");
         JMenuItem deleteFromDirectoryMenuItem = new JMenuItem("Delete from directory");
@@ -609,6 +669,12 @@ public class MainPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
+                if(e.getButton() != MouseEvent.BUTTON1) {
+
+                    return;
+
+                }
+
                 if(!playlist.directoryExists()) {
 
                     GUIUtil.createPopup("Couldn't Find Playlist", "<html>" + playlist.getName() + " could not be found at<br></br><i>" + playlist.getDirectory() + "</i>", new FlatOptionPaneErrorIcon());
@@ -628,6 +694,11 @@ public class MainPanel extends JPanel {
             public void mouseEntered(MouseEvent e) {
 
                 playlistPanel.setBackground(HIGHLIGHTED_PLAYLIST_BUTTON_COLOR);
+                if(playlistPanel.isEnabled()) {
+
+                    playlistPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
 
             }
 
@@ -635,6 +706,7 @@ public class MainPanel extends JPanel {
             public void mouseExited(MouseEvent e) {
 
                 playlistPanel.setBackground(getBackground());
+                playlistPanel.setCursor(Cursor.getDefaultCursor());
 
             }
 
@@ -645,7 +717,11 @@ public class MainPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                popupMenu.show(moreOptionsButton, e.getX(), e.getY());
+                if(e.getButton() == MouseEvent.BUTTON1) {
+
+                    popupMenu.show(moreOptionsButton, e.getX(), e.getY());
+
+                }
 
             }
 
@@ -750,7 +826,7 @@ public class MainPanel extends JPanel {
         JLabel titleLabel = new JLabel(track.getTitle() != null && !track.getTitle().isBlank() ? track.getTitle() : "[No Title]");
         JLabel artistsLabel = new JLabel(track.getArtists() != null && !track.getArtists().isBlank() ? track.getArtists() : "[Unknown Artists]");
         JLabel albumLabel = new JLabel(track.getAlbum() != null && !track.getAlbum().isBlank() ? track.getAlbum() : "[No Album]");
-        JButton moreOptionsButton = new JButton(MORE_OPTIONS_ICON);
+        JButton moreOptionsButton = new HoverableButton(MORE_OPTIONS_ICON);
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem redownloadTrackMenuItem = new JMenuItem("Redownload Track");
         JMenuItem editMetadataMenuItem = new JMenuItem("Edit Track Info");
@@ -795,6 +871,11 @@ public class MainPanel extends JPanel {
             public void mouseEntered(MouseEvent e) {
 
                 trackPanel.setBackground(HIGHLIGHTED_TRACKLIST_ROW_COLOR);
+                if(trackPanel.isEnabled()) {
+
+                    trackPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
 
             }
 
@@ -802,6 +883,7 @@ public class MainPanel extends JPanel {
             public void mouseExited(MouseEvent e) {
 
                 trackPanel.setBackground(defaultBackgroundColor);
+                trackPanel.setCursor(Cursor.getDefaultCursor());
 
             }
 
@@ -812,7 +894,11 @@ public class MainPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                popupMenu.show(moreOptionsButton, e.getX(), e.getY());
+                if(e.getButton() == MouseEvent.BUTTON1) {
+
+                    popupMenu.show(moreOptionsButton, e.getX(), e.getY());
+
+                }
 
             }
 

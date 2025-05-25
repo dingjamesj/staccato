@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 import com.formdev.flatlaf.ui.FlatSliderUI;
 import com.formdev.flatlaf.util.UIScale;
 
+import gui.GUIUtil.HoverableButton;
 import main.TracklistPlayer;
 import net.miginfocom.swing.MigLayout;
 
@@ -98,9 +99,9 @@ public class PlaybarPanel extends JPanel {
 
         //------------------BEGIN GUI BUILDING------------------
 
-        goBackButton = new JButton(GO_BACK_ICON);
-        playPauseButton = new JButton(PLAY_ICON);
-        skipButton = new JButton(SKIP_ICON);
+        goBackButton = new HoverableButton(GO_BACK_ICON);
+        playPauseButton = new HoverableButton(PLAY_ICON);
+        skipButton = new HoverableButton(SKIP_ICON);
         timeElapsedLabel = new JLabel("-:--");
         timeRemainingLabel = new JLabel("-:--");
         progressSlider = new JSlider(JSlider.HORIZONTAL, 0, PROGRESS_BAR_MAX_VALUE, 0);
