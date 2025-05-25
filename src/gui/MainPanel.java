@@ -82,9 +82,10 @@ public class MainPanel extends JPanel {
     private static final int INFO_PANEL_TABLE_GAP = 3;
     private static final int INFO_PANEL_PLAYLIST_ICON_SIZE = 220;
     private static final int INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE = 48;
+    private static final int PLAYLIST_DESCRIPTION_TO_OPTION_BUTTONS_GAP_PX = 30;
     //For resizing the playlist name label
     private static final int INFO_PANEL_PLAYLIST_NAME_MIN_FONT_SIZE = 36;
-    private static final int INFO_PANEL_PLAYLIST_NAME_SUGGESTED_WIDTH_PX = 200;
+    private static final int INFO_PANEL_PLAYLIST_NAME_SUGGESTED_WIDTH_PX = 2800;
     //Tracklist sizing and spacing
     private static final int TRACKLIST_ROWS_SPACING = 3;
     private static final int TRACK_ARTWORK_WIDTH_PX = 64;
@@ -267,7 +268,7 @@ public class MainPanel extends JPanel {
         playlistDescriptionLabel = new JLabel("<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>");
         JScrollPane playlistDescriptionScrollPane = new GUIUtil.JInvisibleScrollPane(playlistDescriptionLabel);
         JButton returnToHomeButton = new JButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton editPlaylistButton = new JButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton playPlaylistButton = new JButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         /*JButton*/ refreshButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JButton addTrackButton = new JButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
 
@@ -301,7 +302,7 @@ public class MainPanel extends JPanel {
             + "cell 1 0, "
             + "span 6 1, "
             + "align left bottom, "
-            + "pushy, growy, "
+            + "pushy, "
             + "gapleft " + INFO_PANEL_SPACING + ", gapbottom " + INFO_PANEL_SPACING + ", "
             + "wmax 70%, "
         );
@@ -329,7 +330,7 @@ public class MainPanel extends JPanel {
             + "cell 3 1, "
             + "span 1 1, "
             + "align left bottom, "
-            + "gapleft " + INFO_PANEL_SPACING + ", "
+            + "gapleft " + PLAYLIST_DESCRIPTION_TO_OPTION_BUTTONS_GAP_PX + ", "
         );
 
         playlistInfoPanel.add(
@@ -341,7 +342,7 @@ public class MainPanel extends JPanel {
         );
 
         playlistInfoPanel.add(
-            editPlaylistButton, ""
+            playPlaylistButton, ""
             + "cell 5 1, "
             + "span 1 1, "
             + "align left bottom, "
@@ -368,16 +369,16 @@ public class MainPanel extends JPanel {
         //-------BEGIN BUILDING TRACKLIST PANEL-------
 
         tracklistPanel = new JPanel();
-        JPanel wrapperPanel = new JPanel(new BorderLayout());
-        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
+        JPanel tracklistWrapperPanel = new JPanel(new BorderLayout());
+        JScrollPane tracklistScrollPane = new JScrollPane(tracklistWrapperPanel);
 
         tracklistPanel.setLayout(new BoxLayout(tracklistPanel, BoxLayout.Y_AXIS));
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
+        tracklistScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        tracklistScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
-        wrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
+        tracklistWrapperPanel.add(tracklistPanel, BorderLayout.NORTH);
 
-        add(scrollPane,
+        add(tracklistScrollPane,
             "cell 0 1, "
             + "span 1 1, "
             + "grow, "
@@ -399,28 +400,6 @@ public class MainPanel extends JPanel {
         trackLoadingThread.start();
 
         //-------------------------BEGIN LISTENERS ADDITION-------------------------
-        
-        // playlistNameLabel.addComponentListener(new ComponentAdapter() {
-            
-        //     @Override
-        //     public void componentResized(ComponentEvent e) {
-
-        //         int fittingFontSize = GUIUtil.getFittingJLabelFontSize(playlistNameLabel);
-        //         if(fittingFontSize >= MIN_PLAYLIST_NAME_FONT_SIZE) {
-
-        //             playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) fittingFontSize));
-
-        //         } else {
-
-        //             playlistNameLabel.setFont(playlistNameLabel.getFont().deriveFont((float) MIN_PLAYLIST_NAME_FONT_SIZE));
-
-        //         }
-
-        //         playlistNameLabel.setVisible(true);
-
-        //     }
-
-        // });
 
         returnToHomeButton.addActionListener((unused) -> {
 
@@ -435,7 +414,29 @@ public class MainPanel extends JPanel {
 
         playlistCoverButton.addActionListener((unused) -> {
 
-            TracklistPlayer.playTracks(currentTracklist);
+            GUIUtil.createPlaylistEditorPopup(playlist);
+
+        });
+
+        playlistNameScrollPane.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                GUIUtil.createPlaylistEditorPopup(playlist);
+
+            }
+
+        });
+
+        playlistDescriptionScrollPane.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                GUIUtil.createPlaylistEditorPopup(playlist);
+
+            }
 
         });
 
@@ -451,9 +452,9 @@ public class MainPanel extends JPanel {
             
         });
 
-        editPlaylistButton.addActionListener((unused) -> {
+        playPlaylistButton.addActionListener((unused) -> {
 
-            GUIUtil.createPlaylistEditorPopup(playlist);
+            TracklistPlayer.playTracks(currentTracklist);
 
         });
 
