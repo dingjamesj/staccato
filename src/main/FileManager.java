@@ -226,6 +226,19 @@ public abstract class FileManager {
 
     }
 
+    public static void deleteTrack(Track track) throws FileNotFoundException, SecurityException {
+
+        File file = new File(track.getFileLocation());
+        if(!file.exists() || file.isDirectory()) {
+
+            throw new FileNotFoundException("Track file not found at " + track.getFileLocation());
+
+        }
+
+        file.delete();
+
+    }
+
     /**
      * 
      * @param dirStr
@@ -273,26 +286,6 @@ public abstract class FileManager {
 
     }
 
-    /**
-     * Inititalizer
-     * https://stackoverflow.com/questions/50778442/how-to-disable-jaudiotagger-logger-completely
-     */
-    static {
-
-        LogManager manager = LogManager.getLogManager();
-
-        try {
-
-            manager.readConfiguration(FileManager.class.getResourceAsStream("/audioTagger.properties"));
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        }
-
-    }
-
     public static byte[] readByteArray(String artworkURL) throws URISyntaxException, IOException {
 
         return readByteArray(new URI(artworkURL).toURL());
@@ -316,43 +309,23 @@ public abstract class FileManager {
 
     }
 
-    public static void main(String[] args) {
+    /**
+     * Inititalizer
+     * https://stackoverflow.com/questions/50778442/how-to-disable-jaudiotagger-logger-completely
+     */
+    static {
+
+        LogManager manager = LogManager.getLogManager();
 
         try {
 
-            System.out.println(addPlaylist(new Playlist("C:\\Users\\James\\Music\\saco")));
-            Set<Playlist> playlists = readPlaylists();
-            System.out.println(playlists.size());
-            for(Playlist playlist: playlists) {
-
-                System.out.println(playlist);
-
-            }
-
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
+            manager.readConfiguration(FileManager.class.getResourceAsStream("/audioTagger.properties"));
 
         } catch (IOException e) {
 
             e.printStackTrace();
 
         }
-
-        // try {
-            
-        //     Set<Track> tracks = readTracksFromDirectory("C:\\Users\\James\\Music\\saco");
-
-        //     for(Track track: tracks) {
-
-        //         System.out.println(track);
-    
-        //     }
-
-        // } catch (FileNotFoundException e) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // }
 
     }
 

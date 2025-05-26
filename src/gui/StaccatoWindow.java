@@ -7,11 +7,11 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -106,7 +106,12 @@ public class StaccatoWindow extends JFrame {
 					
 				} else {
 					
-					GUIUtil.createPopup("Download In Progress", "Cannot exit program: download is in progress.", new FlatOptionPaneErrorIcon());
+					JOptionPane.showMessageDialog(
+						StaccatoWindow.staccatoWindow, 
+						"Cannot exit program: download is in progress.", 
+						"Cannot Exit Program", 
+						JOptionPane.ERROR_MESSAGE
+					);
 					
 				}
 				

@@ -28,9 +28,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon;
-import com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon;
-
 import main.FileManager;
 import main.Playlist;
 import main.Track;
@@ -218,11 +215,11 @@ public class MainPanel extends JPanel {
                 }
 
                 File directory = new File(playlistDirectory);
-                if(!playlistDirectory.isEmpty() && !directory.isDirectory()) {
+                if(!directory.isDirectory()) {
 
                     JOptionPane.showMessageDialog(StaccatoWindow.staccatoWindow, "Invalid directory.", "Add Playlist", JOptionPane.ERROR_MESSAGE);
 
-                } else if(!playlistDirectory.isEmpty()) {
+                } else {
 
                     try {
 
@@ -237,7 +234,12 @@ public class MainPanel extends JPanel {
                     } catch (FileNotFoundException error) {
 
                         //Dialog box that tells the user to ensure the staccato folder is clear of extraneous files
-                        GUIUtil.createPopup("Cannot create playlist file", "<html>Cannot create playlist file.<br></br>Please make sure that the staccato program directory is clear of any extraneous files.</html>", new FlatOptionPaneErrorIcon());
+                        JOptionPane.showMessageDialog(
+                            StaccatoWindow.staccatoWindow, 
+                            "<html>Cannot create playlist file.<br></br>Please make sure that the staccato program directory is clear of any extraneous files.</html>", 
+                            "Cannot Create Playlist File",
+                            JOptionPane.ERROR_MESSAGE
+                        );
                         error.printStackTrace();
 
                     } catch (IOException error) {
@@ -278,7 +280,7 @@ public class MainPanel extends JPanel {
         JPanel playlistInfoPanel = new JPanel(new MigLayout("insets 0, gap 0"));
 
         ImageIcon playlistCoverImageIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
-        JButton playlistCoverButton = new HoverableButton();
+        JLabel playlistCoverLabel = new JLabel();
         JLabel playlistNameLabel = new JLabel(playlist.getName());
         JScrollPane playlistNameScrollPane = new InvisibleScrollPane(playlistNameLabel);
         playlistDescriptionLabel = new JLabel("<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>");
@@ -288,9 +290,9 @@ public class MainPanel extends JPanel {
         /*JButton*/ refreshButton = new HoverableButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         JButton addTrackButton = new HoverableButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
 
-        playlistCoverButton.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
+        playlistCoverLabel.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
         playlistCoverImageIcon = GUIUtil.createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);
-        playlistCoverButton.setIcon(playlistCoverImageIcon);
+        playlistCoverLabel.setIcon(playlistCoverImageIcon);
         playlistNameLabel.setFont(PLAYLIST_TITLE_FONT);
         playlistNameLabel.setAlignmentX(LEFT_ALIGNMENT);
         playlistNameLabel.setVerticalAlignment(JLabel.BOTTOM);
@@ -306,7 +308,7 @@ public class MainPanel extends JPanel {
         playlistDescriptionLabel.setAlignmentX(LEFT_ALIGNMENT);
 
         playlistInfoPanel.add(
-            playlistCoverButton, ""
+            playlistCoverLabel, ""
             + "cell 0 0, "
             + "span 1 2, "
             + "gaptop " + INFO_PANEL_TABLE_GAP + ", "
@@ -428,9 +430,36 @@ public class MainPanel extends JPanel {
 
         });
 
-        playlistCoverButton.addActionListener((unused) -> {
+        playlistCoverLabel.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
 
-            GUIUtil.createPlaylistEditorPopup(playlist);
+                if(e.getButton() == MouseEvent.BUTTON1) {
+
+                    GUIUtil.createPlaylistEditorPopup(playlist);
+
+                }
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                if(playlistCoverLabel.isEnabled()) {
+
+                    playlistCoverLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
+                
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                playlistCoverLabel.setCursor(Cursor.getDefaultCursor());
+
+            }
 
         });
 
@@ -537,10 +566,14 @@ public class MainPanel extends JPanel {
         loadingLabel.setHorizontalAlignment(JLabel.CENTER);
 
         tracklistPanel.removeAll();
-        loadingLabelPanel.add(loadingLabel);
-        tracklistPanel.add(loadingLabelPanel);
-        tracklistPanel.revalidate();
-        tracklistPanel.repaint();
+        SwingUtilities.invokeLater(() -> {
+
+            loadingLabelPanel.add(loadingLabel);
+            tracklistPanel.add(loadingLabelPanel);
+            tracklistPanel.revalidate();
+            tracklistPanel.repaint();
+
+        });
 
         if(playlist.getTracks() == null) {
 
@@ -558,7 +591,11 @@ public class MainPanel extends JPanel {
 
         currentTracklist = playlist.getTracks();
 
-        playlistDescriptionLabel.setText(createDescription(playlist));
+        SwingUtilities.invokeLater(() -> {
+
+            playlistDescriptionLabel.setText(createDescription(playlist));
+
+        });
 
         //Load the track entry GUIs
         killTracklistLoadingThreadFlag.set(false); //Reset the kill flag
@@ -584,14 +621,24 @@ public class MainPanel extends JPanel {
                 
             }
 
-            tracklistPanel.add(trackPanel);
-            tracklistPanel.revalidate();
-            tracklistPanel.repaint();
+            SwingUtilities.invokeLater(() -> {
+
+                tracklistPanel.add(trackPanel);
+                tracklistPanel.revalidate();
+                tracklistPanel.repaint();
+
+            });
 
         }
 
-        tracklistPanel.remove(0); //Remove the "Loading..." panel
-        refreshButton.setEnabled(true);
+        SwingUtilities.invokeLater(() -> {
+
+            tracklistPanel.remove(0); //Remove the "Loading..." panel
+            tracklistPanel.revalidate();
+            tracklistPanel.repaint();
+            refreshButton.setEnabled(true);
+
+        });
 
     }
 
@@ -606,7 +653,7 @@ public class MainPanel extends JPanel {
         JButton moreOptionsButton = new HoverableButton(MORE_OPTIONS_ICON);
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem removePlaylistMenuItem = new JMenuItem("Remove");
-        JMenuItem deleteFromDirectoryMenuItem = new JMenuItem("Delete from directory");
+        JMenuItem deleteFromDirectoryMenuItem = new JMenuItem("Delete");
         JMenuItem editPlaylistMenuItem = new JMenuItem("Edit");
 
         playlistCoverLabel.setIcon(GUIUtil.createResizedIcon(playlistCoverImageIcon, PLAYLIST_SELECTION_ICON_SIZE, PLAYLIST_SELECTION_ICON_SIZE, Image.SCALE_SMOOTH));
@@ -677,7 +724,12 @@ public class MainPanel extends JPanel {
 
                 if(!playlist.directoryExists()) {
 
-                    GUIUtil.createPopup("Couldn't Find Playlist", "<html>" + playlist.getName() + " could not be found at<br></br><i>" + playlist.getDirectory() + "</i>", new FlatOptionPaneErrorIcon());
+                    JOptionPane.showMessageDialog(
+                        StaccatoWindow.staccatoWindow, 
+                        "<html>" + playlist.getName() + " could not be found at<br></br><i>" + playlist.getDirectory() + "</i>", 
+                        "Couldn't Find Playlist", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
                     return;
 
                 }
@@ -743,19 +795,34 @@ public class MainPanel extends JPanel {
             } catch (IOException e) {
 
                 e.printStackTrace();
-                GUIUtil.createPopup("Error", "<html>Could not remove " + playlist.getName() + ".<br></br>Details: " + e.getMessage() + "", new FlatOptionPaneErrorIcon());
+                JOptionPane.showMessageDialog(
+                    StaccatoWindow.staccatoWindow, 
+                    "<html>Could not remove " + playlist.getName() + ".<br></br>Details: " + e.getMessage() + "", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
 
             }
 
             if(removalWasSuccess) {
 
-                GUIUtil.createPopup("Removed Playlist", "Removed " + playlist.getName() + ".", new FlatOptionPaneInformationIcon());
+                JOptionPane.showMessageDialog(
+                    StaccatoWindow.staccatoWindow, 
+                    "Removed " + playlist.getName() + ".", 
+                    "Removed Playlist", 
+                    JOptionPane.INFORMATION_MESSAGE
+                );
                 initHomePage();
 
             } else {
 
-                GUIUtil.createPopup("Error", "<html>Could not remove " + playlist.getName() + " because it was not found.</html>", new FlatOptionPaneErrorIcon());
+                JOptionPane.showMessageDialog(
+                    StaccatoWindow.staccatoWindow, 
+                    "<html>Could not remove " + playlist.getName() + " because it was not found.</html>", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
 
             }
 
@@ -765,7 +832,7 @@ public class MainPanel extends JPanel {
 
             int confirmationResult = JOptionPane.showConfirmDialog(
                 StaccatoWindow.staccatoWindow, 
-                "<html><b>Are you sure you want to delete " + playlist.getName() + " and its files at </b><br></br><i>" + playlist.getDirectory() + "</i>? <br></br><br></br><b><u>This process is irreversible.</b></u></html>", 
+                "<html>Are you sure you want to delete the following playlist and its files?<br></br><br></br>" + playlist.getName() + "<br></br><i>" + playlist.getDirectory() + "</i><br></br><br></br><b>This process is irreversible.</b></html>", 
                 "Confirm Playlist Deletion", 
                 JOptionPane.YES_NO_OPTION, 
                 JOptionPane.WARNING_MESSAGE
@@ -781,23 +848,43 @@ public class MainPanel extends JPanel {
 
                 } catch (FileNotFoundException e) {
 
-                    GUIUtil.createPopup("Error", "<html>Could not delete " + playlist.getName() + " because the directory <br></br><i>" + playlist.getDirectory() + "</i><br></br>was not found.</html>", new FlatOptionPaneErrorIcon());
+                    JOptionPane.showMessageDialog(
+                        StaccatoWindow.staccatoWindow, 
+                        "<html>Could not delete " + playlist.getName() + " because the directory <br></br><i>" + playlist.getDirectory() + "</i><br></br>was not found.</html>", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
                     return;
 
                 } catch (IOException e) {
 
-                    GUIUtil.createPopup("Error", "<html>Could not delete " + playlist.getName() + ".<br></br>Details: " + e.getMessage() + "", new FlatOptionPaneErrorIcon());
+                    JOptionPane.showMessageDialog(
+                        StaccatoWindow.staccatoWindow, 
+                        "<html>Could not delete " + playlist.getName() + ".<br></br>Details: " + e.getMessage() + "", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
                     return;
 
                 }
 
                 if(directoryWasFullyDeleted) {
 
-                    GUIUtil.createPopup("Deleted Playlist", "<html>Deleted " + playlist.getName() + "'s directory <br></br><i>" + playlist.getDirectory() + "</html>", new FlatOptionPaneInformationIcon());
+                    JOptionPane.showMessageDialog(
+                        StaccatoWindow.staccatoWindow, 
+                        "<html>Deleted " + playlist.getName() + "'s directory <br></br><i>" + playlist.getDirectory() + "</html>", 
+                        "Deleted Playlist", 
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
 
                 } else {
 
-                    GUIUtil.createPopup("Deleted Playlist", "<html>Deleted " + playlist.getName() + "'s music files, directory left undeleted at <br></br><i>" + playlist.getDirectory() + "</html>", new FlatOptionPaneInformationIcon());
+                    JOptionPane.showMessageDialog(
+                        StaccatoWindow.staccatoWindow, 
+                        "<html>Deleted " + playlist.getName() + "'s music files, directory left undeleted at <br></br><i>" + playlist.getDirectory() + "</html>", 
+                        "Deleted Playlist", 
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
 
                 }
 
@@ -828,8 +915,9 @@ public class MainPanel extends JPanel {
         JLabel albumLabel = new JLabel(track.getAlbum() != null && !track.getAlbum().isBlank() ? track.getAlbum() : "[No Album]");
         JButton moreOptionsButton = new HoverableButton(MORE_OPTIONS_ICON);
         JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem redownloadTrackMenuItem = new JMenuItem("Redownload Track");
-        JMenuItem editMetadataMenuItem = new JMenuItem("Edit Track Info");
+        JMenuItem redownloadTrackMenuItem = new JMenuItem("Redownload");
+        JMenuItem editMetadataMenuItem = new JMenuItem("Edit Info");
+        JMenuItem deleteTrackMenuItem = new JMenuItem("Delete");
 
         titleAndArtistsPanel.setLayout(new BoxLayout(titleAndArtistsPanel, BoxLayout.Y_AXIS));
         titleAndArtistsPanel.setOpaque(false);
@@ -851,6 +939,7 @@ public class MainPanel extends JPanel {
         trackPanel.add(moreOptionsButton, "cell 3 0, gapright " + TRACKLIST_ROW_TO_PANEL_EDGE_SPACING_PX);
         popupMenu.add(redownloadTrackMenuItem);
         popupMenu.add(editMetadataMenuItem);
+        popupMenu.add(deleteTrackMenuItem);
 
         trackPanel.addMouseListener(new MouseAdapter() {
 
@@ -914,6 +1003,62 @@ public class MainPanel extends JPanel {
 
             GUIUtil.createEditMetadataDialog(track, trackPanel);
 
+        });
+
+        deleteTrackMenuItem.addActionListener((unused) -> {
+
+            int confirmationResult = JOptionPane.showConfirmDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Are you sure you want to remove the following track?<br></br><br></br>" + track.getTitle() + "<br></br><i>" + track.getFileLocation() + "</i><br></br><br></br><b>This will also delete the track from your file system.</b></html>", 
+                "Confirm Track Deletion", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE
+            );
+
+            if(confirmationResult != JOptionPane.YES_OPTION) {
+
+                return;
+
+            }
+
+            try {
+
+                FileManager.deleteTrack(track);
+                SwingUtilities.invokeLater(() -> {
+
+                    tracklistPanel.remove(trackPanel);
+                    tracklistPanel.revalidate();
+                    tracklistPanel.repaint();
+
+                });
+                
+                JOptionPane.showMessageDialog(
+                    StaccatoWindow.staccatoWindow, 
+                    "<html>Deleted " + track.getTitle() + ".</html>", 
+                    "Deleted Track", 
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } catch (FileNotFoundException e) {
+
+                JOptionPane.showMessageDialog(
+                    StaccatoWindow.staccatoWindow, 
+                    "<html>Track was not deleted: file wasn't found at <br></br><i>" + track.getFileLocation() + "</i></html>", 
+                    "Couldn't Delete Track", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+
+            } catch (SecurityException e) {
+
+                JOptionPane.showMessageDialog(
+                    StaccatoWindow.staccatoWindow, 
+                    "<html>Track was not deleted: needs security permissions at <br></br><i>" + track.getFileLocation() + "</i></html>", 
+                    "Couldn't Delete Track", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+                
+            }
+            
         });
 
         return trackPanel;

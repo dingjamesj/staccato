@@ -1,6 +1,5 @@
 package gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -34,8 +33,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.basic.BasicScrollBarUI;
-
-import com.formdev.flatlaf.icons.FlatOptionPaneAbstractIcon;
 
 import main.FileManager;
 import main.Playlist;
@@ -144,48 +141,6 @@ public abstract class GUIUtil {
         return (int) testFontSize;
 
     }
-
-    public static JDialog createPopup(String title, String message, FlatOptionPaneAbstractIcon icon) {
-		
-		JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
-		dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		dialog.setTitle(title);
-		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
-		dialog.setResizable(false);
-		
-		JPanel topPanel = new JPanel();
-		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-		topPanel.add(Box.createHorizontalStrut(15));
-		topPanel.add(new JLabel(icon));
-		topPanel.add(Box.createHorizontalStrut(12));
-		topPanel.add(new JLabel(message));
-		topPanel.add(Box.createHorizontalStrut(15));
-		
-		dialog.add(Box.createVerticalStrut(10));
-		dialog.add(topPanel);
-		
-		JPanel bottomPanel = new JPanel();
-		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-		JButton okayButton = new JButton("OK");
-		okayButton.setBackground(new Color(0x80005d));
-		okayButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		okayButton.addActionListener((e) -> {
-			
-			dialog.dispose();
-			
-		});
-		bottomPanel.add(okayButton);
-		
-		dialog.add(Box.createVerticalStrut(15));
-		dialog.add(bottomPanel);
-		dialog.add(Box.createVerticalStrut(15));
-		dialog.pack();
-		dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
-		dialog.setVisible(true);
-
-		return dialog;
-		
-	}
 
     public static JDialog createPlaylistEditorPopup(Playlist playlist) {
 
