@@ -58,10 +58,10 @@ public class MainPanel extends JPanel {
     private static final ImageIcon PLACEHOLDER_ART_ICON = GUIUtil.createImageIcon("src/main/resources/placeholder art.png");
     private static final ImageIcon REFRESH_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
     private static final ImageIcon RESYNC_ICON = GUIUtil.createImageIcon("src/main/resources/resync.png");
-    private static final ImageIcon EDIT_ICON = GUIUtil.createImageIcon("src/main/resources/edit.png");
+    private static final ImageIcon PLAY_ICON = GUIUtil.createImageIcon("src/main/resources/play.png");
     private static final ImageIcon HOME_ICON = GUIUtil.createImageIcon("src/main/resources/home.png");
     private static final ImageIcon MORE_OPTIONS_ICON = GUIUtil.createImageIcon("src/main/resources/more options.png");
-    private static final ImageIcon ADD_ICON = GUIUtil.createImageIcon("src/main/resources/resync.png");
+    private static final ImageIcon ADD_ICON = GUIUtil.createImageIcon("src/main/resources/add.png");
 
     private static final Color ALTERNATE_TRACKLIST_ROW_COLOR = new Color(0x151515);
     private static final Color HIGHLIGHTED_TRACKLIST_ROW_COLOR = new Color(0x303030);
@@ -292,9 +292,9 @@ public class MainPanel extends JPanel {
         playlistDescriptionLabel = new JLabel("<html>" + playlist.getDirectory() + "<br></br><i>Loading...</i></html>");
         JScrollPane playlistDescriptionScrollPane = new InvisibleScrollPane(playlistDescriptionLabel);
         JButton returnToHomeButton = new HoverableButton(GUIUtil.createResizedIcon(HOME_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton playPlaylistButton = new HoverableButton(GUIUtil.createResizedIcon(EDIT_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton playPlaylistButton = new HoverableButton(GUIUtil.createResizedIcon(PLAY_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
         /*JButton*/ refreshButton = new HoverableButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
-        JButton addTrackButton = new HoverableButton(GUIUtil.createResizedIcon(REFRESH_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
+        JButton addTrackButton = new HoverableButton(GUIUtil.createResizedIcon(ADD_ICON, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, INFO_PANEL_PLAYLIST_OPTION_BUTTON_SIZE, Image.SCALE_SMOOTH));
 
         playlistCoverLabel.setPreferredSize(new Dimension(INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE));
         playlistCoverImageIcon = GUIUtil.createResizedIcon(playlistCoverImageIcon, INFO_PANEL_PLAYLIST_ICON_SIZE, INFO_PANEL_PLAYLIST_ICON_SIZE, Image.SCALE_SMOOTH);

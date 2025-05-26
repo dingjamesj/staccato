@@ -26,8 +26,8 @@ public class QueuePanel extends JPanel {
     private static final Font TRACK_NUMBER_FONT = new Font("Segoe UI", Font.BOLD, 16);
     private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.PLAIN, 16);
 
-    private static final ImageIcon LOOP_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
-    private static final ImageIcon SHUFFLE_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
+    private static final ImageIcon LOOP_ICON = GUIUtil.createImageIcon("src/main/resources/repeat.png");
+    private static final ImageIcon SHUFFLE_ICON = GUIUtil.createImageIcon("src/main/resources/shuffle.png");
 
     private static final int SCROLL_SPEED = 11;
     private static final int ROW_SPACING = 3;

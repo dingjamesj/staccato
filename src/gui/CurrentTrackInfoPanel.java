@@ -24,8 +24,8 @@ public class CurrentTrackInfoPanel extends JPanel {
     private static final Font ARTISTS_FONT = new Font("Segoe UI", Font.BOLD, 18);
     private static final Font ALBUM_FONT = new Font("Segoe UI", Font.ITALIC, 18);
 
-    private static final ImageIcon EDIT_METADATA_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
-    private static final ImageIcon REDOWNLOAD_ICON = GUIUtil.createImageIcon("src/main/resources/refresh.png");
+    private static final ImageIcon EDIT_METADATA_ICON = GUIUtil.createImageIcon("src/main/resources/edit.png");
+    private static final ImageIcon REDOWNLOAD_ICON = GUIUtil.createImageIcon("src/main/resources/resync.png");
 
     private static final int GUI_TO_WINDOW_TOP_GAP = 70;
     private static final int GUI_GAP = 10;
