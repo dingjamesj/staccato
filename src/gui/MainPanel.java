@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -61,6 +63,7 @@ public class MainPanel extends JPanel {
 
     private static final Color ALTERNATE_TRACKLIST_ROW_COLOR = new Color(0x151515);
     private static final Color HIGHLIGHTED_TRACKLIST_ROW_COLOR = new Color(0x303030);
+    private static final Color SELECTED_TRACKLIST_ROW_COLOR = new Color(0x383838);
     private static final Color HIGHLIGHTED_PLAYLIST_BUTTON_COLOR = new Color(0x303030);
 
     //---------------------------------------- /\ VISUALS /\ ----------------------------------------
@@ -425,6 +428,7 @@ public class MainPanel extends JPanel {
 
                 killTracklistLoadingThreadFlag.set(true);
                 initHomePage();
+                PlaybarPanel.playbarPanel.setFocusOnPlayPauseButton();
 
             });
 
@@ -813,7 +817,12 @@ public class MainPanel extends JPanel {
                     "Removed Playlist", 
                     JOptionPane.INFORMATION_MESSAGE
                 );
-                initHomePage();
+
+                SwingUtilities.invokeLater(() -> {
+
+                    initHomePage();
+
+                });
 
             } else {
 
@@ -919,6 +928,7 @@ public class MainPanel extends JPanel {
         JMenuItem editMetadataMenuItem = new JMenuItem("Edit Info");
         JMenuItem deleteTrackMenuItem = new JMenuItem("Delete");
 
+        setFocusable(true);
         titleAndArtistsPanel.setLayout(new BoxLayout(titleAndArtistsPanel, BoxLayout.Y_AXIS));
         titleAndArtistsPanel.setOpaque(false);
         artworkLabel.setPreferredSize(new Dimension(TRACK_ARTWORK_WIDTH_PX, TRACK_ARTWORK_WIDTH_PX));
@@ -946,20 +956,28 @@ public class MainPanel extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
 
-                if(e.getClickCount() < 2) {
+                if(e.getClickCount() == 2) {
 
-                    return;
+                    TracklistPlayer.playTracks(currentTracklist, trackIndex);
+
+                } else if(e.getClickCount() == 1) {
+
+                    trackPanel.requestFocusInWindow();
+                    trackPanel.setBackground(SELECTED_TRACKLIST_ROW_COLOR);
 
                 }
-
-                TracklistPlayer.playTracks(currentTracklist, trackIndex);
 
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
 
-                trackPanel.setBackground(HIGHLIGHTED_TRACKLIST_ROW_COLOR);
+                if(!trackPanel.isFocusOwner()) {
+
+                    trackPanel.setBackground(HIGHLIGHTED_TRACKLIST_ROW_COLOR);
+
+                }
+
                 if(trackPanel.isEnabled()) {
 
                     trackPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -971,8 +989,24 @@ public class MainPanel extends JPanel {
             @Override
             public void mouseExited(MouseEvent e) {
 
-                trackPanel.setBackground(defaultBackgroundColor);
+                if(!trackPanel.isFocusOwner()) {
+
+                    trackPanel.setBackground(defaultBackgroundColor);
+
+                }
+
                 trackPanel.setCursor(Cursor.getDefaultCursor());
+
+            }
+
+        });
+
+        trackPanel.addFocusListener(new FocusAdapter() {
+            
+            @Override
+            public void focusLost(FocusEvent e) {
+
+                trackPanel.setBackground(defaultBackgroundColor);
 
             }
 

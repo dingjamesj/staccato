@@ -48,25 +48,37 @@ public class PlaybarPanel extends JPanel {
 
         TracklistPlayer.addStartTrackAction(() -> {
 
-            playbarPanel.setButtonsEnabled(true);
-            playbarPanel.setButtonsMode(true);
+            SwingUtilities.invokeLater(() -> {
+
+                playbarPanel.setButtonsEnabled(true);
+                playbarPanel.setButtonsMode(true);
+
+            });
 
         });
         
         TracklistPlayer.addSwitchTrackAction(() -> {
 
-            playbarPanel.setButtonsEnabled(true);
-            playbarPanel.setButtonsMode(true);
+            SwingUtilities.invokeLater(() -> {
+
+                playbarPanel.setButtonsEnabled(true);
+                playbarPanel.setButtonsMode(true);
+
+            });
             
         });
 
         TracklistPlayer.addEndTrackActions(() -> {
 
-            playbarPanel.setButtonsEnabled(false);
-            playbarPanel.setButtonsMode(false);
-            playbarPanel.setProgressSliderValue(0);
-            playbarPanel.timeElapsedLabel.setText("-:--");
-            playbarPanel.timeRemainingLabel.setText("-:--");
+            SwingUtilities.invokeLater(() -> {
+
+                playbarPanel.setButtonsEnabled(false);
+                playbarPanel.setButtonsMode(false);
+                playbarPanel.setProgressSliderValue(0);
+                playbarPanel.timeElapsedLabel.setText("-:--");
+                playbarPanel.timeRemainingLabel.setText("-:--");
+
+            });
 
         });
 
@@ -275,6 +287,12 @@ public class PlaybarPanel extends JPanel {
             playPauseButton.setIcon(PLAY_ICON);
 
         }
+
+    }
+
+    public void setFocusOnPlayPauseButton() {
+
+        playPauseButton.requestFocusInWindow();
 
     }
 

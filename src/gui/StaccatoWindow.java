@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -50,6 +52,7 @@ public class StaccatoWindow extends JFrame {
 			staccatoWindow = new StaccatoWindow();
 			staccatoWindow.setVisible(true);
 			staccatoWindow.setLocationRelativeTo(null);
+			PlaybarPanel.playbarPanel.setFocusOnPlayPauseButton();
 		
 			//------------END GUI BUILDING------------
 			
@@ -117,6 +120,17 @@ public class StaccatoWindow extends JFrame {
 				
 			}
 		
+		});
+
+		getRootPane().addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				PlaybarPanel.playbarPanel.setFocusOnPlayPauseButton();
+
+			}
+			
 		});
 		
 		StaccatoWindow.staccatoWindow = this;

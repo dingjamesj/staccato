@@ -707,6 +707,18 @@ public abstract class GUIUtil {
             getViewport().setOpaque(false);
             getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
             getHorizontalScrollBar().setUnitIncrement(SCROLL_SPEED);
+            setFocusable(true);
+            
+            addMouseListener(new MouseAdapter() {
+                
+                @Override
+                public void mouseClicked(MouseEvent e) {
+
+                    requestFocusInWindow();
+
+                }
+
+            });
 
         }
 

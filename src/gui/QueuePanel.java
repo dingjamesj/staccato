@@ -122,6 +122,17 @@ public class QueuePanel extends JPanel {
 
         });
 
+        scrollPane.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                scrollPane.requestFocusInWindow();
+
+            }
+
+        });
+
     }
 
     /**
