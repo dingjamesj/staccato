@@ -9,6 +9,8 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -103,6 +105,7 @@ public class MainPanel extends JPanel {
     public static MainPanel mainPanel;
 
     private JButton refreshButton;
+    private JPanel playlistSelectionPanel;
     private JPanel tracklistPanel;
     private JLabel playlistDescriptionLabel;
 
@@ -127,7 +130,7 @@ public class MainPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         JLabel titleLabel = new JLabel("Your Playlists");
-        JPanel playlistSelectionPanel = new JPanel(new WrapLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
+        playlistSelectionPanel = new JPanel(new WrapLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
         JScrollPane playlistSelectionScrollPane = new JScrollPane(playlistSelectionPanel);
         JPanel addPlaylistButtonPanel = createPlaylistButton(new Playlist("")); //This is just a modified playlist panel
 
@@ -839,67 +842,7 @@ public class MainPanel extends JPanel {
 
         deleteFromDirectoryMenuItem.addActionListener((unused) -> {
 
-            int confirmationResult = JOptionPane.showConfirmDialog(
-                StaccatoWindow.staccatoWindow, 
-                "<html>Are you sure you want to delete the following playlist and its files?<br></br><br></br>" + playlist.getName() + "<br></br><i>" + playlist.getDirectory() + "</i><br></br><br></br><b>This process is irreversible.</b></html>", 
-                "Confirm Playlist Deletion", 
-                JOptionPane.YES_NO_OPTION, 
-                JOptionPane.WARNING_MESSAGE
-            );
-
-            if(confirmationResult == JOptionPane.YES_OPTION) {
-
-                boolean directoryWasFullyDeleted;
-                try {
-
-                    directoryWasFullyDeleted = FileManager.deletePlaylist(playlist);
-                    FileManager.removePlaylist(playlist); //Then remove playlist from staccato
-
-                } catch (FileNotFoundException e) {
-
-                    JOptionPane.showMessageDialog(
-                        StaccatoWindow.staccatoWindow, 
-                        "<html>Could not delete " + playlist.getName() + " because the directory <br></br><i>" + playlist.getDirectory() + "</i><br></br>was not found.</html>", 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                    return;
-
-                } catch (IOException e) {
-
-                    JOptionPane.showMessageDialog(
-                        StaccatoWindow.staccatoWindow, 
-                        "<html>Could not delete " + playlist.getName() + ".<br></br>Details: " + e.getMessage() + "", 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                    return;
-
-                }
-
-                if(directoryWasFullyDeleted) {
-
-                    JOptionPane.showMessageDialog(
-                        StaccatoWindow.staccatoWindow, 
-                        "<html>Deleted " + playlist.getName() + "'s directory <br></br><i>" + playlist.getDirectory() + "</html>", 
-                        "Deleted Playlist", 
-                        JOptionPane.INFORMATION_MESSAGE
-                    );
-
-                } else {
-
-                    JOptionPane.showMessageDialog(
-                        StaccatoWindow.staccatoWindow, 
-                        "<html>Deleted " + playlist.getName() + "'s music files, directory left undeleted at <br></br><i>" + playlist.getDirectory() + "</html>", 
-                        "Deleted Playlist", 
-                        JOptionPane.INFORMATION_MESSAGE
-                    );
-
-                }
-
-                initHomePage();
-
-            }
+            promptPlaylistDeletion(playlist, playlistPanel);
 
         });
 
@@ -1012,6 +955,21 @@ public class MainPanel extends JPanel {
 
         });
 
+        trackPanel.addKeyListener(new KeyAdapter() {
+            
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+                if(e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+
+                    promptTrackDeletion(track, trackPanel);
+
+                }
+
+            }
+
+        });
+
         moreOptionsButton.addMouseListener(new MouseAdapter() {
             
             @Override
@@ -1041,61 +999,141 @@ public class MainPanel extends JPanel {
 
         deleteTrackMenuItem.addActionListener((unused) -> {
 
-            int confirmationResult = JOptionPane.showConfirmDialog(
-                StaccatoWindow.staccatoWindow, 
-                "<html>Are you sure you want to remove the following track?<br></br><br></br>" + track.getTitle() + "<br></br><i>" + track.getFileLocation() + "</i><br></br><br></br><b>This will also delete the track from your file system.</b></html>", 
-                "Confirm Track Deletion", 
-                JOptionPane.YES_NO_OPTION, 
-                JOptionPane.WARNING_MESSAGE
-            );
-
-            if(confirmationResult != JOptionPane.YES_OPTION) {
-
-                return;
-
-            }
-
-            try {
-
-                FileManager.deleteTrack(track);
-                SwingUtilities.invokeLater(() -> {
-
-                    tracklistPanel.remove(trackPanel);
-                    tracklistPanel.revalidate();
-                    tracklistPanel.repaint();
-
-                });
-                
-                JOptionPane.showMessageDialog(
-                    StaccatoWindow.staccatoWindow, 
-                    "<html>Deleted " + track.getTitle() + ".</html>", 
-                    "Deleted Track", 
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-
-            } catch (FileNotFoundException e) {
-
-                JOptionPane.showMessageDialog(
-                    StaccatoWindow.staccatoWindow, 
-                    "<html>Track was not deleted: file wasn't found at <br></br><i>" + track.getFileLocation() + "</i></html>", 
-                    "Couldn't Delete Track", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-
-            } catch (SecurityException e) {
-
-                JOptionPane.showMessageDialog(
-                    StaccatoWindow.staccatoWindow, 
-                    "<html>Track was not deleted: needs security permissions at <br></br><i>" + track.getFileLocation() + "</i></html>", 
-                    "Couldn't Delete Track", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-                
-            }
+            promptTrackDeletion(track, trackPanel);
             
         });
 
         return trackPanel;
+
+    }
+
+    private void promptPlaylistDeletion(Playlist playlist, JPanel playlistPanel) {
+
+        int confirmationResult = JOptionPane.showConfirmDialog(
+            StaccatoWindow.staccatoWindow, 
+            "<html>Are you sure you want to delete the following playlist and its files?<br></br><br></br>" + playlist.getName() + "<br></br><i>" + playlist.getDirectory() + "</i><br></br><br></br><b>This process is irreversible.</b></html>", 
+            "Confirm Playlist Deletion", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if(confirmationResult != JOptionPane.YES_OPTION) {
+
+            return;
+
+        }
+
+        boolean directoryWasFullyDeleted;
+        try {
+
+            directoryWasFullyDeleted = FileManager.deletePlaylist(playlist);
+            FileManager.removePlaylist(playlist); //Then remove playlist from staccato
+
+        } catch (FileNotFoundException e) {
+
+            JOptionPane.showMessageDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Could not delete " + playlist.getName() + " because the directory <br></br><i>" + playlist.getDirectory() + "</i><br></br>was not found.</html>", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+
+        } catch (IOException e) {
+
+            JOptionPane.showMessageDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Could not delete " + playlist.getName() + ".<br></br>Details: " + e.getMessage() + "", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+
+        }
+
+        if(directoryWasFullyDeleted) {
+
+            JOptionPane.showMessageDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Deleted " + playlist.getName() + "'s directory <br></br><i>" + playlist.getDirectory() + "</html>", 
+                "Deleted Playlist", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } else {
+
+            JOptionPane.showMessageDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Deleted " + playlist.getName() + "'s music files, directory left undeleted at <br></br><i>" + playlist.getDirectory() + "</html>", 
+                "Deleted Playlist", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+        }
+
+        SwingUtilities.invokeLater(() -> {
+
+            playlistSelectionPanel.remove(playlistPanel);
+            playlistSelectionPanel.revalidate();
+            playlistSelectionPanel.repaint();
+            
+        });
+
+    }
+
+    private void promptTrackDeletion(Track track, JPanel trackPanel) {
+
+        int confirmationResult = JOptionPane.showConfirmDialog(
+            StaccatoWindow.staccatoWindow, 
+            "<html>Are you sure you want to remove the following track?<br></br><br></br>" + track.getTitle() + "<br></br><i>" + track.getFileLocation() + "</i><br></br><br></br><b>This will also delete the track from your file system.</b></html>", 
+            "Confirm Track Deletion", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if(confirmationResult != JOptionPane.YES_OPTION) {
+
+            return;
+
+        }
+
+        try {
+
+            FileManager.deleteTrack(track);
+            SwingUtilities.invokeLater(() -> {
+
+                tracklistPanel.remove(trackPanel);
+                tracklistPanel.revalidate();
+                tracklistPanel.repaint();
+
+            });
+            
+            JOptionPane.showMessageDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Deleted " + track.getTitle() + ".</html>", 
+                "Deleted Track", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } catch (FileNotFoundException e) {
+
+            JOptionPane.showMessageDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Track was not deleted: file wasn't found at <br></br><i>" + track.getFileLocation() + "</i></html>", 
+                "Couldn't Delete Track", 
+                JOptionPane.ERROR_MESSAGE
+            );
+
+        } catch (SecurityException e) {
+
+            JOptionPane.showMessageDialog(
+                StaccatoWindow.staccatoWindow, 
+                "<html>Track was not deleted: needs security permissions at <br></br><i>" + track.getFileLocation() + "</i></html>", 
+                "Couldn't Delete Track", 
+                JOptionPane.ERROR_MESSAGE
+            );
+            
+        }
 
     }
 
