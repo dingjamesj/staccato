@@ -2,6 +2,7 @@ package main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,13 +30,23 @@ public class Playlist implements Serializable {
 
     public Playlist(String directory) {
 
-        this.name = new File(directory).getName();
+        File directoryFile = new File(directory);
+        this.name = directoryFile.getName();
         if(this.name.isEmpty()) {
 
             this.name = "New Playlist";
 
         }
-        this.directory = directory;
+        try {
+
+            this.directory = directoryFile.getCanonicalPath();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+            this.directory = directory;
+
+        }
         this.coverArtByteArray = null;
 
     }
@@ -71,6 +82,13 @@ public class Playlist implements Serializable {
     }
 
     public void setCoverArtByteArray(byte[] coverArtByteArray) {
+
+        if(coverArtByteArray == null) {
+
+            this.coverArtByteArray = null;
+            return;
+
+        }
 
         this.coverArtByteArray = new byte[coverArtByteArray.length];
         for(int i = 0; i < coverArtByteArray.length; i++) {
@@ -229,14 +247,14 @@ public class Playlist implements Serializable {
 
         }
 
-        //Windows isn't case sensitive, while Unix-based/Unix-like are (e.g. MacOS and Linux)
-        if(System.getProperty("os.name").toLowerCase().contains("windows")) {
+        try {
 
-            return directory.equalsIgnoreCase(((Playlist) obj).directory);
+            return new File(directory).getCanonicalPath().equals(new File(((Playlist) obj).directory).getCanonicalPath());
 
-        } else {
+        } catch (IOException e) {
 
-            return directory.equals(((Playlist) obj).directory);
+            e.printStackTrace();
+            return false;
 
         }
 
