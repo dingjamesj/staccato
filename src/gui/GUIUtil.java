@@ -154,7 +154,7 @@ public abstract class GUIUtil {
 
     public static JDialog createPlaylistEditorPopup(Playlist playlist, int playlistIndex) {
 
-        BinaryDataDialog dialog = new BinaryDataDialog(StaccatoWindow.staccatoWindow, true);
+        InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         dialog.setTitle("Edit Playlist");
         dialog.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX));
@@ -237,7 +237,7 @@ public abstract class GUIUtil {
         );
 
         //--------------------------START ADDING ACTION LISTENERS--------------------------
-        
+
         dialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeDialog");
         dialog.getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
 
@@ -325,6 +325,7 @@ public abstract class GUIUtil {
 
                 File selectedDirectory = fileChooser.getSelectedFile();
                 currentDirectoryLabel.setText(GUIUtil.truncateWithEllipsis(selectedDirectory.getAbsolutePath(), currentDirectoryLabel, CURRENT_PLAYLIST_DIRECTORY_LABEL_MAX_WIDTH_PX) + " ");
+                dialog.setString(selectedDirectory.getAbsolutePath());
 
             }
 
@@ -346,7 +347,7 @@ public abstract class GUIUtil {
                 //If the user changed the playlist's directory, then we need to create a new playlist
 
                 File originalDirectory = new File(playlist.getDirectory());
-                File newDirectory = new File(currentDirectoryLabel.getText());
+                File newDirectory = new File(dialog.getString() == null ? "" : dialog.getString());
                 String newCanonicalPath = newDirectory.getCanonicalPath();
                 boolean editWasSuccessful;
 
@@ -499,7 +500,7 @@ public abstract class GUIUtil {
 
     public static JDialog createEditMetadataDialog(Track track, JPanel trackPanel) {
 
-        BinaryDataDialog dialog = new BinaryDataDialog(StaccatoWindow.staccatoWindow, true);
+        InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         dialog.setTitle("Edit Metadata");
         dialog.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX));
@@ -818,11 +819,12 @@ public abstract class GUIUtil {
     /**
      * Just JDialog with a field to store a byte array
      */
-    public static class BinaryDataDialog extends JDialog {
+    public static class InternalDataDialog extends JDialog {
 
         private byte[] byteArray = null;
+        private String string = null;
 
-        public BinaryDataDialog(Frame owner, boolean modal) {
+        public InternalDataDialog(Frame owner, boolean modal) {
 
             super(owner, modal);
 
@@ -834,9 +836,21 @@ public abstract class GUIUtil {
 
         }
 
+        public String getString() {
+
+            return string;
+
+        }
+
         public void setByteArray(byte[] byteArray) {
 
             this.byteArray = byteArray;
+
+        }
+
+        public void setString(String string) {
+
+            this.string = string;
 
         }
 
