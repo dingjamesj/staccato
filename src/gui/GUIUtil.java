@@ -152,7 +152,7 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createPlaylistEditorPopup(Playlist playlist) {
+    public static JDialog createPlaylistEditorPopup(Playlist playlist, int playlistIndex) {
 
         BinaryDataDialog dialog = new BinaryDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -357,12 +357,29 @@ public abstract class GUIUtil {
                     newPlaylist.setCoverArtByteArray(dialog.getByteArray());
                     editWasSuccessful = FileManager.replacePlaylist(playlist, newPlaylist);
 
-                    MainPanel.mainPanel.initTracklistPage(newPlaylist);
+                    if(MainPanel.mainPanel.getIsOnTracklistView()) {
+
+                        MainPanel.mainPanel.initTracklistPage(newPlaylist);
+
+                    } else {
+
+                        MainPanel.mainPanel.updatePlaylistButton(newPlaylist, playlistIndex);
+
+                    }
 
                 } else {
 
                     editWasSuccessful = FileManager.replacePlaylist(playlist, playlist);
-                    MainPanel.mainPanel.updatePlaylistInfoPanel(dialog.getByteArray(), playlist.getName());
+                    
+                    if(MainPanel.mainPanel.getIsOnTracklistView()) {
+
+                        MainPanel.mainPanel.updatePlaylistInfoPanel(dialog.getByteArray(), playlist.getName());
+
+                    } else {
+
+                        MainPanel.mainPanel.updatePlaylistButton(playlist, playlistIndex);
+
+                    }
 
                 }
 

@@ -17,6 +17,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -113,6 +114,7 @@ public class MainPanel extends JPanel {
 
     private final AtomicBoolean killTracklistLoadingThreadFlag = new AtomicBoolean(false);
     private Track[] currentTracklist;
+    private boolean isOnTracklistView = false;
 
     public MainPanel() {
 
@@ -126,6 +128,7 @@ public class MainPanel extends JPanel {
 
         FileManager.stopReadingTracks();
         currentTracklist = null;
+        isOnTracklistView = false;
 
         removeAll();
 
@@ -134,7 +137,7 @@ public class MainPanel extends JPanel {
         JLabel titleLabel = new JLabel("Your Playlists");
         playlistSelectionPanel = new JPanel(new WrapLayout(FlowLayout.CENTER, PLAYLIST_SELECTION_HSPACING, PLAYLIST_SELECTION_VSPACING));
         JScrollPane playlistSelectionScrollPane = new JScrollPane(playlistSelectionPanel);
-        JPanel addPlaylistButtonPanel = createPlaylistButton(new Playlist("")); //This is just a modified playlist panel
+        JPanel addPlaylistButtonPanel = createPlaylistButton(new Playlist(""), 0); //This is just a modified playlist panel
 
         titleLabel.setFont(PANEL_TITLE_FONT);
         playlistSelectionScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
@@ -159,9 +162,10 @@ public class MainPanel extends JPanel {
 
         add(titleLabel);
         playlistSelectionPanel.add(addPlaylistButtonPanel);
-        for(Playlist playlist: playlists) {
+        Iterator<Playlist> iterator = playlists.iterator();
+        for(int i = 1; iterator.hasNext(); i++) {
 
-            playlistSelectionPanel.add(createPlaylistButton(playlist));
+            playlistSelectionPanel.add(createPlaylistButton(iterator.next(), i));
 
         }
         add(Box.createVerticalStrut(PANEL_TITLE_TO_PLAYLIST_SELECTION_PANEL_GAP));
@@ -282,6 +286,8 @@ public class MainPanel extends JPanel {
             "", 
             "[" + (int) (INFO_PANEL_HEIGHT_PROPORTION * 100) + "%][" + (int) ((1 - INFO_PANEL_HEIGHT_PROPORTION) * 100) + "%]"
         ));
+        
+        isOnTracklistView = true;
 
         //-----BEGIN BUILDING PLAYLIST INFO PANEL-----
 
@@ -470,7 +476,7 @@ public class MainPanel extends JPanel {
 
                 if(e.getButton() == MouseEvent.BUTTON1) {
 
-                    GUIUtil.createPlaylistEditorPopup(playlist);
+                    GUIUtil.createPlaylistEditorPopup(playlist, 0);
 
                 }
 
@@ -503,7 +509,7 @@ public class MainPanel extends JPanel {
 
                 if(e.getButton() == MouseEvent.BUTTON1) {
 
-                    GUIUtil.createPlaylistEditorPopup(playlist);
+                    GUIUtil.createPlaylistEditorPopup(playlist, 0);
 
                 }
 
@@ -560,6 +566,15 @@ public class MainPanel extends JPanel {
             playlistNameLabel.setFont(PLAYLIST_NAME_FONT);
 
         }
+
+    }
+
+    protected void updatePlaylistButton(Playlist playlist, int index) {
+
+        playlistSelectionPanel.remove(index);
+        playlistSelectionPanel.add(createPlaylistButton(playlist, index), index);
+        playlistSelectionPanel.revalidate();
+        playlistSelectionPanel.repaint();
 
     }
 
@@ -656,7 +671,7 @@ public class MainPanel extends JPanel {
 
     }
 
-    private JPanel createPlaylistButton(Playlist playlist) {
+    private JPanel createPlaylistButton(Playlist playlist, int index) {
         
         JPanel playlistPanel = new JPanel(new MigLayout("insets 3 3 3 3"));
 
@@ -795,7 +810,7 @@ public class MainPanel extends JPanel {
 
         editPlaylistMenuItem.addActionListener((unused) -> {
 
-            GUIUtil.createPlaylistEditorPopup(playlist);
+            GUIUtil.createPlaylistEditorPopup(playlist, index);
 
         });
 
@@ -1141,6 +1156,12 @@ public class MainPanel extends JPanel {
             );
             
         }
+
+    }
+
+    public boolean getIsOnTracklistView() {
+
+        return isOnTracklistView;
 
     }
 
