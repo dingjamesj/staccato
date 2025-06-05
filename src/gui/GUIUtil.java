@@ -21,6 +21,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -32,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -47,6 +49,7 @@ import net.miginfocom.swing.MigLayout;
 
 public abstract class GUIUtil {
     
+    private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(300, 500);
     private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
     private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
     private static final Dimension PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE = new Dimension(320, 400);
@@ -152,6 +155,124 @@ public abstract class GUIUtil {
 
     }
 
+    public static JDialog createAddPlaylistDialog() {
+
+        InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        dialog.setTitle("Add Playlist");
+        dialog.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX));
+        dialog.setResizable(false);
+        dialog.setSize(PLAYLIST_ADDER_DIALOG_WINDOW_SIZE);
+
+        //Import playlist:
+        // - Cover art
+        // - Name
+        // - Directory
+
+        //Create new playlist:
+        // - Cover art
+        // - Name
+        // - Directory to create new folder
+        // - Spotify URL
+
+        JLabel titleLabel = new JLabel("Add Playlist");
+        JRadioButton createNewButton = new JRadioButton("Create new playlist from scratch");
+        JRadioButton importExistingButton = new JRadioButton("Import existing mp3 folder");
+        ButtonGroup buttonGroup = new ButtonGroup();
+        JLabel playlistCoverLabel = new JLabel(createResizedIcon(PLACEHOLDER_ART_ICON, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+        JButton removeCoverButton = new JButton("Remove Cover Photo");
+        JLabel nameLabel = new JLabel("Name: ");
+        JTextField nameField = new JTextField(12);
+        JLabel directoryLabel = new JLabel("Directory: ");
+        JButton chooseDirectoryButton = new JButton(UIManager.getIcon("Tree.closedIcon"));
+        JLabel currentDirectoryLabel = new JLabel();
+        JLabel spotifyURLLabel = new JLabel("Spotify URL: ");
+        JButton saveButton = new JButton("Save");
+        JButton cancelButton = new JButton("Cancel");
+        
+        titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
+
+        buttonGroup.add(createNewButton);
+        buttonGroup.add(importExistingButton);
+
+        dialog.add(
+            titleLabel, ""
+            + "cell 0 0, "
+            + "span 2 1, "
+        );
+
+        JPanel radioButtonPanel = new JPanel();
+        radioButtonPanel.setLayout(new BoxLayout(radioButtonPanel, BoxLayout.Y_AXIS));
+        radioButtonPanel.add(createNewButton);
+        radioButtonPanel.add(importExistingButton);
+        dialog.add(
+            radioButtonPanel, ""
+            + "cell 0 1, "
+            + "span 2 1, "
+        );
+
+        dialog.add(
+            playlistCoverLabel, ""
+            + "cell 0 2, "
+            + "span 2 1, "
+        );
+
+        dialog.add(
+            removeCoverButton, ""
+            + "cell 0 3, "
+            + "span 1 1, "
+            + "gapbottom 2, "
+        );
+
+        JPanel namePanel = new JPanel();
+        namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.X_AXIS));
+        namePanel.add(nameLabel);
+        namePanel.add(nameField);
+        dialog.add(
+            namePanel, ""
+            + "cell 0 4, "
+            + "span 1 1, "
+        );
+
+        JPanel chooseDirectoryPanel = new JPanel();
+        chooseDirectoryPanel.setLayout(new BoxLayout(chooseDirectoryPanel, BoxLayout.X_AXIS));
+        chooseDirectoryPanel.add(directoryLabel);
+        chooseDirectoryPanel.add(currentDirectoryLabel);
+        chooseDirectoryPanel.add(Box.createHorizontalStrut(5));
+        chooseDirectoryPanel.add(chooseDirectoryButton);
+        dialog.add(
+            chooseDirectoryPanel, ""
+            + "cell 0 5, "
+            + "span 1 1, "
+        );
+
+        dialog.add(
+            spotifyURLLabel, ""
+            + "cell 0 6, "
+            + "span 1 1, "
+        );
+
+        JPanel bottomButtonPanel = new JPanel();
+        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
+        bottomButtonPanel.add(Box.createHorizontalGlue());
+        bottomButtonPanel.add(saveButton);
+        bottomButtonPanel.add(Box.createHorizontalStrut(BOTTOM_BUTTONS_GAP_PX));
+        bottomButtonPanel.add(cancelButton);
+        dialog.add(
+            bottomButtonPanel, ""
+            + "cell 0 7, "
+            + "span 1 1, "
+            + "pushx, pushy, "
+            + "align right bottom, "
+        );
+
+        dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
+        dialog.setVisible(true);
+
+        return dialog;
+
+    }
+
     public static JDialog createPlaylistEditorPopup(Playlist playlist, int playlistIndex) {
 
         InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
@@ -162,7 +283,7 @@ public abstract class GUIUtil {
         dialog.setSize(PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE);
         dialog.setByteArray(playlist.getCoverArtByteArray());
 
-        JLabel titleLabel = new JLabel("Edit " + playlist.getName());
+        JLabel titleLabel = new JLabel();
         ImageIcon playlistCoverIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JLabel playlistCoverLabel = new JLabel();
         JButton removeCoverButton = new JButton("Remove Cover Photo");

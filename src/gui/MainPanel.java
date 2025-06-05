@@ -14,7 +14,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
@@ -214,53 +213,7 @@ public class MainPanel extends JPanel {
 
                 }
 
-                String playlistDirectory = JOptionPane.showInputDialog(
-                    StaccatoWindow.staccatoWindow, 
-                    "Enter the playlist's directory:", 
-                    "Add Playlist", 
-                    JOptionPane.QUESTION_MESSAGE
-                );
-                if(playlistDirectory == null) {
-
-                    return;
-
-                }
-
-                File directory = new File(playlistDirectory);
-                if(!directory.isDirectory()) {
-
-                    JOptionPane.showMessageDialog(StaccatoWindow.staccatoWindow, "Invalid directory.", "Add Playlist", JOptionPane.ERROR_MESSAGE);
-
-                } else {
-
-                    try {
-
-                        Playlist newPlaylist = new Playlist(playlistDirectory);
-                        FileManager.addPlaylist(newPlaylist);
-                        SwingUtilities.invokeLater(() -> {
-
-                            initTracklistPage(newPlaylist);
-
-                        });
-
-                    } catch (FileNotFoundException error) {
-
-                        //Dialog box that tells the user to ensure the staccato folder is clear of extraneous files
-                        JOptionPane.showMessageDialog(
-                            StaccatoWindow.staccatoWindow, 
-                            "<html>Cannot create playlist file.<br></br>Please make sure that the staccato program directory is clear of any extraneous files.</html>", 
-                            "Cannot Create Playlist File",
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                        error.printStackTrace();
-
-                    } catch (IOException error) {
-
-                        error.printStackTrace();
-
-                    }
-
-                }
+                GUIUtil.createAddPlaylistDialog();
 
             }
 
