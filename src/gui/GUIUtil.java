@@ -49,10 +49,10 @@ import net.miginfocom.swing.MigLayout;
 
 public abstract class GUIUtil {
     
-    private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(300, 500);
+    private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(310, 555);
+    private static final Dimension PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE = new Dimension(320, 420);
     private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
     private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
-    private static final Dimension PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE = new Dimension(320, 400);
     private static final int REDOWNLOAD_FIELD_GAPRIGHT_PX = 55;
     private static final int REDOWNLOAD_PROGRESSBAR_GAPTOP_PX = 10;
     private static final int BOTTOM_BUTTONS_GAP_PX = 5;
@@ -60,6 +60,7 @@ public abstract class GUIUtil {
     private static final int EDIT_METADATA_ARTWORK_BUTTON_TO_LABEL_GAP_PX = 3;
     private static final int EDIT_METADATA_ARTWORK_URL_LABEL_MAX_WIDTH_PX = 240;
     private static final int MIN_VERTICAL_GAP_PX = 5;
+    private static final int SECTION_VERTICAL_GAP_PX = 8;
     private static final int PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX = 200;
     private static final int SCROLL_SPEED = 3;
     private static final int CURRENT_PLAYLIST_DIRECTORY_LABEL_MAX_WIDTH_PX = 200;
@@ -187,18 +188,21 @@ public abstract class GUIUtil {
         JButton chooseDirectoryButton = new JButton(UIManager.getIcon("Tree.closedIcon"));
         JLabel currentDirectoryLabel = new JLabel();
         JLabel spotifyURLLabel = new JLabel("Spotify URL: ");
+        JTextField spotifyURLField = new JTextField(12);
+        JLabel resultingActionLabel = new JLabel("<html><i>staccato will create a new folder in [directory] and download songs from a Spotify playlist.</html>");
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
         
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
-
         buttonGroup.add(createNewButton);
         buttonGroup.add(importExistingButton);
+        buttonGroup.setSelected(createNewButton.getModel(), true);
 
         dialog.add(
             titleLabel, ""
             + "cell 0 0, "
             + "span 2 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         JPanel radioButtonPanel = new JPanel();
@@ -209,6 +213,7 @@ public abstract class GUIUtil {
             radioButtonPanel, ""
             + "cell 0 1, "
             + "span 2 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         dialog.add(
@@ -222,6 +227,7 @@ public abstract class GUIUtil {
             + "cell 0 3, "
             + "span 1 1, "
             + "gapbottom 2, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         JPanel namePanel = new JPanel();
@@ -244,12 +250,25 @@ public abstract class GUIUtil {
             chooseDirectoryPanel, ""
             + "cell 0 5, "
             + "span 1 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
+        );
+
+        JPanel spotifyURLPanel = new JPanel();
+        spotifyURLPanel.setLayout(new BoxLayout(spotifyURLPanel, BoxLayout.X_AXIS));
+        spotifyURLPanel.add(spotifyURLLabel);
+        spotifyURLPanel.add(spotifyURLField);
+        dialog.add(
+            spotifyURLPanel, ""
+            + "cell 0 6, "
+            + "span 1 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         dialog.add(
-            spotifyURLLabel, ""
-            + "cell 0 6, "
+            resultingActionLabel, ""
+            + "cell 0 7, "
             + "span 1 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         JPanel bottomButtonPanel = new JPanel();
@@ -260,11 +279,41 @@ public abstract class GUIUtil {
         bottomButtonPanel.add(cancelButton);
         dialog.add(
             bottomButtonPanel, ""
-            + "cell 0 7, "
+            + "cell 0 8, "
             + "span 1 1, "
             + "pushx, pushy, "
             + "align right bottom, "
         );
+
+        //--------------------------START ADDING ACTION LISTENERS--------------------------
+
+        dialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeDialog");
+        dialog.getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                dialog.dispose();
+
+            }
+
+        });
+
+        createNewButton.addActionListener((unused) -> {
+
+            spotifyURLLabel.setEnabled(true);
+            spotifyURLField.setEnabled(true);
+
+        });
+
+        importExistingButton.addActionListener((unused) -> {
+
+            spotifyURLLabel.setEnabled(false);
+            spotifyURLField.setEnabled(false);
+
+        });
+
+        //---------------------------END ADDING ACTION LISTENERS---------------------------
 
         dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
         dialog.setVisible(true);
@@ -306,6 +355,7 @@ public abstract class GUIUtil {
             titleLabel, ""
             + "cell 0 0, "
             + "span 2 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         dialog.add(
@@ -318,7 +368,7 @@ public abstract class GUIUtil {
             removeCoverButton, ""
             + "cell 0 2, "
             + "span 1 1, "
-            + "gapbottom 2, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         JPanel namePanel = new JPanel();
@@ -445,8 +495,7 @@ public abstract class GUIUtil {
             if(result == JFileChooser.APPROVE_OPTION) {
 
                 File selectedDirectory = fileChooser.getSelectedFile();
-                currentDirectoryLabel.setText(GUIUtil.truncateWithEllipsis(selectedDirectory.getAbsolutePath(), currentDirectoryLabel, CURRENT_PLAYLIST_DIRECTORY_LABEL_MAX_WIDTH_PX) + " ");
-                dialog.setString(selectedDirectory.getAbsolutePath());
+                currentDirectoryLabel.setText(selectedDirectory.getAbsolutePath());
 
             }
 
@@ -468,7 +517,7 @@ public abstract class GUIUtil {
                 //If the user changed the playlist's directory, then we need to create a new playlist
 
                 File originalDirectory = new File(playlist.getDirectory());
-                File newDirectory = new File(dialog.getString() == null ? "" : dialog.getString());
+                File newDirectory = new File(currentDirectoryLabel.getText());
                 String newCanonicalPath = newDirectory.getCanonicalPath();
                 boolean editWasSuccessful;
 
