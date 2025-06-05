@@ -2,14 +2,19 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import com.formdev.flatlaf.FlatDarkLaf;
@@ -98,6 +103,22 @@ public class StaccatoWindow extends JFrame {
 		
 		//--------END PANEL PLACEMENT-------
 		
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeDialog");
+        getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+				if(MainPanel.mainPanel.isOnTracklistView()) {
+
+                	MainPanel.mainPanel.initHomePage();
+
+				}
+
+            }
+
+        });
+
 		addWindowListener(new WindowAdapter() {
 		
 			@Override

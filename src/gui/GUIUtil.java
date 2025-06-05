@@ -528,7 +528,7 @@ public abstract class GUIUtil {
                     newPlaylist.setCoverArtByteArray(dialog.getByteArray());
                     editWasSuccessful = FileManager.replacePlaylist(playlist, newPlaylist);
 
-                    if(MainPanel.mainPanel.getIsOnTracklistView()) {
+                    if(MainPanel.mainPanel.isOnTracklistView()) {
 
                         MainPanel.mainPanel.initTracklistPage(newPlaylist);
 
@@ -542,7 +542,7 @@ public abstract class GUIUtil {
 
                     editWasSuccessful = FileManager.replacePlaylist(playlist, playlist);
                     
-                    if(MainPanel.mainPanel.getIsOnTracklistView()) {
+                    if(MainPanel.mainPanel.isOnTracklistView()) {
 
                         MainPanel.mainPanel.updatePlaylistInfoPanel(dialog.getByteArray(), playlist.getName());
 
@@ -653,6 +653,18 @@ public abstract class GUIUtil {
 
         //--------------------------START ADDING ACTION LISTENERS--------------------------
 
+        dialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeDialog");
+        dialog.getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                dialog.dispose();
+
+            }
+
+        });
+
         okButton.addActionListener((unused) -> {
 
             dialog.dispose();
@@ -714,7 +726,8 @@ public abstract class GUIUtil {
         dialog.add(
             popupTitleLabel, ""
             + "cell 0 0, "
-            + "span 2 1"
+            + "span 2 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         dialog.add(
@@ -789,6 +802,18 @@ public abstract class GUIUtil {
 
         //--------------------------START ADDING ACTION LISTENERS--------------------------
         
+        dialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeDialog");
+        dialog.getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                dialog.dispose();
+
+            }
+
+        });
+
         cancelButton.addActionListener((unused) -> {
 
             dialog.dispose();
@@ -802,7 +827,18 @@ public abstract class GUIUtil {
             track.setAlbum(albumField.getText());
             track.setArtworkByteArray(dialog.getByteArray());
             track.writeMetadata();
-            MainPanel.updateTrackPanel(trackPanel, track);
+
+            if(trackPanel != null) {
+
+                MainPanel.updateTrackPanel(trackPanel, track);
+
+            }
+            if(CurrentTrackInfoPanel.currentTrackInfoPanel.getTrack().equals(track)) {
+
+                CurrentTrackInfoPanel.currentTrackInfoPanel.setTrack(track);
+
+            }
+
             dialog.dispose();
 
         });

@@ -418,15 +418,16 @@ public class Track {
 
 		}
 
-		if(System.getProperty("os.name").toLowerCase().contains("windows")) {
+		try {
 
-			return fileLocation.equalsIgnoreCase(((Track) obj).getFileLocation());
+            return new File(fileLocation).getCanonicalPath().equals(new File(((Track) obj).fileLocation).getCanonicalPath());
 
-		} else {
+        } catch (IOException e) {
 
-			return fileLocation.equals(((Track) obj).getFileLocation());
+            e.printStackTrace();
+            return false;
 
-		}
+        }
 
 	}
 

@@ -490,6 +490,7 @@ public class MainPanel extends JPanel {
 
         refreshButton.addActionListener((unused) -> {
 
+            System.out.println("a");
             Thread refreshTracksThread = new Thread(() -> {
 
                 killTracklistLoadingThreadFlag.set(true);
@@ -1112,7 +1113,7 @@ public class MainPanel extends JPanel {
 
     }
 
-    public boolean getIsOnTracklistView() {
+    public boolean isOnTracklistView() {
 
         return isOnTracklistView;
 

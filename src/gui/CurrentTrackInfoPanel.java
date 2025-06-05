@@ -41,6 +41,8 @@ public class CurrentTrackInfoPanel extends JPanel {
     private JLabel albumLabel;
     private JPanel buttonsPanel;
 
+    private Track track;
+
     public static CurrentTrackInfoPanel currentTrackInfoPanel;
 
     static {
@@ -158,6 +160,20 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         currentTrackInfoPanel = this;
 
+        //--------------------------START ACTION LISTENERS--------------------------
+
+        editMetadataButton.addActionListener((unused) -> {
+
+            GUIUtil.createEditMetadataDialog(track, null);
+
+        });
+
+        redownloadButton.addActionListener((unused) -> {
+
+            GUIUtil.createRedownloadPopup();
+
+        });
+
     }
 
     public void setTrack(Track track) {
@@ -189,6 +205,14 @@ public class CurrentTrackInfoPanel extends JPanel {
         
         revalidate();
         repaint();
+
+        this.track = track;
+
+    }
+
+    public Track getTrack() {
+
+        return track;
 
     }
 
