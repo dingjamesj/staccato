@@ -49,7 +49,7 @@ import net.miginfocom.swing.MigLayout;
 
 public abstract class GUIUtil {
     
-    private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(310, 555);
+    private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(310, 550);
     private static final Dimension PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE = new Dimension(320, 420);
     private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
     private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
@@ -59,8 +59,8 @@ public abstract class GUIUtil {
     private static final int EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX = 64;
     private static final int EDIT_METADATA_ARTWORK_BUTTON_TO_LABEL_GAP_PX = 3;
     private static final int EDIT_METADATA_ARTWORK_URL_LABEL_MAX_WIDTH_PX = 240;
-    private static final int MIN_VERTICAL_GAP_PX = 5;
-    private static final int SECTION_VERTICAL_GAP_PX = 8;
+    private static final int MIN_VERTICAL_GAP_PX = 3;
+    private static final int SECTION_VERTICAL_GAP_PX = 11;
     private static final int PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX = 200;
     private static final int SCROLL_SPEED = 3;
     private static final int CURRENT_PLAYLIST_DIRECTORY_LABEL_MAX_WIDTH_PX = 200;
@@ -186,10 +186,11 @@ public abstract class GUIUtil {
         JTextField nameField = new JTextField(12);
         JLabel directoryLabel = new JLabel("Directory: ");
         JButton chooseDirectoryButton = new JButton(UIManager.getIcon("Tree.closedIcon"));
-        JLabel currentDirectoryLabel = new JLabel();
+        JLabel currentDirectoryLabel = new JLabel(System.getProperty("user.dir"));
+        JScrollPane currentDirectoryScrollPane = new InvisibleScrollPane(currentDirectoryLabel);
         JLabel spotifyURLLabel = new JLabel("Spotify URL: ");
         JTextField spotifyURLField = new JTextField(12);
-        JLabel resultingActionLabel = new JLabel("<html><i>staccato will create a new folder in [directory] and download songs from a Spotify playlist.</html>");
+        JLabel resultingActionLabel = new JLabel();
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
         
@@ -197,6 +198,9 @@ public abstract class GUIUtil {
         buttonGroup.add(createNewButton);
         buttonGroup.add(importExistingButton);
         buttonGroup.setSelected(createNewButton.getModel(), true);
+        resultingActionLabel.setText(
+            createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+        );
 
         dialog.add(
             titleLabel, ""
@@ -243,7 +247,7 @@ public abstract class GUIUtil {
         JPanel chooseDirectoryPanel = new JPanel();
         chooseDirectoryPanel.setLayout(new BoxLayout(chooseDirectoryPanel, BoxLayout.X_AXIS));
         chooseDirectoryPanel.add(directoryLabel);
-        chooseDirectoryPanel.add(currentDirectoryLabel);
+        chooseDirectoryPanel.add(currentDirectoryScrollPane);
         chooseDirectoryPanel.add(Box.createHorizontalStrut(5));
         chooseDirectoryPanel.add(chooseDirectoryButton);
         dialog.add(
@@ -268,7 +272,7 @@ public abstract class GUIUtil {
             resultingActionLabel, ""
             + "cell 0 7, "
             + "span 1 1, "
-            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
+            + "align right bottom, "
         );
 
         JPanel bottomButtonPanel = new JPanel();
@@ -304,12 +308,49 @@ public abstract class GUIUtil {
             spotifyURLLabel.setEnabled(true);
             spotifyURLField.setEnabled(true);
 
+            resultingActionLabel.setText(
+                createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+            );
+
         });
 
         importExistingButton.addActionListener((unused) -> {
 
             spotifyURLLabel.setEnabled(false);
             spotifyURLField.setEnabled(false);
+
+            resultingActionLabel.setText(
+                createResultingActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
+            );
+
+        });
+
+        chooseDirectoryButton.addActionListener((unused) -> {
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+            int result = fileChooser.showOpenDialog(dialog);
+
+            if(result == JFileChooser.APPROVE_OPTION) {
+
+                File selectedDirectory = fileChooser.getSelectedFile();
+                currentDirectoryLabel.setText(selectedDirectory.getAbsolutePath());
+                if(buttonGroup.getSelection().equals(createNewButton.getModel())) {
+
+                    resultingActionLabel.setText(
+                        createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+                    );
+
+                } else {
+
+                    resultingActionLabel.setText(
+                        createResultingActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
+                    );
+
+                }
+
+            }
 
         });
 
@@ -319,6 +360,20 @@ public abstract class GUIUtil {
         dialog.setVisible(true);
 
         return dialog;
+
+    }
+
+    private static String createResultingActionString(String dirStr, boolean isCreatingNew, String outsideSource, JComponent component) {
+
+        if(isCreatingNew) {
+
+            return "<html><p align=\"right\"><i>staccato will create a new folder at<br></br>" + truncateWithEllipsis(dirStr, component, PLAYLIST_ADDER_DIALOG_WINDOW_SIZE.width - 20) + "</html>";
+
+        } else {
+
+            return "<html><p align=\"right\"><i>staccato will import mp3 files from<br></br>" + truncateWithEllipsis(dirStr, component, PLAYLIST_ADDER_DIALOG_WINDOW_SIZE.width - 20) + "</html>";
+
+        }
 
     }
 
