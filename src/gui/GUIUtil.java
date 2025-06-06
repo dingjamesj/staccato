@@ -201,6 +201,7 @@ public abstract class GUIUtil {
         resultingActionLabel.setText(
             createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
         );
+        nameField.putClientProperty("JTextField.placeholderText", "New Playlist");
 
         dialog.add(
             titleLabel, ""
@@ -307,6 +308,13 @@ public abstract class GUIUtil {
 
             spotifyURLLabel.setEnabled(true);
             spotifyURLField.setEnabled(true);
+            nameField.putClientProperty("JTextField.placeholderText", "New Playlist");
+
+            if(currentDirectoryLabel.getText().isBlank()) {
+
+                currentDirectoryLabel.setText(System.getProperty("user.dir"));
+
+            }
 
             resultingActionLabel.setText(
                 createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
@@ -317,11 +325,23 @@ public abstract class GUIUtil {
         importExistingButton.addActionListener((unused) -> {
 
             spotifyURLLabel.setEnabled(false);
-            spotifyURLField.setEnabled(false);
+            spotifyURLField.setEnabled(false);            
+            if(currentDirectoryLabel.getText().equals(System.getProperty("user.dir"))) {
 
-            resultingActionLabel.setText(
-                createResultingActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
-            );
+                currentDirectoryLabel.setText("");
+                resultingActionLabel.setText(
+                    "<html><p align=\"right\"><i><br></br>Please select a directory</html>"
+                );
+                nameField.putClientProperty("JTextField.placeholderText", "--");
+
+            } else {
+
+                resultingActionLabel.setText(
+                    createResultingActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
+                );
+                nameField.putClientProperty("JTextField.placeholderText", new File(currentDirectoryLabel.getText()).getName());
+
+            }
 
         });
 
@@ -411,6 +431,7 @@ public abstract class GUIUtil {
                     resultingActionLabel.setText(
                         createResultingActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
                     );
+                    nameField.putClientProperty("JTextField.placeholderText", new File(currentDirectoryLabel.getText()).getName());
 
                 }
 
