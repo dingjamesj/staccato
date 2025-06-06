@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
@@ -232,6 +233,11 @@ public class QueuePanel extends JPanel {
             public void mouseEntered(MouseEvent e) {
 
                 trackPanel.setBackground(HIGHLIGHTED_ROW_COLOR);
+                if(isEnabled()) {
+
+                    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
 
             }
 
@@ -239,6 +245,7 @@ public class QueuePanel extends JPanel {
             public void mouseExited(MouseEvent e) {
 
                 trackPanel.setBackground(getBackground());
+                setCursor(Cursor.getDefaultCursor());
 
             }
 

@@ -181,18 +181,18 @@ public abstract class GUIUtil {
         JRadioButton importExistingButton = new JRadioButton("Import existing mp3 folder");
         ButtonGroup buttonGroup = new ButtonGroup();
         JLabel playlistCoverLabel = new JLabel(createResizedIcon(PLACEHOLDER_ART_ICON, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
-        JButton removeCoverButton = new JButton("Remove Cover Photo");
+        JButton removeCoverButton = new HoverableButton("Remove Cover Photo");
         JLabel nameLabel = new JLabel("Name: ");
         JTextField nameField = new JTextField(12);
         JLabel directoryLabel = new JLabel("Directory: ");
-        JButton chooseDirectoryButton = new JButton(UIManager.getIcon("Tree.closedIcon"));
+        JButton chooseDirectoryButton = new HoverableButton(UIManager.getIcon("Tree.closedIcon"));
         JLabel currentDirectoryLabel = new JLabel(System.getProperty("user.dir"));
         JScrollPane currentDirectoryScrollPane = new InvisibleScrollPane(currentDirectoryLabel);
         JLabel spotifyURLLabel = new JLabel("Spotify URL: ");
         JTextField spotifyURLField = new JTextField(12);
         JLabel resultingActionLabel = new JLabel();
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
+        JButton saveButton = new HoverableButton("Save");
+        JButton cancelButton = new HoverableButton("Cancel");
         
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
         buttonGroup.add(createNewButton);
@@ -325,6 +325,70 @@ public abstract class GUIUtil {
 
         });
 
+        playlistCoverLabel.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                if(e.getClickCount() != 1) {
+
+                    return;
+
+                }
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileFilter(new FileNameExtensionFilter("Images (*.jpg, *.png, *.jpeg)", "jpg", "png", "jpeg"));
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setMultiSelectionEnabled(false);
+                int result = fileChooser.showOpenDialog(dialog);
+
+                if(result == JFileChooser.APPROVE_OPTION) {
+
+                    File selectedFile = fileChooser.getSelectedFile();
+
+                    try {
+
+                        byte[] coverArtByteArray = FileManager.readByteArray(selectedFile);
+                        playlistCoverLabel.setIcon(createResizedIcon(new ImageIcon(coverArtByteArray), PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+                        dialog.setByteArray(coverArtByteArray);
+
+                    } catch (IOException error) {
+
+                        error.printStackTrace();;
+
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                if(playlistCoverLabel.isEnabled()) {
+
+                    playlistCoverLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                playlistCoverLabel.setCursor(Cursor.getDefaultCursor());
+
+            }
+
+        });
+
+        removeCoverButton.addActionListener((unused) -> {
+
+            playlistCoverLabel.setIcon(createResizedIcon(PLACEHOLDER_ART_ICON, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
+            dialog.setByteArray(null);
+
+        });
+
         chooseDirectoryButton.addActionListener((unused) -> {
 
             JFileChooser fileChooser = new JFileChooser();
@@ -351,6 +415,12 @@ public abstract class GUIUtil {
                 }
 
             }
+
+        });
+
+        cancelButton.addActionListener((unused) -> {
+
+            dialog.dispose();
 
         });
 
@@ -390,15 +460,15 @@ public abstract class GUIUtil {
         JLabel titleLabel = new JLabel();
         ImageIcon playlistCoverIcon = playlist.getCoverArtByteArray() != null ? new ImageIcon(playlist.getCoverArtByteArray()) : PLACEHOLDER_ART_ICON;
         JLabel playlistCoverLabel = new JLabel();
-        JButton removeCoverButton = new JButton("Remove Cover Photo");
+        JButton removeCoverButton = new HoverableButton("Remove Cover Photo");
         JLabel nameLabel = new JLabel("Name: ");
         JTextField nameField = new JTextField(12);
         JLabel chooseDirectoryLabel = new JLabel("Directory: ");
-        JButton chooseDirectoryButton = new JButton(UIManager.getIcon("Tree.closedIcon"));
+        JButton chooseDirectoryButton = new HoverableButton(UIManager.getIcon("Tree.closedIcon"));
         JLabel currentDirectoryLabel = new JLabel();
         JScrollPane currentDirectoryScrollPane = new InvisibleScrollPane(currentDirectoryLabel);
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
+        JButton saveButton = new HoverableButton("Save");
+        JButton cancelButton = new HoverableButton("Cancel");
 
         playlistCoverLabel.setIcon(createResizedIcon(playlistCoverIcon, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX, Image.SCALE_SMOOTH));
         nameField.setText(playlist.getName());
@@ -661,8 +731,8 @@ public abstract class GUIUtil {
         JLabel titleLabel = new JLabel("New YouTube URL:");
         JTextField urlField = new JTextField();
         JProgressBar downloadProgressBar = new JProgressBar();
-        JButton downloadButton = new JButton("Download");
-        JButton okButton = new JButton("OK");
+        JButton downloadButton = new HoverableButton("Download");
+        JButton okButton = new HoverableButton("OK");
 
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
 
@@ -754,11 +824,11 @@ public abstract class GUIUtil {
         JTextField artistsField = new JTextField();
         JTextField albumField = new JTextField();
         JPanel artworkOptionsPanel = new JPanel();
-        JButton artworkButton = new JButton();
+        JButton artworkButton = new HoverableButton();
         JLabel artworkURLLabel = new JLabel();
         JPanel bottomButtonPanel = new JPanel();
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
+        JButton saveButton = new HoverableButton("Save");
+        JButton cancelButton = new HoverableButton("Cancel");
 
         popupTitleLabel.setFont(POPUP_TITLE_LABEL_FONT);
         bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
