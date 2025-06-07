@@ -20,7 +20,7 @@ import java.util.logging.LogManager;
 
 public abstract class FileManager {
 
-    private static final String PLAYLIST_DATA_LOCATION = "playlists.dat";
+    public static final String PLAYLIST_DATA_LOCATION = "playlists.dat";
 
     private static AtomicBoolean isReadingTracks = new AtomicBoolean(false);
 

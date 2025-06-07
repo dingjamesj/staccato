@@ -254,7 +254,7 @@ public class Playlist implements Serializable {
         } catch (IOException e) {
 
             e.printStackTrace();
-            return false;
+            return directory.equals(((Playlist) obj).directory);
 
         }
 

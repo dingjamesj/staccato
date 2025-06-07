@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
@@ -38,6 +39,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.basic.BasicScrollBarUI;
@@ -191,7 +193,7 @@ public abstract class GUIUtil {
         JLabel spotifyURLLabel = new JLabel("Spotify URL: ");
         JTextField spotifyURLField = new JTextField(12);
         JLabel resultingActionLabel = new JLabel();
-        JButton saveButton = new HoverableButton("Save");
+        JButton saveButton = new HoverableButton("Create");
         JButton cancelButton = new HoverableButton("Cancel");
         
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
@@ -442,6 +444,75 @@ public abstract class GUIUtil {
         cancelButton.addActionListener((unused) -> {
 
             dialog.dispose();
+
+        });
+
+        saveButton.addActionListener((unused) -> {
+
+            Playlist playlist;
+            if(buttonGroup.getSelection().equals(createNewButton.getModel())) {
+
+                return;
+
+            } else {
+
+                System.out.println(nameField.getText());
+
+                if(currentDirectoryLabel.getText().isBlank()) {
+
+                    JOptionPane.showMessageDialog(
+                        dialog, 
+                        "Please select a directory", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
+
+                    return;
+
+                }
+
+                playlist = new Playlist(currentDirectoryLabel.getText());
+                playlist.setCoverArtByteArray(dialog.getByteArray());
+                playlist.setName(nameField.getText().isBlank() ? new File(currentDirectoryLabel.getText()).getName() : nameField.getText());
+
+            }
+
+            try {
+
+                FileManager.addPlaylist(playlist);
+                SwingUtilities.invokeLater(() -> {
+
+                    MainPanel.mainPanel.initTracklistPage(playlist);
+
+                });
+
+            } catch (FileNotFoundException e) {
+
+                JOptionPane.showMessageDialog(
+                    dialog, 
+                    "<html>Could not create playlists data file. Please ensure that the location " + new File(FileManager.PLAYLIST_DATA_LOCATION).getAbsolutePath() + " is clear of extra files.</html>", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+
+                e.printStackTrace();
+
+            } catch (IOException e) {
+
+                JOptionPane.showMessageDialog(
+                    dialog, 
+                    "<html>An unknown error occurred.<br></br>" + e.getMessage() + "</html>", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+
+                e.printStackTrace();
+
+            } finally {
+
+                dialog.dispose();
+
+            }
 
         });
 
