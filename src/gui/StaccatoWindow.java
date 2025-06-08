@@ -109,9 +109,14 @@ public class StaccatoWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+				MainPanel.mainPanel.killTracklistLoadingThread();
 				if(MainPanel.mainPanel.isOnTracklistView()) {
 
-                	MainPanel.mainPanel.initHomePage();
+					SwingUtilities.invokeLater(() -> {
+
+                		MainPanel.mainPanel.initHomePage();
+
+					});
 
 				}
 

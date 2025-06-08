@@ -53,6 +53,7 @@ public abstract class GUIUtil {
     
     private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(310, 550);
     private static final Dimension PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE = new Dimension(320, 420);
+    private static final Dimension TRACK_ADDER_DIALOG_WINDOW_SIZE = new Dimension(320, 550);
     private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
     private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
     private static final int REDOWNLOAD_FIELD_GAPRIGHT_PX = 55;
@@ -162,21 +163,9 @@ public abstract class GUIUtil {
 
         InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dialog.setTitle("Add Playlist");
         dialog.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX));
         dialog.setResizable(false);
         dialog.setSize(PLAYLIST_ADDER_DIALOG_WINDOW_SIZE);
-
-        //Import playlist:
-        // - Cover art
-        // - Name
-        // - Directory
-
-        //Create new playlist:
-        // - Cover art
-        // - Name
-        // - Directory to create new folder
-        // - Spotify URL
 
         JLabel titleLabel = new JLabel("Add Playlist");
         JRadioButton createNewButton = new JRadioButton("Create new playlist from scratch");
@@ -201,14 +190,14 @@ public abstract class GUIUtil {
         buttonGroup.add(importExistingButton);
         buttonGroup.setSelected(createNewButton.getModel(), true);
         resultingActionLabel.setText(
-            createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+            createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
         );
         nameField.putClientProperty("JTextField.placeholderText", "New Playlist");
 
         dialog.add(
             titleLabel, ""
             + "cell 0 0, "
-            + "span 2 1, "
+            + "span 1 1, "
             + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
@@ -219,14 +208,14 @@ public abstract class GUIUtil {
         dialog.add(
             radioButtonPanel, ""
             + "cell 0 1, "
-            + "span 2 1, "
+            + "span 1 1, "
             + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
         );
 
         dialog.add(
             playlistCoverLabel, ""
             + "cell 0 2, "
-            + "span 2 1, "
+            + "span 1 1, "
         );
 
         dialog.add(
@@ -275,7 +264,9 @@ public abstract class GUIUtil {
             resultingActionLabel, ""
             + "cell 0 7, "
             + "span 1 1, "
+            + "pushy, "
             + "align right bottom, "
+            + "gapbottom " + MIN_VERTICAL_GAP_PX + ", "
         );
 
         JPanel bottomButtonPanel = new JPanel();
@@ -288,7 +279,7 @@ public abstract class GUIUtil {
             bottomButtonPanel, ""
             + "cell 0 8, "
             + "span 1 1, "
-            + "pushx, pushy, "
+            + "pushx, "
             + "align right bottom, "
         );
 
@@ -310,6 +301,7 @@ public abstract class GUIUtil {
 
             spotifyURLLabel.setEnabled(true);
             spotifyURLField.setEnabled(true);
+            saveButton.setText("Create");
             nameField.putClientProperty("JTextField.placeholderText", "New Playlist");
 
             if(currentDirectoryLabel.getText().isBlank()) {
@@ -319,7 +311,7 @@ public abstract class GUIUtil {
             }
 
             resultingActionLabel.setText(
-                createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+                createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
             );
 
         });
@@ -328,18 +320,19 @@ public abstract class GUIUtil {
 
             spotifyURLLabel.setEnabled(false);
             spotifyURLField.setEnabled(false);            
+            saveButton.setText("Import");
             if(currentDirectoryLabel.getText().equals(System.getProperty("user.dir"))) {
 
                 currentDirectoryLabel.setText("");
                 resultingActionLabel.setText(
                     "<html><p align=\"right\"><i><br></br>Please select a directory</html>"
                 );
-                nameField.putClientProperty("JTextField.placeholderText", "--");
+                nameField.putClientProperty("JTextField.placeholderText", "---");
 
             } else {
 
                 resultingActionLabel.setText(
-                    createResultingActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
+                    createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
                 );
                 nameField.putClientProperty("JTextField.placeholderText", new File(currentDirectoryLabel.getText()).getName());
 
@@ -425,13 +418,13 @@ public abstract class GUIUtil {
                 if(buttonGroup.getSelection().equals(createNewButton.getModel())) {
 
                     resultingActionLabel.setText(
-                        createResultingActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+                        createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
                     );
 
                 } else {
 
                     resultingActionLabel.setText(
-                        createResultingActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
+                        createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
                     );
                     nameField.putClientProperty("JTextField.placeholderText", new File(currentDirectoryLabel.getText()).getName());
 
@@ -463,7 +456,7 @@ public abstract class GUIUtil {
                     JOptionPane.showMessageDialog(
                         dialog, 
                         "Please select a directory", 
-                        "Error", 
+                        "", 
                         JOptionPane.ERROR_MESSAGE
                     );
 
@@ -491,7 +484,7 @@ public abstract class GUIUtil {
                 JOptionPane.showMessageDialog(
                     dialog, 
                     "<html>Could not create playlists data file. Please ensure that the location " + new File(FileManager.PLAYLIST_DATA_LOCATION).getAbsolutePath() + " is clear of extra files.</html>", 
-                    "Error", 
+                    "", 
                     JOptionPane.ERROR_MESSAGE
                 );
 
@@ -502,7 +495,7 @@ public abstract class GUIUtil {
                 JOptionPane.showMessageDialog(
                     dialog, 
                     "<html>An unknown error occurred.<br></br>" + e.getMessage() + "</html>", 
-                    "Error", 
+                    "", 
                     JOptionPane.ERROR_MESSAGE
                 );
 
@@ -525,11 +518,11 @@ public abstract class GUIUtil {
 
     }
 
-    private static String createResultingActionString(String dirStr, boolean isCreatingNew, String outsideSource, JComponent component) {
+    private static String createResultingAddPlaylistActionString(String dirStr, boolean isCreatingNew, String outsideSource, JComponent component) {
 
         if(isCreatingNew) {
 
-            return "<html><p align=\"right\"><i>staccato will create a new folder at<br></br>" + truncateWithEllipsis(dirStr, component, PLAYLIST_ADDER_DIALOG_WINDOW_SIZE.width - 20) + "</html>";
+            return "<html><p align=\"right\"><i>staccato will create a new folder in<br></br>" + truncateWithEllipsis(dirStr, component, PLAYLIST_ADDER_DIALOG_WINDOW_SIZE.width - 20) + "</html>";
 
         } else {
 
@@ -539,11 +532,16 @@ public abstract class GUIUtil {
 
     }
 
+    private static String createResultingAddTrackActionString() {
+
+        return "<html><p align=\"right\"><i>resulting action</html>";
+
+    }
+
     public static JDialog createPlaylistEditorPopup(Playlist playlist, int playlistIndex) {
 
         InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dialog.setTitle("Edit Playlist");
         dialog.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX));
         dialog.setResizable(false);
         dialog.setSize(PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE);
@@ -777,7 +775,7 @@ public abstract class GUIUtil {
                     JOptionPane.showMessageDialog(
                         StaccatoWindow.staccatoWindow, 
                         "Changes not saved: couldn't find original playlist in the playlists file.", 
-                        "Error", 
+                        "", 
                         JOptionPane.ERROR_MESSAGE
                     );
                     return;
@@ -791,7 +789,7 @@ public abstract class GUIUtil {
                 JOptionPane.showMessageDialog(
                     StaccatoWindow.staccatoWindow, 
                     "Could not save changes to playlist.", 
-                    "Error", 
+                    "", 
                     JOptionPane.ERROR_MESSAGE
                 );
                 return;
@@ -808,6 +806,134 @@ public abstract class GUIUtil {
         dialog.setVisible(true);
 
         return dialog;
+
+    }
+
+    public static JDialog createAddTrackDialog() {
+
+        InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        dialog.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX));
+        dialog.setResizable(false);
+        dialog.setSize(TRACK_ADDER_DIALOG_WINDOW_SIZE);
+
+        JLabel titleLabel = new JLabel("Add Track");
+        JRadioButton downloadNewButton = new JRadioButton("Download new track");
+        JRadioButton importExistingButton = new JRadioButton("Import mp3 files");
+        ButtonGroup buttonGroup = new ButtonGroup();
+        JPanel contentPanel = new JPanel();
+        JLabel resultingActionLabel = new JLabel();
+        JButton saveButton = new HoverableButton("Download");
+        JButton cancelButton = new HoverableButton("Cancel");
+
+        titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
+        buttonGroup.add(downloadNewButton);
+        buttonGroup.add(importExistingButton);
+        buttonGroup.setSelected(downloadNewButton.getModel(), true);
+        initDownloadNewTrackDialog(contentPanel);
+        resultingActionLabel.setText(
+            createResultingAddTrackActionString()
+        );
+
+        dialog.add(
+            titleLabel, ""
+            + "cell 0 0, "
+            + "span 1 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
+        );
+
+        JPanel radioButtonPanel = new JPanel();
+        radioButtonPanel.setLayout(new BoxLayout(radioButtonPanel, BoxLayout.Y_AXIS));
+        radioButtonPanel.add(downloadNewButton);
+        radioButtonPanel.add(importExistingButton);
+        dialog.add(
+            radioButtonPanel, ""
+            + "cell 0 1, "
+            + "span 1 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
+        );
+
+        dialog.add(
+            contentPanel, ""
+            + "cell 0 2, "
+            + "span 1 1, "
+        );
+
+        dialog.add(
+            resultingActionLabel, ""
+            + "cell 0 3, "
+            + "span 1 1, "
+            + "pushy, "
+            + "align right bottom, "
+            + "gapbottom " + MIN_VERTICAL_GAP_PX + ", "
+        );
+
+        JPanel bottomButtonPanel = new JPanel();
+        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
+        bottomButtonPanel.add(Box.createHorizontalGlue());
+        bottomButtonPanel.add(saveButton);
+        bottomButtonPanel.add(Box.createHorizontalStrut(BOTTOM_BUTTONS_GAP_PX));
+        bottomButtonPanel.add(cancelButton);
+        dialog.add(
+            bottomButtonPanel, ""
+            + "cell 0 4, "
+            + "span 1 1, "
+            + "pushx, "
+            + "align right bottom, "
+        );
+
+        //--------------------------START ADDING ACTION LISTENERS--------------------------
+
+        dialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeDialog");
+        dialog.getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                dialog.dispose();
+
+            }
+
+        });
+
+        downloadNewButton.addActionListener((unused) -> {
+
+            initImportExistingTracksDialog(contentPanel);
+            saveButton.setText("Download");
+
+        });
+
+        importExistingButton.addActionListener((unused) -> {
+
+            initImportExistingTracksDialog(contentPanel);
+            saveButton.setText("Import");
+
+        });
+
+        cancelButton.addActionListener((unused) -> {
+
+            dialog.dispose();
+
+        });
+
+        //---------------------------END ADDING ACTION LISTENERS---------------------------
+
+        dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
+        dialog.setVisible(true);
+
+        return dialog;
+
+    }
+
+    private static void initImportExistingTracksDialog(JPanel panel) {
+
+        
+
+    }
+
+    private static void initDownloadNewTrackDialog(JPanel panel) {
+
+
 
     }
 

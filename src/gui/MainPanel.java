@@ -128,6 +128,7 @@ public class MainPanel extends JPanel {
         FileManager.stopReadingTracks();
         currentTracklist = null;
         isOnTracklistView = false;
+        killTracklistLoadingThreadFlag.set(true);
 
         removeAll();
 
@@ -490,7 +491,6 @@ public class MainPanel extends JPanel {
 
         refreshButton.addActionListener((unused) -> {
 
-            System.out.println("a");
             Thread refreshTracksThread = new Thread(() -> {
 
                 killTracklistLoadingThreadFlag.set(true);
@@ -499,6 +499,16 @@ public class MainPanel extends JPanel {
             });
             refreshTracksThread.start();
             
+        });
+
+        addTrackButton.addActionListener((unused) -> {
+
+            SwingUtilities.invokeLater(() -> {
+
+                GUIUtil.createAddTrackDialog();
+
+            });
+
         });
 
     }
@@ -548,7 +558,11 @@ public class MainPanel extends JPanel {
         loadingLabel.setAlignmentX(CENTER_ALIGNMENT);
         loadingLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        tracklistPanel.removeAll();
+        SwingUtilities.invokeLater(() -> {
+
+            tracklistPanel.removeAll();
+
+        });
         SwingUtilities.invokeLater(() -> {
 
             loadingLabelPanel.add(loadingLabel);
@@ -1116,6 +1130,12 @@ public class MainPanel extends JPanel {
     public boolean isOnTracklistView() {
 
         return isOnTracklistView;
+
+    }
+
+    protected void killTracklistLoadingThread() {
+
+        killTracklistLoadingThreadFlag.set(true);
 
     }
 
