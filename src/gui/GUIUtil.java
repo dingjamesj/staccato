@@ -175,10 +175,9 @@ public abstract class GUIUtil {
         JButton removeCoverButton = new HoverableButton("Remove Cover Photo");
         JLabel nameLabel = new JLabel("Name: ");
         JTextField nameField = new JTextField(12);
-        JLabel directoryLabel = new JLabel("Directory: ");
         JButton chooseDirectoryButton = new HoverableButton(UIManager.getIcon("Tree.closedIcon"));
-        JLabel currentDirectoryLabel = new JLabel(System.getProperty("user.dir"));
-        JScrollPane currentDirectoryScrollPane = new InvisibleScrollPane(currentDirectoryLabel);
+        JLabel directoryLabel = new JLabel(System.getProperty("user.dir"));
+        JScrollPane directoryScrollPane = new InvisibleScrollPane(directoryLabel);
         JLabel spotifyURLLabel = new JLabel("Spotify URL: ");
         JTextField spotifyURLField = new JTextField(12);
         JLabel resultingActionLabel = new JLabel();
@@ -190,7 +189,7 @@ public abstract class GUIUtil {
         buttonGroup.add(importExistingButton);
         buttonGroup.setSelected(createNewButton.getModel(), true);
         resultingActionLabel.setText(
-            createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+            createResultingAddPlaylistActionString(directoryLabel.getText(), true, null, resultingActionLabel)
         );
         nameField.putClientProperty("JTextField.placeholderText", "New Playlist");
 
@@ -238,10 +237,9 @@ public abstract class GUIUtil {
 
         JPanel chooseDirectoryPanel = new JPanel();
         chooseDirectoryPanel.setLayout(new BoxLayout(chooseDirectoryPanel, BoxLayout.X_AXIS));
-        chooseDirectoryPanel.add(directoryLabel);
-        chooseDirectoryPanel.add(currentDirectoryScrollPane);
-        chooseDirectoryPanel.add(Box.createHorizontalStrut(5));
         chooseDirectoryPanel.add(chooseDirectoryButton);
+        chooseDirectoryPanel.add(Box.createHorizontalStrut(MIN_VERTICAL_GAP_PX));
+        chooseDirectoryPanel.add(directoryScrollPane);
         dialog.add(
             chooseDirectoryPanel, ""
             + "cell 0 5, "
@@ -304,14 +302,14 @@ public abstract class GUIUtil {
             saveButton.setText("Create");
             nameField.putClientProperty("JTextField.placeholderText", "New Playlist");
 
-            if(currentDirectoryLabel.getText().isBlank()) {
+            if(directoryLabel.getText().isBlank()) {
 
-                currentDirectoryLabel.setText(System.getProperty("user.dir"));
+                directoryLabel.setText(System.getProperty("user.dir"));
 
             }
 
             resultingActionLabel.setText(
-                createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+                createResultingAddPlaylistActionString(directoryLabel.getText(), true, null, resultingActionLabel)
             );
 
         });
@@ -321,9 +319,9 @@ public abstract class GUIUtil {
             spotifyURLLabel.setEnabled(false);
             spotifyURLField.setEnabled(false);            
             saveButton.setText("Import");
-            if(currentDirectoryLabel.getText().equals(System.getProperty("user.dir"))) {
+            if(directoryLabel.getText().equals(System.getProperty("user.dir"))) {
 
-                currentDirectoryLabel.setText("");
+                directoryLabel.setText("");
                 resultingActionLabel.setText(
                     "<html><p align=\"right\"><i><br></br>Please select a directory</html>"
                 );
@@ -332,9 +330,9 @@ public abstract class GUIUtil {
             } else {
 
                 resultingActionLabel.setText(
-                    createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
+                    createResultingAddPlaylistActionString(directoryLabel.getText(), false, null, resultingActionLabel)
                 );
-                nameField.putClientProperty("JTextField.placeholderText", new File(currentDirectoryLabel.getText()).getName());
+                nameField.putClientProperty("JTextField.placeholderText", new File(directoryLabel.getText()).getName());
 
             }
 
@@ -414,19 +412,19 @@ public abstract class GUIUtil {
             if(result == JFileChooser.APPROVE_OPTION) {
 
                 File selectedDirectory = fileChooser.getSelectedFile();
-                currentDirectoryLabel.setText(selectedDirectory.getAbsolutePath());
+                directoryLabel.setText(selectedDirectory.getAbsolutePath());
                 if(buttonGroup.getSelection().equals(createNewButton.getModel())) {
 
                     resultingActionLabel.setText(
-                        createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), true, null, resultingActionLabel)
+                        createResultingAddPlaylistActionString(directoryLabel.getText(), true, null, resultingActionLabel)
                     );
 
                 } else {
 
                     resultingActionLabel.setText(
-                        createResultingAddPlaylistActionString(currentDirectoryLabel.getText(), false, null, resultingActionLabel)
+                        createResultingAddPlaylistActionString(directoryLabel.getText(), false, null, resultingActionLabel)
                     );
-                    nameField.putClientProperty("JTextField.placeholderText", new File(currentDirectoryLabel.getText()).getName());
+                    nameField.putClientProperty("JTextField.placeholderText", new File(directoryLabel.getText()).getName());
 
                 }
 
@@ -451,7 +449,7 @@ public abstract class GUIUtil {
 
                 System.out.println(nameField.getText());
 
-                if(currentDirectoryLabel.getText().isBlank()) {
+                if(directoryLabel.getText().isBlank()) {
 
                     JOptionPane.showMessageDialog(
                         dialog, 
@@ -464,9 +462,9 @@ public abstract class GUIUtil {
 
                 }
 
-                playlist = new Playlist(currentDirectoryLabel.getText());
+                playlist = new Playlist(directoryLabel.getText());
                 playlist.setCoverArtByteArray(dialog.getByteArray());
-                playlist.setName(nameField.getText().isBlank() ? new File(currentDirectoryLabel.getText()).getName() : nameField.getText());
+                playlist.setName(nameField.getText().isBlank() ? new File(directoryLabel.getText()).getName() : nameField.getText());
 
             }
 
@@ -553,7 +551,6 @@ public abstract class GUIUtil {
         JButton removeCoverButton = new HoverableButton("Remove Cover Photo");
         JLabel nameLabel = new JLabel("Name: ");
         JTextField nameField = new JTextField(12);
-        JLabel chooseDirectoryLabel = new JLabel("Directory: ");
         JButton chooseDirectoryButton = new HoverableButton(UIManager.getIcon("Tree.closedIcon"));
         JLabel currentDirectoryLabel = new JLabel();
         JScrollPane currentDirectoryScrollPane = new InvisibleScrollPane(currentDirectoryLabel);
@@ -598,10 +595,9 @@ public abstract class GUIUtil {
 
         JPanel chooseDirectoryPanel = new JPanel();
         chooseDirectoryPanel.setLayout(new BoxLayout(chooseDirectoryPanel, BoxLayout.X_AXIS));
-        chooseDirectoryPanel.add(chooseDirectoryLabel);
-        chooseDirectoryPanel.add(currentDirectoryScrollPane);
-        chooseDirectoryPanel.add(Box.createHorizontalStrut(5));
         chooseDirectoryPanel.add(chooseDirectoryButton);
+        chooseDirectoryPanel.add(Box.createHorizontalStrut(5));
+        chooseDirectoryPanel.add(currentDirectoryScrollPane);
         dialog.add(
             chooseDirectoryPanel, ""
             + "cell 0 4, "
@@ -822,18 +818,12 @@ public abstract class GUIUtil {
         JRadioButton importExistingButton = new JRadioButton("Import mp3 files");
         ButtonGroup buttonGroup = new ButtonGroup();
         JPanel contentPanel = new JPanel();
-        JLabel resultingActionLabel = new JLabel();
-        JButton saveButton = new HoverableButton("Download");
-        JButton cancelButton = new HoverableButton("Cancel");
 
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
         buttonGroup.add(downloadNewButton);
         buttonGroup.add(importExistingButton);
         buttonGroup.setSelected(downloadNewButton.getModel(), true);
         initDownloadNewTrackDialog(contentPanel);
-        resultingActionLabel.setText(
-            createResultingAddTrackActionString()
-        );
 
         dialog.add(
             titleLabel, ""
@@ -857,29 +847,7 @@ public abstract class GUIUtil {
             contentPanel, ""
             + "cell 0 2, "
             + "span 1 1, "
-        );
-
-        dialog.add(
-            resultingActionLabel, ""
-            + "cell 0 3, "
-            + "span 1 1, "
-            + "pushy, "
-            + "align right bottom, "
-            + "gapbottom " + MIN_VERTICAL_GAP_PX + ", "
-        );
-
-        JPanel bottomButtonPanel = new JPanel();
-        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
-        bottomButtonPanel.add(Box.createHorizontalGlue());
-        bottomButtonPanel.add(saveButton);
-        bottomButtonPanel.add(Box.createHorizontalStrut(BOTTOM_BUTTONS_GAP_PX));
-        bottomButtonPanel.add(cancelButton);
-        dialog.add(
-            bottomButtonPanel, ""
-            + "cell 0 4, "
-            + "span 1 1, "
-            + "pushx, "
-            + "align right bottom, "
+            + "grow, push, "
         );
 
         //--------------------------START ADDING ACTION LISTENERS--------------------------
@@ -898,21 +866,21 @@ public abstract class GUIUtil {
 
         downloadNewButton.addActionListener((unused) -> {
 
-            initImportExistingTracksDialog(contentPanel);
-            saveButton.setText("Download");
+            SwingUtilities.invokeLater(() -> {
+
+                initDownloadNewTrackDialog(contentPanel);
+
+            });
 
         });
 
         importExistingButton.addActionListener((unused) -> {
 
-            initImportExistingTracksDialog(contentPanel);
-            saveButton.setText("Import");
+            SwingUtilities.invokeLater(() -> {
 
-        });
+                initImportExistingTracksDialog(contentPanel, dialog);
 
-        cancelButton.addActionListener((unused) -> {
-
-            dialog.dispose();
+            });
 
         });
 
@@ -925,15 +893,97 @@ public abstract class GUIUtil {
 
     }
 
-    private static void initImportExistingTracksDialog(JPanel panel) {
+    private static void initImportExistingTracksDialog(JPanel panel, JDialog dialog) {
 
+        panel.removeAll();
+        panel.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX + ", insets 0"));
+
+        JButton chooseFilesButton = new HoverableButton(UIManager.getIcon("Tree.closedIcon"));
+        JLabel directoryLabel = new JLabel("<html><i>Select one or more mp3 files to import.</html>");
+        JScrollPane directoryScrollPane = new InvisibleScrollPane(directoryLabel);
+        JLabel resultingActionLabel = new JLabel();
+        JButton importButton = new HoverableButton("Import");
+        JButton cancelButton = new HoverableButton("Cancel");
         
+        resultingActionLabel.setText(
+            createResultingAddTrackActionString()
+        );
+
+        JPanel chooseFilesPanel = new JPanel();
+        chooseFilesPanel.setLayout(new BoxLayout(chooseFilesPanel, BoxLayout.X_AXIS));
+        chooseFilesPanel.add(chooseFilesButton);
+        chooseFilesPanel.add(Box.createHorizontalStrut(MIN_VERTICAL_GAP_PX));
+        chooseFilesPanel.add(directoryScrollPane);
+        panel.add(
+            chooseFilesPanel, ""
+            + "cell 0 0, "
+            + "span 1 1, "
+        );
+
+        panel.add(
+            resultingActionLabel, ""
+            + "cell 0 1, "
+            + "span 1 1, "
+            + "pushy, "
+            + "align right bottom, "
+            + "gapbottom " + MIN_VERTICAL_GAP_PX + ", "
+        );
+
+        JPanel bottomButtonPanel = new JPanel();
+        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
+        bottomButtonPanel.add(Box.createHorizontalGlue());
+        bottomButtonPanel.add(importButton);
+        bottomButtonPanel.add(Box.createHorizontalStrut(BOTTOM_BUTTONS_GAP_PX));
+        bottomButtonPanel.add(cancelButton);
+        panel.add(
+            bottomButtonPanel, ""
+            + "cell 0 2, "
+            + "span 1 1, "
+            + "pushx, "
+            + "align right bottom, "
+        );
+
+        //--------------------------START ADDING ACTION LISTENERS--------------------------
+
+        chooseFilesButton.addActionListener((unused) -> {
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter("*.mp3", "mp3"));
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(true);
+            int result = fileChooser.showOpenDialog(dialog);
+
+            if(result == JFileChooser.APPROVE_OPTION) {
+
+                File[] selectedFiles = fileChooser.getSelectedFiles();
+
+                //TODO: Copy the selected files into the playlist's directory
+                //Include a progress bar
+
+            }
+
+        });
+
+        cancelButton.addActionListener((unused) -> {
+
+            dialog.dispose();
+
+        });
+
+        //---------------------------END ADDING ACTION LISTENERS---------------------------
+
+        panel.revalidate();
+        panel.repaint();
 
     }
 
     private static void initDownloadNewTrackDialog(JPanel panel) {
 
+        panel.removeAll();
+        panel.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX + ", insets 0"));
 
+        panel.revalidate();
+        panel.repaint();
 
     }
 

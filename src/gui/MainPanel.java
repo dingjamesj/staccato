@@ -128,7 +128,7 @@ public class MainPanel extends JPanel {
         FileManager.stopReadingTracks();
         currentTracklist = null;
         isOnTracklistView = false;
-        killTracklistLoadingThreadFlag.set(true);
+        killTracklistLoadingThread();
 
         removeAll();
 
@@ -370,7 +370,7 @@ public class MainPanel extends JPanel {
 
         Thread trackLoadingThread = new Thread(() -> {
 
-            killTracklistLoadingThreadFlag.set(true);
+            killTracklistLoadingThread();
             loadTracklistInfo(playlist);
 
         });
@@ -382,7 +382,6 @@ public class MainPanel extends JPanel {
 
             SwingUtilities.invokeLater(() -> {
 
-                killTracklistLoadingThreadFlag.set(true);
                 initHomePage();
                 PlaybarPanel.playbarPanel.setFocusOnPlayPauseButton();
 
@@ -493,7 +492,7 @@ public class MainPanel extends JPanel {
 
             Thread refreshTracksThread = new Thread(() -> {
 
-                killTracklistLoadingThreadFlag.set(true);
+                killTracklistLoadingThread();
                 loadTracklistInfo(playlist);
 
             });
