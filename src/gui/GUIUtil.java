@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -51,26 +53,36 @@ import net.miginfocom.swing.MigLayout;
 
 public abstract class GUIUtil {
     
-    private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(310, 550);
-    private static final Dimension PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE = new Dimension(320, 420);
+    //Track adder popup
     private static final Dimension TRACK_ADDER_DIALOG_WINDOW_SIZE = new Dimension(320, 550);
-    private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
+    private static final double IMPORTED_TRACKS_PANEL_HEIGHT_PROPORTION = 0.55;
+
+    //Track editor popup
     private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
-    private static final int REDOWNLOAD_FIELD_GAPRIGHT_PX = 55;
-    private static final int REDOWNLOAD_PROGRESSBAR_GAPTOP_PX = 10;
-    private static final int BOTTOM_BUTTONS_GAP_PX = 5;
     private static final int EDIT_METADATA_ARTWORK_BUTTON_SIZE_PX = 64;
     private static final int EDIT_METADATA_ARTWORK_BUTTON_TO_LABEL_GAP_PX = 3;
     private static final int EDIT_METADATA_ARTWORK_URL_LABEL_MAX_WIDTH_PX = 240;
+    private static final ImageIcon EDIT_METADATA_ADD_ARTWORK_ICON = createImageIcon("src/main/resources/add.png");
+
+    //Track redownloader popup
+    private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
+    private static final int REDOWNLOAD_FIELD_GAPRIGHT_PX = 55;
+    private static final int REDOWNLOAD_PROGRESSBAR_GAPTOP_PX = 10;
+
+    //Playlist adder popup
+    private static final Dimension PLAYLIST_ADDER_DIALOG_WINDOW_SIZE = new Dimension(310, 550);
+
+    //Playlist editor popup
+    private static final Dimension PLAYLIST_EDITOR_DIALOG_WINDOW_SIZE = new Dimension(320, 420);
+    private static final int PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX = 200;
+    private static final int PLAYLIST_NAME_LABEL_MAX_WIDTH_PX = 280;
+    
+    //General
+    private static final int BOTTOM_BUTTONS_GAP_PX = 5;
     private static final int MIN_VERTICAL_GAP_PX = 3;
     private static final int SECTION_VERTICAL_GAP_PX = 11;
-    private static final int PLAYLIST_EDITOR_COVER_BUTTON_SIZE_PX = 200;
     private static final int SCROLL_SPEED = 3;
-    private static final int CURRENT_PLAYLIST_DIRECTORY_LABEL_MAX_WIDTH_PX = 200;
-    private static final int PLAYLIST_NAME_LABEL_MAX_WIDTH_PX = 280;
-
     private static final ImageIcon PLACEHOLDER_ART_ICON = createImageIcon("src/main/resources/placeholder art.png");
-    private static final ImageIcon EDIT_METADATA_ADD_ARTWORK_ICON = createImageIcon("src/main/resources/refresh.png");
     private static final Font POPUP_TITLE_LABEL_FONT = new Font("Segoe UI", Font.BOLD, 24);
 
     public static ImageIcon createResizedIcon(ImageIcon imageIcon, int width, int height, int rescalingAlgorithm) {
@@ -893,24 +905,33 @@ public abstract class GUIUtil {
 
     }
 
-    private static void initImportExistingTracksDialog(JPanel panel, JDialog dialog) {
+    private static void initImportExistingTracksDialog(JPanel panel, InternalDataDialog dialog) {
 
         panel.removeAll();
         panel.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX + ", insets 0"));
 
+        JPanel chooseFilesPanel = new JPanel();
         JButton chooseFilesButton = new HoverableButton(UIManager.getIcon("Tree.closedIcon"));
         JLabel directoryLabel = new JLabel("<html><i>Select one or more mp3 files to import.</html>");
         JScrollPane directoryScrollPane = new InvisibleScrollPane(directoryLabel);
+        JPanel importedTracksPanel = new JPanel();
+        JPanel tracklistWrapperPanel = new JPanel(new BorderLayout());
+        JScrollPane importedTracksScrollPane = new JScrollPane(tracklistWrapperPanel);
+        JPanel trackPreviewPanel = new JPanel(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX + ", insets 0"));
         JLabel resultingActionLabel = new JLabel();
+        JPanel bottomButtonPanel = new JPanel();
         JButton importButton = new HoverableButton("Import");
         JButton cancelButton = new HoverableButton("Cancel");
         
+        chooseFilesPanel.setLayout(new BoxLayout(chooseFilesPanel, BoxLayout.X_AXIS));
+        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
+        importedTracksPanel.setLayout(new BoxLayout(importedTracksPanel, BoxLayout.Y_AXIS));
+        importedTracksScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        importedTracksScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
         resultingActionLabel.setText(
             createResultingAddTrackActionString()
         );
 
-        JPanel chooseFilesPanel = new JPanel();
-        chooseFilesPanel.setLayout(new BoxLayout(chooseFilesPanel, BoxLayout.X_AXIS));
         chooseFilesPanel.add(chooseFilesButton);
         chooseFilesPanel.add(Box.createHorizontalStrut(MIN_VERTICAL_GAP_PX));
         chooseFilesPanel.add(directoryScrollPane);
@@ -918,26 +939,42 @@ public abstract class GUIUtil {
             chooseFilesPanel, ""
             + "cell 0 0, "
             + "span 1 1, "
+            + "gapbottom " + MIN_VERTICAL_GAP_PX + ", "
+        );
+
+        tracklistWrapperPanel.add(importedTracksPanel);
+        panel.add(
+            importedTracksScrollPane, ""
+            + "cell 0 1, "
+            + "span 1 1, "
+            + "grow, pushx, "
+            + "hmin " + (int) (IMPORTED_TRACKS_PANEL_HEIGHT_PROPORTION * 100) + "%, "
+        );
+
+        trackPreviewPanel.setBackground(Color.red);
+        panel.add(
+            trackPreviewPanel, ""
+            + "cell 0 2, "
+            + "span 1 1, "
+            + "growx, pushx, "
         );
 
         panel.add(
             resultingActionLabel, ""
-            + "cell 0 1, "
+            + "cell 0 3, "
             + "span 1 1, "
             + "pushy, "
             + "align right bottom, "
             + "gapbottom " + MIN_VERTICAL_GAP_PX + ", "
         );
 
-        JPanel bottomButtonPanel = new JPanel();
-        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.X_AXIS));
         bottomButtonPanel.add(Box.createHorizontalGlue());
         bottomButtonPanel.add(importButton);
         bottomButtonPanel.add(Box.createHorizontalStrut(BOTTOM_BUTTONS_GAP_PX));
         bottomButtonPanel.add(cancelButton);
         panel.add(
             bottomButtonPanel, ""
-            + "cell 0 2, "
+            + "cell 0 4, "
             + "span 1 1, "
             + "pushx, "
             + "align right bottom, "
@@ -956,11 +993,18 @@ public abstract class GUIUtil {
             if(result == JFileChooser.APPROVE_OPTION) {
 
                 File[] selectedFiles = fileChooser.getSelectedFiles();
-
-                //TODO: Copy the selected files into the playlist's directory
-                //Include a progress bar
+                dialog.setFiles(selectedFiles);
+                //TODO: add the files to the importedTracksPanel
 
             }
+
+        });
+
+        importButton.addActionListener((unused) -> {
+
+            //TODO: Copy the selected files into the playlist's directory
+            //Include a progress bar
+            File[] selectedFiles = dialog.getFiles();
 
         });
 
@@ -1422,6 +1466,7 @@ public abstract class GUIUtil {
 
         private byte[] byteArray = null;
         private String string = null;
+        private File[] files = null;
 
         public InternalDataDialog(Frame owner, boolean modal) {
 
@@ -1441,6 +1486,12 @@ public abstract class GUIUtil {
 
         }
 
+        public File[] getFiles() {
+
+            return files;
+
+        }
+
         public void setByteArray(byte[] byteArray) {
 
             this.byteArray = byteArray;
@@ -1450,6 +1501,12 @@ public abstract class GUIUtil {
         public void setString(String string) {
 
             this.string = string;
+
+        }
+
+        public void setFiles(File[] files) {
+
+            this.files = files;
 
         }
 
