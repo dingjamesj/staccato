@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,6 +57,9 @@ public abstract class GUIUtil {
     //Track adder popup
     private static final Dimension TRACK_ADDER_DIALOG_WINDOW_SIZE = new Dimension(320, 550);
     private static final double IMPORTED_TRACKS_PANEL_HEIGHT_PROPORTION = 0.55;
+    private static final int REMOVE_BUTTON_SIZE_PX = 18;
+    private static final double FILE_LOCATION_LABEL_SIZE_PROPORTION = 0.87;
+    private static final Color HIGHLIGHTED_TRACKLIST_ROW_COLOR = new Color(0x272727);
 
     //Track editor popup
     private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
@@ -931,6 +935,15 @@ public abstract class GUIUtil {
         resultingActionLabel.setText(
             createResultingAddTrackActionString()
         );
+        if(dialog.getFiles() != null) {
+
+            for(int i = 0; i < dialog.getFiles().length; i++) {
+
+                importedTracksPanel.add(createImportedTrackEntry(dialog.getFiles()[i]));
+
+            }
+
+        }
 
         chooseFilesPanel.add(chooseFilesButton);
         chooseFilesPanel.add(Box.createHorizontalStrut(MIN_VERTICAL_GAP_PX));
@@ -942,7 +955,7 @@ public abstract class GUIUtil {
             + "gapbottom " + MIN_VERTICAL_GAP_PX + ", "
         );
 
-        tracklistWrapperPanel.add(importedTracksPanel);
+        tracklistWrapperPanel.add(importedTracksPanel, BorderLayout.NORTH);
         panel.add(
             importedTracksScrollPane, ""
             + "cell 0 1, "
@@ -990,11 +1003,18 @@ public abstract class GUIUtil {
             fileChooser.setMultiSelectionEnabled(true);
             int result = fileChooser.showOpenDialog(dialog);
 
+            System.out.println("a)");
             if(result == JFileChooser.APPROVE_OPTION) {
 
                 File[] selectedFiles = fileChooser.getSelectedFiles();
                 dialog.setFiles(selectedFiles);
-                //TODO: add the files to the importedTracksPanel
+                for(int i = 0; i < selectedFiles.length; i++) {
+
+                    importedTracksPanel.add(createImportedTrackEntry(selectedFiles[i]));
+
+                }
+                importedTracksPanel.revalidate();
+                importedTracksPanel.repaint();
 
             }
 
@@ -1028,6 +1048,102 @@ public abstract class GUIUtil {
 
         panel.revalidate();
         panel.repaint();
+
+    }
+
+    private static JPanel createImportedTrackEntry(File trackFile) {
+
+        JPanel trackPanel = new JPanel(new MigLayout("insets 2 4 2 4"));
+        JLabel fileLocationLabel = new JLabel(trackFile.getAbsolutePath());
+        JScrollPane fileLocationScrollPane = new InvisibleScrollPane(fileLocationLabel);
+        JButton removeButton = new JButton("-");
+        
+        trackPanel.add(
+            fileLocationScrollPane, ""
+            + "cell 0 0, "
+            + "span 1 1, "
+            + "growx, "
+            + "wmax " + (int) (FILE_LOCATION_LABEL_SIZE_PROPORTION * 100) + "%, "
+        );
+
+        trackPanel.add(
+            removeButton, ""
+            + "cell 1 0, "
+            + "span 1 1, "
+            + "pushx, "
+            + "align right center, "
+            + "wmax " + REMOVE_BUTTON_SIZE_PX + ", hmax " + REMOVE_BUTTON_SIZE_PX + ", "
+        );
+
+        trackPanel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                if(!trackPanel.isFocusOwner()) {
+
+                    trackPanel.setOpaque(true);
+                    trackPanel.setBackground(HIGHLIGHTED_TRACKLIST_ROW_COLOR);
+                    trackPanel.revalidate();
+                    trackPanel.repaint();
+
+                }
+
+                if(trackPanel.isEnabled()) {
+
+                    trackPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                }
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                if(!trackPanel.isFocusOwner()) {
+
+                    trackPanel.setOpaque(false);
+                    trackPanel.revalidate();
+                    trackPanel.repaint();
+
+                }
+
+                trackPanel.setCursor(Cursor.getDefaultCursor());
+
+            }
+
+        });
+
+        fileLocationScrollPane.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+                // Convert coordinates to panel
+                MouseEvent converted = SwingUtilities.convertMouseEvent(fileLocationScrollPane, e, trackPanel);
+                for(MouseListener mouseListener: trackPanel.getMouseListeners()) {
+
+                    mouseListener.mouseEntered(converted);
+
+                }
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                MouseEvent converted = SwingUtilities.convertMouseEvent(fileLocationScrollPane, e, trackPanel);
+                for(MouseListener mouseListener: trackPanel.getMouseListeners()) {
+                    
+                    mouseListener.mouseExited(converted);
+
+                }
+            
+            }
+            
+        });
+
+        return trackPanel;
 
     }
 
