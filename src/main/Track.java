@@ -175,20 +175,38 @@ public class Track {
 	
 	public String getTitle() {
 		
-		return title;
+		return !title.isBlank() ? title : "[Unknown Title]";
 		
 	}
 	
 	public String getArtists() {
 		
-		return artists;
+		return !artists.isBlank() ? artists : "[Unknown Artists]";
 		
 	}
 	
 	public String getAlbum() {
 		
-		return album;
+		return !album.isBlank() ? album : "[Unknown Album]";
 		
+	}
+
+	public boolean hasTitle() {
+
+		return !title.isBlank();
+
+	}
+
+	public boolean hasArtists() {
+
+		return !artists.isBlank();
+
+	}
+
+	public boolean hasAlbum() {
+
+		return !album.isBlank();
+
 	}
 	
 	public byte[] getArtworkByteArray() {

@@ -851,9 +851,9 @@ public class MainPanel extends JPanel {
         ImageIcon artworkIcon = track.getArtworkByteArray() != null ? new ImageIcon(track.getArtworkByteArray()) : PLACEHOLDER_ART_ICON;
         JLabel artworkLabel = new JLabel();
         JPanel titleAndArtistsPanel = new JPanel();
-        JLabel titleLabel = new JLabel(track.getTitle() != null && !track.getTitle().isBlank() ? track.getTitle() : "[No Title]");
-        JLabel artistsLabel = new JLabel(track.getArtists() != null && !track.getArtists().isBlank() ? track.getArtists() : "[Unknown Artists]");
-        JLabel albumLabel = new JLabel(track.getAlbum() != null && !track.getAlbum().isBlank() ? track.getAlbum() : "[No Album]");
+        JLabel titleLabel = new JLabel(track.getTitle());
+        JLabel artistsLabel = new JLabel(track.getArtists());
+        JLabel albumLabel = new JLabel(track.getAlbum());
         JButton moreOptionsButton = new HoverableButton(MORE_OPTIONS_ICON);
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem redownloadTrackMenuItem = new JMenuItem("Redownload");

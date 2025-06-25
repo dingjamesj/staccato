@@ -26,6 +26,7 @@ public class CurrentTrackInfoPanel extends JPanel {
 
     private static final ImageIcon EDIT_METADATA_ICON = GUIUtil.createImageIcon("src/main/resources/edit.png");
     private static final ImageIcon REDOWNLOAD_ICON = GUIUtil.createImageIcon("src/main/resources/resync.png");
+    private static final ImageIcon PLACEHOLDER_ART_ICON = GUIUtil.createImageIcon("src/main/resources/placeholder art.png");
 
     private static final int GUI_TO_WINDOW_TOP_GAP = 70;
     private static final int GUI_GAP = 10;
@@ -192,8 +193,11 @@ public class CurrentTrackInfoPanel extends JPanel {
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
         artistsLabel.setHorizontalAlignment(JLabel.CENTER);
         albumLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        ImageIcon albumArtImageIcon = GUIUtil.createResizedIcon(new ImageIcon(track.getArtworkByteArray()), ALBUM_ART_ICON_SIZE_PX, ALBUM_ART_ICON_SIZE_PX, Image.SCALE_SMOOTH);
+        ImageIcon albumArtImageIcon = GUIUtil.createResizedIcon(
+            track.getArtworkByteArray() == null ? PLACEHOLDER_ART_ICON : new ImageIcon(track.getArtworkByteArray()), 
+            ALBUM_ART_ICON_SIZE_PX, 
+            ALBUM_ART_ICON_SIZE_PX, 
+            Image.SCALE_SMOOTH);
         albumArtLabel.setIcon(albumArtImageIcon);
 
         for(JScrollPane scrollpane: trackInfoScrollPanes) {

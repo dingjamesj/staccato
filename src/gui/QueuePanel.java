@@ -219,7 +219,7 @@ public class QueuePanel extends JPanel {
         ));
 
         JLabel numberLabel = new JLabel("" + (trackNum + 1));
-        JLabel titleLabel = new JLabel(track.getTitle() != null && !track.getTitle().isBlank() ? track.getTitle() : "[No Title]");
+        JLabel titleLabel = new JLabel(track.getTitle());
 
         numberLabel.setFont(TRACK_NUMBER_FONT);
         titleLabel.setFont(TRACK_TITLE_FONT);
