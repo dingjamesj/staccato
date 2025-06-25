@@ -62,9 +62,12 @@ public abstract class GUIUtil {
     private static final double IMPORTED_TRACKS_PANEL_HEIGHT_PROPORTION = 0.55;
     private static final int REMOVE_BUTTON_SIZE_PX = 18;
     private static final double FILE_LOCATION_LABEL_SIZE_PROPORTION = 0.87;
-    private static final int IMPORT_TRACK_PREVIEW_ICON_SIZE_PX = 48;
+    private static final int IMPORT_TRACK_PREVIEW_ICON_SIZE_PX = 84;
     private static final Color HIGHLIGHTED_TRACKLIST_ROW_COLOR = new Color(0x272727);
     private static final Color SELECTED_TRACKLIST_ROW_COLOR = new Color(0x353535);
+    private static final Font TRACK_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 18);
+    private static final Font TRACK_ARTISTS_FONT = new Font("Segoe UI", Font.ITALIC, 14);
+    private static final Font TRACK_ALBUM_FONT = new Font("Segoe UI", Font.ITALIC, 14);
 
     //Track editor popup
     private static final Dimension EDIT_METADATA_WINDOW_SIZE = new Dimension(400, 275);
@@ -980,7 +983,6 @@ public abstract class GUIUtil {
             + "hmin " + (int) (IMPORTED_TRACKS_PANEL_HEIGHT_PROPORTION * 100) + "%, "
         );
 
-        trackPreviewPanel.setBackground(Color.red);
         panel.add(
             trackPreviewPanel, ""
             + "cell 0 2, "
@@ -1022,6 +1024,10 @@ public abstract class GUIUtil {
 
             }
 
+        });
+
+        trackPreviewPanel.addMouseListener(new MouseAdapter() {
+            //This empty mouse listener prevents clicks on the panel from being sent to the root pane (thereby destroying the preview pane)
         });
 
         chooseFilesButton.addActionListener((unused) -> {
@@ -1193,7 +1199,7 @@ public abstract class GUIUtil {
                 trackPanel.repaint();
 
                 trackPreviewPanel.removeAll();
-                trackPreviewPanel.setLayout(new MigLayout("insets 0"));
+                trackPreviewPanel.setLayout(new MigLayout("insets 0, gap 3 0"));
                 Track track;
                 try {
 
@@ -1205,13 +1211,44 @@ public abstract class GUIUtil {
                         IMPORT_TRACK_PREVIEW_ICON_SIZE_PX, 
                         Image.SCALE_SMOOTH
                     ));
+                    JLabel trackTitleLabel = new JLabel(track.getTitle());
+                    JLabel trackArtistsLabel = new JLabel(track.getArtists());
+                    JLabel trackAlbumLabel = new JLabel(track.getAlbum());
+
+                    trackTitleLabel.setFont(TRACK_TITLE_FONT);
+                    trackArtistsLabel.setFont(TRACK_ARTISTS_FONT);
+                    trackAlbumLabel.setFont(TRACK_ALBUM_FONT);
 
                     trackPreviewPanel.add(
                         albumArtworkLabel, ""
                         + "cell 0 0, "
-                        + "span 1 2, "
+                        + "span 1 3, "
                     );
                     
+                    trackPreviewPanel.add(
+                        trackTitleLabel, ""
+                        + "cell 1 0, "
+                        + "span 1 1, "
+                        + "pushx, pushy 0.5, "
+                        + "aligny bottom, "
+                    );
+                    
+                    trackPreviewPanel.add(
+                        trackArtistsLabel, ""
+                        + "cell 1 1, "
+                        + "span 1 1, "
+                        + "pushx, "
+                        + "aligny top, "
+                    );
+
+                    trackPreviewPanel.add(
+                        trackAlbumLabel, ""
+                        + "cell 1 2, "
+                        + "span 1 1, "
+                        + "pushx, pushy 0.5, "
+                        + "aligny top, "
+                    );
+
                     trackPreviewPanel.revalidate();
                     trackPreviewPanel.repaint();
 
