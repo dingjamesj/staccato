@@ -18,7 +18,7 @@ import java.util.Set;
 */
 public class Playlist implements Serializable {
 
-    private static final long serialVersionUID = 0L;
+    private static final long serialVersionUID = 1654388804786983102L;
 
     //Staccato only tracks the name, directory, and cover art of a playlist.
     private String name;

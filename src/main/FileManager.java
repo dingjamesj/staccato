@@ -309,6 +309,50 @@ public abstract class FileManager {
 
     }
 
+    public static String getUniqueFilePath(String path) {
+
+        File file = new File(path);
+        if(!file.exists()) {
+
+            return file.getAbsolutePath();
+
+        }
+
+        String extension = file.getAbsolutePath().substring(file.getAbsolutePath().indexOf('.'));
+
+        //Detect and remove a "(number)" at the end of the file path (e.g. "myfile (1).mp3")
+        String fileName = file.getName();
+        if(fileName.indexOf('.') != -1) {
+
+            fileName = fileName.substring(0, fileName.indexOf('.'));
+
+        }
+        String nakedFileName = fileName;
+        int indexOfLeftParentheses = fileName.indexOf('(');
+        if(fileName.charAt(fileName.length() - 1) == ')' && indexOfLeftParentheses > 0 && fileName.charAt(indexOfLeftParentheses - 1) == ' ') {
+
+            try {
+
+                Integer.parseInt(fileName.substring(indexOfLeftParentheses + 1, fileName.length() - 1));
+                nakedFileName = fileName.substring(0, indexOfLeftParentheses - 1);
+
+            } catch(NumberFormatException e) {}
+
+        }
+
+        fileName = nakedFileName;
+        int i = 1;
+        while(new File(file.getParent() + File.separator + fileName + extension).exists()) {
+
+            fileName = nakedFileName + " (" + i + ")";
+            i++;
+
+        }
+
+        return file.getParent() + File.separator + fileName + extension;
+
+    }
+
     /**
      * Inititalizer
      * https://stackoverflow.com/questions/50778442/how-to-disable-jaudiotagger-logger-completely

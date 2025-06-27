@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -60,7 +61,8 @@ import net.miginfocom.swing.MigLayout;
 public abstract class GUIUtil {
     
     //Track adder popup
-    private static final Dimension TRACK_ADDER_DIALOG_WINDOW_SIZE = new Dimension(320, 550);
+    private static final Dimension TRACK_ADDER_DIALOG_WINDOW_SIZE = new Dimension(320, 580);
+    private static final Dimension IMPORT_TRACKS_PROGRESS_DIALOG_WINDOW_SIZE = new Dimension(330, 200);
     private static final double IMPORTED_TRACKS_PANEL_HEIGHT_PROPORTION = 0.55;
     private static final int REMOVE_BUTTON_SIZE_PX = 18;
     private static final double FILE_LOCATION_LABEL_SIZE_PROPORTION = 0.87;
@@ -472,8 +474,6 @@ public abstract class GUIUtil {
                 return;
 
             } else {
-
-                System.out.println(nameField.getText());
 
                 if(directoryLabel.getText().isBlank()) {
 
@@ -953,9 +953,10 @@ public abstract class GUIUtil {
         Iterator<File> previouslySelectedFiles = dialog.getFilesIterator();
         while(previouslySelectedFiles.hasNext()) {
 
-            importedTracksPanel.add(createImportedTrackEntry(previouslySelectedFiles.next(), trackPreviewPanel, dialog, resultingActionLabel, playlist));
+            importedTracksPanel.add(createImportedTrackEntry(previouslySelectedFiles.next(), trackPreviewPanel, dialog, resultingActionLabel, playlist, importButton));
 
         }
+        importButton.setEnabled(false);
 
         chooseFilesPanel.add(chooseFilesButton);
         chooseFilesPanel.add(Box.createHorizontalStrut(MIN_VERTICAL_GAP_PX));
@@ -1037,11 +1038,12 @@ public abstract class GUIUtil {
                 dialog.addFiles(newlySelectedFiles);
                 for(int i = 0; i < newlySelectedFiles.length; i++) {
 
-                    importedTracksPanel.add(createImportedTrackEntry(newlySelectedFiles[i], trackPreviewPanel, dialog, resultingActionLabel, playlist));
+                    importedTracksPanel.add(createImportedTrackEntry(newlySelectedFiles[i], trackPreviewPanel, dialog, resultingActionLabel, playlist, importButton));
 
                 }
 
                 resultingActionLabel.setText(createResultingAddTrackActionString(false, dialog.getNumFiles(), null, playlist.getDirectory(), resultingActionLabel));
+                importButton.setEnabled(true);
 
                 importedTracksPanel.revalidate();
                 importedTracksPanel.repaint();
@@ -1065,15 +1067,8 @@ public abstract class GUIUtil {
 
         importButton.addActionListener((unused) -> {
 
-            //TODO: Copy the selected files into the playlist's directory
-            //Include a progress bar
-            
-            Iterator<File> selectedFiles = dialog.getFilesIterator();
-            while(selectedFiles.hasNext()) {
-
-                System.out.println(selectedFiles.next().getAbsolutePath());
-
-            }
+            dialog.dispose();
+            importTracks(dialog.getFilesIterator(), playlist, dialog.getNumFiles());
 
         });
 
@@ -1116,6 +1111,69 @@ public abstract class GUIUtil {
 
     }
 
+    private static void importTracks(Iterator<File> selectedFiles, Playlist playlist, int numNewTracks) {
+
+        JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
+        dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        dialog.setLayout(new MigLayout());
+        dialog.setResizable(false);
+        dialog.setSize(IMPORT_TRACKS_PROGRESS_DIALOG_WINDOW_SIZE);
+
+        JLabel titleLabel = new JLabel("Importing...");
+        JProgressBar progressBar = new JProgressBar(0, numNewTracks);
+
+        titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
+
+        dialog.add(
+            titleLabel, ""
+            + "cell 0 0, "
+            + "span 1 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
+        );
+
+        dialog.add(
+            progressBar, ""
+            + "cell 0 1, "
+            + "span 1 1, "
+            + "pushx, growx, "
+        );
+
+        Thread fileCopyThread = new Thread(() -> {
+
+            File file;
+            int fileCounter = 0;
+            while(selectedFiles.hasNext()) {
+
+                file = selectedFiles.next();
+                titleLabel.setText(truncateWithEllipsis("Importing " + file.getAbsolutePath(), titleLabel, titleLabel.getWidth() - 20));
+                
+                String destinationPath = playlist.getDirectory() + File.separator + file.getName();
+                try {
+
+                    Files.copy(file.toPath(), new File(FileManager.getUniqueFilePath(destinationPath)).toPath());
+
+                } catch (IOException e) {
+
+                    e.printStackTrace();
+                
+                }
+
+                fileCounter++;
+                progressBar.setValue(fileCounter);
+
+            }
+
+            dialog.dispose();
+
+        });
+
+        fileCopyThread.start();
+
+        dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
+        dialog.setVisible(true);
+
+    }
+
     private static void initDownloadNewTrackDialog(JPanel panel) {
 
         panel.removeAll();
@@ -1126,7 +1184,7 @@ public abstract class GUIUtil {
 
     }
 
-    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel, InternalDataDialog dialog, JLabel resultingActionLabel, Playlist playlist) {
+    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel, InternalDataDialog dialog, JLabel resultingActionLabel, Playlist playlist, JButton importButton) {
 
         JPanel trackPanel = new JPanel(new MigLayout("insets 2 4 2 4"));
         JLabel fileLocationLabel = new JLabel(trackFile.getAbsolutePath());
@@ -1329,6 +1387,11 @@ public abstract class GUIUtil {
             parent.revalidate();
             parent.repaint();
             resultingActionLabel.setText(createResultingAddTrackActionString(false, dialog.getNumFiles(), null, playlist.getDirectory(), resultingActionLabel));
+            if(dialog.getNumFiles() == 0) {
+
+                importButton.setEnabled(false);
+
+            }
 
         });
 
