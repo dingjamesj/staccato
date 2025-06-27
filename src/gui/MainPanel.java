@@ -999,9 +999,15 @@ public class MainPanel extends JPanel {
 
     private void promptPlaylistDeletion(Playlist playlist, JPanel playlistPanel) {
 
+        String truncatedDirectory = playlist.getDirectory();
+        if(truncatedDirectory.length() > 50) {
+
+            truncatedDirectory = truncatedDirectory.substring(0, 50) + "...";
+
+        }
         int confirmationResult = JOptionPane.showConfirmDialog(
             StaccatoWindow.staccatoWindow, 
-            "<html>Are you sure you want to delete the following playlist and its files?<br></br><br></br>" + playlist.getName() + "<br></br><i>" + playlist.getDirectory() + "</i><br></br><br></br><b>This process is irreversible.</b></html>", 
+            "<html>Are you sure you want to delete the following playlist and its files?<br></br><br></br>" + playlist.getName() + "<br></br><i>" + truncatedDirectory + "</i><br></br><br></br><b>This process is irreversible.</b></html>", 
             "Confirm Playlist Deletion", 
             JOptionPane.YES_NO_OPTION, 
             JOptionPane.WARNING_MESSAGE
@@ -1073,9 +1079,15 @@ public class MainPanel extends JPanel {
 
     private void promptTrackDeletion(Track track, JPanel trackPanel) {
 
+        String truncatedFileLocation = track.getFileLocation();
+        if(truncatedFileLocation.length() > 50) {
+
+            truncatedFileLocation = truncatedFileLocation.substring(0, 50) + "...";
+
+        }
         int confirmationResult = JOptionPane.showConfirmDialog(
             StaccatoWindow.staccatoWindow, 
-            "<html>Are you sure you want to remove the following track?<br></br><br></br>" + track.getTitle() + "<br></br><i>" + track.getFileLocation() + "</i><br></br><br></br><b>This will also delete the track from your file system.</b></html>", 
+            "<html>Are you sure you want to remove the following track?<br></br><br></br>" + track.getTitle() + "<br></br><i>" + truncatedFileLocation + "</i><br></br><br></br><b>This will also delete the track from your file system.</b></html>", 
             "Confirm Track Deletion", 
             JOptionPane.YES_NO_OPTION, 
             JOptionPane.WARNING_MESSAGE
