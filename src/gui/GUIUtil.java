@@ -1669,7 +1669,7 @@ public abstract class GUIUtil {
             track.setArtists(artistsField.getText());
             track.setAlbum(albumField.getText());
             track.setArtworkByteArray(dialog.getByteArray());
-            track.writeMetadata();
+            track.writeFileMetadata();
 
             if(trackPanel != null) {
 

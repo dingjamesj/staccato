@@ -14,7 +14,8 @@ class PythonLink(object):
         self._gateway = gateway
         pass
     
-    # Method to be called from JavaLink.java
+    # If is_playlist is true, returns a list of dicts that contain info about each track in the Spotify playlist.
+    # If is_playlist is false, returns a list with one dict that contains info about the Spotify track.
     def send_tracks_to_java(self, spotify_id: str, is_playlist: bool) -> list[dict[str, str]]:
         spotify_tracks: list[dict]
         try: 
@@ -41,7 +42,6 @@ class PythonLink(object):
                     "artists": artists,
                     "album": track["track"]["album"]["name"],
                     "artworkURL": track["track"]["album"]["images"][0]["url"],
-                    "youtubeID": fetcher.search_youtube(track["track"]["name"], track["track"]["artists"][0]["name"])
                 }, self._gateway._gateway_client))
         else:
             artists = ""
@@ -53,11 +53,18 @@ class PythonLink(object):
                 "artists": artists,
                 "album": spotify_tracks[0]["album"]["name"],
                 "artworkURL": spotify_tracks[0]["album"]["images"][0]["url"],
-                "youtubeID": fetcher.search_youtube(spotify_tracks[0]["name"], spotify_tracks[0]["artists"][0]["name"])
             }, self._gateway._gateway_client)]
 
         return ListConverter().convert(send_to_java_tracks, self._gateway._gateway_client)
     
+    # Returns the YouTube URL of the best matching YouTube video
+    def find_best_match_youtube_url(self, title: str, artists: str) -> str:
+        return fetcher.search_youtube(title, artists)
+
+    # Returns the path to the downloaded file
+    def download_raw_track_file(self, youtube_url: str) -> str:
+        return ""
+
     class Java:
         implements = ["main.JavaLink.IPythonLink"]
 

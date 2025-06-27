@@ -41,15 +41,15 @@ public class Track {
 	private transient String artworkURL;
 	
 	/**
-	 * For reading a track from python fetcher
+	 * Tracks created with this constructor have no file location. They are to represent tracks on the web.
 	 * @param title
 	 * @param artists
 	 * @param album
 	 * @param artworkURL
 	 */
-	public Track(String fileLocation, String title, String artists, String album, String artworkURL) {
+	public Track(String title, String artists, String album, String artworkURL) {
 		
-		this.fileLocation = fileLocation;
+		this.fileLocation = null;
 		this.title = title;
 		this.artists = artists;
 		this.album = album;
@@ -58,7 +58,7 @@ public class Track {
 	}
 
 	/**
-	 * For reading a track from a mp3 file
+	 * Tracks created with this constructor represent a track in this device's file storage.
 	 * @param fileLocation
 	 * @throws FileNotFoundException
 	 */
@@ -71,10 +71,15 @@ public class Track {
 
 		}
 
-		setAttributesFromFileMetadata();
+		setPropertiesFromFileMetadata();
 
 	}
 
+	/**
+	 * Tracks created with this constructor represent a track in this device's file storage.
+	 * @param file
+	 * @throws FileNotFoundException
+	 */
 	public Track(File file) throws FileNotFoundException {
 
 		try{
@@ -105,7 +110,7 @@ public class Track {
 
 		}
 
-		setAttributesFromFileMetadata();
+		setPropertiesFromFileMetadata();
 
 	}
 	
@@ -264,9 +269,9 @@ public class Track {
 	}
 
 	/**
-	 * Reads the track file's metadata and stores it in this track object. 
+	 * Sets the attributes on this track OBJECT on memory, reading from the physical file.
 	 */
-	private synchronized void setAttributesFromFileMetadata() {
+	private synchronized void setPropertiesFromFileMetadata() {
 
 		if(!canRead()) {
 
@@ -306,9 +311,9 @@ public class Track {
 	}
 
 	/**
-	 * Writes this track object's attributes onto the track file
+	 * Sets the attributes on the track's FILE, reading from the OBJECT on memory.
 	 */
-	public synchronized void writeMetadata() {
+	public synchronized void writeFileMetadata() {
 		
 		if(!canRead()) {
 			
@@ -377,6 +382,19 @@ public class Track {
 		
 	}
 
+	public synchronized void download() {
+
+		download(JavaLink.findBestYouTubeURLMatch(title, artists));
+
+	}
+
+	public synchronized void download(String youtubeURL) {
+
+		String downloadedPath = JavaLink.downloadRawTrackFile(youtubeURL);
+		this.fileLocation = downloadedPath;
+
+	}
+
 	@Override
 	public int hashCode() {
 
@@ -409,8 +427,26 @@ public class Track {
 	@Override
 	public String toString() {
 		
-		String toString = "\"" + null + "\" [" + formatHoursMinutesSeconds(duration) + "] from \"" + album + "\" by " + artists;
+		String toString = "\"" + title + "\"";
 		
+		if(duration >= 0) {
+
+			toString += " [" + formatHoursMinutesSeconds(duration) + "]";
+
+		}
+
+		toString += " from \"" + album + "\" by " + artists;
+
+		if(fileLocation != null) {
+
+			toString += " (@ " + fileLocation + ")";
+
+		} else {
+
+			toString += " (not on file)";
+
+		}
+
 		if(artworkURL != null && !artworkURL.isBlank()) {
 
 			toString += " (artwork @ " + artworkURL + ")";

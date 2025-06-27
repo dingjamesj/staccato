@@ -15,6 +15,8 @@ public class JavaLink {
     public interface IPythonLink {
 
         public List<Map<String, String>> send_tracks_to_java(String spotify_id, boolean is_playlist);
+        public String find_best_match_youtube_url(String title, String artists);
+        public String download_raw_music_file(String youtube_url);
 
     }
 
@@ -37,18 +39,37 @@ public class JavaLink {
         for(int i = 0; i < pythonData.size(); i++) {
 
             Track track = new Track(
-                pythonData.get(i).get("fileLocation"),
                 pythonData.get(i).get("title"),
                 pythonData.get(i).get("artists"),
                 pythonData.get(i).get("album"),
                 pythonData.get(i).get("artworkURL")
             );
             tracks.add(track);
-            track.writeMetadata();
+            track.writeFileMetadata();
 
         }
 
         return tracks;
+
+    }
+
+    public static String findBestYouTubeURLMatch(String title, String artists) {
+
+        ClientServer clientServer = new ClientServer(null);
+        IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
+        String youtubeID = pythonLink.find_best_match_youtube_url(title, artists);
+        clientServer.shutdown();
+        return youtubeID;
+
+    }
+
+    public static String downloadRawTrackFile(String youtubeURL) {
+
+        ClientServer clientServer = new ClientServer(null);
+        IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
+        String downloadedPath = pythonLink.download_raw_music_file(youtubeURL);
+        clientServer.shutdown();
+        return downloadedPath;
 
     }
 
@@ -58,7 +79,7 @@ public class JavaLink {
 
         try {
 
-            tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", true);
+            tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cda098d366544530", true);
 
         } catch(SpotipyException e) {
 
@@ -87,6 +108,22 @@ public class JavaLink {
         if(tracks == null) {
 
             return;
+
+        }
+
+        for(Track track: tracks) {
+
+            System.out.println(track);
+            
+        }
+
+        try {
+
+            tracks = getTracks("https://open.spotify.com/playlist/3oMkpen2toJFAvPDPml7HC?si=11f6570295a84372", true);
+
+        } catch(SpotipyException e) {
+
+            e.printStackTrace();
 
         }
 

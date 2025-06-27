@@ -1,14 +1,12 @@
 # Fetches Spotify and YouTube information
 
-import platform
-
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 import yt_dlp
 
-SETTINGS_FILE_LOCATION = "staccatoapikeys.txt"
-NUM_ACCEPTED_SEARCHES = 3
+SETTINGS_FILE_LOCATION: str = "staccatoapikeys.txt"
+NUM_ACCEPTED_SEARCHES: int = 3
 
 api_keys: list[str] = []
 market: str = ""
@@ -30,10 +28,7 @@ def read_api_settings():
 def change_api_settings(client_id: str, client_secret: str, market: str):
     try:
         with open(SETTINGS_FILE_LOCATION, "w") as file:
-            if platform.system().lower() == "windows":
-                file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
-            else:
-                file.writelines(f"{client_id}\n", f"{client_secret}\n", f"{market}")
+            file.writelines(f"{client_id}\n{client_secret}\n{market}")
     except IOError as e:
         print(e)
 
@@ -103,4 +98,4 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
     return score
 
 if __name__ == "__main__":
-    pass    
+    pass
