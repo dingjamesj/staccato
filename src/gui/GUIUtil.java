@@ -1055,7 +1055,7 @@ public abstract class GUIUtil {
         chooseFilesButton.addMouseListener(new MouseAdapter() {
             
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
 
                 trackPreviewPanel.removeAll();
                 trackPreviewPanel.revalidate();
@@ -1075,7 +1075,7 @@ public abstract class GUIUtil {
         importButton.addMouseListener(new MouseAdapter() {
             
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
 
                 trackPreviewPanel.removeAll();
                 trackPreviewPanel.revalidate();
@@ -1094,8 +1094,22 @@ public abstract class GUIUtil {
         cancelButton.addMouseListener(new MouseAdapter() {
             
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
 
+                trackPreviewPanel.removeAll();
+                trackPreviewPanel.revalidate();
+                trackPreviewPanel.repaint();
+
+            }
+
+        });
+
+        importedTracksScrollPane.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+				cancelButton.requestFocusInWindow();
                 trackPreviewPanel.removeAll();
                 trackPreviewPanel.revalidate();
                 trackPreviewPanel.repaint();

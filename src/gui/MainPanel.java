@@ -511,6 +511,17 @@ public class MainPanel extends JPanel {
 
         });
 
+        tracklistScrollPane.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+				PlaybarPanel.playbarPanel.setFocusOnPlayPauseButton();
+
+            }
+
+        });
+
     }
 
     protected void updatePlaylistInfoPanel(byte[] artworkByteArray, String name) {
@@ -887,7 +898,7 @@ public class MainPanel extends JPanel {
         trackPanel.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
 
                 if(e.getClickCount() == 2) {
 
