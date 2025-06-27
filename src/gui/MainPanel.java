@@ -371,7 +371,7 @@ public class MainPanel extends JPanel {
         Thread trackLoadingThread = new Thread(() -> {
 
             killTracklistLoadingThread();
-            loadTracklistInfo(playlist);
+            fillTracklistGUI(playlist);
 
         });
         trackLoadingThread.start();
@@ -493,7 +493,8 @@ public class MainPanel extends JPanel {
             Thread refreshTracksThread = new Thread(() -> {
 
                 killTracklistLoadingThread();
-                loadTracklistInfo(playlist);
+                playlist.loadTracks();
+                fillTracklistGUI(playlist);
 
             });
             refreshTracksThread.start();
@@ -542,10 +543,10 @@ public class MainPanel extends JPanel {
     }
 
     /**
-     * Loads the tracklist info
+     * Fills the tracklist GUI
      * @param playlist
      */
-    private synchronized void loadTracklistInfo(Playlist playlist) {
+    protected synchronized void fillTracklistGUI(Playlist playlist) {
 
         refreshButton.setEnabled(false);
 

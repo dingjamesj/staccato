@@ -1163,6 +1163,8 @@ public abstract class GUIUtil {
 
             }
 
+            playlist.loadTracks();
+            MainPanel.mainPanel.fillTracklistGUI(playlist);
             dialog.dispose();
 
         });
