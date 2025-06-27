@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -22,7 +23,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -954,13 +956,10 @@ public abstract class GUIUtil {
         resultingActionLabel.setText(
             createResultingAddTrackActionString()
         );
-        if(dialog.getFiles() != null) {
+        Iterator<File> previouslySelectedFiles = dialog.getFilesIterator();
+        while(previouslySelectedFiles.hasNext()) {
 
-            for(int i = 0; i < dialog.getFiles().length; i++) {
-
-                importedTracksPanel.add(createImportedTrackEntry(dialog.getFiles()[i], trackPreviewPanel));
-
-            }
+            importedTracksPanel.add(createImportedTrackEntry(previouslySelectedFiles.next(), trackPreviewPanel, dialog));
 
         }
 
@@ -1040,13 +1039,14 @@ public abstract class GUIUtil {
 
             if(result == JFileChooser.APPROVE_OPTION) {
 
-                File[] selectedFiles = fileChooser.getSelectedFiles();
-                dialog.setFiles(selectedFiles);
-                for(int i = 0; i < selectedFiles.length; i++) {
+                File[] newlySelectedFiles = fileChooser.getSelectedFiles();
+                dialog.addFiles(newlySelectedFiles);
+                for(int i = 0; i < newlySelectedFiles.length; i++) {
 
-                    importedTracksPanel.add(createImportedTrackEntry(selectedFiles[i], trackPreviewPanel));
+                    importedTracksPanel.add(createImportedTrackEntry(newlySelectedFiles[i], trackPreviewPanel, dialog));
 
                 }
+
                 importedTracksPanel.revalidate();
                 importedTracksPanel.repaint();
 
@@ -1071,7 +1071,13 @@ public abstract class GUIUtil {
 
             //TODO: Copy the selected files into the playlist's directory
             //Include a progress bar
-            File[] selectedFiles = dialog.getFiles();
+            
+            Iterator<File> selectedFiles = dialog.getFilesIterator();
+            while(selectedFiles.hasNext()) {
+
+                System.out.println(selectedFiles.next().getAbsolutePath());
+
+            }
 
         });
 
@@ -1124,7 +1130,7 @@ public abstract class GUIUtil {
 
     }
 
-    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel) {
+    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel, InternalDataDialog dialog) {
 
         JPanel trackPanel = new JPanel(new MigLayout("insets 2 4 2 4"));
         JLabel fileLocationLabel = new JLabel(trackFile.getAbsolutePath());
@@ -1205,7 +1211,7 @@ public abstract class GUIUtil {
 
                     track = new Track(trackFile.getAbsolutePath());
                     
-                    JLabel albumArtworkLabel = new JLabel(createResizedIcon(
+                    JLabel artworkLabel = new JLabel(createResizedIcon(
                         track.getArtworkByteArray() == null ? PLACEHOLDER_ART_ICON : new ImageIcon(track.getArtworkByteArray()), 
                         IMPORT_TRACK_PREVIEW_ICON_SIZE_PX, 
                         IMPORT_TRACK_PREVIEW_ICON_SIZE_PX, 
@@ -1214,19 +1220,22 @@ public abstract class GUIUtil {
                     JLabel trackTitleLabel = new JLabel(track.getTitle());
                     JLabel trackArtistsLabel = new JLabel(track.getArtists());
                     JLabel trackAlbumLabel = new JLabel(track.getAlbum());
+                    JScrollPane trackTitleScrollPane = new InvisibleScrollPane(trackTitleLabel);
+                    JScrollPane trackArtistsScrollPane = new InvisibleScrollPane(trackArtistsLabel);
+                    JScrollPane trackAlbumScrollPane = new InvisibleScrollPane(trackAlbumLabel);
 
                     trackTitleLabel.setFont(TRACK_TITLE_FONT);
                     trackArtistsLabel.setFont(TRACK_ARTISTS_FONT);
                     trackAlbumLabel.setFont(TRACK_ALBUM_FONT);
 
                     trackPreviewPanel.add(
-                        albumArtworkLabel, ""
+                        artworkLabel, ""
                         + "cell 0 0, "
                         + "span 1 3, "
                     );
                     
                     trackPreviewPanel.add(
-                        trackTitleLabel, ""
+                        trackTitleScrollPane, ""
                         + "cell 1 0, "
                         + "span 1 1, "
                         + "pushx, pushy 0.5, "
@@ -1234,7 +1243,7 @@ public abstract class GUIUtil {
                     );
                     
                     trackPreviewPanel.add(
-                        trackArtistsLabel, ""
+                        trackArtistsScrollPane, ""
                         + "cell 1 1, "
                         + "span 1 1, "
                         + "pushx, "
@@ -1242,7 +1251,7 @@ public abstract class GUIUtil {
                     );
 
                     trackPreviewPanel.add(
-                        trackAlbumLabel, ""
+                        trackAlbumScrollPane, ""
                         + "cell 1 2, "
                         + "span 1 1, "
                         + "pushx, pushy 0.5, "
@@ -1313,6 +1322,16 @@ public abstract class GUIUtil {
                 }
             
             }
+
+        });
+        
+        removeButton.addActionListener((unused) -> {
+
+            dialog.removeFiles(trackFile);
+            Container parent = trackPanel.getParent();
+            parent.remove(trackPanel);
+            parent.revalidate();
+            parent.repaint();
 
         });
 
@@ -1755,7 +1774,7 @@ public abstract class GUIUtil {
 
         private byte[] byteArray = null;
         private String string = null;
-        private File[] files = null;
+        private HashSet<File> files = new HashSet<File>();
 
         public InternalDataDialog(Frame owner, boolean modal) {
 
@@ -1775,12 +1794,6 @@ public abstract class GUIUtil {
 
         }
 
-        public File[] getFiles() {
-
-            return files;
-
-        }
-
         public void setByteArray(byte[] byteArray) {
 
             this.byteArray = byteArray;
@@ -1793,9 +1806,35 @@ public abstract class GUIUtil {
 
         }
 
-        public void setFiles(File[] files) {
+        public Iterator<File> getFilesIterator() {
 
-            this.files = files;
+            return files.iterator();
+
+        }
+
+        public int getNumFiles() {
+
+            return files.size();
+
+        }
+
+        public void addFiles(File... files) {
+
+            for(int i = 0; i < files.length; i++) {
+
+                this.files.add(files[i]);
+
+            }
+
+        }
+
+        public void removeFiles(File... files) {
+
+            for(int i = 0; i < files.length; i++) {
+
+                this.files.remove(files[i]);
+
+            }
 
         }
 
