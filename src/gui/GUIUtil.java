@@ -556,12 +556,6 @@ public abstract class GUIUtil {
 
     }
 
-    private static String createResultingAddTrackActionString() {
-
-        return "<html><p align=\"right\"><i>resulting action</html>";
-
-    }
-
     public static JDialog createPlaylistEditorPopup(Playlist playlist, int playlistIndex) {
 
         InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
@@ -831,7 +825,7 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createAddTrackDialog() {
+    public static JDialog createAddTrackDialog(Playlist playlist) {
 
         InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -915,7 +909,7 @@ public abstract class GUIUtil {
 
             SwingUtilities.invokeLater(() -> {
 
-                initImportExistingTracksDialog(contentPanel, dialog);
+                initImportExistingTracksDialog(contentPanel, dialog, playlist);
 
             });
 
@@ -930,7 +924,7 @@ public abstract class GUIUtil {
 
     }
 
-    private static void initImportExistingTracksDialog(JPanel panel, InternalDataDialog dialog) {
+    private static void initImportExistingTracksDialog(JPanel panel, InternalDataDialog dialog, Playlist playlist) {
 
         panel.removeAll();
         panel.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX + ", insets 0"));
@@ -954,12 +948,12 @@ public abstract class GUIUtil {
         importedTracksScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         importedTracksScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
         resultingActionLabel.setText(
-            createResultingAddTrackActionString()
+            createResultingAddTrackActionString(false, dialog.getNumFiles(), null, playlist.getDirectory(), resultingActionLabel)
         );
         Iterator<File> previouslySelectedFiles = dialog.getFilesIterator();
         while(previouslySelectedFiles.hasNext()) {
 
-            importedTracksPanel.add(createImportedTrackEntry(previouslySelectedFiles.next(), trackPreviewPanel, dialog));
+            importedTracksPanel.add(createImportedTrackEntry(previouslySelectedFiles.next(), trackPreviewPanel, dialog, resultingActionLabel, playlist));
 
         }
 
@@ -1043,9 +1037,11 @@ public abstract class GUIUtil {
                 dialog.addFiles(newlySelectedFiles);
                 for(int i = 0; i < newlySelectedFiles.length; i++) {
 
-                    importedTracksPanel.add(createImportedTrackEntry(newlySelectedFiles[i], trackPreviewPanel, dialog));
+                    importedTracksPanel.add(createImportedTrackEntry(newlySelectedFiles[i], trackPreviewPanel, dialog, resultingActionLabel, playlist));
 
                 }
+
+                resultingActionLabel.setText(createResultingAddTrackActionString(false, dialog.getNumFiles(), null, playlist.getDirectory(), resultingActionLabel));
 
                 importedTracksPanel.revalidate();
                 importedTracksPanel.repaint();
@@ -1130,7 +1126,7 @@ public abstract class GUIUtil {
 
     }
 
-    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel, InternalDataDialog dialog) {
+    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel, InternalDataDialog dialog, JLabel resultingActionLabel, Playlist playlist) {
 
         JPanel trackPanel = new JPanel(new MigLayout("insets 2 4 2 4"));
         JLabel fileLocationLabel = new JLabel(trackFile.getAbsolutePath());
@@ -1332,10 +1328,33 @@ public abstract class GUIUtil {
             parent.remove(trackPanel);
             parent.revalidate();
             parent.repaint();
+            resultingActionLabel.setText(createResultingAddTrackActionString(false, dialog.getNumFiles(), null, playlist.getDirectory(), resultingActionLabel));
 
         });
 
         return trackPanel;
+
+    }
+
+    private static String createResultingAddTrackActionString(boolean isCreatingNew, int numNewTracks, String musicPlatform, String playlistDirStr, JComponent component) {
+
+        if(isCreatingNew) {
+
+            return "<html><p align=\"right\"><i>Downloading tracks from " + musicPlatform + "</html>";
+
+        } else {
+
+            if(numNewTracks == 0) {
+
+                return "<html><p align=\"right\"><i>Please select files to copy into<br></br>" + truncateWithEllipsis(playlistDirStr, component, PLAYLIST_ADDER_DIALOG_WINDOW_SIZE.width - 20) + "</html>";
+
+            } else {
+
+                return "<html><p align=\"right\"><i>Will copy " + numNewTracks + " mp3 files into<br></br>" + truncateWithEllipsis(playlistDirStr, component, PLAYLIST_ADDER_DIALOG_WINDOW_SIZE.width - 20) + "</html>";
+
+            }
+
+        }
 
     }
 

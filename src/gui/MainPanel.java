@@ -504,7 +504,7 @@ public class MainPanel extends JPanel {
 
             SwingUtilities.invokeLater(() -> {
 
-                GUIUtil.createAddTrackDialog();
+                GUIUtil.createAddTrackDialog(playlist);
 
             });
 
