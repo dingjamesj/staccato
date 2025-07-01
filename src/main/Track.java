@@ -382,16 +382,16 @@ public class Track {
 		
 	}
 
-	public synchronized void download() {
+	public synchronized void download(String location) {
 
-		download(JavaLink.findBestYouTubeURLMatch(title, artists));
+		download(JavaLink.findBestYouTubeURLMatch(title, artists), location);
 
 	}
 
-	public synchronized void download(String youtubeURL) {
+	public synchronized void download(String youtubeURL, String location) {
 
-		String downloadedPath = JavaLink.downloadRawTrackFile(youtubeURL);
-		this.fileLocation = downloadedPath;
+		JavaLink.downloadRawTrackFile(youtubeURL, location);
+		this.fileLocation = location;
 
 	}
 
