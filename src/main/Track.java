@@ -390,7 +390,7 @@ public class Track {
 
 	public synchronized void download(String youtubeURL, String location) {
 
-		JavaLink.downloadRawTrackFile(youtubeURL, location);
+		JavaLink.downloadRawTrack(youtubeURL, location);
 		this.fileLocation = location;
 
 	}

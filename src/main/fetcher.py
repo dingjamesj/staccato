@@ -40,7 +40,7 @@ def get_spotify_track(spotify_id: str) -> dict:
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
     return sp.track(track_id=spotify_id, market=market)
 
-def search_youtube(title: str, artists: str) -> str:
+def find_best_youtube_url(title: str, artists: str) -> str:
     # Search for the top few videos---searching with "{Title} {1st artist}"
     # e.g. "née-nah 21 Savage"
     ydl_opts: dict = {

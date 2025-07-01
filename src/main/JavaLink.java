@@ -15,8 +15,9 @@ public class JavaLink {
     public interface IPythonLink {
 
         public List<Map<String, String>> send_spotify_tracks_to_java(String spotify_id, boolean is_playlist);
-        public String find_best_match_youtube_url(String title, String artists);
-        public int download_raw_music_file(String youtube_url, String location);
+        public String find_best_youtube_url(String title, String artists);
+        public int download_raw_track(String youtube_url, String location);
+        public int update_yt_dlp();
 
     }
 
@@ -70,7 +71,7 @@ public class JavaLink {
 
         ClientServer clientServer = new ClientServer(null);
         IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
-        String youtubeURL = pythonLink.find_best_match_youtube_url(title, artists);
+        String youtubeURL = pythonLink.find_best_youtube_url(title, artists);
         clientServer.shutdown();
         return youtubeURL;
 
@@ -83,76 +84,37 @@ public class JavaLink {
      * @param location
      * @return 0 if download was successful, 1 otherwise
      */
-    public static int downloadRawTrackFile(String youtubeURL, String location) {
+    public static int downloadRawTrack(String youtubeURL, String location) {
 
         ClientServer clientServer = new ClientServer(null);
         IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
-        int downloadResult = pythonLink.download_raw_music_file(youtubeURL, location);
+        int downloadResult = pythonLink.download_raw_track(youtubeURL, location);
         clientServer.shutdown();
-
         return downloadResult;
+
+    }
+
+    /**
+     * Through pip, updates yt-dlp and pip
+     * @return
+     */
+    public static int updateYtdlp() {
+
+        ClientServer clientServer = new ClientServer(null);
+        IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
+        int updateResult = pythonLink.update_yt_dlp();
+        clientServer.shutdown();
+        return updateResult;
 
     }
 
     public static void main(String[] args) {
 
-        Set<Track> tracks = null;
-
-        try {
-
-            tracks = getSpotifyTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cda098d366544530", true);
-
-        } catch(SpotipyException e) {
-
-            e.printStackTrace();
-
-        }
-
-        for(Track track: tracks) {
-
-            System.out.println(track);
-            
-        }
-
-        // tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", false);
-        // tracks = getTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=cb2f14163fde4403", true);
-        try {
-
-            tracks = getSpotifyTracks("https://open.spotify.com/track/0rx7xu0RmZLpJjKNVZjSVv?si=f4edb873a32e4629", false);
-
-        } catch (SpotipyException e) {
-
-            e.printStackTrace();
-
-        }
-
-        if(tracks == null) {
-
-            return;
-
-        }
-
-        for(Track track: tracks) {
-
-            System.out.println(track);
-            
-        }
-
-        try {
-
-            tracks = getSpotifyTracks("https://open.spotify.com/playlist/3oMkpen2toJFAvPDPml7HC?si=11f6570295a84372", true);
-
-        } catch(SpotipyException e) {
-
-            e.printStackTrace();
-
-        }
-
-        for(Track track: tracks) {
-
-            System.out.println(track);
-            
-        }
+        System.out.println("UPDATE YT-DLP");
+        System.out.println(updateYtdlp());
+        System.out.println();
+        System.out.println("DOWNLOAD TRACK");
+        System.out.println(downloadRawTrack("https://www.youtube.com/watch?v=SmSUpVC4sn4", "D:\\"));
 
     }
 

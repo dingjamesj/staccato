@@ -7,8 +7,7 @@ import fetcher
 import downloader
 
 class PythonLink(object):
-    """Methods to find in JavaLink.java"""
-
+    """Functions to find in JavaLink.java"""
     def __init__(self):
         self._gateway: ClientServer = None
     
@@ -17,11 +16,8 @@ class PythonLink(object):
         pass
     
     def send_spotify_tracks_to_java(self, spotify_id: str, is_playlist: bool) -> list[dict[str, str]]:
-        """
-        If is_playlist is true, returns a list of dicts that contain info about each track in the Spotify playlist.
-        If is_playlist is false, returns a list with one dict that contains info about the Spotify track.
-        """
-
+        """If is_playlist is true, returns a list of dicts that contain info about each track in the Spotify playlist. 
+        If is_playlist is false, returns a list with one dict that contains info about the Spotify track."""
         spotify_tracks: list[dict]
         try: 
             if is_playlist:
@@ -63,12 +59,15 @@ class PythonLink(object):
         return ListConverter().convert(send_to_java_tracks, self._gateway._gateway_client)
     
     # Returns the YouTube URL of the best matching YouTube video
-    def find_best_match_youtube_url(self, title: str, artists: str) -> str:
-        return fetcher.search_youtube(title, artists)
+    def find_best_youtube_url(self, title: str, artists: str) -> str:
+        return fetcher.find_best_youtube_url(title, artists)
 
     # Returns the path to the downloaded file
-    def download_raw_track_file(self, youtube_url: str, location: str) -> int:
+    def download_raw_track(self, youtube_url: str, location: str) -> int:
         return downloader.download_youtube_track(youtube_url, location)
+    
+    def update_yt_dlp(self) -> int:
+        return downloader.update_yt_dlp()
 
     class Java:
         implements = ["main.JavaLink.IPythonLink"]
