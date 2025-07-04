@@ -16,7 +16,7 @@ public class JavaLink {
 
         public List<Map<String, String>> send_spotify_tracks_to_java(String spotify_id, boolean is_playlist);
         public String find_best_youtube_url(String title, String artists);
-        public int download_raw_track(String youtube_url, String location);
+        public String download_raw_track(String youtube_url, String location);
         public int update_yt_dlp();
 
     }
@@ -82,15 +82,15 @@ public class JavaLink {
      * Does not contain any metadata.
      * @param youtubeURL
      * @param location
-     * @return 0 if download was successful, 1 otherwise
+     * @return The downloaded file's path
      */
-    public static int downloadRawTrack(String youtubeURL, String location) {
+    public static String downloadRawTrack(String youtubeURL, String location) {
 
         ClientServer clientServer = new ClientServer(null);
         IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
-        int downloadResult = pythonLink.download_raw_track(youtubeURL, location);
+        String downloadPath = pythonLink.download_raw_track(youtubeURL, location);
         clientServer.shutdown();
-        return downloadResult;
+        return downloadPath;
 
     }
 

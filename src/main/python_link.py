@@ -63,8 +63,8 @@ class PythonLink(object):
         return fetcher.find_best_youtube_url(title, artists)
 
     # Returns the path to the downloaded file
-    def download_raw_track(self, youtube_url: str, location: str) -> int:
-        return downloader.download_youtube_track(youtube_url, location)
+    def download_raw_track(self, youtube_url: str, location: str) -> str:
+        return downloader.download_youtube_track(youtube_url, location)["download_path"]
     
     def update_yt_dlp(self) -> int:
         return downloader.update_yt_dlp()
