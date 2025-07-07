@@ -113,6 +113,7 @@ public class MainPanel extends JPanel {
 
     private final AtomicBoolean killTracklistLoadingThreadFlag = new AtomicBoolean(false);
     private Track[] currentTracklist;
+    private Playlist currentPlaylist;
     private boolean isOnTracklistView = false;
 
     public MainPanel() {
@@ -127,6 +128,7 @@ public class MainPanel extends JPanel {
 
         FileManager.stopReadingTracks();
         currentTracklist = null;
+        currentPlaylist = null;
         isOnTracklistView = false;
         killTracklistLoadingThread();
 
@@ -598,6 +600,7 @@ public class MainPanel extends JPanel {
         }
 
         currentTracklist = playlist.getTracks();
+        currentPlaylist = playlist;
 
         SwingUtilities.invokeLater(() -> {
 
@@ -988,7 +991,7 @@ public class MainPanel extends JPanel {
 
         redownloadTrackMenuItem.addActionListener((unused) -> {
 
-            GUIUtil.createRedownloadPopup();
+            GUIUtil.createRedownloadPopup(track, currentPlaylist);
 
         });
 
@@ -1206,6 +1209,12 @@ public class MainPanel extends JPanel {
 
         }
         
+    }
+
+    protected Playlist getCurrentPlaylist() {
+
+        return currentPlaylist;
+
     }
 
 }

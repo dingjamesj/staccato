@@ -171,7 +171,7 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         redownloadButton.addActionListener((unused) -> {
 
-            GUIUtil.createRedownloadPopup();
+            GUIUtil.createRedownloadPopup(track, MainPanel.mainPanel.getCurrentPlaylist());
 
         });
 

@@ -80,8 +80,9 @@ public abstract class GUIUtil {
     private static final int EDIT_METADATA_ARTWORK_URL_LABEL_MAX_WIDTH_PX = 240;
     private static final ImageIcon EDIT_METADATA_ADD_ARTWORK_ICON = createImageIcon("src/main/resources/add.png");
 
-    //Track redownloader popup
+    //Track (re)downloader popup
     private static final Dimension REDOWNLOAD_DIALOG_WINDOW_SIZE = new Dimension(300, 175);
+    private static final Dimension DOWNLOAD_TRACK_PROGRESS_DIALOG_WINDOW_SIZE = new Dimension(330, 200);
     private static final int REDOWNLOAD_FIELD_GAPRIGHT_PX = 55;
     private static final int REDOWNLOAD_PROGRESSBAR_GAPTOP_PX = 10;
 
@@ -1437,7 +1438,7 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createRedownloadPopup() {
+    public static JDialog createRedownloadPopup(Track track, Playlist playlist) {
 
         JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -1448,9 +1449,8 @@ public abstract class GUIUtil {
 
         JLabel titleLabel = new JLabel("New YouTube URL:");
         JTextField urlField = new JTextField();
-        JProgressBar downloadProgressBar = new JProgressBar();
         JButton downloadButton = new HoverableButton("Download");
-        JButton okButton = new HoverableButton("OK");
+        JButton cancelButton = new HoverableButton("Cancel");
 
         titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
 
@@ -1470,25 +1470,16 @@ public abstract class GUIUtil {
         );
 
         dialog.add(
-            downloadProgressBar, ""
+            cancelButton, ""
             + "cell 0 2, "
-            + "span 2 1, "
-            + "growx, "
-            + "gapright " + REDOWNLOAD_FIELD_GAPRIGHT_PX + ", "
-            + "gaptop " + REDOWNLOAD_PROGRESSBAR_GAPTOP_PX
-        );
-
-        dialog.add(
-            downloadButton, ""
-            + "cell 0 3, "
             + "span 1 1, "
             + "align right bottom, "
             + "pushx, pushy"
         );
 
         dialog.add(
-            okButton, ""
-            + "cell 1 3, "
+            downloadButton, ""
+            + "cell 1 2, "
             + "span 1 1, "
             + "align right bottom, "
             + "pushy"
@@ -1508,9 +1499,16 @@ public abstract class GUIUtil {
 
         });
 
-        okButton.addActionListener((unused) -> {
+        cancelButton.addActionListener((unused) -> {
 
             dialog.dispose();
+
+        });
+
+        downloadButton.addActionListener((unused) -> {
+
+            dialog.dispose();
+            downloadTrack(urlField.getText(), track, playlist, false);
 
         });
 
@@ -1520,6 +1518,51 @@ public abstract class GUIUtil {
         dialog.setVisible(true);
 
         return dialog;
+
+    }
+
+    private static void downloadTrack(String url, Track track, Playlist playlist, boolean forceMp3) {
+
+        JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
+        dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        dialog.setLayout(new MigLayout());
+        dialog.setResizable(false);
+        dialog.setSize(DOWNLOAD_TRACK_PROGRESS_DIALOG_WINDOW_SIZE);
+
+        JLabel titleLabel = new JLabel("Downloading...");
+        
+        titleLabel.setFont(POPUP_TITLE_LABEL_FONT);
+
+        dialog.add(
+            titleLabel, ""
+            + "cell 0 0, "
+            + "span 1 1, "
+            + "gapbottom " + SECTION_VERTICAL_GAP_PX + ", "
+        );
+
+        Thread downloadThread = new Thread(() -> {
+
+            //Replace any pre-existing file
+            if(track.canRead()) {
+
+                File oldFileLocation = new File(track.getFileLocation());
+                track.download(url, oldFileLocation.getParent(), forceMp3);
+                oldFileLocation.delete();
+
+            } else {
+
+                track.download(url, playlist.getDirectory(), forceMp3);
+                
+            }
+
+            dialog.dispose();
+
+        });
+
+        downloadThread.start();
+        
+        dialog.setLocationRelativeTo(StaccatoWindow.staccatoWindow);
+        dialog.setVisible(true);
 
     }
 

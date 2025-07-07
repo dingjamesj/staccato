@@ -393,7 +393,19 @@ public class Track {
 
 	public synchronized void download(String youtubeURL, String location) {
 
-		String downloadedPath = JavaLink.downloadRawTrack(youtubeURL, location, true);
+		download(youtubeURL, location, false);
+
+	}
+
+	public synchronized void download(String location, boolean forceMp3) {
+
+		download(JavaLink.findBestYouTubeURLMatch(title, artists), location, forceMp3);
+
+	}
+
+	public synchronized void download(String youtubeURL, String location, boolean forceMp3) {
+
+		String downloadedPath = JavaLink.downloadRawTrack(youtubeURL, location, forceMp3);
 		this.fileLocation = downloadedPath;
 
 		writeFileMetadata();
