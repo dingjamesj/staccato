@@ -25,6 +25,26 @@ public abstract class FileManager {
     private static AtomicBoolean isReadingTracks = new AtomicBoolean(false);
 
     /**
+     * Inititalizer
+     * https://stackoverflow.com/questions/50778442/how-to-disable-jaudiotagger-logger-completely
+     */
+    static {
+
+        LogManager manager = LogManager.getLogManager();
+
+        try {
+
+            manager.readConfiguration(FileManager.class.getResourceAsStream("/audioTagger.properties"));
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    /**
      * Returns the HashSet<Playlist> stored in the playlist data file
      * @return The HashSet<Playlist> stored in the playlist data file
      * @throws IOException
@@ -266,7 +286,7 @@ public abstract class FileManager {
 
             }
 
-            if(files[i].isDirectory() || !files[i].getName().endsWith(".mp3")) {
+            if(files[i].isDirectory() || !isFileAudio(files[i].getName())) {
 
                 continue;
 
@@ -353,23 +373,18 @@ public abstract class FileManager {
 
     }
 
-    /**
-     * Inititalizer
-     * https://stackoverflow.com/questions/50778442/how-to-disable-jaudiotagger-logger-completely
-     */
-    static {
+    private static boolean isFileAudio(String fileName) {
 
-        LogManager manager = LogManager.getLogManager();
-
-        try {
-
-            manager.readConfiguration(FileManager.class.getResourceAsStream("/audioTagger.properties"));
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        }
+        return (
+            fileName.endsWith(".mp3") || 
+            fileName.endsWith(".m4a") || 
+            fileName.endsWith(".aac") || 
+            fileName.endsWith(".webm") || 
+            fileName.endsWith(".ogg") || 
+            fileName.endsWith(".wav") ||
+            fileName.endsWith(".flac") ||
+            fileName.endsWith(".wma")
+        );
 
     }
 

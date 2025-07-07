@@ -431,7 +431,7 @@ public class MainPanel extends JPanel {
 
                 if(e.getButton() == MouseEvent.BUTTON1) {
 
-                    GUIUtil.createPlaylistEditorPopup(playlist, 0);
+                    GUIUtil.createPlaylistEditorPopup(0);
 
                 }
 
@@ -464,7 +464,7 @@ public class MainPanel extends JPanel {
 
                 if(e.getButton() == MouseEvent.BUTTON1) {
 
-                    GUIUtil.createPlaylistEditorPopup(playlist, 0);
+                    GUIUtil.createPlaylistEditorPopup(0);
 
                 }
 
@@ -507,7 +507,7 @@ public class MainPanel extends JPanel {
 
             SwingUtilities.invokeLater(() -> {
 
-                GUIUtil.createAddTrackDialog(playlist);
+                GUIUtil.createAddTrackDialog();
 
             });
 
@@ -792,7 +792,7 @@ public class MainPanel extends JPanel {
 
         editPlaylistMenuItem.addActionListener((unused) -> {
 
-            GUIUtil.createPlaylistEditorPopup(playlist, index);
+            GUIUtil.createPlaylistEditorPopup(index);
 
         });
 
@@ -991,7 +991,7 @@ public class MainPanel extends JPanel {
 
         redownloadTrackMenuItem.addActionListener((unused) -> {
 
-            GUIUtil.createRedownloadPopup(track, currentPlaylist);
+            GUIUtil.createRedownloadPopup(track);
 
         });
 

@@ -65,7 +65,7 @@ public class QueuePanel extends JPanel {
 
         TracklistPlayer.addStartTrackAction(() -> {
 
-            queuePanel.setTracksInGUI(TracklistPlayer.getCurrentlyPlayingTrackNumber());
+            queuePanel.setTracksInGUI(TracklistPlayer.getCurrentTrackNumber());
             
         });
 
@@ -143,19 +143,19 @@ public class QueuePanel extends JPanel {
      */
     private synchronized void updateQueueGUI() {
 
-        if(currentTrackNum.get() == TracklistPlayer.getCurrentlyPlayingTrackNumber() - 1) {
+        if(currentTrackNum.get() == TracklistPlayer.getCurrentTrackNumber() - 1) {
 
             currentTrackNum.incrementAndGet();
             removeGUIFirstTrack();
 
-        } else if(currentTrackNum.get() == TracklistPlayer.getCurrentlyPlayingTrackNumber() + 1) {
+        } else if(currentTrackNum.get() == TracklistPlayer.getCurrentTrackNumber() + 1) {
 
             currentTrackNum.decrementAndGet();
-            addTrackToGUIFront(TracklistPlayer.getCurrentlyPlayingTrack());
+            addTrackToGUIFront(TracklistPlayer.getCurrentTrack());
 
         } else {
 
-            currentTrackNum.set(TracklistPlayer.getCurrentlyPlayingTrackNumber());
+            currentTrackNum.set(TracklistPlayer.getCurrentTrackNumber());
             setTracksInGUI(currentTrackNum.get());
 
         }

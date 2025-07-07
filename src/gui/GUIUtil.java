@@ -557,7 +557,9 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createPlaylistEditorPopup(Playlist playlist, int playlistIndex) {
+    public static JDialog createPlaylistEditorPopup(int playlistIndex) {
+
+        Playlist playlist = MainPanel.mainPanel.getCurrentPlaylist();
 
         InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -826,7 +828,7 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createAddTrackDialog(Playlist playlist) {
+    public static JDialog createAddTrackDialog() {
 
         InternalDataDialog dialog = new InternalDataDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -910,7 +912,7 @@ public abstract class GUIUtil {
 
             SwingUtilities.invokeLater(() -> {
 
-                initImportExistingTracksDialog(contentPanel, dialog, playlist);
+                initImportExistingTracksDialog(contentPanel, dialog);
 
             });
 
@@ -925,8 +927,10 @@ public abstract class GUIUtil {
 
     }
 
-    private static void initImportExistingTracksDialog(JPanel panel, InternalDataDialog dialog, Playlist playlist) {
+    private static void initImportExistingTracksDialog(JPanel panel, InternalDataDialog dialog) {
 
+        Playlist playlist = MainPanel.mainPanel.getCurrentPlaylist();
+        
         panel.removeAll();
         panel.setLayout(new MigLayout("gap 0 " + MIN_VERTICAL_GAP_PX + ", insets 0"));
 
@@ -954,7 +958,7 @@ public abstract class GUIUtil {
         Iterator<File> previouslySelectedFiles = dialog.getFilesIterator();
         while(previouslySelectedFiles.hasNext()) {
 
-            importedTracksPanel.add(createImportedTrackEntry(previouslySelectedFiles.next(), trackPreviewPanel, dialog, resultingActionLabel, playlist, importButton));
+            importedTracksPanel.add(createImportedTrackEntry(previouslySelectedFiles.next(), trackPreviewPanel, dialog, resultingActionLabel, importButton));
 
         }
         importButton.setEnabled(false);
@@ -1039,7 +1043,7 @@ public abstract class GUIUtil {
                 dialog.addFiles(newlySelectedFiles);
                 for(int i = 0; i < newlySelectedFiles.length; i++) {
 
-                    importedTracksPanel.add(createImportedTrackEntry(newlySelectedFiles[i], trackPreviewPanel, dialog, resultingActionLabel, playlist, importButton));
+                    importedTracksPanel.add(createImportedTrackEntry(newlySelectedFiles[i], trackPreviewPanel, dialog, resultingActionLabel, importButton));
 
                 }
 
@@ -1069,7 +1073,7 @@ public abstract class GUIUtil {
         importButton.addActionListener((unused) -> {
 
             dialog.dispose();
-            importTracks(dialog.getFilesIterator(), playlist, dialog.getNumFiles());
+            importTracks(dialog.getFilesIterator(), dialog.getNumFiles());
 
         });
 
@@ -1126,7 +1130,9 @@ public abstract class GUIUtil {
 
     }
 
-    private static void importTracks(Iterator<File> selectedFiles, Playlist playlist, int numNewTracks) {
+    private static void importTracks(Iterator<File> selectedFiles, int numNewTracks) {
+
+        Playlist playlist = MainPanel.mainPanel.getCurrentPlaylist();
 
         JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -1201,7 +1207,7 @@ public abstract class GUIUtil {
 
     }
 
-    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel, InternalDataDialog dialog, JLabel resultingActionLabel, Playlist playlist, JButton importButton) {
+    private static JPanel createImportedTrackEntry(File trackFile, JPanel trackPreviewPanel, InternalDataDialog dialog, JLabel resultingActionLabel, JButton importButton) {
 
         JPanel trackPanel = new JPanel(new MigLayout("insets 2 4 2 4"));
         JLabel fileLocationLabel = new JLabel(trackFile.getAbsolutePath());
@@ -1403,7 +1409,7 @@ public abstract class GUIUtil {
             parent.remove(trackPanel);
             parent.revalidate();
             parent.repaint();
-            resultingActionLabel.setText(createResultingAddTrackActionString(false, dialog.getNumFiles(), null, playlist.getDirectory(), resultingActionLabel));
+            resultingActionLabel.setText(createResultingAddTrackActionString(false, dialog.getNumFiles(), null, MainPanel.mainPanel.getCurrentPlaylist().getDirectory(), resultingActionLabel));
             if(dialog.getNumFiles() == 0) {
 
                 importButton.setEnabled(false);
@@ -1438,7 +1444,7 @@ public abstract class GUIUtil {
 
     }
 
-    public static JDialog createRedownloadPopup(Track track, Playlist playlist) {
+    public static JDialog createRedownloadPopup(Track track) {
 
         JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -1508,7 +1514,7 @@ public abstract class GUIUtil {
         downloadButton.addActionListener((unused) -> {
 
             dialog.dispose();
-            downloadTrack(urlField.getText(), track, playlist, false);
+            downloadTrack(urlField.getText(), track, false);
 
         });
 
@@ -1521,7 +1527,7 @@ public abstract class GUIUtil {
 
     }
 
-    private static void downloadTrack(String url, Track track, Playlist playlist, boolean forceMp3) {
+    private static void downloadTrack(String url, Track track, boolean forceMp3) {
 
         JDialog dialog = new JDialog(StaccatoWindow.staccatoWindow, true);
         dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -1551,7 +1557,7 @@ public abstract class GUIUtil {
 
             } else {
 
-                track.download(url, playlist.getDirectory(), forceMp3);
+                track.download(url, MainPanel.mainPanel.getCurrentPlaylist().getDirectory(), forceMp3);
                 
             }
 

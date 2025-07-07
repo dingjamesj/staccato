@@ -50,7 +50,7 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         Runnable updateTrackInfoAction = () -> {
 
-            currentTrackInfoPanel.setTrack(TracklistPlayer.getCurrentlyPlayingTrack());
+            currentTrackInfoPanel.setTrack(TracklistPlayer.getCurrentTrack());
 
         };
 
@@ -171,7 +171,7 @@ public class CurrentTrackInfoPanel extends JPanel {
 
         redownloadButton.addActionListener((unused) -> {
 
-            GUIUtil.createRedownloadPopup(track, MainPanel.mainPanel.getCurrentPlaylist());
+            GUIUtil.createRedownloadPopup(track);
 
         });
 

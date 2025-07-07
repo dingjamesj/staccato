@@ -384,13 +384,13 @@ public abstract class TracklistPlayer {
 
     }
 
-    public static int getCurrentlyPlayingTrackNumber() {
+    public static int getCurrentTrackNumber() {
 
         return currentTrackNum.get();
 
     }
 
-    public static Track getCurrentlyPlayingTrack() {
+    public static Track getCurrentTrack() {
 
         return queuedTracks.get(currentTrackNum.get());
 
