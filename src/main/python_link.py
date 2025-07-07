@@ -15,9 +15,11 @@ class PythonLink(object):
         self._gateway = gateway
         pass
     
-    def send_spotify_tracks_to_java(self, spotify_id: str, is_playlist: bool) -> list[dict[str, str]]:
+    def get_spotify_tracks(self, spotify_id: str, is_playlist: bool) -> list[dict[str, str]]:
         """If is_playlist is true, returns a list of dicts that contain info about each track in the Spotify playlist. 
-        If is_playlist is false, returns a list with one dict that contains info about the Spotify track."""
+        If is_playlist is false, returns a list with one dict that contains info about the Spotify track.
+        Spotify ID encompasses URLs, URIs, and alphanumeric IDs"""
+        print("CALLED get_spotify_tracks")
         spotify_tracks: list[dict]
         try: 
             if is_playlist:
@@ -60,13 +62,16 @@ class PythonLink(object):
     
     # Returns the YouTube URL of the best matching YouTube video
     def find_best_youtube_url(self, title: str, artists: str) -> str:
+        print("CALLED find_best_youtube_url")
         return fetcher.find_best_youtube_url(title, artists)
 
     # Returns the path to the downloaded file
-    def download_raw_track(self, youtube_url: str, location: str) -> str:
-        return downloader.download_youtube_track(youtube_url, location)["download_path"]
+    def download_raw_track(self, youtube_url: str, location: str, force_mp3: bool) -> str:
+        print("CALLED download_raw_track")
+        return downloader.download_youtube_track(youtube_url, location, force_mp3)["download_path"]
     
     def update_yt_dlp(self) -> int:
+        print("CALLED update_yt_dlp")
         return downloader.update_yt_dlp()
 
     class Java:

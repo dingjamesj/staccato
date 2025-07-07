@@ -6,7 +6,7 @@ import sys
 
 import os
 
-def download_youtube_track(url: str, location: str) -> dict:
+def download_youtube_track(url: str, location: str, force_mp3: bool) -> dict:
     """Returns 0 if download was successful, 1 otherwise."""
 
     # Get the unique file enumerator e.g. the (1) in "duplicatemusicfile (1).mp3"
@@ -29,6 +29,13 @@ def download_youtube_track(url: str, location: str) -> dict:
         "format": "m4a/aac/mp3/bestaudio",
         "paths": {"home": location},
     }
+    if force_mp3:
+        ydl_opts["format"] = "bestaudio"
+        ydl_opts["postprocessors"] = [{
+            "key": "FFmpegExtractAudio", 
+            "preferredcodec": "mp3"
+        }]
+    
     if unique_file_enumerator == 0:
         ydl_opts["outtmpl"] = {
             "default": "%(id)s.%(ext)s"
@@ -69,9 +76,15 @@ def download_youtube_track(url: str, location: str) -> dict:
             info["album"] = ""
 
         if unique_file_enumerator == 0:
-            info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
+            if force_mp3:
+                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]}.mp3"
+            else:
+                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
         else:
-            info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
+            if force_mp3:
+                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).mp3"
+            else: 
+                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
         
         return info
 

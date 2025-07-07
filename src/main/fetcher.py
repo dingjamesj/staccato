@@ -33,10 +33,12 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
         print(e)
 
 def get_spotify_playlist_tracks(spotify_id: str) -> list[dict]:
+    """ID includes URL, URI, and alphanumeric ID"""
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
     return sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
 
 def get_spotify_track(spotify_id: str) -> dict:
+    """ID includes URL, URI, and alphanumeric ID"""
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
     return sp.track(track_id=spotify_id, market=market)
 

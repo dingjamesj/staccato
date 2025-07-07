@@ -315,6 +315,8 @@ public class Track {
 	 */
 	public synchronized void writeFileMetadata() {
 		
+		System.out.println(fileLocation);
+
 		if(!canRead()) {
 			
 			return;
@@ -329,6 +331,7 @@ public class Track {
 			Artwork coverImage = null;
 			if(artworkURL != null || artworkByteArray != null) {
 
+				//Get artwork from URL. If no URL exists, then get artwork from existing byte array
 				byte[] newArtworkByteArray;
 				if(artworkURL != null) {
 
@@ -390,8 +393,10 @@ public class Track {
 
 	public synchronized void download(String youtubeURL, String location) {
 
-		JavaLink.downloadRawTrack(youtubeURL, location);
-		this.fileLocation = location;
+		String downloadedPath = JavaLink.downloadRawTrack(youtubeURL, location, true);
+		this.fileLocation = downloadedPath;
+
+		writeFileMetadata();
 
 	}
 

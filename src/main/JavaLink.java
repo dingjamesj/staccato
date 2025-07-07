@@ -14,9 +14,9 @@ public class JavaLink {
      */
     public interface IPythonLink {
 
-        public List<Map<String, String>> send_spotify_tracks_to_java(String spotify_id, boolean is_playlist);
+        public List<Map<String, String>> get_spotify_tracks(String spotify_id, boolean is_playlist);
         public String find_best_youtube_url(String title, String artists);
-        public String download_raw_track(String youtube_url, String location);
+        public String download_raw_track(String youtube_url, String location, boolean force_mp3);
         public int update_yt_dlp();
 
     }
@@ -32,7 +32,7 @@ public class JavaLink {
 
         ClientServer clientServer = new ClientServer(null);
         IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
-        List<Map<String, String>> pythonData = pythonLink.send_spotify_tracks_to_java(spotifyID, isPlaylist);
+        List<Map<String, String>> pythonData = pythonLink.get_spotify_tracks(spotifyID, isPlaylist);
         clientServer.shutdown();
 
         //Spotipy exception handling
@@ -53,7 +53,6 @@ public class JavaLink {
                 pythonData.get(i).get("artworkURL")
             );
             tracks.add(track);
-            track.writeFileMetadata();
 
         }
 
@@ -78,7 +77,25 @@ public class JavaLink {
     }
 
     /**
-     * Downloads an audio file from the specified YouTube URL to the specified location. <br></br>
+     * Downloads an audio file (usually m4a) from the specified YouTube URL to the specified location. <br></br>
+     * Does not contain any metadata.
+     * @param youtubeURL
+     * @param location
+     * @param forceMp3 If true, forces the downloaded track to be an mp3
+     * @return The downloaded file's path
+     */
+    public static String downloadRawTrack(String youtubeURL, String location, boolean forceMp3) {
+
+        ClientServer clientServer = new ClientServer(null);
+        IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
+        String downloadPath = pythonLink.download_raw_track(youtubeURL, location, forceMp3);
+        clientServer.shutdown();
+        return downloadPath;
+
+    }
+
+    /**
+     * Downloads an mp3 from the specified YouTube URL to the specified location. <br></br>
      * Does not contain any metadata.
      * @param youtubeURL
      * @param location
@@ -86,11 +103,7 @@ public class JavaLink {
      */
     public static String downloadRawTrack(String youtubeURL, String location) {
 
-        ClientServer clientServer = new ClientServer(null);
-        IPythonLink pythonLink = (IPythonLink) clientServer.getPythonServerEntryPoint(new Class[] {IPythonLink.class});
-        String downloadPath = pythonLink.download_raw_track(youtubeURL, location);
-        clientServer.shutdown();
-        return downloadPath;
+        return downloadRawTrack(youtubeURL, location, false);
 
     }
 
@@ -110,11 +123,21 @@ public class JavaLink {
 
     public static void main(String[] args) {
 
-        System.out.println("UPDATE YT-DLP");
-        System.out.println(updateYtdlp());
-        System.out.println();
-        System.out.println("DOWNLOAD TRACK");
-        System.out.println(downloadRawTrack("https://www.youtube.com/watch?v=SmSUpVC4sn4", "D:\\"));
+        try {
+            Set<Track> tracks = getSpotifyTracks("https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=a5c972a9d8db46f0", true);
+            for(Track track: tracks) {
+
+                System.out.println(track);
+
+            }
+            for(Track track: tracks) {
+
+                track.download("D:\\");
+
+            }
+        } catch (SpotipyException e) {
+            System.out.println("spotipy exception");
+        }
 
     }
 
