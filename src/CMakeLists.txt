@@ -10,5 +10,9 @@ include_directories(headers)
 add_executable(staccato 
     main/main.cpp
     main/file_manager.cpp
-    headers/file_manager.h
+    main/playlist.cpp
+    main/track.cpp
+    headers/file_manager.hpp
+    headers/playlist.hpp
+    headers/track.hpp
 )

@@ -13,25 +13,40 @@ class Playlist {
 
 private:
     std::vector<char> cover_image_raw;
-    std::vector<staccato::Track> tracklist;
-    staccato::TrackSortMode current_sort_setting;
+    std::vector<Track> tracklist;
+    TrackSortMode current_sort_setting;
     std::string directory_connection;
+    std::string online_connection;
 
 public:
+    //For playlist information
     std::string name;
     void set_cover_image(std::string image_path);
     void remove_cover_image();
     const std::vector<char>& get_cover_image_raw();
-    const std::vector<char>& get_tracklist();
-    int add_track(staccato::Track track);
-    int remove_track(staccato::Track track);
-    staccato::TrackSortMode get_current_sort_mode();
-    bool track_exists(staccato::Track track);
-    int get_duration();
+    
+    //Connections
     void add_directory_connection(std::string directory);
     void remove_directory_connection();
+    std::string get_directory_connection();
+    void add_online_connection(std::string url);
+    void remove_online_connection(std::string url);
+    std::string get_online_connection();
+
+    //Tracklist info
+    const std::vector<char>& get_tracklist();
+    int add_track(Track track);
+    int remove_track(Track track);
+    TrackSortMode get_current_sort_mode();
+    bool track_exists(Track track);
+    int get_duration();
+
+    Playlist(std::string name, const std::vector<char>& cover_image_raw, const std::vector<Track>& tracklist, TrackSortMode current_sort_setting, std::string directory_connection, std::string online_connection);
 
 };
+
+Playlist read_playlist_file(std::string path);
+int write_playlist_file(std::string path, Playlist playlist);
 
 }
 
