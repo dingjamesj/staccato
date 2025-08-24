@@ -28,6 +28,14 @@ struct Track {
     //Misc
     void write_changes_to_file() const;
     bool operator==(const Track& other) const;
+    bool file_exists() const;
+    /**
+     * @brief Deletes the file and clears all member variables
+     * @return True if successfully deleted, false otherwise
+     * 
+     * 
+     */
+    bool delete_file();
     
 };
 
@@ -37,14 +45,14 @@ Track download_track(URLType url_type, std::string url);
 
 }
 
-namespace std {
+template<> struct std::hash<staccato::Track> {
 
-template<> struct hash<staccato::Track> {
+    std::size_t operator()(const staccato::Track& track) const {
 
-    std::size_t operator()(const staccato::Track& track) const;
+        return std::hash<std::string>()(track.path);
+
+    }
 
 };
-
-}
 
 #endif

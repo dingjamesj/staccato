@@ -2,6 +2,7 @@
 #include "util.hpp"
 #include <iostream>
 #include <taglib/fileref.h>
+#include <filesystem>
 
 using namespace staccato;
 
@@ -32,15 +33,23 @@ bool Track::operator==(const Track& other) const {
 
 }
 
-template<> struct std::hash<Track> {
+bool Track::file_exists() const {
 
-    std::size_t operator()(const Track& track) const {
+    return std::filesystem::is_regular_file(path);
 
-        return std::hash<std::string>()(track.path);
+}
+
+bool Track::delete_file() {
+
+    if(!std::filesystem::is_regular_file(path)) {
+
+        return false;
 
     }
 
-};
+    return std::filesystem::remove(path);
+
+}
 
 Track staccato::import_track(std::string path) {
 
