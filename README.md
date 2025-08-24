@@ -1,0 +1,1 @@
+Uses TagLib (https://taglib.org/)
