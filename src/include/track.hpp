@@ -8,14 +8,12 @@ namespace staccato {
 
 enum class URLType {SPOTIFY, YOUTUBE, UNKNOWN};
 
-class Track {
+struct Track {
 
-private:
-    std::string path;
-    std::string youtube_url;
-    int duration {0};
+    const std::string path;
+    const std::string youtube_url;
+    const int duration {0};
 
-public:
     //These aren't transient because we need these to search for songs
     std::string title;
     std::string artists;
@@ -28,9 +26,6 @@ public:
     void print() const;
 
     //Misc
-    std::string get_path() const;
-    std::string get_youtube_url() const;
-    int get_duration() const;
     void write_changes_to_file() const;
     bool operator==(const Track& other) const;
     

@@ -26,24 +26,6 @@ void Track::print() const {
 
 }
 
-std::string Track::get_path() const {
-
-    return path;
-
-}
-
-std::string Track::get_youtube_url() const {
-
-    return youtube_url;
-    
-}
-
-int Track::get_duration() const {
-
-    return duration;
-
-}
-
 bool Track::operator==(const Track& other) const {
 
     return path == other.path;
@@ -54,7 +36,7 @@ template<> struct std::hash<Track> {
 
     std::size_t operator()(const Track& track) const {
 
-        return std::hash<std::string>()(track.get_path());
+        return std::hash<std::string>()(track.path);
 
     }
 
