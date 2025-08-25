@@ -1,15 +1,10 @@
 #include "track.hpp"
 #include "util.hpp"
-#include <iostream>
-#include <taglib/fileref.h>
-#include <filesystem>
+#include "file_manager.hpp"
 
 using namespace staccato;
 
-Track::Track(std::string path, std::string youtube_url, int duration, std::string title, std::string artists, std::string album): 
-    path{path}, 
-    youtube_url{youtube_url}, 
-    duration{duration},
+Track::Track(std::string title, std::string artists, std::string album): 
     title{title}, 
     artists{artists}, 
     album{album} 
@@ -17,51 +12,42 @@ Track::Track(std::string path, std::string youtube_url, int duration, std::strin
 
 void Track::print() const {
 
-    std::cout << path << std::endl;
-    if(!youtube_url.empty()) {
-
-        std::cout << youtube_url << std::endl;
-
-    }
-    std::cout << seconds_to_hms(duration) << std::endl << title << std::endl << artists << std::endl << album << std::endl;
-
-}
-
-bool Track::operator==(const Track& other) const {
-
-    return path == other.path;
+    std::cout << "BEGIN Track::print()" << std::endl << std::endl;
+    std::cout << title << std::endl << artists << std::endl << album << std::endl << std::endl;
+    std::cout << "END Track::print()" << std::endl;
 
 }
 
 bool Track::file_exists() const {
 
-    return std::filesystem::is_regular_file(path);
+    return FileManager::track_file_exists(*this);
 
 }
 
 bool Track::delete_file() {
 
-    if(!std::filesystem::is_regular_file(path)) {
+    bool result = FileManager::delete_track(*this);
+    
+    if(result) {
 
-        return false;
+        title = "";
+        artists = "";
+        album = "";
 
     }
 
-    return std::filesystem::remove(path);
+    return result;
 
 }
 
-Track staccato::import_track(std::string path) {
+bool Track::is_empty() const {
 
-    TagLib::FileRef file_ref(path.c_str());
-    if(file_ref.isNull()) {
+    return title.empty() && artists.empty() && album.empty();
 
-        return Track("", "", 0, "--", "--", "--");
+}
 
-    }
+bool Track::operator==(const Track& other) const {
 
-    TagLib::Tag* tag = file_ref.tag();
-    TagLib::AudioProperties* audio_properties = file_ref.audioProperties();
-    return Track(path, "", audio_properties->lengthInSeconds(), tag->title().to8Bit(true), tag->artist().to8Bit(true), tag->album().to8Bit(true));
+    return std::format("{} {} {}", title, artists, album) == std::format("{} {} {}", other.title, other.artists, other.album);
 
 }

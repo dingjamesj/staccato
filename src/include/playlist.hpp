@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <filesystem>
 #include "track.hpp"
 
 namespace staccato {
@@ -108,6 +109,8 @@ public:
     static int write_playlist_file(std::string path, Playlist playlist);
 
 };
+
+// const std::string Playlist::PLAYLIST_FOLDER_PATH {std::filesystem::path::preferred_separator + "playlists"};
 
 }
 

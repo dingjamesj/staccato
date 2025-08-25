@@ -1,6 +1,5 @@
 #include "playlist.hpp"
 #include "track.hpp"
-#include <filesystem>
 
 using namespace staccato;
 
@@ -20,7 +19,6 @@ Playlist::Playlist(
     set_online_connection(online_connection);
 
 }
-
 
 void Playlist::set_cover_image(std::string image_path) {
 
@@ -122,7 +120,7 @@ int Playlist::get_total_duration() const {
     std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.cbegin();
     for(; iter != tracklist.end(); iter++) {
 
-        total_duration += iter->duration;
+        // total_duration += iter->;
 
     }
 
