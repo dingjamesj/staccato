@@ -18,7 +18,19 @@ void Track::print() const {
 
 }
 
-bool Track::file_exists() const {
+std::string Track::get_path() const {
+
+    if(!FileManager::track_dict.contains(*this)) {
+
+        return "";
+
+    }
+
+    return FileManager::track_dict.at(*this).first;
+
+}
+
+bool Track::file_readable() const {
 
     return FileManager::track_file_exists(*this);
 

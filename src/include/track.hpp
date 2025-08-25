@@ -22,11 +22,30 @@ struct Track {
 
     Track(std::string title, std::string artists, std::string album);
     
+    /*
+     * 
+     * For debugging purposes
+     */
     void print() const;
-    bool file_exists() const;
+
+    /**
+     * @return The track's path, according to staccato's track dictionary. 
+     */
+    std::string get_path() const;
+    
+    bool file_readable() const;
+
+    /**
+     * 
+     *  
+     * Sets member variable to empty strings, deletes the file, and removes this track from staccato's track dictionary.
+     */
     bool delete_file();
+
     void write_changes_to_file() const;
+
     bool is_empty() const;
+    
     bool operator==(const Track& other) const;
     
 };

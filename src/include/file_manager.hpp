@@ -2,6 +2,7 @@
 #define FILE_MANAGER_HPP
 
 #include "track.hpp"
+#include "playlist.hpp"
 #include <string>
 #include <unordered_map>
 #include <filesystem>
@@ -14,13 +15,18 @@ namespace staccato {
  * @brief Manages playlist (.sply) files, the track dictionary (.stkl), and the track folder.
  * 
  * 
- * ALL interactions with the file system and track dictionary should come through here.
+ * ALL interactions with the file system and track dictionary should come through here. 
+ * 
+ * Track and Playlist should provide abstractions for interactions with the file system--i.e. FileManager shouldn't be seen outside of Track and Playlist.
  */
 class FileManager {
 
 friend Track;
+friend Playlist;
 
 private:
+    static const std::unordered_map<Track, std::pair<std::string, std::string>>& get_track_dict();
+
     /**
      * @brief A dict that maps Track objects to the track's file path and the track's YouTube URL 
      * 
@@ -29,12 +35,17 @@ private:
     static std::unordered_map<Track, std::pair<std::string, std::string>> track_dict;
 
     /**
-     * @return True if the file exists in staccato's track dictionary and is a real file, false otherwise. \line
+     * @return True if the file exists in staccato's track dictionary and is a real file, false otherwise.
      * 
      */
     static bool track_file_exists(const Track& track);
     /**
-     * @brief Deletes the file and clears all member variables. Removes this track from staccato's track dictionary.
+     * @return True if the path is accessible as as music file.
+     * 
+     */
+    static bool path_is_track_file(const std::string& path);
+    /**
+     * @brief Deletes the file and removes this track from staccato's track dictionary.
      * @return True if successfully deleted, false otherwise
      * 
      * Note that the track is removed from the track dictionary whether or not the file was successfully deleted.
@@ -53,8 +64,7 @@ public:
     static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/tracks.stkl"};
     #endif
 
-    static const std::unordered_map<Track, std::pair<std::string, std::string>>& get_track_dict();
-
+    //For debugging purposes
     static void print_track_dict();
 
     /**

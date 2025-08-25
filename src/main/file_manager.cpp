@@ -33,12 +33,6 @@ bool FileManager::delete_track(const Track& track) {
 
 }
 
-const std::unordered_map<Track, std::pair<std::string, std::string>>& FileManager::get_track_dict() {
-
-    return track_dict;
-
-}
-
 void FileManager::print_track_dict() {
 
     std::cout << "BEGIN FileManager::print_track_dict()" << std::endl << std::endl;
