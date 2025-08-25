@@ -13,20 +13,22 @@ bool FileManager::track_file_exists(const Track& track) {
     }
 
     std::string track_file_path = track_dict[track].first;
-    return std::filesystem::is_regular_file(track_file_path);
+    TagLib::FileRef file_ref(track_file_path.c_str());
+    return !file_ref.isNull();
 
 }
 
 bool FileManager::delete_track(const Track& track) {
 
-    std::string file_path = track_dict[track].first;
-    track_dict.erase(track);
-    if(!std::filesystem::is_regular_file(file_path)) {
+    if(!track_file_exists(track)) {
 
+        track_dict.erase(track);
         return false;
 
     }
 
+    std::string file_path = track_dict[track].first;
+    track_dict.erase(track);
     return std::filesystem::remove(file_path);
 
 }
