@@ -1,5 +1,5 @@
-#include "playlist.hpp"
 #include "track.hpp"
+#include "playlist.hpp"
 
 using namespace staccato;
 

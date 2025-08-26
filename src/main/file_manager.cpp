@@ -1,26 +1,39 @@
+#include "track.hpp"
+#include "playlist.hpp"
 #include "file_manager.hpp"
 
 using namespace staccato;
 
 std::unordered_map<Track, std::pair<std::string, std::string>> FileManager::track_dict = {};
 
-bool FileManager::track_file_exists(const Track& track) {
+bool FileManager::path_is_readable_audio_file(const std::string& path) {
 
-    if(!track_dict.contains(track)) {
+    //Check if the file is an audio file
+
+    TagLib::FileRef file_ref(path.c_str());
+    if(file_ref.isNull()) {
 
         return false;
 
     }
 
-    std::string track_file_path = track_dict[track].first;
-    TagLib::FileRef file_ref(track_file_path.c_str());
-    return !file_ref.isNull();
+    TagLib::AudioProperties* audio_properties = file_ref.audioProperties();
+    if(audio_properties == nullptr || audio_properties->lengthInSeconds() == 0) {
+
+        return false;
+
+    }
+
+    //Check if the file is openable
+
+    std::ifstream file(path, std::ios::binary);
+    return file.is_open();
 
 }
 
 bool FileManager::delete_track(const Track& track) {
 
-    if(!track_file_exists(track)) {
+    if(!track_dict.contains(track)) {
 
         track_dict.erase(track);
         return false;
@@ -42,38 +55,5 @@ void FileManager::print_track_dict() {
 
     }
     std::cout << "END FileManager::print_track_dict()" << std::endl;
-
-}
-
-Track FileManager::import_track(std::string path) {
-
-    TagLib::FileRef file_ref(path.c_str());
-
-    //Signify failed import when the file is not an audio file
-    if(file_ref.isNull()) {
-
-        return Track("null", "null", "null");
-
-    }
-
-    TagLib::Tag* tag = file_ref.tag();
-    Track track(tag->title().to8Bit(true), tag->artist().to8Bit(true), tag->album().to8Bit(true));
-    
-    //Signify failed import when the track is already in track_dict
-    if(track_dict.contains(track)) {
-
-        return Track("", "", "");
-
-    }
-
-    //If the track has no metadata, we will give it metadata since returning an empty Track signifies an error in the import process.
-    if(track.is_empty()) {
-
-        track = Track("Unknown Title", "Unknown Artists", "Unknown Album");
-
-    }
-
-    track_dict[track] = std::pair<std::string, std::string>(path, "");
-    return track;
 
 }

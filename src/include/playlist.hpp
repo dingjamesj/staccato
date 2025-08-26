@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_set>
 #include <filesystem>
-#include "track.hpp"
 
 namespace staccato {
 
@@ -17,6 +16,8 @@ enum class SortMode {
     BITRATE_ASCENDING, BITRATE_DESCENDING,
     FILE_EXT_ASCENDING, FILE_EXT_DESCENDING
 };
+
+class Track;
 
 class Playlist {
 
