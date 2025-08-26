@@ -16,10 +16,10 @@ namespace staccato {
 
         Track(std::string title, std::string artists, std::string album);
 
-        /** For debugging purposes */
-        void print() const;
-
+        /** Returns if this Track contains no metadata (if all strings are empty) */
         bool is_empty() const;
+        /** Returns a string representation of this Track */
+        std::string string() const;
 
         bool operator==(const Track& other) const;
 
@@ -27,18 +27,18 @@ namespace staccato {
 
 }
 
-namespace std {
+//For debugging purposes
+std::ostream& operator<<(std::ostream& os, const staccato::Track& track);
 
-    template<> struct hash<staccato::Track> {
+//To make hash-using collections work
+template<> struct std::hash<staccato::Track> {
 
-        inline std::size_t operator()(const staccato::Track& track) const {
+    inline std::size_t operator()(const staccato::Track& track) const {
 
-            return std::hash<std::string>()(track.title + " " + track.artists + " " + track.album);
+        return std::hash<string>()(track.title + " " + track.artists + " " + track.album);
 
-        }
+    }
 
-    };
-
-}
+};
 
 #endif

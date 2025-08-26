@@ -9,96 +9,53 @@
 namespace staccato {
 
     enum class SortMode;
-    class Track;
+    struct Track;
 
     class Playlist {
 
     private:
-        std::vector<char> cover_image_raw;
+        std::string id;
         std::unordered_multiset<Track> tracklist;
+
+    public:
+        std::string name;
+        std::string cover_image_file_path;
         std::string online_connection;
 
         Playlist(
             std::string name, 
-            const std::vector<char> cover_image_raw, 
-            const std::unordered_multiset<Track> tracklist, 
+            std::string cover_image_file_path,
+            const std::unordered_multiset<Track>& tracklist, 
             std::string online_connection
         );
 
-    public:
-        std::string name;
+        //Playlist info
 
-        //=================
-        //  Playlist info
-        //=================
+        std::string get_id() const;
 
-        void set_cover_image(std::string image_path);
-        void remove_cover_image();
-        const std::vector<char>& get_cover_image_raw() const;
-        
-        //===============
-        //  Connections
-        //===============
+        //Connections
 
         void set_online_connection(std::string url);
         void remove_online_connection();
         std::string get_online_connection() const;
+        std::unordered_multiset<Track> get_online_connection_tracklist() const;
 
-        //=============
-        //  Tracklist
-        //=============
+        //Tracklist
 
-        /**
-         * @return A const ref to the tracklist
-         * 
-         * Note that this is a const ref.
-         */
-        const std::unordered_multiset<Track>& get_unordered_tracklist() const;
-        /**
-         * @param sort_mode The order which the tracklist should be sorted in
-         * @return A vector of all tracks in the playlist in the order defined by sort_mode
-         * 
-         * Note that this returns a brand-new vector, sort of expensive
-         */
-        std::vector<Track> get_tracklist(SortMode sort_mode) const;
-        /**
-         * @brief Adds the track to the playlist
-         * @param track The track to add
-         * 
-         * Note that duplicate tracks are allowed
-         */
+        /** Returns a const ref to the tracklist as an unordered_multiset */
+        const std::unordered_multiset<Track>& get_tracklist() const;
+        /** Returns a sorted tracklist as a vector */
+        std::vector<Track> get_sorted_tracklist(SortMode sort_mode) const;
+        /** Adds a track to the tracklist */
         void add_track(Track track);
-        /**
-         * @brief Removes the track from the playlist
-         * @param track The track to remove
-         * @return True if the track was removed successfully
-         * 
-         * Note that the removed track is based on the location of the track's file
-         */
+        /** Removes a track from the tracklist, returns true if was successfully removed */
         bool remove_track(Track track);
-        /**
-         * @return True if the playlist's tracklist contains the track
-         * 
-         * Note that the tracks are found by matching file locations
-         */
+        /** Check if a track is in the tracklist */
         bool contains_track(Track track) const;
-        /**
-         * @return The total duration of the playlist in seconds
-         * 
-         * Sums up the duration of all tracks in the playlist
-         */
+        /** The total duration of the playlist */
         int get_total_duration() const;
 
-        //============================
-        //  Public playlist creation
-        //============================
-
-        static Playlist read_playlist_file(std::string path);
-        static int write_playlist_file(std::string path, Playlist playlist);
-
     };
-
-    // const std::string Playlist::PLAYLIST_FOLDER_PATH {std::filesystem::path::preferred_separator + "playlists"};
 
 }
 

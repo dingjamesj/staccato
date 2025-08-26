@@ -43,12 +43,18 @@ bool TrackManager::delete_track(const Track& track) {
 
 }
 
+std::string TrackManager::get_sply_file_name(const std::string& id, const std::string& playlist_name) {
+
+    return playlist_name.substr(0, 40) + " " + id;
+
+}
+
 void TrackManager::print_track_dict() {
 
     int count = 0;
     for(std::pair<const staccato::Track, std::string> key_value: track_dict) {
 
-        std::cout << "K: " << std::format("({}, {}, {})", key_value.first.title, key_value.first.artists, key_value.first.album) << std::endl << "V: " << key_value.second << std::endl;
+        std::cout << "K: " << key_value.first.title + " " + key_value.first.artists + " " + key_value.first.album << std::endl << "V: " << key_value.second << std::endl;
 
         if(count < track_dict.size() - 1) {
 

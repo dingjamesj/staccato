@@ -6,34 +6,17 @@ using namespace staccato;
 
 Playlist::Playlist(
     std::string name, 
-    std::vector<char> cover_image_raw, 
-    std::unordered_multiset<Track> tracklist, 
+    std::string cover_image_file_path, 
+    const std::unordered_multiset<Track>& tracklist, 
     std::string online_connection
 ): 
-    cover_image_raw{std::move(cover_image_raw)},
+    name{name},
+    cover_image_file_path{cover_image_file_path},
     tracklist{std::move(tracklist)},
-    name(name)
+    online_connection{online_connection}
 {
 
     set_online_connection(online_connection);
-
-}
-
-void Playlist::set_cover_image(std::string image_path) {
-
-    //Check how Qt wants its raw image data
-
-}
-
-void Playlist::remove_cover_image() {
-
-    cover_image_raw.clear();
-
-}
-
-const std::vector<char>& Playlist::get_cover_image_raw() const {
-
-    return cover_image_raw;
 
 }
 
@@ -55,7 +38,7 @@ std::string Playlist::get_online_connection() const {
 
 }
 
-const std::unordered_multiset<Track>& Playlist::get_unordered_tracklist() const {
+const std::unordered_multiset<Track>& Playlist::get_tracklist() const {
 
     return tracklist;
 

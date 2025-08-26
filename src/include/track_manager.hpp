@@ -18,16 +18,17 @@ namespace staccato {
     class TrackManager {
 
         private:
+        //The dict that maps all Tracks to a file path
         static std::unordered_map<Track, std::string> track_dict;
 
         public:
 
         //Adding new tracks to staccato
 
-        static Track get_local_track_info(std::string path);
-        static Track get_online_track_info(URLType url_type, std::string url);
-        static bool import_local_track(std::string path, Track track);
-        static bool download_track(URLType url_type, std::string url, Track track);
+        static Track get_local_track_info(const std::string& path);
+        static Track get_online_track_info(const URLType& url_type, const std::string& url);
+        static bool import_local_track(const std::string& path, const Track& track);
+        static bool download_track(const URLType& url_type, const std::string& url, const Track& track);
 
         //Reading and writing tracks
 
@@ -44,7 +45,7 @@ namespace staccato {
         /** Searches for the track in the dictionary, then returns the raw artwork metadata of the track's file */
         static std::vector<char> get_track_artwork_raw(const Track& track);
         /** Searches for the track in the dictionary, then writes the track's file's artwork metadata */
-        static bool set_track_artwork(const Track& track, std::string artwork_file_path);
+        static bool set_track_artwork(const Track& track, const std::string& artwork_file_path);
 
         //Reading and writing the track dictionary
 
@@ -59,26 +60,30 @@ namespace staccato {
 
         //Reading and writing playlists
 
-        /** Returns basic info about every playlist (a pair of the playlist name and cover image file path) */
-        static std::vector<std::pair<std::string, std::string>> read_playlists_from_files();
+        /** Returns basic info about every playlist (a tuple of the playlist id, name, and cover image file path) */
+        static std::vector<std::tuple<std::string, std::string, std::string>> read_basic_playlist_info_from_files();
         /** Searches for .sply file with the same name, and returns complete playlist info */
-        static Playlist read_playlist_from_file(std::string playlist_name);
+        static Playlist read_playlist_from_file(const std::string& id, const std::string& playlist_name);
         /** Serializes the playlist to its file */
         static bool write_playlist_to_file(const Playlist& playlist);
+        /** What the .sply file name would be, given a playlist ID and name */
+        static std::string get_sply_file_name(const std::string& id, const std::string& playlist_name);
 
         //Debugging
 
         static void print_track_dict();
+
+        //Constexprs
 
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
-        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\tracks.stkl"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\trackdict.stkl"};
         #else
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
-        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/tracks.stkl"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.stkl"};
         #endif
         
     };
