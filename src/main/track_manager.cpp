@@ -45,7 +45,7 @@ bool TrackManager::delete_track(const Track& track) {
 
 std::string TrackManager::get_sply_file_name(const std::string& id, const std::string& playlist_name) {
 
-    return playlist_name.substr(0, 40) + " " + id;
+    return id + " " + playlist_name.substr(0, 40);
 
 }
 

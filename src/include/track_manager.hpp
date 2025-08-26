@@ -36,12 +36,18 @@ namespace staccato {
         static bool track_has_readable_file(const std::string& path);
         /** Returns the track's file path that's stored in the dictionary */
         static std::string get_track_file_path(const Track& track);
+        /** Returns if the track is in the dictionary */
+        static bool track_is_in_dict(const Track& track);
         /** Deletes the track's file and removes the track key-value pair from the dictionary */
         static bool delete_track(const Track& track);
         /** Finds the key original_track and replaces it with new_track, then updates the track file's metadata accordingly */
         static bool edit_track(const Track& original_track, const Track& new_track);
-        /** Searches for the track in the dictionary, then returns the duration of the track's file */
+        /** Returns the duration of the track's file */
         static int get_track_duration(const Track& track);
+        /** Returns the bitrate of the track's file in kbps */
+        static int get_track_bitrate(const Track& track);
+        /** Returns the file extension of the track's file */
+        static std::string get_track_file_ext(const Track& track);
         /** Searches for the track in the dictionary, then returns the raw artwork metadata of the track's file */
         static std::vector<char> get_track_artwork_raw(const Track& track);
         /** Searches for the track in the dictionary, then writes the track's file's artwork metadata */
@@ -65,7 +71,7 @@ namespace staccato {
         /** Searches for .sply file with the same name, and returns complete playlist info */
         static Playlist read_playlist_from_file(const std::string& id, const std::string& playlist_name);
         /** Serializes the playlist to its file */
-        static bool write_playlist_to_file(const Playlist& playlist);
+        static bool write_playlist_to_file(const std::string& id, const Playlist& playlist);
         /** What the .sply file name would be, given a playlist ID and name */
         static std::string get_sply_file_name(const std::string& id, const std::string& playlist_name);
 

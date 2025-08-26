@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_set>
 #include <filesystem>
+#include <iostream>
 
 namespace staccato {
 
@@ -14,7 +15,6 @@ namespace staccato {
     class Playlist {
 
     private:
-        std::string id;
         std::unordered_multiset<Track> tracklist;
 
     public:
@@ -29,10 +29,6 @@ namespace staccato {
             std::string online_connection
         );
 
-        //Playlist info
-
-        std::string get_id() const;
-
         //Connections
 
         void set_online_connection(std::string url);
@@ -45,7 +41,7 @@ namespace staccato {
         /** Returns a const ref to the tracklist as an unordered_multiset */
         const std::unordered_multiset<Track>& get_tracklist() const;
         /** Returns a sorted tracklist as a vector */
-        std::vector<Track> get_sorted_tracklist(SortMode sort_mode) const;
+        std::vector<Track> get_sorted_tracklist(SortMode sort_mode, bool is_ascending) const;
         /** Adds a track to the tracklist */
         void add_track(Track track);
         /** Removes a track from the tracklist, returns true if was successfully removed */
@@ -54,9 +50,13 @@ namespace staccato {
         bool contains_track(Track track) const;
         /** The total duration of the playlist */
         int get_total_duration() const;
+        /** Returns a string representation of this playlist */
+        std::string string() const;
 
     };
 
 }
+
+std::ostream& operator<<(std::ostream& os, const staccato::Playlist& track);
 
 #endif

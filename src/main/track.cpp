@@ -34,7 +34,7 @@ bool Track::operator==(const Track& other) const {
 
 std::ostream& operator<<(std::ostream& os, const Track& track) {
 
-    os << track.string() << std::endl;
+    os << track.string();
     return os;
 
 }
