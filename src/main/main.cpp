@@ -1,7 +1,7 @@
 #include "track.hpp"
 #include "playlist.hpp"
 #include "util.hpp"
-#include "file_manager.hpp"
+#include "track_manager.hpp"
 
 #include <iostream>
 
@@ -9,26 +9,36 @@ using namespace staccato;
 
 int main() {
 
-    Track track = Track::import_track("C:\\Users\\James\\Music\\mongo\\Tyler, The Creator - Balloon (Lyrics).mp3");
-    std::cout << track.get_path() << std::endl;
-    std::cout << track.has_valid_audio_file() << std::endl;
-    std::cout << "==============================" << std::endl;
+    /*
+    
+    Normal file:
+    "C:\\Users\\James\\Music\\mongo\\Tyler, The Creator - Balloon (Lyrics).mp3"
 
-    Track track2 = Track::import_track("C:\\Users\\James\\Music\\file_example_MP3_2MG.mp3");
-    std::cout << track2.get_path() << std::endl;
-    std::cout << track2.has_valid_audio_file() << std::endl;
-    std::cout << "==============================" << std::endl;
+    File with no metadata:
+    "C:\\Users\\James\\Music\\file_example_MP3_2MG.mp3"
 
-    Track fake_track = Track::import_track("C:\\Users\\James\\Documents\\Empty Document.pdf");
-    std::cout << fake_track.get_path() << std::endl;
-    std::cout << fake_track.has_valid_audio_file() << std::endl;
-    std::cout << "==============================" << std::endl;
+    Non-audio file:
+    "C:\\Users\\James\\Documents\\Empty Document.pdf"
 
-    Track dupe_track = Track::import_track("C:\\Users\\James\\Music\\aodsh.mp3");
-    std::cout << dupe_track.get_path() << std::endl;
-    std::cout << dupe_track.has_valid_audio_file() << std::endl;
+    File with duplicate metadata as the "normal file":
+    "C:\\Users\\James\\Music\\aodsh.mp3"
 
-    // std::cout << std::format("{} {} {}", "goon1", "poop", "second") << std::endl;
+    Non-existent file:
+    "C:\\Users\\James\\Music\\alisudhauidhauisdsghauisdhsaisudhsaosuidhs.mp3"
+
+    Invalid file path:
+    "\\\\ //o  ua s h d ///////\\\\@@@@@8091kq.,dsnlaidha90dASOD 90D A9 S09js90j ioqwmk"
+
+    Invalid file path pt 2:
+    ""
+    
+    Invalid file path pt 3:
+    "   "
+
+    Invalid perms file path:
+    "C:\\Users\\Big Idiot Cat\\Music\\file_example_MP3_2MG.mp3"
+
+    */
 
     return 0;
 

@@ -1,3 +1,4 @@
+#include "util.hpp"
 #include "track.hpp"
 #include "playlist.hpp"
 
@@ -7,7 +8,6 @@ Playlist::Playlist(
     std::string name, 
     std::vector<char> cover_image_raw, 
     std::unordered_multiset<Track> tracklist, 
-    std::string directory_connection, 
     std::string online_connection
 ): 
     cover_image_raw{std::move(cover_image_raw)},
@@ -15,7 +15,6 @@ Playlist::Playlist(
     name(name)
 {
 
-    set_directory_connection(directory_connection);
     set_online_connection(online_connection);
 
 }
@@ -35,32 +34,6 @@ void Playlist::remove_cover_image() {
 const std::vector<char>& Playlist::get_cover_image_raw() const {
 
     return cover_image_raw;
-
-}
-
-void Playlist::set_directory_connection(std::string directory) {
-
-    if(std::filesystem::is_directory(directory)) {
-
-        directory_connection = directory;
-
-    } else {
-
-        directory_connection = "";
-
-    }
-
-}
-
-void Playlist::remove_directory_connection() {
-
-    directory_connection = "";
-
-}
-
-std::string Playlist::get_directory_connection() const {
-
-    return directory_connection;
 
 }
 
