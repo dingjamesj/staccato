@@ -39,6 +39,38 @@ const std::unordered_multiset<Track>& Playlist::get_tracklist() const {
 
 }
 
+std::vector<Track> Playlist::get_sorted_tracklist(SortMode sort_mode, bool is_ascending) const {
+
+    std::vector sorted_tracklist(tracklist.begin(), tracklist.end());
+
+    auto comparator_lambda = [sort_mode, is_ascending](const Track& track1, const Track& track2) {
+
+        switch(sort_mode) {
+
+            case SortMode::TITLE:
+                return is_ascending ? (track1.title < track2.title) : (track2.title > track1.title);
+            case SortMode::ARTISTS:
+                return is_ascending ? (track1.artists < track2.artists) : (track1.artists > track2.artists);
+            case SortMode::ALBUM:
+                return is_ascending ? (track1.album < track2.album) : (track1.album > track2.album);
+            case SortMode::DURATION:
+                return is_ascending ? (TrackManager::get_track_duration(track1) < TrackManager::get_track_duration(track2)) : (TrackManager::get_track_duration(track1) > TrackManager::get_track_duration(track2));
+            case SortMode::BITRATE:
+                return is_ascending ? (TrackManager::get_track_bitrate(track1) < TrackManager::get_track_bitrate(track2)) : (TrackManager::get_track_bitrate(track1) > TrackManager::get_track_bitrate(track2));
+            case SortMode::FILE_EXT:
+                return is_ascending ? (TrackManager::get_track_file_ext(track1) < TrackManager::get_track_file_ext(track2)) : (TrackManager::get_track_file_ext(track1) > TrackManager::get_track_file_ext(track2));
+            default:
+                return true;
+
+        }
+
+    };
+
+    std::sort(sorted_tracklist.begin(), sorted_tracklist.end());
+    return sorted_tracklist;
+
+}
+
 void Playlist::add_track(Track track) {
 
     tracklist.insert(track);

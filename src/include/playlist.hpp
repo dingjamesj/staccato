@@ -31,9 +31,13 @@ namespace staccato {
 
         //Connections
 
-        void set_online_connection(std::string url);
+        /** If the URL is valid, then it is set as the online connection. Returns false if the URL isn't valid*/
+        bool set_online_connection(std::string url);
+        /** Removes the online connection */
         void remove_online_connection();
+        /** Returns the online connection's URL */
         std::string get_online_connection() const;
+        /** Returns the tracklist of the online connection */
         std::unordered_multiset<Track> get_online_connection_tracklist() const;
 
         //Tracklist

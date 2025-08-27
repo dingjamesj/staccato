@@ -21,19 +21,28 @@ namespace staccato {
         //The dict that maps all Tracks to a file path
         static std::unordered_map<Track, std::string> track_dict;
 
+        //Helper functions
+
+        static std::filesystem::path get_unique_filename(std::filesystem::path path);
+        static bool write_file_metadata(const std::string& path, const Track& track);
+
         public:
 
-        //Adding new tracks to staccato
+        //Accessing external tracks
 
+        /** Returns metadata of the track accessed from the local file system */
         static Track get_local_track_info(const std::string& path);
+        /** Returns metadata of the track accessed from the URL */
         static Track get_online_track_info(const URLType& url_type, const std::string& url);
+        /** (DOES NOT REPLACE) Copies the track file, overwrites the copy's metadata, puts it into staccato, and pairs it with the Track object */
         static bool import_local_track(const std::string& path, const Track& track);
+        /** (DOES NOT REPLACE) Downloads the track from the URL, puts it into staccato and pairs it with the Track object */
         static bool download_track(const URLType& url_type, const std::string& url, const Track& track);
 
         //Reading and writing tracks
 
         /** Returns if the track file is readable */
-        static bool track_has_readable_file(const std::string& path);
+        static bool path_is_readable_track_file(const std::string& path);
         /** Returns the track's file path that's stored in the dictionary */
         static std::string get_track_file_path(const Track& track);
         /** Returns if the track is in the dictionary */

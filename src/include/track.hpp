@@ -10,9 +10,9 @@ namespace staccato {
     struct Track {
 
     public:
-        const std::string title;
-        const std::string artists;
-        const std::string album;
+        std::string title;
+        std::string artists;
+        std::string album;
 
         Track(std::string title, std::string artists, std::string album);
 
