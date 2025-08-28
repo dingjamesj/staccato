@@ -61,6 +61,8 @@ namespace staccato {
         static std::vector<char> get_track_artwork_raw(const Track& track);
         /** Searches for the track in the dictionary, then writes the track's file's artwork metadata */
         static bool set_track_artwork(const Track& track, const std::string& artwork_file_path);
+        /** Searches for the track in the dictionary, then deletes the track's file's artwork metadata */
+        static bool delete_track_artwork(const Track& track);
 
         //Reading and writing the track dictionary
 

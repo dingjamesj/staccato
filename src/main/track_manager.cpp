@@ -21,7 +21,7 @@ std::filesystem::path TrackManager::get_unique_filename(std::filesystem::path pa
 
         }
 
-        path.replace_filename(std::format("{} ({}){}", path.stem(), count, path.extension()));
+        path.replace_filename(std::format("{} ({}){}", path.stem().string(), count, path.extension().string()));
 
     }
 
@@ -109,8 +109,9 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
 
     if(track_dict.contains(track)) {
 
-        //Since this function doesn't replace existing tracks in the dict, return false
-        return false;
+        //(we return true because we only return false if the import was unsuccessful,
+        // since an import didn't happen, then the import vacuously was successful)
+        return true;
 
     }
 
@@ -277,36 +278,113 @@ std::string TrackManager::get_track_file_ext(const Track& track) {
 
 }
 
+std::vector<char> TrackManager::get_track_artwork_raw(const Track& track) {
 
+    if(!track_dict.contains(track)) {
 
+        return std::vector<char>();
 
+    }
 
+    TagLib::FileRef file_ref(track_dict.at(track).c_str());
+    if(file_ref.isNull()) {
 
+        return std::vector<char>();
 
+    }
 
+    TagLib::List<TagLib::VariantMap> picture_properties = file_ref.complexProperties("PICTURE");
 
+    TagLib::Variant value = picture_properties.front().value("data");
+    if(value.type() == TagLib::Variant::ByteVector) {
 
-//TODO just finished get_track_file_ext
+        const char* data = value.value<TagLib::ByteVector>().data();
+        std::vector<char> return_vector {};
+        for(std::size_t i = 0; data[i] != '\0'; i++) {
 
-//next up: get_track_artwork_raw
+            return_vector.push_back(data[i]);
 
+        }
 
+        return return_vector;
 
+    }
 
+    return std::vector<char>();
 
+}
 
+bool TrackManager::set_track_artwork(const Track& track, const std::string& artwork_file_path) {
 
+    if(!track_dict.contains(track)) {
 
+        //Like said previously we return true because we only return false if setting the artwork went wrong
+        //Since we're not even going to attempt to set up the artwork, it's vacuously true
+        return true;
 
+    }
 
+    TagLib::FileRef file_ref(track_dict.at(track).c_str());
+    if(file_ref.isNull()) {
 
+        //This however we return false because we ARE trying to set the artwork metadata.
+        //It fails because the track file isn't a valid audio file
+        return false;
 
+    }
 
+    std::filesystem::path artwork_file = artwork_file_path;
+    std::string file_ext = artwork_file.extension().string();
+    if(file_ext != ".jpg" && file_ext != ".png" && file_ext != ".jpeg") {
 
+        return false;
+
+    }
+
+    std::ifstream input_stream(artwork_file, std::ios::binary);
+    std::vector<char> image_data = {std::istreambuf_iterator<char>(input_stream), {}};
+    file_ref.setComplexProperties("PICTURE", {
+
+        {
+            {"data", TagLib::ByteVector(image_data.data(), image_data.size())},
+            {"pictureType", ""},
+            {"mimeType", (file_ext == ".png") ? "image/png" : "image/jpeg"},
+            {"description", ""}
+        }
+
+    });
+
+    return file_ref.save();
+
+}
+
+bool TrackManager::delete_track_artwork(const Track& track) {
+
+    if(!track_dict.contains(track)) {
+
+        //Like said previously we return true because we only return false if setting the artwork went wrong
+        //Since we're not even going to attempt to set up the artwork, it's vacuously true
+        return true;
+
+    }
+
+    TagLib::FileRef file_ref(track_dict.at(track).c_str());
+    if(file_ref.isNull()) {
+
+        //This however we return false because we ARE trying to set the artwork metadata.
+        //It fails because the track file isn't a valid audio file
+        return false;
+
+    }
+
+    file_ref.setComplexProperties("PICTURE", {});
+    return file_ref.save();
+
+}
 
 std::string TrackManager::get_sply_file_name(const std::string& id, const std::string& playlist_name) {
 
-    return id + std::string(" ") + std::string(playlist_name.substr(0, 40));
+    return std::string(id) + std::string(" ") + std::string(playlist_name.substr(0, 40));
 
 }
 

@@ -1,7 +1,7 @@
 # staccato
 A desktop app that tracks audio files & their metadata, organizes them into playlists, and downloads audio files from the web.
 
-Uses Qt, TagLib, yt-dlp, and Spotipy.
+Uses Qt 6, TagLib 2.x.x, yt-dlp, and Spotipy.
 
 ## Please note:
 *This README currently serves as notes about the project that I take for myself.*  

@@ -1,44 +1,27 @@
-#include "track.hpp"
-#include "playlist.hpp"
-#include "util.hpp"
-#include "track_manager.hpp"
 
 #include <iostream>
-
-using namespace staccato;
+#include <taglib/fileref.h>
 
 int main() {
 
-    /*
-    
-    Normal file:
-    "C:\\Users\\James\\Music\\mongo\\Tyler, The Creator - Balloon (Lyrics).mp3"
+    TagLib::FileRef file_ref("C:\\Users\\James\\Music\\mongo\\Tyler, The Creator - Balloon (Lyrics).mp3");
+    if(file_ref.isNull()) {
 
-    File with no metadata:
-    "C:\\Users\\James\\Music\\file_example_MP3_2MG.mp3"
+        std::cout << "File null";
+        return 1;
 
-    Non-audio file:
-    "C:\\Users\\James\\Documents\\Empty Document.pdf"
+    }
 
-    File with duplicate metadata as the "normal file":
-    "C:\\Users\\James\\Music\\aodsh.mp3"
+    TagLib::List<TagLib::VariantMap> picture_properties = file_ref.complexProperties("PICTURE");
+    for(const TagLib::VariantMap& property: picture_properties) {
 
-    Non-existent file:
-    "C:\\Users\\James\\Music\\alisudhauidhauisdsghauisdhsaisudhsaosuidhs.mp3"
+        for(const std::pair<const TagLib::String, TagLib::Variant>& pair: property) {
 
-    Invalid file path:
-    "\\\\ //o  ua s h d ///////\\\\@@@@@8091kq.,dsnlaidha90dASOD 90D A9 S09js90j ioqwmk"
+            std::cout << "K: " << pair.first << std::endl;
 
-    Invalid file path pt 2:
-    ""
-    
-    Invalid file path pt 3:
-    "   "
+        }
 
-    Invalid perms file path:
-    "C:\\Users\\Big Idiot Cat\\Music\\file_example_MP3_2MG.mp3"
-
-    */
+    }
 
     return 0;
 
