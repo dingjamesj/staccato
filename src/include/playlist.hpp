@@ -9,7 +9,7 @@
 
 namespace staccato {
 
-    enum class SortMode;
+    enum class sortmode;
     struct Track;
 
     class Playlist {
@@ -47,7 +47,7 @@ namespace staccato {
         /** Returns a const ref to the tracklist as an unordered_multiset */
         const std::unordered_multiset<Track>& get_tracklist() const;
         /** Returns a sorted tracklist as a vector */
-        std::vector<Track> get_sorted_tracklist(SortMode sort_mode, bool is_ascending) const;
+        std::vector<Track> get_sorted_tracklist(sortmode sort_mode, bool is_ascending) const;
         /** Adds a track to the tracklist */
         void add_track(Track track);
         /** Removes a track from the tracklist, returns true if was successfully removed */

@@ -35,12 +35,35 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
 def get_spotify_playlist_tracks(spotify_id: str) -> list[dict]:
     """ID includes URL, URI, and alphanumeric ID"""
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
-    return sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
+    playlist_data: list[dict] = sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
+    playlist: list[dict] = []
+    for track_data in playlist_data:
+        artists = ""
+        for artist_data in track_data["track"]["artists"]:
+            artists = artists + artist_data["name"] + ", "
+        artists = artists[:-2]
+        playlist.append({
+            "title": track_data["track"]["name"],
+            "artists": artists,
+            "album": track_data["track"]["album"]["name"],
+            "artwork_url": track_data["track"]["album"]["images"][0]["url"]
+        })
+    return playlist
 
 def get_spotify_track(spotify_id: str) -> dict:
     """ID includes URL, URI, and alphanumeric ID"""
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
-    return sp.track(track_id=spotify_id, market=market)
+    track_data: dict = sp.track(track_id=spotify_id, market=market)
+    artists: str = ""
+    for artist_data in track_data["artists"]:
+        artists = artists + artist_data["name"] + ", "
+    artists = artists[:-2]
+    return {
+        "title": track_data["name"],
+        "artists": artists,
+        "album": track_data["album"]["name"],
+        "artwork_url": track_data["album"]["images"][0]["url"]
+    }
 
 def find_best_youtube_url(title: str, artists: str) -> str:
     # Search for the top few videos---searching with "{Title} {1st artist}"
@@ -100,4 +123,5 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
     return score
 
 if __name__ == "__main__":
-    pass
+    read_api_settings()
+    print(get_spotify_track("https://open.spotify.com/track/51vRumtqbkNW9wrKfESwfu?si=5c5598584843462e"))

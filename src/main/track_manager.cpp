@@ -67,6 +67,24 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
 
 }
 
+urltype TrackManager::get_url_type(const std::string& url) {
+
+    if(url.find("spotify.com") != std::string::npos) {
+
+        return urltype::spotify;
+
+    }
+
+    if(url.find("youtube.com") != std::string::npos || url.find("youtu.be") != std::string::npos) {
+
+        return urltype::youtube;
+
+    }
+
+    return urltype::unknown;
+
+}
+
 //===========================
 //  PUBLIC ACCESS FUNCTIONS
 //===========================
@@ -102,6 +120,12 @@ Track TrackManager::get_local_track_info(const std::string& path) {
     }
 
     return Track(title, artist, album);
+
+}
+
+Track TrackManager::get_online_track_info(const std::string& url) {
+
+    urltype url_type = get_url_type(url);
 
 }
 

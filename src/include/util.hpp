@@ -6,15 +6,15 @@
 
 namespace staccato {
 
-    enum class URLType {SPOTIFY, YOUTUBE, UNKNOWN};
+    enum class urltype {spotify, youtube, unknown};
 
-    enum class SortMode {
-        TITLE,
-        ARTISTS,
-        ALBUM,
-        BITRATE,
-        DURATION,
-        FILE_EXT
+    enum class sortmode {
+        title,
+        artists,
+        album,
+        bitrate,
+        duration,
+        file_ext
     };
 
     std::string seconds_to_hms(int seconds);

@@ -13,6 +13,7 @@
 #include <fstream>
 #include <taglib/fileref.h>
 #include <vector>
+#include <Python.h>
 
 namespace staccato {
     
@@ -26,6 +27,7 @@ namespace staccato {
 
         static std::filesystem::path get_unique_filename(std::filesystem::path path);
         static bool write_file_metadata(const std::string& path, const Track& track);
+        static urltype get_url_type(const std::string& url);
 
         public:
 
@@ -34,7 +36,7 @@ namespace staccato {
         /** Returns metadata of the track accessed from the local file system */
         static Track get_local_track_info(const std::string& path);
         /** Returns metadata of the track accessed from the URL */
-        static Track get_online_track_info(const URLType& url_type, const std::string& url);
+        static Track get_online_track_info(const std::string& url);
         /** (DOES NOT REPLACE) Copies the track file, overwrites the copy's metadata, puts it into staccato, and pairs it with the Track object */
         static bool import_local_track(const std::string& path, const Track& track);
         /** (DOES NOT REPLACE) Downloads the track from the YouTube URL, puts it into staccato and pairs it with the Track object */
