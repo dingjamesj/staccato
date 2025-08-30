@@ -88,6 +88,7 @@ def download_youtube_track(url: str, location: str, force_mp3: bool) -> dict:
         
         return info
 
+
 def update_yt_dlp() -> int:
     """Return 0 if update was successful, 1 if no update was needed, and -1 if update failed"""
     pip_install_result: CompletedProcess[str] = subprocess.run(
@@ -107,6 +108,7 @@ def update_yt_dlp() -> int:
         return 1
     return 0
 
+
 def extract_youtube_id_from_url(url: str) -> str:
     default_youtube_str: str = "youtube.com/watch?v="
     shortened_youtube_str: str = "youtu.be/"
@@ -125,6 +127,7 @@ def extract_youtube_id_from_url(url: str) -> str:
     if id_end == -1:
         return url[id_begin:]
     return url[id_begin:id_end]
+
 
 if __name__ == "__main__":
     print(download_youtube_track("https://www.youtube.com/watch?v=ss5msvokUkY", "D:\\"))

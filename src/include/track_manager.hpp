@@ -40,9 +40,9 @@ namespace staccato {
         /** (DOES NOT REPLACE) Copies the track file, overwrites the copy's metadata, puts it into staccato, and pairs it with the Track object */
         static bool import_local_track(const std::string& path, const Track& track);
         /** (DOES NOT REPLACE) Downloads the track from the YouTube URL, puts it into staccato and pairs it with the Track object */
-        static bool download_track(const Track& track, const std::string& youtube_url);
+        static bool download_track(const Track& track, const std::string& youtube_url, bool force_mp3);
         /** (DOES NOT REPLACE) Finds the best matching YouTube URL, downloads it, puts it into staccato and pairs it with the Track object */
-        static bool download_track(const Track& track);
+        static bool download_track(const Track& track, bool force_mp3);
 
         //Reading and writing tracks
 
