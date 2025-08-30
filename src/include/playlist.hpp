@@ -29,6 +29,8 @@ namespace staccato {
             std::string online_connection
         );
 
+        Playlist();
+
         //Connections
 
         /** If the URL is valid, then it is set as the online connection. Returns false if the URL isn't valid*/
@@ -56,6 +58,8 @@ namespace staccato {
         int get_total_duration() const;
         /** Returns a string representation of this playlist */
         std::string string() const;
+        /** Returns if the playlist is empty (denoting an invalid playlist) */
+        bool is_empty() const;
 
     };
 

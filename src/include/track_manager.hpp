@@ -7,6 +7,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
@@ -36,8 +37,10 @@ namespace staccato {
         static Track get_online_track_info(const URLType& url_type, const std::string& url);
         /** (DOES NOT REPLACE) Copies the track file, overwrites the copy's metadata, puts it into staccato, and pairs it with the Track object */
         static bool import_local_track(const std::string& path, const Track& track);
-        /** (DOES NOT REPLACE) Downloads the track from the URL, puts it into staccato and pairs it with the Track object */
-        static bool download_track(const URLType& url_type, const std::string& url, const Track& track);
+        /** (DOES NOT REPLACE) Downloads the track from the YouTube URL, puts it into staccato and pairs it with the Track object */
+        static bool download_track(const Track& track, const std::string& youtube_url);
+        /** (DOES NOT REPLACE) Finds the best matching YouTube URL, downloads it, puts it into staccato and pairs it with the Track object */
+        static bool download_track(const Track& track);
 
         //Reading and writing tracks
 
@@ -67,7 +70,7 @@ namespace staccato {
         //Reading and writing the track dictionary
 
         /** Loads track_dict from the .stkl file */
-        static void read_track_dict_from_file();
+        static bool read_track_dict_from_file();
         /** Serializes track_dict to the .stkl file */
         static bool write_track_dict_to_file();
         /** Tracks in track_dict whose associated file no longer exists */
@@ -80,11 +83,9 @@ namespace staccato {
         /** Returns basic info about every playlist (a tuple of the playlist id, name, and cover image file path) */
         static std::vector<std::tuple<std::string, std::string, std::string>> read_basic_playlist_info_from_files();
         /** Searches for .sply file with the same name, and returns complete playlist info */
-        static Playlist read_playlist_from_file(const std::string& id, const std::string& playlist_name);
+        static Playlist read_playlist_from_file(const std::string& id);
         /** Serializes the playlist to its file */
         static bool write_playlist_to_file(const std::string& id, const Playlist& playlist);
-        /** What the .sply file name would be, given a playlist ID and name */
-        static std::string get_sply_file_name(const std::string& id, const std::string& playlist_name);
 
         //Debugging
 
@@ -94,6 +95,7 @@ namespace staccato {
 
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
+        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};

@@ -18,6 +18,7 @@ namespace staccato {
     };
 
     std::string seconds_to_hms(int seconds);
+    void trim_string(std::string& str);
 
 }
 

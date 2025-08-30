@@ -75,7 +75,7 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
     if(!path_is_readable_track_file(path)) {
 
-        return Track("", "", "");
+        return Track();
 
     }
 
@@ -382,9 +382,372 @@ bool TrackManager::delete_track_artwork(const Track& track) {
 
 }
 
-std::string TrackManager::get_sply_file_name(const std::string& id, const std::string& playlist_name) {
+bool TrackManager::read_track_dict_from_file() {
 
-    return std::string(id) + std::string(" ") + std::string(playlist_name.substr(0, 40));
+    track_dict.clear();
+
+    std::ifstream input(std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
+    if(!input.is_open()) {
+
+        return false;
+
+    }
+
+    std::uint8_t count {0};
+    std::string title, artists, album, path {""};
+    char c = '\0';
+    while(!input.eof()) {
+
+        c = input.get();
+
+        if(input.fail()) {
+
+            return false;
+
+        }
+
+        switch(count) {
+
+            case 0:
+                title.push_back(c);
+                break;
+            case 1:
+                artists.push_back(c);
+                break;
+            case 2:
+                album.push_back(c);
+                break;
+            case 3:
+                path.push_back(c);
+                break;
+            default:
+                break;
+
+        }
+
+        if(c == '\0') {
+
+            count++;
+
+        }
+
+        if(count == 4) {
+
+            count = 0;
+            track_dict.insert({Track(title, artists, album), path});
+            title, artists, album, path = "";
+
+        }
+
+    }
+
+    //The reading was unsuccessful if the file ends early in the middle of a track-path pair
+    if(count != 0) {
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+bool TrackManager::write_track_dict_to_file() {
+
+    std::ofstream output(std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
+    if(!output.is_open()) {
+
+        return false;
+
+    }
+
+    for(const std::pair<Track, std::string>& pair: track_dict) {
+
+        output.write(pair.first.title.c_str(), pair.first.title.size());
+        output.write(pair.first.artists.c_str(), pair.first.artists.size());
+        output.write(pair.first.album.c_str(), pair.first.album.size());
+        output.write(pair.second.c_str(), pair.second.size());
+
+        if(output.fail()) {
+
+            return false;
+
+        }
+
+    }
+
+    output.flush();
+    if(output.fail()) {
+
+        return false;
+
+    }
+
+    output.close();
+    return true;
+
+}
+
+std::vector<Track> TrackManager::find_missing_tracks() {
+
+    std::vector<Track> missing_tracks {};
+    for(const std::pair<Track, std::string>& pair: track_dict) {
+
+        if(!path_is_readable_track_file(pair.second)) {
+
+            missing_tracks.push_back(pair.first);
+
+        }
+
+    }
+
+    return missing_tracks;
+
+}
+
+std::vector<std::string> TrackManager::find_extraneous_track_files() {
+
+    std::unordered_set<std::filesystem::path> paths_in_dict {};
+    for(const std::pair<Track, std::string>& pair: track_dict) {
+
+        paths_in_dict.insert(std::filesystem::path(pair.second));
+
+    }
+
+    std::vector<std::string> extraneous_track_files {};
+    for(std::filesystem::directory_entry file: std::filesystem::directory_iterator(TRACK_FILES_DIRECTORY)) {
+
+        //Ignore directories and non-audio files
+
+        if(file.is_directory()) {
+
+            continue;
+
+        }
+
+        TagLib::FileRef file_ref(file.path().c_str());
+        if(file_ref.isNull()) {
+
+            continue;
+
+        }
+
+        if(!paths_in_dict.contains(file.path())) {
+
+            extraneous_track_files.push_back(file.path().string());
+
+        }
+
+    }
+
+    return extraneous_track_files;
+
+}
+
+std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::read_basic_playlist_info_from_files() {
+
+    std::vector<std::tuple<std::string, std::string, std::string>> info {};
+
+    for(std::filesystem::directory_entry file: std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY)) {
+
+        //We only want the .sply files
+        if(file.path().extension().string() != std::string{PLAYLIST_FILE_EXTENSION}) {
+
+            continue;
+
+        }
+
+        std::string id = file.path().stem().string();
+        
+        std::ifstream input(file.path(), std::ios::binary);
+        if(!input.is_open()) {
+
+            continue;
+
+        }
+
+        std::uint8_t count {0};
+        std::string name, cover_image_file_path {""};
+        char c = '\0';
+        while(!input.eof()) {
+
+            c = input.get();
+
+            if(input.fail()) {
+
+                break;
+
+            }
+
+            if(count == 0) {
+
+                name.push_back(c);
+
+            } else if(count == 1) {
+
+                cover_image_file_path.push_back(c);
+
+            }
+
+            if(c == '\0') {
+
+                count++;
+
+            }
+
+        }
+
+        //The reading was unsuccessful if the file ends early
+        if(count != 2) {
+
+            continue;
+
+        }
+
+        info.push_back({id, name, cover_image_file_path});
+        
+    }
+
+    return info;
+
+}
+
+Playlist TrackManager::read_playlist_from_file(const std::string& id) {
+
+    std::ifstream input(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION});
+    if(!input.is_open()) {
+
+        return Playlist();
+
+    }
+
+    //Read basic playlist details
+    std::uint8_t count {0};
+    std::string name, cover_image_file_path, online_connection {""};
+    char c = '\0';
+    while(!input.eof()) {
+
+        c = input.get();
+
+        if(input.fail()) {
+
+            return Playlist();
+
+        }
+
+        if(count == 0) {
+
+            name.push_back(c);
+
+        } else if(count == 1) {
+
+            cover_image_file_path.push_back(c);
+
+        } else if(count == 2) {
+
+            online_connection.push_back(c);
+
+        }
+
+        if(c == '\0') {
+
+            count++;
+
+        }
+
+    }
+
+    //Reading unsuccessful if the file ends early
+    if(count != 3) {
+
+        return Playlist();
+
+    }
+
+    std::unordered_multiset<Track> tracklist {};
+    std::string title, artists, album {""};
+    count = 0;
+    while(!input.eof()) {
+
+        c = input.get();
+
+        if(count == 0) {
+
+            title.push_back(c);
+
+        } else if(count == 1) {
+
+            artists.push_back(c);
+
+        } else if(count == 2) {
+
+            album.push_back(c);
+
+        }
+
+        if(c == '\0') {
+
+            count++;
+
+        }
+
+        if(count == 3) {
+
+            count = 0;
+            tracklist.insert(Track(title, artists, album));
+            title, artists, album = "";
+
+        }
+
+    }
+
+    //Reading unsuccessful if it ends early
+    if(count != 0) {
+
+        return Playlist();
+
+    }
+
+    return Playlist(name, cover_image_file_path, tracklist, online_connection);
+
+}
+
+bool TrackManager::write_playlist_to_file(const std::string& id, const Playlist& playlist) {
+
+    std::ofstream output(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION}, std::ios::binary);
+    if(!output.is_open()) {
+
+        return false;
+
+    }
+
+    output.write(playlist.name.c_str(), playlist.name.size());
+    output.write(playlist.cover_image_file_path.c_str(), playlist.cover_image_file_path.size());
+    output.write(playlist.online_connection.c_str(), playlist.online_connection.size());
+    std::unordered_multiset<Track> tracklist = playlist.get_tracklist();
+    for(Track track: tracklist) {
+
+        output.write(track.title.c_str(), track.title.size());
+        output.write(track.artists.c_str(), track.artists.size());
+        output.write(track.album.c_str(), track.album.size());
+
+        if(output.fail()) {
+
+            return false;
+
+        }
+
+    }
+
+    output.flush();
+    if(output.fail()) {
+
+        return false;
+
+    }
+
+    output.close();
+    return true;
 
 }
 

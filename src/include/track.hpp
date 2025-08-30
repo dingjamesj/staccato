@@ -15,6 +15,7 @@ namespace staccato {
         std::string album;
 
         Track(std::string title, std::string artists, std::string album);
+        Track();
 
         /** Returns if this Track contains no metadata (if all strings are empty) */
         bool is_empty() const;

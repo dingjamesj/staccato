@@ -3,10 +3,12 @@
 using namespace staccato;
 
 Track::Track(std::string title, std::string artists, std::string album): 
-    title{title}, 
-    artists{artists}, 
-    album{album} 
+    title {title}, 
+    artists {artists}, 
+    album {album} 
 {}
+
+Track::Track(): title {""}, artists {""}, album {""} {}
 
 bool Track::is_empty() const {
 

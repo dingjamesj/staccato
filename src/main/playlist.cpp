@@ -11,15 +11,17 @@ Playlist::Playlist(
     const std::unordered_multiset<Track>& tracklist, 
     std::string online_connection
 ): 
-    name{name},
-    cover_image_file_path{cover_image_file_path},
-    tracklist{std::move(tracklist)},
-    online_connection{online_connection}
+    name {name},
+    cover_image_file_path {cover_image_file_path},
+    tracklist {std::move(tracklist)},
+    online_connection {online_connection}
 {
 
     set_online_connection(online_connection);
 
 }
+
+Playlist::Playlist(): name {""}, cover_image_file_path {""}, tracklist {}, online_connection {""} {}
 
 void Playlist::remove_online_connection() {
 
@@ -128,6 +130,12 @@ std::string Playlist::string() const {
     }
 
     return str;
+
+}
+
+bool Playlist::is_empty() const {
+
+    return name == "" && cover_image_file_path == "" && tracklist.size() == 0 && online_connection == "";
 
 }
 
