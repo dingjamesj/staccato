@@ -42,10 +42,10 @@ I will update the README and turn it into an actual README when the project is a
   - Its tracks as `Track` objects
     - Represented as an `unordered_set`
   - The current sort mode
-- The name of a .sply file is the playlist's unique ID and then the first 40 characters of the playlist name
-  - *e.g.* a playlist with name "rargb" and ID "1dda23" will have a .sply file "1dda23 rargb"
+- The name of a .sply file is the playlist's unique ID
+  - *e.g.* a playlist with name "rargb" and ID "1dda23" will have a .sply file "rargb.sply"
 - To load a playlist, the program searches for the .sply with the unique ID
-  - *e.g.* to look for the previous playlist "rargb," we try to find "1dda23 rargb.sply"
+  - *e.g.* to look for the previous playlist "rargb," we try to find "1dda23.sply"
 - When the playlist is loaded onto the GUI, it takes the `unordered_set`, sorts the tracks, and puts them into a `vector`.
   - The `vector` is then used in the display of the tracklist
 - Note that the playlist object does not contain an ID

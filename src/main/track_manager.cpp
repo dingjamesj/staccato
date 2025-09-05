@@ -124,8 +124,55 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 }
 
 Track TrackManager::get_online_track_info(const std::string& url) {
+    
+    Py_Initialize();
+    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
+    PyObject* py_module = PyImport_Import(py_fetcher);
+    Py_DECREF(py_fetcher);
+    if(py_module == nullptr) {
+
+        return Track();
+
+    }
 
     urltype url_type = get_url_type(url);
+    PyObject* py_func = nullptr;
+    PyObject* py_param = PyTuple_Pack(1, url.c_str());
+    PyObject* py_return = nullptr;
+    if(url_type == urltype::spotify) {
+
+        py_func = PyObject_GetAttrString(py_module, "get_spotify_track");
+
+    } else if(url_type == urltype::youtube) {
+
+        py_func = PyObject_GetAttrString(py_module, "get_youtube_track");
+
+    }
+    Py_DECREF(py_module);
+
+    //Check if the python function was found
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return Track();
+
+    }
+
+    py_return = PyObject_CallObject(py_func, py_param);
+    Py_DECREF(py_func);
+    Py_DECREF(py_param);
+    if(py_return == nullptr || !PyDict_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return Track();
+
+    }
+
+    std::string title, artists, album {};
+    title = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "title"));
+    artists = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "artists"));
+    album = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "album"));
+    return Track(title, artists, album);
 
 }
 

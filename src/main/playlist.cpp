@@ -49,17 +49,17 @@ std::vector<Track> Playlist::get_sorted_tracklist(sortmode sort_mode, bool is_as
 
         switch(sort_mode) {
 
-            case sortmode::TITLE:
+            case sortmode::title:
                 return is_ascending ? (track1.title < track2.title) : (track2.title > track1.title);
-            case sortmode::ARTISTS:
+            case sortmode::artists:
                 return is_ascending ? (track1.artists < track2.artists) : (track1.artists > track2.artists);
-            case sortmode::ALBUM:
+            case sortmode::album:
                 return is_ascending ? (track1.album < track2.album) : (track1.album > track2.album);
-            case sortmode::DURATION:
+            case sortmode::duration:
                 return is_ascending ? (TrackManager::get_track_duration(track1) < TrackManager::get_track_duration(track2)) : (TrackManager::get_track_duration(track1) > TrackManager::get_track_duration(track2));
-            case sortmode::BITRATE:
+            case sortmode::bitrate:
                 return is_ascending ? (TrackManager::get_track_bitrate(track1) < TrackManager::get_track_bitrate(track2)) : (TrackManager::get_track_bitrate(track1) > TrackManager::get_track_bitrate(track2));
-            case sortmode::FILE_EXT:
+            case sortmode::file_ext:
                 return is_ascending ? (TrackManager::get_track_file_ext(track1) < TrackManager::get_track_file_ext(track2)) : (TrackManager::get_track_file_ext(track1) > TrackManager::get_track_file_ext(track2));
             default:
                 return true;
