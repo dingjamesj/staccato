@@ -57,12 +57,12 @@ bool Playlist::set_online_connection(const std::string& url) {
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
+        Py_Finalize();
         return false;
 
     }
 
     urltype url_type = get_url_type(url);
-    PyObject* py_param = PyTuple_Pack(1, url.c_str());
     PyObject* py_func = nullptr;
     if(url_type == urltype::spotify) {
 
@@ -77,16 +77,19 @@ bool Playlist::set_online_connection(const std::string& url) {
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
+        Py_Finalize();
         return false;
 
     }
 
+    PyObject* py_param = PyTuple_Pack(1, url.c_str());
     PyObject* py_return = PyObject_CallObject(py_func, py_param);
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyBool_Check(py_return)) {
 
         Py_XDECREF(py_return);
+        Py_Finalize();
         return false;
 
     }
@@ -108,6 +111,79 @@ void Playlist::remove_online_connection() {
 std::string Playlist::get_online_connection() const {
 
     return online_connection;
+
+}
+
+std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const {
+
+    Py_Initialize();
+    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
+    PyObject* py_module = PyImport_Import(py_fetcher);
+    Py_DECREF(py_fetcher);
+    if(py_module == nullptr) {
+
+        Py_Finalize();
+        return std::unordered_multiset<Track> {};
+
+    }
+
+    urltype url_type = get_url_type(online_connection);
+    PyObject* py_func = nullptr;
+    if(url_type == urltype::spotify) {
+
+        py_func = PyObject_GetAttrString(py_module, "get_spotify_playlist");
+
+    } else if(url_type == urltype::youtube) {
+
+        py_func = PyObject_GetAttrString(py_module, "get_youtube_playlist");
+
+    }
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        Py_Finalize();
+        return std::unordered_multiset<Track> {};
+
+    }
+
+    PyObject* py_param = PyTuple_Pack(1, online_connection.c_str());
+    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    Py_DECREF(py_func);
+    Py_DECREF(py_param);
+    //Note that the return value should be a list[dict]
+    if(py_return == nullptr || !PyList_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        Py_Finalize();
+        return std::unordered_multiset<Track> {};
+
+    }
+
+    std::unordered_multiset<Track> tracklist {};
+    Py_ssize_t size = PyList_Size(py_return);
+    for(Py_ssize_t i {0}; i < size; i++) {
+
+        PyObject* py_item = PyList_GetItem(py_return, i); //Note that this is a borrowed reference (no need to DECREF)
+        if(!PyDict_Check(py_item)) {
+
+            Py_DECREF(py_return);
+            Py_Finalize();
+            return std::unordered_multiset<Track> {};
+
+        }
+
+        tracklist.insert(Track(
+            PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "title")),
+            PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "artists")),
+            PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "album"))
+        ));
+
+    }
+
+    Py_DECREF(py_return);
+    Py_Finalize();
+    return tracklist;
 
 }
 

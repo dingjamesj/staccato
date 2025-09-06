@@ -131,12 +131,12 @@ Track TrackManager::get_online_track_info(const std::string& url) {
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
+        Py_Finalize();
         return Track();
 
     }
 
     urltype url_type = get_url_type(url);
-    PyObject* py_param = PyTuple_Pack(1, url.c_str());
     PyObject* py_func = nullptr;
     if(url_type == urltype::spotify) {
 
@@ -152,28 +152,31 @@ Track TrackManager::get_online_track_info(const std::string& url) {
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
+        Py_Finalize();
         return Track();
 
     }
 
+    PyObject* py_param = PyTuple_Pack(1, url.c_str());
     PyObject* py_return = PyObject_CallObject(py_func, py_param);
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyDict_Check(py_return)) {
 
         Py_XDECREF(py_return);
+        Py_Finalize();
         return Track();
 
     }
 
-    std::string title, artists, album {};
-    title = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "title"));
-    artists = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "artists"));
-    album = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "album"));
+    Track track (
+        PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "title")),
+        PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "artists")),
+        PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "album"))
+    );
     Py_DECREF(py_return);
-
     Py_Finalize();
-    return Track(title, artists, album);
+    return track;
 
 }
 
@@ -221,33 +224,35 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     Py_DECREF(py_downloader);
     if(py_module == nullptr) {
 
+        Py_Finalize();
         return false;
 
     }
 
-    PyObject* py_param = PyTuple_Pack(3, youtube_url, TRACK_FILES_DIRECTORY, force_mp3);
     PyObject* py_func = PyObject_GetAttrString(py_module, "download_youtube_track");
     Py_DECREF(py_module);
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
+        Py_Finalize();
         return false;
 
     }
 
+    PyObject* py_param = PyTuple_Pack(3, youtube_url, TRACK_FILES_DIRECTORY, force_mp3);
     PyObject* py_return = PyObject_CallObject(py_func, py_param);
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);
+        Py_Finalize();
         return false;
 
     }
 
     std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
     Py_DECREF(py_return);
-    
     Py_Finalize();
     track_dict.insert({track, downloaded_path});
     return write_file_metadata(downloaded_path, track);
@@ -272,33 +277,35 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
+        Py_Finalize();
         return false;
 
     }
 
-    PyObject* py_param = PyTuple_Pack(2, track.title, track.artists);
     PyObject* py_func = PyObject_GetAttrString(py_module, "find_best_youtube_url");
     Py_DECREF(py_module);
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
+        Py_Finalize();
         return false;
 
     }
 
+    PyObject* py_param = PyTuple_Pack(2, track.title, track.artists);
     PyObject* py_return = PyObject_CallObject(py_func, py_param);
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);
+        Py_Finalize();
         return false;
 
     }
 
     std::string youtube_url {PyUnicode_AsUTF8(py_return)};
     Py_DECREF(py_return);
-
     Py_Finalize();
     return download_track(track, youtube_url, force_mp3);
 
