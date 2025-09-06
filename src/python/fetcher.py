@@ -34,11 +34,14 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
         print(e)
 
 
-def get_spotify_playlist_tracks(spotify_id: str) -> list[dict]:
+def get_spotify_playlist(spotify_id: str) -> list[dict]:
     """ID includes URL, URI, and alphanumeric ID"""
     try:
+        print("0")
         sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
+        print("1")
         playlist_data: list[dict] = sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
+        print("2")
         playlist: list[dict] = []
         for track_data in playlist_data:
             artists = ""
@@ -54,6 +57,23 @@ def get_spotify_playlist_tracks(spotify_id: str) -> list[dict]:
         return playlist
     except:
         return []
+
+
+def get_youtube_playlist(youtube_url: str) -> list[dict]:
+    pass
+
+
+def can_access_spotify_playlist(spotify_id: str) -> bool:
+    try:
+        sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))        
+        sp.playlist_tracks(playlist_id=spotify_id, market=market)
+        return True
+    except:
+        return False
+
+
+def can_access_youtube_playlist(youtube_url: str) -> bool:
+    pass
 
 
 def get_spotify_track(spotify_id: str) -> dict:
@@ -161,4 +181,5 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
 
 if __name__ == "__main__":
     read_api_settings()
-    print(get_youtube_track("https://www.youtube.com/watch?v=bu7nU9Mhpyo"))
+    # print(get_youtube_track("https://www.youtube.com/watch?v=bu7nU9Mhpyo"))
+    get_spotify_playlist("https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=4eb5aafb572d4cd0&pt=dd22d977b7894480865d7da9375e4102")

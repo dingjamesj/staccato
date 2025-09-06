@@ -1,21 +1,26 @@
 #ifndef PLAYLIST_HPP
 #define PLAYLIST_HPP
 
+#include "util.hpp"
+
 #include <string>
 #include <vector>
 #include <unordered_set>
 #include <filesystem>
 #include <iostream>
+#include <Python.h>
 
 namespace staccato {
 
-    enum class sortmode;
     struct Track;
 
     class Playlist {
 
     private:
         std::unordered_multiset<Track> tracklist;
+        
+        //Helper functions
+        static urltype get_url_type(const std::string& url);
 
     public:
         std::string name;
@@ -34,7 +39,7 @@ namespace staccato {
         //Connections
 
         /** If the URL is valid, then it is set as the online connection. Returns false if the URL isn't valid*/
-        bool set_online_connection(std::string url);
+        bool set_online_connection(const std::string& url);
         /** Removes the online connection */
         void remove_online_connection();
         /** Returns the online connection's URL */
@@ -49,9 +54,9 @@ namespace staccato {
         /** Returns a sorted tracklist as a vector */
         std::vector<Track> get_sorted_tracklist(sortmode sort_mode, bool is_ascending) const;
         /** Adds a track to the tracklist */
-        void add_track(Track track);
+        void add_track(const Track& track);
         /** Removes a track from the tracklist, returns true if was successfully removed */
-        bool remove_track(Track track);
+        bool remove_track(const Track& track);
         /** Check if a track is in the tracklist */
         bool contains_track(Track track) const;
         /** The total duration of the playlist */

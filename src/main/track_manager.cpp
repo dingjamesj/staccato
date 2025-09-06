@@ -238,7 +238,7 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     PyObject* py_return = PyObject_CallObject(py_func, py_param);
     Py_DECREF(py_func);
     Py_DECREF(py_param);
-    if(py_return == nullptr || !PyCallable_Check(py_return)) {
+    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);
         return false;

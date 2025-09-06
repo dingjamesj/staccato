@@ -5,6 +5,32 @@
 
 using namespace staccato;
 
+//====================
+//  HELPER FUNCTIONS
+//====================
+
+urltype Playlist::get_url_type(const std::string& url) {
+
+    if(url.find("spotify.com") != std::string::npos) {
+
+        return urltype::spotify;
+
+    }
+
+    if(url.find("youtube.com") != std::string::npos || url.find("youtu.be") != std::string::npos) {
+
+        return urltype::youtube;
+
+    }
+
+    return urltype::unknown;
+
+}
+
+//===========================
+//  PUBLIC ACCESS FUNCTIONS
+//===========================
+
 Playlist::Playlist(
     std::string name, 
     std::string cover_image_file_path, 
@@ -22,6 +48,56 @@ Playlist::Playlist(
 }
 
 Playlist::Playlist(): name {""}, cover_image_file_path {""}, tracklist {}, online_connection {""} {}
+
+bool Playlist::set_online_connection(const std::string& url) {
+
+    Py_Initialize();
+    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
+    PyObject* py_module = PyImport_Import(py_fetcher);
+    Py_DECREF(py_fetcher);
+    if(py_module == nullptr) {
+
+        return false;
+
+    }
+
+    urltype url_type = get_url_type(url);
+    PyObject* py_param = PyTuple_Pack(1, url.c_str());
+    PyObject* py_func = nullptr;
+    if(url_type == urltype::spotify) {
+
+        py_func = PyObject_GetAttrString(py_module, "can_access_spotify_playlist");
+
+    } else if(url_type == urltype::youtube) {
+
+        py_func = PyObject_GetAttrString(py_module, "can_access_youtube_playlist");
+
+    }
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return false;
+
+    }
+
+    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    Py_DECREF(py_func);
+    Py_DECREF(py_param);
+    if(py_return == nullptr || !PyBool_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return false;
+
+    }
+
+    bool is_valid_url = PyObject_IsTrue(py_return) == 1;
+    Py_DECREF(py_return);
+
+    Py_Finalize();
+    return is_valid_url;
+
+}
 
 void Playlist::remove_online_connection() {
 
@@ -68,18 +144,18 @@ std::vector<Track> Playlist::get_sorted_tracklist(sortmode sort_mode, bool is_as
 
     };
 
-    std::sort(sorted_tracklist.begin(), sorted_tracklist.end());
+    std::sort(sorted_tracklist.begin(), sorted_tracklist.end(), comparator_lambda);
     return sorted_tracklist;
 
 }
 
-void Playlist::add_track(Track track) {
+void Playlist::add_track(const Track& track) {
 
     tracklist.insert(track);
 
 }
 
-bool Playlist::remove_track(Track track) {
+bool Playlist::remove_track(const Track& track) {
 
     std::unordered_multiset<staccato::Track>::iterator iter = tracklist.find(track);
     if(iter == tracklist.end()) {
