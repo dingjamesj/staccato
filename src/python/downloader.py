@@ -6,8 +6,8 @@ import sys
 
 import os
 
-def download_youtube_track(url: str, location: str, force_mp3: bool) -> dict:
-    """Returns 0 if download was successful, 1 otherwise."""
+def download_youtube_track(url: str, location: str, force_mp3: bool) -> str:
+    """Returns the downloaded path if the download was successful, empty string otherwise"""
 
     # Get the unique file enumerator e.g. the (1) in "duplicatemusicfile (1).mp3"
     possible_file_paths: list[str] = [
@@ -52,41 +52,13 @@ def download_youtube_track(url: str, location: str, force_mp3: bool) -> dict:
         if trimmed_location[-1] == os.sep:
             trimmed_location = trimmed_location[:-1]
         # Return the downloaded path
-
-        info: dict[str, str] = {}
-
-        if "track" in video_info:
-            info["title"] = video_info["track"]
-        else:
-            info["title"] = video_info["title"]
-        
-        if "creator" in video_info:
-            info["artists"] = video_info["creator"]
-        elif "artists" in video_info:
-            artists_str: str = ""
-            for artist_str in video_info["artists"]:
-                artists_str = artists_str + artist_str
-            info["artists"] = artists_str
-        else:
-            info["artists"] = video_info["uploader"]
-        
-        if "album" in video_info:
-            info["album"] = video_info["album"]
-        else:
-            info["album"] = ""
-
+        downloaded_path: str
         if unique_file_enumerator == 0:
-            if force_mp3:
-                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]}.mp3"
-            else:
-                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
+            downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
         else:
-            if force_mp3:
-                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).mp3"
-            else: 
-                info["download_path"] = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
+            downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
         
-        return info
+        return downloaded_path
 
 
 def update_yt_dlp() -> int:

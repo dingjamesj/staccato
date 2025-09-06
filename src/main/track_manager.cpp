@@ -136,9 +136,8 @@ Track TrackManager::get_online_track_info(const std::string& url) {
     }
 
     urltype url_type = get_url_type(url);
-    PyObject* py_func = nullptr;
     PyObject* py_param = PyTuple_Pack(1, url.c_str());
-    PyObject* py_return = nullptr;
+    PyObject* py_func = nullptr;
     if(url_type == urltype::spotify) {
 
         py_func = PyObject_GetAttrString(py_module, "get_spotify_track");
@@ -149,7 +148,6 @@ Track TrackManager::get_online_track_info(const std::string& url) {
 
     }
     Py_DECREF(py_module);
-
     //Check if the python function was found
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
@@ -158,7 +156,7 @@ Track TrackManager::get_online_track_info(const std::string& url) {
 
     }
 
-    py_return = PyObject_CallObject(py_func, py_param);
+    PyObject* py_return = PyObject_CallObject(py_func, py_param);
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyDict_Check(py_return)) {
@@ -172,6 +170,9 @@ Track TrackManager::get_online_track_info(const std::string& url) {
     title = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "title"));
     artists = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "artists"));
     album = PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "album"));
+    Py_DECREF(py_return);
+
+    Py_Finalize();
     return Track(title, artists, album);
 
 }
@@ -202,6 +203,105 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     track_dict.insert({track, new_track_path});
     return write_file_metadata(new_track_path, track);
     
+}
+
+bool TrackManager::download_track(const Track& track, const std::string& youtube_url, bool force_mp3) {
+
+    if(track_dict.contains(track)) {
+
+        //(we return true because we only return false if the import was unsuccessful,
+        // since an import didn't happen, then the import vacuously was successful)
+        return true;
+
+    }
+
+    Py_Initialize();
+    PyObject* py_downloader = PyUnicode_DecodeFSDefault("downloader");
+    PyObject* py_module = PyImport_Import(py_downloader);
+    Py_DECREF(py_downloader);
+    if(py_module == nullptr) {
+
+        return false;
+
+    }
+
+    PyObject* py_param = PyTuple_Pack(3, youtube_url, TRACK_FILES_DIRECTORY, force_mp3);
+    PyObject* py_func = PyObject_GetAttrString(py_module, "download_youtube_track");
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return false;
+
+    }
+
+    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    Py_DECREF(py_func);
+    Py_DECREF(py_param);
+    if(py_return == nullptr || !PyCallable_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return false;
+
+    }
+
+    std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
+    Py_DECREF(py_return);
+    
+    Py_Finalize();
+    track_dict.insert({track, downloaded_path});
+    return write_file_metadata(downloaded_path, track);
+
+}
+
+bool TrackManager::download_track(const Track& track, bool force_mp3) {
+
+    if(track_dict.contains(track)) {
+
+        //(we return true because we only return false if the import was unsuccessful,
+        // since an import didn't happen, then the import vacuously was successful)
+        return true;
+
+    }
+
+    //Find the best YouTube URL and then download
+
+    Py_Initialize();
+    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
+    PyObject* py_module = PyImport_Import(py_fetcher);
+    Py_DECREF(py_fetcher);
+    if(py_module == nullptr) {
+
+        return false;
+
+    }
+
+    PyObject* py_param = PyTuple_Pack(2, track.title, track.artists);
+    PyObject* py_func = PyObject_GetAttrString(py_module, "find_best_youtube_url");
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return false;
+
+    }
+
+    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    Py_DECREF(py_func);
+    Py_DECREF(py_param);
+    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return false;
+
+    }
+
+    std::string youtube_url {PyUnicode_AsUTF8(py_return)};
+    Py_DECREF(py_return);
+
+    Py_Finalize();
+    return download_track(track, youtube_url, force_mp3);
+
 }
 
 bool TrackManager::path_is_readable_track_file(const std::string& path) {

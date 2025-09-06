@@ -94,7 +94,10 @@ def get_youtube_track(url: str) -> dict:
         if "creator" in info:
             track["artists"] = info["creator"]
         elif "artists" in info:
-            track["artists"] = info["artists"]
+            artists_str: str = ""
+            for artist_str in info["artists"]:
+                artists_str = artists_str + artist_str + ", "
+            track["artists"] = artists_str[:-2]
         else:
             track["artists"] = info["uploader"]
         # Album
