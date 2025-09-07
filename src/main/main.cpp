@@ -4,24 +4,21 @@
 
 int main() {
 
-    TagLib::FileRef file_ref("C:\\Users\\James\\Music\\mongo\\Tyler, The Creator - Balloon (Lyrics).mp3");
-    if(file_ref.isNull()) {
+    /* Test Cases
+    
+    get_online_track_info
+     - Regular Spotify track
+     - Unavailable Spotify track
+     - Spotify podcast
+     - Unavailable Spotify podcast
+     - Regular YouTube Music vdeo
+     - Non-music regular YouTube video 
+     - Age restricted YouTube video
+     - Unavailable YouTube video
+     - Privated YouTube video
+     - Unlisted YouTube video
 
-        std::cout << "File null";
-        return 1;
-
-    }
-
-    TagLib::List<TagLib::VariantMap> picture_properties = file_ref.complexProperties("PICTURE");
-    for(const TagLib::VariantMap& property: picture_properties) {
-
-        for(const std::pair<const TagLib::String, TagLib::Variant>& pair: property) {
-
-            std::cout << "K: " << pair.first << std::endl;
-
-        }
-
-    }
+    */
 
     return 0;
 

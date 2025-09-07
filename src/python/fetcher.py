@@ -1,6 +1,7 @@
 # Fetches Spotify and YouTube information
 
 import spotipy
+from spotipy import Spotify
 from spotipy.oauth2 import SpotifyClientCredentials
 
 from yt_dlp import YoutubeDL
@@ -38,7 +39,7 @@ def get_spotify_playlist(spotify_id: str) -> list[dict]:
     """ID includes URL, URI, and alphanumeric ID"""
     try:
         print("0")
-        sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
+        sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
         print("1")
         playlist_data: list[dict] = sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
         print("2")
@@ -59,13 +60,27 @@ def get_spotify_playlist(spotify_id: str) -> list[dict]:
         return []
 
 
-def get_youtube_playlist(youtube_url: str) -> list[dict]:
-    pass
+def get_youtube_playlist(url: str) -> list[dict]:
+    ydl_opts: dict = {
+        "ignoreerrors": True,
+        "quiet": True
+    }
+    with YoutubeDL(ydl_opts) as ydl:
+        info: dict = ydl.extract_info(url, download=False)
+        if info is None:
+            return []
+        if "entries" not in info:
+            return []
+        tracklist_raw: list = info["entries"]
+        tracklist: list[dict] = []
+        for track_raw in tracklist_raw:
+            tracklist.append(get_refined_youtube_track_info(track_raw))
+        return tracklist
 
 
 def can_access_spotify_playlist(spotify_id: str) -> bool:
     try:
-        sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))        
+        sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))        
         sp.playlist_tracks(playlist_id=spotify_id, market=market)
         return True
     except:
@@ -79,7 +94,7 @@ def can_access_youtube_playlist(youtube_url: str) -> bool:
 def get_spotify_track(spotify_id: str) -> dict:
     """ID includes URL, URI, and alphanumeric ID"""
     try:
-        sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
+        sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
         track_data: dict = sp.track(track_id=spotify_id, market=market)
         artists: str = ""
         for artist_data in track_data["artists"]:
@@ -104,28 +119,7 @@ def get_youtube_track(url: str) -> dict:
         info: dict = ydl.extract_info(url, download=False)
         if info is None:
             return {}
-        track: dict = {}
-        # Title
-        if "track" in info:
-            track["title"] = info["track"]
-        else:
-            track["title"] = info["title"]
-        # Artists
-        if "creator" in info:
-            track["artists"] = info["creator"]
-        elif "artists" in info:
-            artists_str: str = ""
-            for artist_str in info["artists"]:
-                artists_str = artists_str + artist_str + ", "
-            track["artists"] = artists_str[:-2]
-        else:
-            track["artists"] = info["uploader"]
-        # Album
-        if "album" in info:
-            track["album"] = info["album"]
-        else:
-            track["album"] = ""
-        return track
+        return get_refined_youtube_track_info(info)
 
 
 def find_best_youtube_url(title: str, artists: str) -> str:
@@ -179,7 +173,38 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
     return score
 
 
+def get_refined_youtube_track_info(raw_info: dict) -> dict:
+    # Differentiate between a YouTube track and playlist
+    if "entries" in raw_info:
+        return {}
+    
+    track: dict = {}
+    # Title
+    if "track" in raw_info:
+        track["title"] = raw_info["track"]
+    else:
+        track["title"] = raw_info["title"]
+    # Artists
+    if "creator" in raw_info:
+        track["artists"] = raw_info["creator"]
+    elif "artists" in raw_info:
+        artists_str: str = ""
+        for artist_str in raw_info["artists"]:
+            artists_str = artists_str + artist_str + ", "
+        track["artists"] = artists_str[:-2]
+    else:
+        track["artists"] = raw_info["uploader"]
+    # Album
+    if "album" in raw_info:
+        track["album"] = raw_info["album"]
+    else:
+        track["album"] = ""
+    return track
+
+
+
 if __name__ == "__main__":
     read_api_settings()
     # print(get_youtube_track("https://www.youtube.com/watch?v=bu7nU9Mhpyo"))
-    get_spotify_playlist("https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=4eb5aafb572d4cd0&pt=dd22d977b7894480865d7da9375e4102")
+    print(get_youtube_playlist("https://music.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF&si=DifccXOmGrgY9Yp-"))
+    # get_spotify_playlist("https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=4eb5aafb572d4cd0&pt=dd22d977b7894480865d7da9375e4102")
