@@ -38,11 +38,8 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
 def get_spotify_playlist(spotify_id: str) -> list[dict]:
     """ID includes URL, URI, and alphanumeric ID"""
     try:
-        print("0")
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
-        print("1")
         playlist_data: list[dict] = sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
-        print("2")
         playlist: list[dict] = []
         for track_data in playlist_data:
             artists = ""
@@ -87,8 +84,14 @@ def can_access_spotify_playlist(spotify_id: str) -> bool:
         return False
 
 
-def can_access_youtube_playlist(youtube_url: str) -> bool:
-    pass
+def can_access_youtube_playlist(url: str) -> bool:
+    ydl_opts: dict = {
+        "ignoreerrors": True,
+        "quiet": True
+    }
+    with YoutubeDL(ydl_opts) as ydl:
+        info: dict = ydl.extract_info(url, download=False)
+        return "entries" in info and info is not None
 
 
 def get_spotify_track(spotify_id: str) -> dict:
@@ -206,5 +209,6 @@ def get_refined_youtube_track_info(raw_info: dict) -> dict:
 if __name__ == "__main__":
     read_api_settings()
     # print(get_youtube_track("https://www.youtube.com/watch?v=bu7nU9Mhpyo"))
-    print(get_youtube_playlist("https://music.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF&si=DifccXOmGrgY9Yp-"))
+    print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
+    print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY"))
     # get_spotify_playlist("https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=4eb5aafb572d4cd0&pt=dd22d977b7894480865d7da9375e4102")
