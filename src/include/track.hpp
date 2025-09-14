@@ -6,7 +6,7 @@
 
 namespace staccato {
 
-    /** Immutable struct that contains metadata for a track (title, artists, album) */
+    /** Struct that contains metadata for a track (title, artists, album) */
     struct Track {
 
     public:

@@ -1,6 +1,7 @@
+#include "track.hpp"
+#include "playlist.hpp"
 
-#include <iostream>
-#include <taglib/fileref.h>
+using namespace staccato;
 
 int main() {
 
@@ -19,6 +20,10 @@ int main() {
      - Unlisted YouTube video
 
     */
+
+    std::cout << "PRE goon" << std::endl;
+    Playlist playlist ("test", "", std::unordered_multiset<Track> {}, "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF");
+    std::cout << playlist.string() << std::endl;
 
     return 0;
 

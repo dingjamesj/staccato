@@ -1,6 +1,5 @@
 # Fetches Spotify and YouTube information
 
-import spotipy
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -209,6 +208,6 @@ def get_refined_youtube_track_info(raw_info: dict) -> dict:
 if __name__ == "__main__":
     read_api_settings()
     # print(get_youtube_track("https://www.youtube.com/watch?v=bu7nU9Mhpyo"))
-    print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
-    print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY"))
+    # print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
+    # print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY"))
     # get_spotify_playlist("https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=4eb5aafb572d4cd0&pt=dd22d977b7894480865d7da9375e4102")

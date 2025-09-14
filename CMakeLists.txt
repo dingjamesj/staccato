@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB SOURCES "src/main/*.cpp")
 add_executable(staccato ${SOURCES})
 target_include_directories(staccato PRIVATE "src/include")
+target_include_directories(staccato PRIVATE "src/python")
 
 target_include_directories(staccato PRIVATE "C:/msys64/ucrt64/include/taglib")
 target_link_directories(staccato PRIVATE "C:/msys64/ucrt64/lib")

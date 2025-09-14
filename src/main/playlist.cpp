@@ -39,8 +39,7 @@ Playlist::Playlist(
 ): 
     name {name},
     cover_image_file_path {cover_image_file_path},
-    tracklist {std::move(tracklist)},
-    online_connection {online_connection}
+    tracklist {std::move(tracklist)}
 {
 
     set_online_connection(online_connection);
@@ -51,7 +50,14 @@ Playlist::Playlist(): name {""}, cover_image_file_path {""}, tracklist {}, onlin
 
 bool Playlist::set_online_connection(const std::string& url) {
 
-    Py_Initialize();
+    bool init_success = init_python();
+    if(!init_success) {
+
+        std::cout << "fuck" << std::endl;
+        return false;
+
+    }
+
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
@@ -98,6 +104,13 @@ bool Playlist::set_online_connection(const std::string& url) {
     Py_DECREF(py_return);
 
     Py_Finalize();
+
+    if(is_valid_url) {
+
+        online_connection = url;
+
+    }
+
     return is_valid_url;
 
 }
@@ -267,10 +280,25 @@ int Playlist::get_total_duration() const {
 
 std::string Playlist::string() const {
 
-    std::string str = name + "\n" + cover_image_file_path + "\n";
+    std::string str = name + "\n";
+
+    if(!cover_image_file_path.empty()) {
+        
+        str += cover_image_file_path + "\n";
+
+    } else {
+
+        str += "[no cover image]\n";
+
+    }
+
     if(!online_connection.empty()) {
 
         str += online_connection + "\n";
+
+    } else {
+
+        str += "[no online connection]\n";
 
     }
 
