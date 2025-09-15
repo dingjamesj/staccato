@@ -59,13 +59,14 @@ bool staccato::init_python() {
     relative_path_to_scripts = L"/scripts";
     #endif
 
-    config.module_search_paths_set = 0;
-    PyWideStringList_Append(&config.module_search_paths, (build_path + relative_path_to_scripts).c_str());
-    for(std::size_t i {0}; i < config.module_search_paths.length; i++) {
+    // config.module_search_paths_set = 0;
+    // PyWideStringList_Append(&config.module_search_paths, (build_path + relative_path_to_scripts).c_str());
 
-        std::wcout << std::wstring(config.module_search_paths.items[i]) << std::endl;
+//     PyRun_SimpleString("import sysconfig; import sys; sys._debugmallocstats = True");
+// PyRun_SimpleString("import sys; print('sys.prefix =', sys.prefix)");
+// PyRun_SimpleString("print('sys.executable =', sys.executable)");
+// PyRun_SimpleString("import pprint; pprint.pprint(sys.path)");
 
-    }
 
     //Make the interpreter see the virtual environment
 

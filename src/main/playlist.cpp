@@ -42,7 +42,9 @@ Playlist::Playlist(
     tracklist {std::move(tracklist)}
 {
 
+    std::cout << "PRE CONNECT" << std::endl;
     set_online_connection(online_connection);
+    std::cout << "POST CONNECT" << std::endl;
 
 }
 
@@ -88,18 +90,32 @@ bool Playlist::set_online_connection(const std::string& url) {
 
     }
 
-    PyObject* py_param = PyTuple_Pack(1, url.c_str());
-    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    PyObject* py_param = PyUnicode_FromString(url.c_str());
+
+    //TODO: Look at how when ran from C++, the python function "can_access_youtube_playlist" stops when YoutubeDL is referenced.
+    //      Maybe check if C++ actually recognizes the libraries in .venv?
+
+    std::cout << (py_func != nullptr && PyCallable_Check(py_func)) << std::endl;
+    std::cout << (py_param != nullptr && PyTuple_Check(py_param)) << std::endl;
+    std::cout << "playlist.cpp: pre call" << std::endl;
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    // PyObject* py_return = PyObject_CallObject(py_func, py_param); //This is crashing
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param, NULL);
+    PyGILState_Release(gstate);
+    std::cout << "playlist.cpp: test" << std::endl;
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyBool_Check(py_return)) {
 
         Py_XDECREF(py_return);
+        PyErr_Print();
         Py_Finalize();
         return false;
 
     }
 
+    std::cout << "playlist.cpp: " << ((PyObject_IsTrue(py_return) == 1) ? "true" : "false") << std::endl;
     bool is_valid_url = PyObject_IsTrue(py_return) == 1;
     Py_DECREF(py_return);
 
