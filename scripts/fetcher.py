@@ -5,7 +5,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 from yt_dlp import YoutubeDL
 
-SETTINGS_FILE_LOCATION: str = "staccatoapikeys.txt"
+SETTINGS_FILE_LOCATION: str = "../staccatoapikeys.txt"
 NUM_ACCEPTED_SEARCHES: int = 3
 
 api_keys: list[str] = []
@@ -35,6 +35,7 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
 
 
 def get_spotify_playlist(spotify_id: str) -> list[dict]:
+    read_api_settings()
     """ID includes URL, URI, and alphanumeric ID"""
     try:
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
@@ -75,6 +76,7 @@ def get_youtube_playlist(url: str) -> list[dict]:
 
 
 def can_access_spotify_playlist(spotify_id: str) -> bool:
+    read_api_settings()
     try:
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))        
         sp.playlist_tracks(playlist_id=spotify_id, market=market)
@@ -94,6 +96,7 @@ def can_access_youtube_playlist(url: str) -> bool:
 
 
 def get_spotify_track(spotify_id: str) -> dict:
+    read_api_settings()
     """ID includes URL, URI, and alphanumeric ID"""
     try:
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))

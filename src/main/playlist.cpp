@@ -55,7 +55,6 @@ bool Playlist::set_online_connection(const std::string& url) {
     bool init_success = init_python();
     if(!init_success) {
 
-        std::cout << "fuck" << std::endl;
         return false;
 
     }
@@ -92,12 +91,6 @@ bool Playlist::set_online_connection(const std::string& url) {
 
     PyObject* py_param = PyUnicode_FromString(url.c_str());
 
-    //TODO: Look at how when ran from C++, the python function "can_access_youtube_playlist" stops when YoutubeDL is referenced.
-    //      Maybe check if C++ actually recognizes the libraries in .venv?
-
-    std::cout << (py_func != nullptr && PyCallable_Check(py_func)) << std::endl;
-    std::cout << (py_param != nullptr && PyTuple_Check(py_param)) << std::endl;
-    std::cout << "playlist.cpp: pre call" << std::endl;
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     // PyObject* py_return = PyObject_CallObject(py_func, py_param); //This is crashing

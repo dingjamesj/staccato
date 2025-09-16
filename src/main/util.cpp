@@ -50,24 +50,6 @@ bool staccato::init_python() {
     PyConfig_InitIsolatedConfig(&config);
     std::wstring build_path {std::filesystem::current_path().wstring()};
 
-    //Make the interpreter see the .py files
-
-    std::wstring relative_path_to_scripts;
-    #if(DEVELOPMENT_BUILD)
-    relative_path_to_scripts = L"/../scripts";
-    #else
-    relative_path_to_scripts = L"/scripts";
-    #endif
-
-    // config.module_search_paths_set = 0;
-    // PyWideStringList_Append(&config.module_search_paths, (build_path + relative_path_to_scripts).c_str());
-
-//     PyRun_SimpleString("import sysconfig; import sys; sys._debugmallocstats = True");
-// PyRun_SimpleString("import sys; print('sys.prefix =', sys.prefix)");
-// PyRun_SimpleString("print('sys.executable =', sys.executable)");
-// PyRun_SimpleString("import pprint; pprint.pprint(sys.path)");
-
-
     //Make the interpreter see the virtual environment
 
     std::wstring relative_path_to_venv;
@@ -88,6 +70,18 @@ bool staccato::init_python() {
 
     PyStatus status = Py_InitializeFromConfig(&config);
     PyConfig_Clear(&config);
+
+    //Make the interpreter see the .py files
+
+    std::string relative_path_to_scripts;
+    #if(DEVELOPMENT_BUILD)
+    relative_path_to_scripts = "../scripts";
+    #else
+    relative_path_to_scripts = "./scripts";
+    #endif
+
+    PyRun_SimpleString(("import sys; sys.path.append('" + relative_path_to_scripts + "')").c_str());
+
     return !(bool) PyStatus_Exception(status);
 
 }

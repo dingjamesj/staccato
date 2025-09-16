@@ -22,8 +22,8 @@ int main() {
     */
 
     std::cout << "PRE goon" << std::endl;
-    // Playlist playlist ("test", "", std::unordered_multiset<Track> {}, "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF");
-    Playlist playlist ("test", "", std::unordered_multiset<Track> {}, "https://open.spotify.com/playlist/4hvp9WUZ7x0YxbkMMQi3e6?si=0e009312d8ed4dc7");
+    Playlist playlist ("test", "", std::unordered_multiset<Track> {}, "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF");
+    // Playlist playlist ("test", "", std::unordered_multiset<Track> {}, "https://open.spotify.com/playlist/4hvp9WUZ7x0YxbkMMQi3e6?si=0e009312d8ed4dc7");
     std::cout << "POST goon" << std::endl;
     std::cout << playlist.string() << std::endl;
 
