@@ -125,7 +125,13 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
 Track TrackManager::get_online_track_info(const std::string& url) {
     
-    Py_Initialize();
+    bool init_success = init_python();
+    if(!init_success) {
+
+        return Track();
+
+    }
+
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
@@ -157,8 +163,12 @@ Track TrackManager::get_online_track_info(const std::string& url) {
 
     }
 
-    PyObject* py_param = PyTuple_Pack(1, url.c_str());
-    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    PyObject* py_param = PyUnicode_FromString(url.c_str());
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param, NULL);
+    PyGILState_Release(gstate);
+
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyDict_Check(py_return)) {
@@ -218,7 +228,13 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
 
     }
 
-    Py_Initialize();
+    bool init_success = init_python();
+    if(!init_success) {
+
+        return false;
+
+    }
+
     PyObject* py_downloader = PyUnicode_DecodeFSDefault("downloader");
     PyObject* py_module = PyImport_Import(py_downloader);
     Py_DECREF(py_downloader);
@@ -239,10 +255,18 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
 
     }
 
-    PyObject* py_param = PyTuple_Pack(3, youtube_url, TRACK_FILES_DIRECTORY, force_mp3);
-    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    PyObject* py_param_url = PyUnicode_FromString(youtube_url.c_str());
+    PyObject* py_param_track_files_directory = PyUnicode_FromString(std::string(TRACK_FILES_DIRECTORY).c_str());
+    PyObject* py_param_force_mp3 = PyBool_FromLong(force_mp3);
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_track_files_directory, py_param_force_mp3, NULL);
+    PyGILState_Release(gstate);
+
     Py_DECREF(py_func);
-    Py_DECREF(py_param);
+    Py_DECREF(py_param_url);
+    Py_DECREF(py_param_track_files_directory);
+    Py_DECREF(py_param_force_mp3);
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);
@@ -271,7 +295,13 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
 
     //Find the best YouTube URL and then download
 
-    Py_Initialize();
+    bool init_success = init_python();
+    if(!init_success) {
+
+        return false;
+
+    }
+
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
@@ -292,10 +322,16 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
 
     }
 
-    PyObject* py_param = PyTuple_Pack(2, track.title, track.artists);
-    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    PyObject* py_param_title = PyUnicode_FromString(track.title.c_str());
+    PyObject* py_param_artists = PyUnicode_FromString(track.artists.c_str());
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_title, py_param_artists, NULL);
+    PyGILState_Release(gstate);
+    
     Py_DECREF(py_func);
-    Py_DECREF(py_param);
+    Py_DECREF(py_param_title);
+    Py_DECREF(py_param_artists);
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);

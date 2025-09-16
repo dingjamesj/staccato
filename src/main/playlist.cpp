@@ -42,9 +42,7 @@ Playlist::Playlist(
     tracklist {std::move(tracklist)}
 {
 
-    std::cout << "PRE CONNECT" << std::endl;
     set_online_connection(online_connection);
-    std::cout << "POST CONNECT" << std::endl;
 
 }
 
@@ -90,13 +88,11 @@ bool Playlist::set_online_connection(const std::string& url) {
     }
 
     PyObject* py_param = PyUnicode_FromString(url.c_str());
-
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    // PyObject* py_return = PyObject_CallObject(py_func, py_param); //This is crashing
     PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param, NULL);
     PyGILState_Release(gstate);
-    std::cout << "playlist.cpp: test" << std::endl;
+
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     if(py_return == nullptr || !PyBool_Check(py_return)) {
@@ -108,7 +104,6 @@ bool Playlist::set_online_connection(const std::string& url) {
 
     }
 
-    std::cout << "playlist.cpp: " << ((PyObject_IsTrue(py_return) == 1) ? "true" : "false") << std::endl;
     bool is_valid_url = PyObject_IsTrue(py_return) == 1;
     Py_DECREF(py_return);
 
@@ -138,7 +133,13 @@ std::string Playlist::get_online_connection() const {
 
 std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const {
 
-    Py_Initialize();
+    bool init_success = init_python();
+    if(!init_success) {
+
+        return std::unordered_multiset<Track> {};
+
+    }
+
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
@@ -169,8 +170,12 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
 
     }
 
-    PyObject* py_param = PyTuple_Pack(1, online_connection.c_str());
-    PyObject* py_return = PyObject_CallObject(py_func, py_param);
+    PyObject* py_param = PyUnicode_FromString(online_connection.c_str());
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param, NULL);
+    PyGILState_Release(gstate);
+    
     Py_DECREF(py_func);
     Py_DECREF(py_param);
     //Note that the return value should be a list[dict]
