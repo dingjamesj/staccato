@@ -50,19 +50,11 @@ Playlist::Playlist(): name {""}, cover_image_file_path {""}, tracklist {}, onlin
 
 bool Playlist::set_online_connection(const std::string& url) {
 
-    bool init_success = init_python();
-    if(!init_success) {
-
-        return false;
-
-    }
-
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
-        Py_Finalize();
         return false;
 
     }
@@ -82,7 +74,6 @@ bool Playlist::set_online_connection(const std::string& url) {
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        Py_Finalize();
         return false;
 
     }
@@ -98,16 +89,12 @@ bool Playlist::set_online_connection(const std::string& url) {
     if(py_return == nullptr || !PyBool_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        PyErr_Print();
-        Py_Finalize();
         return false;
 
     }
 
     bool is_valid_url = PyObject_IsTrue(py_return) == 1;
     Py_DECREF(py_return);
-
-    Py_Finalize();
 
     if(is_valid_url) {
 
@@ -133,19 +120,11 @@ std::string Playlist::get_online_connection() const {
 
 std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const {
 
-    bool init_success = init_python();
-    if(!init_success) {
-
-        return std::unordered_multiset<Track> {};
-
-    }
-
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
-        Py_Finalize();
         return std::unordered_multiset<Track> {};
 
     }
@@ -165,7 +144,6 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        Py_Finalize();
         return std::unordered_multiset<Track> {};
 
     }
@@ -182,7 +160,6 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
     if(py_return == nullptr || !PyList_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        Py_Finalize();
         return std::unordered_multiset<Track> {};
 
     }
@@ -195,7 +172,6 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
         if(!PyDict_Check(py_item)) {
 
             Py_DECREF(py_return);
-            Py_Finalize();
             return std::unordered_multiset<Track> {};
 
         }
@@ -209,7 +185,6 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
     }
 
     Py_DECREF(py_return);
-    Py_Finalize();
     return tracklist;
 
 }

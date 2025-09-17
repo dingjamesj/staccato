@@ -124,20 +124,12 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 }
 
 Track TrackManager::get_online_track_info(const std::string& url) {
-    
-    bool init_success = init_python();
-    if(!init_success) {
-
-        return Track();
-
-    }
 
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
-        Py_Finalize();
         return Track();
 
     }
@@ -158,7 +150,6 @@ Track TrackManager::get_online_track_info(const std::string& url) {
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        Py_Finalize();
         return Track();
 
     }
@@ -174,7 +165,6 @@ Track TrackManager::get_online_track_info(const std::string& url) {
     if(py_return == nullptr || !PyDict_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        Py_Finalize();
         return Track();
 
     }
@@ -185,7 +175,6 @@ Track TrackManager::get_online_track_info(const std::string& url) {
         PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "album"))
     );
     Py_DECREF(py_return);
-    Py_Finalize();
     return track;
 
 }
@@ -228,19 +217,11 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
 
     }
 
-    bool init_success = init_python();
-    if(!init_success) {
-
-        return false;
-
-    }
-
     PyObject* py_downloader = PyUnicode_DecodeFSDefault("downloader");
     PyObject* py_module = PyImport_Import(py_downloader);
     Py_DECREF(py_downloader);
     if(py_module == nullptr) {
 
-        Py_Finalize();
         return false;
 
     }
@@ -250,7 +231,6 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        Py_Finalize();
         return false;
 
     }
@@ -270,14 +250,12 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        Py_Finalize();
         return false;
 
     }
 
     std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
     Py_DECREF(py_return);
-    Py_Finalize();
     track_dict.insert({track, downloaded_path});
     return write_file_metadata(downloaded_path, track);
 
@@ -295,19 +273,11 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
 
     //Find the best YouTube URL and then download
 
-    bool init_success = init_python();
-    if(!init_success) {
-
-        return false;
-
-    }
-
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
-        Py_Finalize();
         return false;
 
     }
@@ -317,7 +287,6 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        Py_Finalize();
         return false;
 
     }
@@ -335,14 +304,12 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        Py_Finalize();
         return false;
 
     }
 
     std::string youtube_url {PyUnicode_AsUTF8(py_return)};
     Py_DECREF(py_return);
-    Py_Finalize();
     return download_track(track, youtube_url, force_mp3);
 
 }
