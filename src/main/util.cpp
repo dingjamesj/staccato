@@ -26,24 +26,6 @@ void staccato::trim_string(std::string& str) {
 
 }
 
-void staccato::redirect_python_sys() {
-
-    #if(DEVELOPMENT_BUILD)
-    PyRun_SimpleString("print(\"DEVELOPMENT BUILD\")");
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(f\"{sys.executable}/../../scripts\")");
-    PyRun_SimpleString("print(sys.path)");
-    PyRun_SimpleString("print(sys.executable)");
-    #else
-    PyRun_SimpleString("print(\"NON-DEVELOPMENT BUILD\")");
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(f\"{sys.executable}/../scripts\")");
-    PyRun_SimpleString("print(sys.path)");
-    PyRun_SimpleString("print(sys.executable)");
-    #endif
-
-}
-
 bool staccato::init_python() {
 
     PyConfig config;

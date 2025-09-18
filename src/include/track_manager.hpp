@@ -95,6 +95,24 @@ namespace staccato {
 
         //Constexprs
 
+        #if(DEVELOPMENT_BUILD)
+
+        #if defined(_WIN32) || defined(_WIN64)
+        static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"..\\playlists"};
+        static constexpr std::string_view TRACK_FILES_DIRECTORY {"..\\tracks"};
+        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
+        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"..\\playlists\\images"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"..\\tracks\\trackdict.stkl"};
+        #else
+        static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"../playlists"};
+        static constexpr std::string_view TRACK_FILES_DIRECTORY {"../tracks"};
+        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
+        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"../playlists/images"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"../tracks/trackdict.stkl"};
+        #endif
+
+        #else
+        
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
@@ -106,6 +124,10 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.stkl"};
         #endif
+
+        #endif
+
+        
         
     };
 

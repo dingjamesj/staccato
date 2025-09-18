@@ -33,20 +33,18 @@ urltype Playlist::get_url_type(const std::string& url) {
 
 Playlist::Playlist(
     std::string name, 
-    std::string cover_image_file_path, 
     const std::unordered_multiset<Track>& tracklist, 
     std::string online_connection
 ): 
     name {name},
-    cover_image_file_path {cover_image_file_path},
-    tracklist {std::move(tracklist)}
+    tracklist {tracklist}
 {
 
     set_online_connection(online_connection);
 
 }
 
-Playlist::Playlist(): name {""}, cover_image_file_path {""}, tracklist {}, online_connection {""} {}
+Playlist::Playlist(): name {""}, tracklist {}, online_connection {""} {}
 
 bool Playlist::set_online_connection(const std::string& url) {
 
@@ -164,7 +162,7 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
 
     }
 
-    std::unordered_multiset<Track> tracklist {};
+    std::unordered_multiset<Track> connected_tracklist {};
     Py_ssize_t size = PyList_Size(py_return);
     for(Py_ssize_t i {0}; i < size; i++) {
 
@@ -176,7 +174,7 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
 
         }
 
-        tracklist.insert(Track(
+        connected_tracklist.insert(Track(
             PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "title")),
             PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "artists")),
             PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "album"))
@@ -185,7 +183,7 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
     }
 
     Py_DECREF(py_return);
-    return tracklist;
+    return connected_tracklist;
 
 }
 
@@ -201,22 +199,27 @@ std::vector<Track> Playlist::get_sorted_tracklist(sortmode sort_mode, bool is_as
 
     auto comparator_lambda = [sort_mode, is_ascending](const Track& track1, const Track& track2) {
 
-        switch(sort_mode) {
+        int compare_result = Track::compare(track1, track2, sort_mode);
 
-            case sortmode::title:
-                return is_ascending ? (track1.title < track2.title) : (track2.title > track1.title);
-            case sortmode::artists:
-                return is_ascending ? (track1.artists < track2.artists) : (track1.artists > track2.artists);
-            case sortmode::album:
-                return is_ascending ? (track1.album < track2.album) : (track1.album > track2.album);
-            case sortmode::duration:
-                return is_ascending ? (TrackManager::get_track_duration(track1) < TrackManager::get_track_duration(track2)) : (TrackManager::get_track_duration(track1) > TrackManager::get_track_duration(track2));
-            case sortmode::bitrate:
-                return is_ascending ? (TrackManager::get_track_bitrate(track1) < TrackManager::get_track_bitrate(track2)) : (TrackManager::get_track_bitrate(track1) > TrackManager::get_track_bitrate(track2));
-            case sortmode::file_ext:
-                return is_ascending ? (TrackManager::get_track_file_ext(track1) < TrackManager::get_track_file_ext(track2)) : (TrackManager::get_track_file_ext(track1) > TrackManager::get_track_file_ext(track2));
-            default:
-                return true;
+        //If the two tracks are equal together according to the sort mode, then sort based on title.
+        //If the sort mode is by title, then sort by artists.
+        if(compare_result == 0 && sort_mode != sortmode::title) {
+
+            compare_result = Track::compare(track1, track2, sortmode::title);
+
+        } else if(compare_result == 0 && sort_mode == sortmode::title) {
+
+            compare_result = Track::compare(track1, track2, sortmode::artists);
+
+        }
+
+        if(is_ascending) {
+
+            return compare_result == -1;
+
+        } else {
+
+            return compare_result == 1;
 
         }
 
@@ -269,17 +272,7 @@ int Playlist::get_total_duration() const {
 
 std::string Playlist::string() const {
 
-    std::string str = name + "\n";
-
-    if(!cover_image_file_path.empty()) {
-        
-        str += cover_image_file_path + "\n";
-
-    } else {
-
-        str += "[no cover image]\n";
-
-    }
+    std::string str = "PLAYLIST: " + name + "\n";
 
     if(!online_connection.empty()) {
 
@@ -291,7 +284,7 @@ std::string Playlist::string() const {
 
     }
 
-    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.cbegin();
+    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.begin();
     for(; iter != tracklist.end(); iter++) {
 
         str += (*iter).string() + "\n";
@@ -304,7 +297,7 @@ std::string Playlist::string() const {
 
 bool Playlist::is_empty() const {
 
-    return name == "" && cover_image_file_path == "" && tracklist.size() == 0 && online_connection == "";
+    return name == "" && tracklist.size() == 0 && online_connection == "";
 
 }
 

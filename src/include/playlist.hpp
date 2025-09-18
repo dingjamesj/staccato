@@ -24,12 +24,10 @@ namespace staccato {
 
     public:
         std::string name;
-        std::string cover_image_file_path;
         std::string online_connection;
 
         Playlist(
             std::string name, 
-            std::string cover_image_file_path,
             const std::unordered_multiset<Track>& tracklist, 
             std::string online_connection
         );

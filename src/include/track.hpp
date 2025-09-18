@@ -3,8 +3,12 @@
 
 #include <string>
 #include <iostream>
+#include <unicode/unistr.h>
+#include <unicode/ustream.h>
 
 namespace staccato {
+
+    enum class sortmode;
 
     /** Struct that contains metadata for a track (title, artists, album) */
     struct Track {
@@ -21,6 +25,8 @@ namespace staccato {
         bool is_empty() const;
         /** Returns a string representation of this Track */
         std::string string() const;
+        /** Returns -1 if track1 < track2, 0 if track1 == track2, and 1 if track1 > track2 */
+        static int compare(const Track& track1, const Track& track2, sortmode sort_mode);
 
         bool operator==(const Track& other) const;
 

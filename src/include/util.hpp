@@ -1,6 +1,16 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
+
+// =========================================================================================
+// 
+//                SET TO TRUE DURING DEVELOPMENT, SET TO FALSE WHEN DEPLOYED.             
+//   USED TO ADJUST FOR THE DIFFERENCE BETWEEN DEVELOPMENT AND DEPLOYED PROJECT STRUCTURE.
+// 
+// =========================================================================================
+
 #define DEVELOPMENT_BUILD true
+
+// =========================================================================================
 
 #include <string>
 #include <format>
@@ -22,8 +32,6 @@ namespace staccato {
 
     std::string seconds_to_hms(int seconds);
     void trim_string(std::string& str);
-    /** Used for the C++ program to find the python scripts */
-    void redirect_python_sys();
     bool init_python();
 
 }

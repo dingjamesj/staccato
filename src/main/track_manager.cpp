@@ -804,7 +804,7 @@ Playlist TrackManager::read_playlist_from_file(const std::string& id) {
 
     //Read basic playlist details
     std::uint8_t count {0};
-    std::string name, cover_image_file_path, online_connection {""};
+    std::string name, online_connection {""};
     char c = '\0';
     while(!input.eof()) {
 
@@ -822,10 +822,6 @@ Playlist TrackManager::read_playlist_from_file(const std::string& id) {
 
         } else if(count == 1) {
 
-            cover_image_file_path.push_back(c);
-
-        } else if(count == 2) {
-
             online_connection.push_back(c);
 
         }
@@ -839,7 +835,7 @@ Playlist TrackManager::read_playlist_from_file(const std::string& id) {
     }
 
     //Reading unsuccessful if the file ends early
-    if(count != 3) {
+    if(count != 2) {
 
         return Playlist();
 
@@ -889,7 +885,7 @@ Playlist TrackManager::read_playlist_from_file(const std::string& id) {
 
     }
 
-    return Playlist(name, cover_image_file_path, tracklist, online_connection);
+    return Playlist(name, tracklist, online_connection);
 
 }
 
@@ -903,7 +899,6 @@ bool TrackManager::write_playlist_to_file(const std::string& id, const Playlist&
     }
 
     output.write(playlist.name.c_str(), playlist.name.size());
-    output.write(playlist.cover_image_file_path.c_str(), playlist.cover_image_file_path.size());
     output.write(playlist.online_connection.c_str(), playlist.online_connection.size());
     std::unordered_multiset<Track> tracklist = playlist.get_tracklist();
     for(Track track: tracklist) {

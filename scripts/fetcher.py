@@ -39,19 +39,24 @@ def get_spotify_playlist(spotify_id: str) -> list[dict]:
     """ID includes URL, URI, and alphanumeric ID"""
     try:
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
-        playlist_data: list[dict] = sp.playlist_tracks(playlist_id=spotify_id, market=market)["items"]
         playlist: list[dict] = []
-        for track_data in playlist_data:
-            artists = ""
-            for artist_data in track_data["track"]["artists"]:
-                artists = artists + artist_data["name"] + ", "
-            artists = artists[:-2]
-            playlist.append({
-                "title": track_data["track"]["name"],
-                "artists": artists,
-                "album": track_data["track"]["album"]["name"],
-                "artwork_url": track_data["track"]["album"]["images"][0]["url"]
-            })
+        playlist_data: list[dict] = [{}]
+        # Note that the Spotify API can only retrieve 100 tracks at a time.
+        call_count: int = 0
+        while len(playlist_data) > 0:
+            playlist_data = sp.playlist_tracks(playlist_id=spotify_id, market=market, offset=(call_count * 100))["items"]
+            for track_data in playlist_data:
+                artists = ""
+                for artist_data in track_data["track"]["artists"]:
+                    artists = artists + artist_data["name"] + ", "
+                artists = artists[:-2]
+                playlist.append({
+                    "title": track_data["track"]["name"],
+                    "artists": artists,
+                    "album": track_data["track"]["album"]["name"],
+                    "artwork_url": track_data["track"]["album"]["images"][0]["url"]
+                })
+            call_count = call_count + 1
         return playlist
     except:
         return []

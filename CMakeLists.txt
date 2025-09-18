@@ -12,5 +12,8 @@ target_include_directories(staccato PRIVATE "C:/msys64/ucrt64/include/taglib")
 target_link_directories(staccato PRIVATE "C:/msys64/ucrt64/lib")
 target_link_libraries(staccato PRIVATE tag)
 
+find_package(ICU REQUIRED COMPONENTS uc i18n)
+target_link_libraries(staccato PRIVATE ICU::uc ICU::i18n)
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 target_link_libraries(staccato PRIVATE Python3::Python)
