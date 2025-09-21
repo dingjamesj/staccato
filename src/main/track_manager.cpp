@@ -593,6 +593,11 @@ bool TrackManager::delete_track_artwork(const Track& track) {
 
 bool TrackManager::read_track_dict_from_file() {
 
+    //The structure of this file is:
+    // [TITLE]\0[ARTIST1]\0[ARTIST2]\0[ARTIST2]\0[ARTIST3]...\0\0[ALBUM]\0[PATH]\0 ... (next dictionary entry)
+    //In other words, each dictionary entry is composed of the Track object, a null char, and then the path.
+    //The Track object is written as the title, a null char, the artists separated by null chars, two null chars, and then the album.
+
     track_dict.clear();
 
     std::ifstream input(std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
@@ -603,9 +608,9 @@ bool TrackManager::read_track_dict_from_file() {
     }
 
     std::uint8_t count {0};
-    std::string title, album, path {""};
+    std::string title, curr_artist, album, path {""};
     std::vector<std::string> artists {};
-    char c = '\0';
+    char c {'\0'};
     while(!input.eof()) {
 
         c = input.get();
@@ -616,43 +621,62 @@ bool TrackManager::read_track_dict_from_file() {
 
         }
 
-        switch(count) {
+        //Handle artists-reading separately from title, album, and path reading since there can be multiple artists.
+        if(count != 1) {
 
-            case 0:
-                title.push_back(c);
-                break;
-            case 1:
-                artists.push_back(c);
-                break;
-            case 2:
-                album.push_back(c);
-                break;
-            case 3:
-                path.push_back(c);
-                break;
-            default:
-                break;
+            if(c == '\0') {
 
-        }
+                count++;
 
-        if(c == '\0') {
+            } else {
 
-            count++;
+                switch(count) {
+            
+                case 0:
+                    title.push_back(c);
+                    break;
+                case 2:
+                    album.push_back(c);
+                    break;
+                case 3:
+                    path.push_back(c);
+                    break;
+                default:
+                    count = 0;
+                    track_dict.insert({Track(title, artists, album), path});
+                    title, curr_artist, album, path = "";
+                    artists.clear();
+                    break;
 
-        }
+                }
 
-        if(count == 4) {
+            }
 
-            count = 0;
-            track_dict.insert({Track(title, artists, album), path});
-            title, artists, album, path = "";
+        } else {
+
+            if(c == '\0' && curr_artist.empty()) {
+
+                //Start reading the album if we got two null chars in a row
+                count++;
+
+            } else if(c == '\0') {
+
+                //Read the next artist if we received a null char
+                artists.push_back(curr_artist);
+                curr_artist = "";
+
+            } else {
+
+                curr_artist.push_back(c);
+
+            }
 
         }
 
     }
 
     //The reading was unsuccessful if the file ends early in the middle of a track-path pair
-    if(count != 0) {
+    if(count != 4) {
 
         return false;
 
