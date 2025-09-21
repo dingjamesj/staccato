@@ -27,9 +27,9 @@ namespace staccato {
         std::string online_connection;
 
         Playlist(
-            std::string name, 
+            const std::string& name, 
             const std::unordered_multiset<Track>& tracklist, 
-            std::string online_connection
+            const std::string& online_connection
         );
 
         Playlist();
@@ -56,7 +56,7 @@ namespace staccato {
         /** Removes a track from the tracklist, returns true if was successfully removed */
         bool remove_track(const Track& track);
         /** Check if a track is in the tracklist */
-        bool contains_track(Track track) const;
+        bool contains_track(const Track& track) const;
         /** The total duration of the playlist */
         int get_total_duration() const;
         /** Returns a string representation of this playlist */

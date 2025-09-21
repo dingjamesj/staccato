@@ -55,7 +55,7 @@ void playlist_testing() {
     std::cout << invalid_playlist_2.string() << std::endl;
 
     std::cout << "+ Playlist constructor (from tracklist)" << std::endl;
-    std::unordered_multiset<Track> custom_tracklist {Track("Track 1", "artist", "asdoi"), Track("asdoihias", "late", "s"), Track("a", "a", "a"), Track("a", "a", "a")};
+    std::unordered_multiset<Track> custom_tracklist {Track("Track 1", {"artist"}, "asdoi"), Track("asdoihias", {"late"}, "s"), Track("a", {"a"}, "a"), Track("a", {"a"}, "a")};
     Playlist playlist ("Playlist", custom_tracklist, "");
     std::cout << playlist.string() << std::endl;
 

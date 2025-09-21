@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
 
@@ -15,10 +16,10 @@ namespace staccato {
 
     public:
         std::string title;
-        std::string artists;
+        std::vector<std::string> artists;
         std::string album;
 
-        Track(std::string title, std::string artists, std::string album);
+        Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album);
         Track();
 
         /** Returns if this Track contains no metadata (if all strings are empty) */
@@ -42,7 +43,14 @@ template<> struct std::hash<staccato::Track> {
 
     inline std::size_t operator()(const staccato::Track& track) const {
 
-        return std::hash<string>()(track.title + " " + track.artists + " " + track.album);
+        std::string artists_str {};
+        for(std::size_t i {0}; i < track.artists.size(); i++) {
+
+            artists_str += track.artists[i] + " ";
+
+        }
+
+        return std::hash<string>()(track.title + " " + artists_str + track.album);
 
     }
 

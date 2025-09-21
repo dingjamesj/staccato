@@ -26,6 +26,28 @@ void staccato::trim_string(std::string& str) {
 
 }
 
+std::vector<std::string> staccato::tokenize_comma_separated_string(const std::string& str) {
+
+    std::vector<std::string> list {};
+    std::size_t begin_index {0};
+    std::size_t index_of_comma {str.find(',', begin_index)};
+    std::string curr_token {};
+    while(index_of_comma != -1) {
+
+        curr_token = str.substr(begin_index, index_of_comma - begin_index);
+        trim_string(curr_token);
+        list.push_back(curr_token);
+        begin_index = index_of_comma + 1;
+        index_of_comma = str.find(',', begin_index);
+
+    }
+
+    list.push_back(str.substr(begin_index));
+
+    return list;
+
+}
+
 bool staccato::init_python() {
 
     PyConfig config;

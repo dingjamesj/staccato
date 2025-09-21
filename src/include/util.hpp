@@ -14,8 +14,9 @@
 
 #include <string>
 #include <format>
-#include <Python.h>
 #include <filesystem>
+#include <vector>
+#include <Python.h>
 
 namespace staccato {
 
@@ -32,6 +33,7 @@ namespace staccato {
 
     std::string seconds_to_hms(int seconds);
     void trim_string(std::string& str);
+    std::vector<std::string> tokenize_comma_separated_string(const std::string& str);
     bool init_python();
 
 }

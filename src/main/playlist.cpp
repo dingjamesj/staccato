@@ -32,9 +32,9 @@ urltype Playlist::get_url_type(const std::string& url) {
 //===========================
 
 Playlist::Playlist(
-    std::string name, 
+    const std::string& name, 
     const std::unordered_multiset<Track>& tracklist, 
-    std::string online_connection
+    const std::string& online_connection
 ): 
     name {name},
     tracklist {tracklist}
@@ -174,9 +174,17 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
 
         }
 
+        PyObject* py_artists_list = PyDict_GetItemString(py_item, "artists");
+        std::vector<std::string> artists {};
+        for(Py_ssize_t i {0}; i < PyList_Size(py_artists_list); i++) {
+
+            artists.push_back(PyUnicode_AsUTF8(PyList_GetItem(py_artists_list, i)));
+
+        }
+
         connected_tracklist.insert(Track(
             PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "title")),
-            PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "artists")),
+            artists,
             PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "album"))
         ));
 
@@ -250,7 +258,7 @@ bool Playlist::remove_track(const Track& track) {
 
 }
 
-bool Playlist::contains_track(Track track) const {
+bool Playlist::contains_track(const Track& track) const {
 
     return tracklist.contains(track);
 

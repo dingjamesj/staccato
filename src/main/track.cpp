@@ -4,13 +4,13 @@
 
 using namespace staccato;
 
-Track::Track(std::string title, std::string artists, std::string album): 
+Track::Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album): 
     title {title}, 
     artists {artists}, 
     album {album} 
 {}
 
-Track::Track(): title {""}, artists {""}, album {""} {}
+Track::Track(): title {""}, artists {}, album {""} {}
 
 bool Track::is_empty() const {
 
@@ -26,7 +26,19 @@ std::string Track::string() const {
 
     }
 
-    return title + " by " + artists + " from " + album;
+    std::string artists_str {};
+    for(std::size_t i {0}; i < artists.size(); i++) {
+
+        artists_str += artists[i];
+        if(i < artists.size() - 1) {
+
+            artists_str += ", ";
+
+        }
+
+    }
+
+    return title + " by " + artists_str + " from " + album;
     
 }
 
@@ -52,8 +64,22 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
             }
         }
         case sortmode::artists: {
-            icu::UnicodeString artists1 = icu::UnicodeString::fromUTF8(track1.artists).toLower();
-            icu::UnicodeString artists2 = icu::UnicodeString::fromUTF8(track2.artists).toLower();
+            if(track1.artists.size() == 0 && track2.artists.size() == 0) {
+
+                return 0;
+
+            } else if(track1.artists.size() == 0) {
+
+                return -1;
+
+            } else if(track2.artists.size() == 0) {
+
+                return 1;
+
+            }
+
+            icu::UnicodeString artists1 = icu::UnicodeString::fromUTF8(track1.artists[0]).toLower();
+            icu::UnicodeString artists2 = icu::UnicodeString::fromUTF8(track2.artists[0]).toLower();
             if(artists1 < artists2) {
 
                 return -1;

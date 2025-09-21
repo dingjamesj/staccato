@@ -49,7 +49,19 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
 
     } else {
 
-        file_ref.tag()->setArtist(track.artists);
+        std::string artists_str {""};
+        for(std::size_t i {0}; i < track.artists.size(); i++) {
+
+            artists_str += track.artists[i];
+            if(i < track.artists.size() - 1) {
+
+                artists_str += ", ";
+
+            }
+
+        }
+        
+        file_ref.tag()->setArtist(artists_str);
 
     }
 
@@ -100,7 +112,7 @@ Track TrackManager::get_local_track_info(const std::string& path) {
     TagLib::FileRef file_ref(path.c_str());
 
     std::string title = file_ref.tag()->title().to8Bit();
-    std::string artist = file_ref.tag()->artist().to8Bit();
+    std::string artist_str = file_ref.tag()->artist().to8Bit();
     std::string album = file_ref.tag()->album().to8Bit();
 
     if(title.empty()) {
@@ -108,9 +120,9 @@ Track TrackManager::get_local_track_info(const std::string& path) {
         title = "Unknown Title";
 
     }
-    if(artist.empty()) {
+    if(artist_str.empty()) {
 
-        artist = "Unknown Artists";
+        artist_str = "Unknown Artists";
 
     }
     if(album.empty()) {
@@ -119,7 +131,9 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
     }
 
-    return Track(title, artist, album);
+    std::vector<std::string> artists = tokenize_comma_separated_string(artist_str);
+
+    return Track(title, artists, album);
 
 }
 
@@ -169,9 +183,17 @@ Track TrackManager::get_online_track_info(const std::string& url) {
 
     }
 
+    PyObject* py_artists_list = PyDict_GetItemString(py_return, "artists");
+    std::vector<std::string> artists {};
+    for(Py_ssize_t i {0}; i < PyList_Size(py_artists_list); i++) {
+
+        artists.push_back(PyUnicode_AsUTF8(PyList_GetItem(py_artists_list, i)));
+
+    }
+
     Track track (
         PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "title")),
-        PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "artists")),
+        artists,
         PyUnicode_AsUTF8(PyDict_GetItemString(py_return, "album"))
     );
     Py_DECREF(py_return);
@@ -292,7 +314,13 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
     }
 
     PyObject* py_param_title = PyUnicode_FromString(track.title.c_str());
-    PyObject* py_param_artists = PyUnicode_FromString(track.artists.c_str());
+    PyObject* py_param_artists = PyList_New(track.artists.size());
+    for(std::size_t i {0}; i < track.artists.size(); i++) {
+
+        PyList_Append(py_param_artists, PyUnicode_FromString(track.artists[i].c_str()));
+
+    }
+    
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_title, py_param_artists, NULL);
@@ -575,7 +603,8 @@ bool TrackManager::read_track_dict_from_file() {
     }
 
     std::uint8_t count {0};
-    std::string title, artists, album, path {""};
+    std::string title, album, path {""};
+    std::vector<std::string> artists {};
     char c = '\0';
     while(!input.eof()) {
 
