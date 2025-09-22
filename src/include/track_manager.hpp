@@ -15,6 +15,46 @@
 #include <vector>
 #include <Python.h>
 
+/* Examples of .stkl and .sply file structures:
+
+Note: new lines are only there for visual purposes---they don't exist in the actual binary files.
+
+.stkl:
+File version
+Track title 1
+\0
+Artist 1
+\0
+Artist 2
+\0
+\0      <-- Note that two null chars separate the artists list and the album.
+Album
+\0
+Path 1
+\0
+Track title 2
+\0
+...
+
+.sply:
+File version
+Playlist name
+\0
+Online connection
+\0
+Track title 1
+\0
+Artist 1
+\0
+\0
+Album
+\0
+Track title 2
+\0
+...
+
+*/
+
 namespace staccato {
     
     class TrackManager {
@@ -112,22 +152,22 @@ namespace staccato {
         #endif
 
         #else
-        
+
+        #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-
-        #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\trackdict.stkl"};
         #else
+        static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
+        static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
+        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.stkl"};
         #endif
 
         #endif
-
-        
         
     };
 
