@@ -97,6 +97,34 @@ urltype TrackManager::get_url_type(const std::string& url) {
 
 }
 
+std::string TrackManager::ifstream_read_file_header(std::ifstream& input) {
+
+    //Read file header
+    char c = '\0';
+    std::string header {""};
+    while(!input.eof()) {
+
+        c = input.get();
+        if(input.fail()) {
+
+            continue;
+
+        }
+
+        if(c == '\0') {
+
+            break;
+
+        }
+
+        header.push_back(c);
+
+    }
+
+    return header;
+    
+}
+
 //===========================
 //  PUBLIC ACCESS FUNCTIONS
 //===========================
@@ -593,15 +621,17 @@ bool TrackManager::delete_track_artwork(const Track& track) {
 
 bool TrackManager::read_track_dict_from_file() {
 
-    //The structure of this file is:
-    // [TITLE]\0[ARTIST1]\0[ARTIST2]\0[ARTIST2]\0[ARTIST3]...\0\0[ALBUM]\0[PATH]\0 ... (next dictionary entry)
-    //In other words, each dictionary entry is composed of the Track object, a null char, and then the path.
-    //The Track object is written as the title, a null char, the artists separated by null chars, two null chars, and then the album.
-
     track_dict.clear();
 
     std::ifstream input(std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
     if(!input.is_open()) {
+
+        return false;
+
+    }
+
+    std::string header = ifstream_read_file_header(input);
+    if(header != std::string(FILE_HEADER)) {
 
         return false;
 
@@ -694,6 +724,8 @@ bool TrackManager::write_track_dict_to_file() {
         return false;
 
     }
+
+    output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
 
     for(const std::pair<Track, std::string>& pair: track_dict) {
 
@@ -805,6 +837,14 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::rea
 
         }
 
+        //Read file header
+        std::string header = ifstream_read_file_header(input);
+        if(header != std::string(FILE_HEADER)) {
+
+            continue;
+
+        }
+
         std::uint8_t count {0};
         std::string name, cover_image_file_path {""};
         char c = '\0';
@@ -855,6 +895,14 @@ Playlist TrackManager::read_playlist_from_file(const std::string& id) {
 
     std::ifstream input(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION});
     if(!input.is_open()) {
+
+        return Playlist();
+
+    }
+
+    //Read file header
+    std::string header = ifstream_read_file_header(input);
+    if(header != std::string(FILE_HEADER)) {
 
         return Playlist();
 
@@ -975,6 +1023,7 @@ bool TrackManager::write_playlist_to_file(const std::string& id, const Playlist&
 
     }
 
+    output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
     output.write(playlist.name.c_str(), playlist.name.size());
     output.write(playlist.online_connection.c_str(), playlist.online_connection.size());
     std::unordered_multiset<Track> tracklist = playlist.get_tracklist();

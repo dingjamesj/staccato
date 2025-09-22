@@ -68,6 +68,7 @@ namespace staccato {
         static std::filesystem::path get_unique_filename(std::filesystem::path path);
         static bool write_file_metadata(const std::string& path, const Track& track);
         static urltype get_url_type(const std::string& url);
+        static std::string ifstream_read_file_header(std::ifstream& input);
 
         public:
 
@@ -134,6 +135,7 @@ namespace staccato {
         static void print_track_dict();
 
         //Constexprs
+        static constexpr std::string_view FILE_HEADER {"staccato1"};
 
         #if(DEVELOPMENT_BUILD)
 
