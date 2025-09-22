@@ -42,9 +42,9 @@ void playlist_testing() {
     std::cout << spotify_playlist.string() << std::endl;
 
     std::cout << std::endl << "+ Playlist.contains_track()" << std::endl;
-    std::cout << (spotify_playlist.contains_track(Track("SAFARI", "Tyler, The Creator", "CALL ME IF YOU GET LOST")) ? "true" : "false") << std::endl << std::endl;
+    std::cout << (spotify_playlist.contains_track(Track("SAFARI", {"Tyler, The Creator"}, "CALL ME IF YOU GET LOST")) ? "true" : "false") << std::endl << std::endl;
     std::cout << std::endl << "- Playlist.contains_track()" << std::endl;
-    std::cout << (spotify_playlist.contains_track(Track("SAFAI", "Tyler, The Creator", "CALL ME IF YOU GET LOST")) ? "true" : "false") << std::endl << std::endl;
+    std::cout << (spotify_playlist.contains_track(Track("SAFAI", {"Tyler, The Creator"}, "CALL ME IF YOU GET LOST")) ? "true" : "false") << std::endl << std::endl;
 
     std::cout << "- Playlist constructor (Spotify)" << std::endl;
     Playlist invalid_playlist_1 ("Playlist 2", std::unordered_multiset<Track> {}, "https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=5bce260d95c6436e&pt=c61881f0d2e0b444b89c0519dfe05748");
@@ -60,23 +60,23 @@ void playlist_testing() {
     std::cout << playlist.string() << std::endl;
 
     std::cout << "+ Playlist.add_track() (unique track)" << std::endl;
-    playlist.add_track(Track("Track4324", "poop", "pee"));
+    playlist.add_track(Track("Track4324", {"poop"}, "pee"));
     std::cout << playlist.string() << std::endl;
 
     std::cout << "+ Playlist.add_track() (duplicate track)" << std::endl;
-    playlist.add_track(Track("a", "a", "a"));
+    playlist.add_track(Track("a", {"a"}, "a"));
     std::cout << playlist.string() << std::endl;
 
     std::cout << "+ Playlist.remove_track() (unique track)" << std::endl;
-    playlist.remove_track(Track("Track4324", "poop", "pee"));
+    playlist.remove_track(Track("Track4324", {"poop"}, "pee"));
     std::cout << playlist.string() << std::endl;
     
     std::cout << "+ Playlist.remove_track() (duplicate track, ONLY ONE OF THE DUPLICATES SHOULD BE REMOVED)" << std::endl;
-    playlist.remove_track(Track("a", "a", "a"));
+    playlist.remove_track(Track("a", {"a"}, "a"));
     std::cout << playlist.string() << std::endl;
 
     std::cout << "- Playlist.remove_track()" << std::endl;
-    bool remove_track_result = playlist.remove_track(Track("NOT EXIST", "appleseed", "john"));
+    bool remove_track_result = playlist.remove_track(Track("NOT EXIST", {"appleseed"}, "john"));
     std::cout << (remove_track_result ? "true" : "false") << ", " << playlist.string() << std::endl;
 
     std::cout << "- Playlist.is_empty()" << std::endl;

@@ -735,7 +735,7 @@ bool TrackManager::write_track_dict_to_file() {
             output.write(artist.c_str(), artist.size());
 
         }
-        output.write('\0', 1);
+        output.put('\0');
         output.write(pair.first.album.c_str(), pair.first.album.size());
         output.write(pair.second.c_str(), pair.second.size());
 
@@ -1035,7 +1035,7 @@ bool TrackManager::write_playlist_to_file(const std::string& id, const Playlist&
             output.write(artist.c_str(), artist.size());
 
         }
-        output.write('\0', 1);
+        output.put('\0');
         output.write(track.album.c_str(), track.album.size());
 
         if(output.fail()) {
