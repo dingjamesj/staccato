@@ -619,6 +619,21 @@ bool TrackManager::delete_track_artwork(const Track& track) {
 
 }
 
+int TrackManager::get_playlist_duration(const Playlist& playlist) {
+
+    int total_duration = 0;
+    const std::unordered_multiset<Track>& tracklist = playlist.get_tracklist();
+    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.cbegin();
+    for(; iter != tracklist.end(); iter++) {
+
+        total_duration += TrackManager::get_track_duration(*iter);
+
+    }
+
+    return total_duration;
+
+}
+
 bool TrackManager::read_track_dict_from_file() {
 
     track_dict.clear();

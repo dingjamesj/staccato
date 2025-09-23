@@ -5,7 +5,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 from yt_dlp import YoutubeDL
 
-SETTINGS_FILE_LOCATION: str = "staccatoapikeys.txt"
+SETTINGS_FILE_LOCATION: str = "../staccatoapikeys.txt"
 NUM_ACCEPTED_SEARCHES: int = 3
 
 api_keys: list[str] = []

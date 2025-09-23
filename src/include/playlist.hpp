@@ -57,8 +57,6 @@ namespace staccato {
         bool remove_track(const Track& track);
         /** Check if a track is in the tracklist */
         bool contains_track(const Track& track) const;
-        /** The total duration of the playlist */
-        int get_total_duration() const;
         /** Returns a string representation of this playlist */
         std::string string() const;
         /** Returns if the playlist is empty (denoting an invalid playlist) */

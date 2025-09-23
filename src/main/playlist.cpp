@@ -264,20 +264,6 @@ bool Playlist::contains_track(const Track& track) const {
 
 }
 
-int Playlist::get_total_duration() const {
-
-    int total_duration = 0;
-    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.cbegin();
-    for(; iter != tracklist.end(); iter++) {
-
-        total_duration += TrackManager::get_track_duration(*iter);
-
-    }
-
-    return total_duration;
-
-}
-
 std::string Playlist::string() const {
 
     std::string str = "PLAYLIST: " + name + "\n";

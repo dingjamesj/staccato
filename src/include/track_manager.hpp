@@ -109,6 +109,8 @@ namespace staccato {
         static bool set_track_artwork(const Track& track, const std::string& artwork_file_path);
         /** Searches for the track in the dictionary, then deletes the track's file's artwork metadata */
         static bool delete_track_artwork(const Track& track);
+        /** Returns the summed duration of each track in the playlist */
+        static int get_playlist_duration(const Playlist& playlist);
 
         //Reading and writing the track dictionary
 
