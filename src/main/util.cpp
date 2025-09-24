@@ -14,13 +14,13 @@ void staccato::trim_string(std::string& str) {
 
     while(str.length() > 0 && std::isspace(str.at(0))) {
 
-        str.erase(0);
+        str.erase(0, 1);
 
     }
 
-    while(str.length() > 0 && std::isspace(str.length() - 1)) {
+    while(str.length() > 0 && std::isspace(str.at(str.length() - 1))) {
 
-        str.erase(str.length() - 1);
+        str.erase(str.length() - 1, 1);
 
     }
 
@@ -42,7 +42,9 @@ std::vector<std::string> staccato::tokenize_comma_separated_string(const std::st
 
     }
 
-    list.push_back(str.substr(begin_index));
+    curr_token = str.substr(begin_index);
+    trim_string(curr_token);
+    list.push_back(curr_token);
 
     return list;
 

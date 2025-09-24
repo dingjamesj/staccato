@@ -38,7 +38,7 @@ std::string Track::string() const {
 
     }
 
-    return title + " by " + artists_str + " from " + album;
+    return title + " by " + artists_str + " from " + album + "\n";
     
 }
 

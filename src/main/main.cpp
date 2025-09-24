@@ -1,5 +1,6 @@
 #include "track.hpp"
 #include "playlist.hpp"
+#include "track_manager.hpp"
 
 using namespace staccato;
 
@@ -126,7 +127,27 @@ void playlist_testing() {
 
 void track_manager_testing() {
 
+    std::string sample_track_path = "..\\tracks\\90210.mp3";
+
+    //Accessing external tracks
+    std::cout << "TrackManager::get_local_track_info()" << std::endl;
+    Track local_track = TrackManager::get_local_track_info(sample_track_path);
+    std::cout << local_track.string() << std::endl;
+
+    //Reading and writing the track dictionary
     
+    std::cout << "TrackManager::read_track_dict_from_file()" << std::endl;
+    TrackManager::read_track_dict_from_file();
+    std::cout << std::endl;
+
+    std::cout << "TrackManager::find_extraneous_track_files()" << std::endl;
+    std::vector<std::string> extraneous_track_files = TrackManager::find_extraneous_track_files();
+    for(std::string track_file: extraneous_track_files) {
+
+        std::cout << track_file << std::endl;
+
+    }
+    std::cout << std::endl;
 
 }
 
@@ -155,7 +176,8 @@ int main() {
 
     }
 
-    playlist_testing();
+    // playlist_testing();
+    track_manager_testing();
 
     Py_FinalizeEx();
 
