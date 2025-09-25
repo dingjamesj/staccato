@@ -128,11 +128,37 @@ void playlist_testing() {
 void track_manager_testing() {
 
     std::string sample_track_path = "..\\tracks\\90210.mp3";
+    std::string non_music_file_path = "D:\\car\\idiot23.PNG";
 
     //Accessing external tracks
-    std::cout << "TrackManager::get_local_track_info()" << std::endl;
+
+    std::cout << "+ TrackManager::get_local_track_info()" << std::endl;
     Track local_track = TrackManager::get_local_track_info(sample_track_path);
     std::cout << local_track.string() << std::endl;
+
+    std::cout << "- TrackManager::get_local_track_info()" << std::endl;
+    local_track = TrackManager::get_local_track_info("asodihas");
+    std::cout << (local_track.is_empty() ? "is_empty true" : "is_empty false") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_local_track_info()" << std::endl;
+    local_track = TrackManager::get_local_track_info(non_music_file_path);
+    std::cout << (local_track.is_empty() ? "is_empty true" : "is_empty false") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_local_track_info()" << std::endl;
+    local_track = TrackManager::get_local_track_info("");
+    std::cout << (local_track.is_empty() ? "is_empty true" : "is_empty false") << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (Normal Spotify track)" << std::endl;
+    Track online_track = TrackManager::get_online_track_info("https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a");
+    std::cout << online_track.string() << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (Unavailable Spotify track)" << std::endl;
+    online_track = TrackManager::get_online_track_info("https://open.spotify.com/track/2VW3Mcwjgs4NO4P6kx52C0?si=f737371736c74c05");
+    std::cout << online_track.string() << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (Spotify podcast)" << std::endl;
+    online_track = TrackManager::get_online_track_info("https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a");
+    std::cout << online_track.string() << std::endl;
 
     //Reading and writing the track dictionary
     

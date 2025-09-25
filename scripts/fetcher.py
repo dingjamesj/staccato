@@ -5,6 +5,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 from yt_dlp import YoutubeDL
 
+# Note: you need to prefix the file location with "../" when running python from C++
+# SETTINGS_FILE_LOCATION: str = "staccatoapikeys.txt"
 SETTINGS_FILE_LOCATION: str = "../staccatoapikeys.txt"
 NUM_ACCEPTED_SEARCHES: int = 3
 
@@ -115,7 +117,19 @@ def get_spotify_track(spotify_id: str) -> dict:
             "artwork_url": track_data["album"]["images"][0]["url"]
         }
     except:
-        return {}
+        pass
+    # Maybe the previous attempt failed because it was a podcast episode?
+    try:
+        sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
+        podcast_data: dict = sp.episode(episode_id=spotify_id, market=market)
+        return {
+            "title": podcast_data["name"],
+            "artists": ["Unknown Artists"],
+            "album": "Unknown Album",
+            "artwork_url": podcast_data["images"][0]["url"]
+        }
+    except Exception as e:
+        return {} # Guess it wasn't a valid track nor a valid podcast episode
 
 
 def get_youtube_track(url: str) -> dict:
@@ -220,10 +234,12 @@ def get_refined_youtube_track_info(raw_info: dict) -> dict:
 if __name__ == "__main__":
     read_api_settings()
     # print(get_youtube_track("https://www.youtube.com/watch?v=bu7nU9Mhpyo"))
-    print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
+    # print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
     # print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY"))
 
     # Regular playlist (rargb)
     # get_spotify_playlist("https://open.spotify.com/playlist/3oMkpen2toJFAvPDPml7HC?si=5bf8e98da54b4424")
     # Playlist with single track (test3)
     # get_spotify_playlist("https://open.spotify.com/playlist/302qOeuyMFtdYFg5owNOiQ?si=d42fb6936e9148c9")
+    # Podcast
+    print(get_spotify_track("https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a"))
