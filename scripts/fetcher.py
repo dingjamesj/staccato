@@ -37,9 +37,9 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
 
 
 def get_spotify_playlist(spotify_id: str) -> list[dict]:
-    read_api_settings()
     """ID includes URL, URI, and alphanumeric ID"""
     try:
+        read_api_settings()
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
         playlist: list[dict] = []
         playlist_data: list[dict] = [{}]
@@ -102,9 +102,9 @@ def can_access_youtube_playlist(url: str) -> bool:
 
 
 def get_spotify_track(spotify_id: str) -> dict:
-    read_api_settings()
     """ID includes URL, URI, and alphanumeric ID"""
     try:
+        read_api_settings()
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
         track_data: dict = sp.track(track_id=spotify_id, market=market)
         artists: list = []
@@ -133,46 +133,52 @@ def get_spotify_track(spotify_id: str) -> dict:
 
 
 def get_youtube_track(url: str) -> dict:
-    ydl_opts: dict = {
-        "ignoreerrors": True,
-        "quiet": True
-    }
-    with YoutubeDL(ydl_opts) as ydl:
-        info: dict = ydl.extract_info(url, download=False)
-        if info is None:
-            return {}
-        return get_refined_youtube_track_info(info)
+    try:
+        ydl_opts: dict = {
+            "ignoreerrors": True,
+            "quiet": True
+        }
+        with YoutubeDL(ydl_opts) as ydl:
+            info: dict = ydl.extract_info(url, download=False)
+            if info is None:
+                return {}
+            return get_refined_youtube_track_info(info)
+    except:
+        return {}
 
 
 def find_best_youtube_url(title: str, artists: list[str]) -> str:
-    artists_str: str = ""
-    for artist in artists:
-        artists_str = artists_str + artist + " "
-    artists_str = artists_str[:-1]
+    try: 
+        artists_str: str = ""
+        for artist in artists:
+            artists_str = artists_str + artist + " "
+        artists_str = artists_str[:-1]
 
-    # Search for the top few videos---searching with "{Title} {1st artist}"
-    # e.g. "née-nah 21 Savage"
-    ydl_opts: dict = {
-        "ignoreerrors": True,
-        "quiet": True
-    }
-    with YoutubeDL(ydl_opts) as ydl:
-        info: dict = ydl.extract_info(url=f"ytsearch{NUM_ACCEPTED_SEARCHES}:{title} {artists_str}", download=False)
-    search_results: list[dict] = info["entries"]
-    # Find the ID of the highest-scoring video
-    index: int = 0
-    largest_score: int = -9999999
-    id_with_largest_score: str = ""
-    for search_result in search_results:
-        if search_result is None:
-            index = index + 1
-            continue
-        score: int = calculate_video_score(search_result, index, title, artists_str)
-        if score > largest_score:
-            largest_score = score
-            id_with_largest_score = search_result["id"]
-    # Return
-    return f"https://www.youtube.com/watch?v={id_with_largest_score}"
+        # Search for the top few videos---searching with "{Title} {1st artist}"
+        # e.g. "née-nah 21 Savage"
+        ydl_opts: dict = {
+            "ignoreerrors": True,
+            "quiet": True
+        }
+        with YoutubeDL(ydl_opts) as ydl:
+            info: dict = ydl.extract_info(url=f"ytsearch{NUM_ACCEPTED_SEARCHES}:{title} {artists_str}", download=False)
+        search_results: list[dict] = info["entries"]
+        # Find the ID of the highest-scoring video
+        index: int = 0
+        largest_score: int = -9999999
+        id_with_largest_score: str = ""
+        for search_result in search_results:
+            if search_result is None:
+                index = index + 1
+                continue
+            score: int = calculate_video_score(search_result, index, title, artists_str)
+            if score > largest_score:
+                largest_score = score
+                id_with_largest_score = search_result["id"]
+        # Return
+        return f"https://www.youtube.com/watch?v={id_with_largest_score}"
+    except:
+        return ""
 
 # How well a video's info matches up with the target track information.
 def calculate_video_score(search_result: dict, index: int, target_title: str, target_artists: str) -> int:
@@ -242,4 +248,6 @@ if __name__ == "__main__":
     # Playlist with single track (test3)
     # get_spotify_playlist("https://open.spotify.com/playlist/302qOeuyMFtdYFg5owNOiQ?si=d42fb6936e9148c9")
     # Podcast
-    print(get_spotify_track("https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a"))
+    # print(get_spotify_track("https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a"))
+
+    print(get_youtube_track("https://www.youtube.com/watch?v=VTmaf0jggF8"))

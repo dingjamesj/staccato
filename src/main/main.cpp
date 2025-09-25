@@ -138,15 +138,15 @@ void track_manager_testing() {
 
     std::cout << "- TrackManager::get_local_track_info()" << std::endl;
     local_track = TrackManager::get_local_track_info("asodihas");
-    std::cout << (local_track.is_empty() ? "is_empty true" : "is_empty false") << std::endl << std::endl;
+    std::cout << local_track.string() << std::endl;
 
     std::cout << "- TrackManager::get_local_track_info()" << std::endl;
     local_track = TrackManager::get_local_track_info(non_music_file_path);
-    std::cout << (local_track.is_empty() ? "is_empty true" : "is_empty false") << std::endl << std::endl;
+    std::cout << local_track.string() << std::endl;
 
     std::cout << "- TrackManager::get_local_track_info()" << std::endl;
     local_track = TrackManager::get_local_track_info("");
-    std::cout << (local_track.is_empty() ? "is_empty true" : "is_empty false") << std::endl << std::endl;
+    std::cout << local_track.string() << std::endl << std::endl;
 
     std::cout << "+ TrackManager::get_online_track_info() (Normal Spotify track)" << std::endl;
     Track online_track = TrackManager::get_online_track_info("https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a");
@@ -158,6 +158,26 @@ void track_manager_testing() {
 
     std::cout << "+ TrackManager::get_online_track_info() (Spotify podcast)" << std::endl;
     online_track = TrackManager::get_online_track_info("https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a");
+    std::cout << online_track.string() << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (YouTube Music)" << std::endl;
+    online_track = TrackManager::get_online_track_info("https://www.youtube.com/watch?v=SZiwpL62to8&list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY&index=2");
+    std::cout << online_track.string() << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (YouTube, non-music)" << std::endl;
+    online_track = TrackManager::get_online_track_info("https://www.youtube.com/watch?v=uXwRgnZ990I");
+    std::cout << online_track.string() << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (Age-restricted YouTube)" << std::endl;
+    online_track = TrackManager::get_online_track_info("https://www.youtube.com/watch?v=VTmaf0jggF8");
+    std::cout << online_track.string() << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (Unavailable YouTube video)" << std::endl;
+    online_track = TrackManager::get_online_track_info("https://www.youtube.com/watch?v=NPTHZtcSADs");
+    std::cout << online_track.string() << std::endl;
+
+    std::cout << "+ TrackManager::get_online_track_info() (Suicide/self-harm YouTube video)" << std::endl;
+    online_track = TrackManager::get_online_track_info("https://www.youtube.com/watch?v=Y0hl_HRgQtc");
     std::cout << online_track.string() << std::endl;
 
     //Reading and writing the track dictionary

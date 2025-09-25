@@ -22,7 +22,7 @@ std::string Track::string() const {
 
     if(is_empty()) {
 
-        return "";
+        return "[empty]\n";
 
     }
 

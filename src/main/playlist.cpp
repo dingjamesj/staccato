@@ -175,6 +175,13 @@ std::unordered_multiset<Track> Playlist::get_online_connection_tracklist() const
         }
 
         PyObject* py_artists_list = PyDict_GetItemString(py_item, "artists");
+        if(py_artists_list == nullptr) {
+
+            Py_DECREF(py_return);
+            return std::unordered_multiset<Track> {};
+
+        }
+
         std::vector<std::string> artists {};
         for(Py_ssize_t i {0}; i < PyList_Size(py_artists_list); i++) {
 

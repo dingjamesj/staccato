@@ -212,6 +212,13 @@ Track TrackManager::get_online_track_info(const std::string& url) {
     }
 
     PyObject* py_artists_list = PyDict_GetItemString(py_return, "artists");
+    if(py_artists_list == nullptr) {
+
+        Py_DECREF(py_return);
+        return Track();
+
+    }
+
     std::vector<std::string> artists {};
     for(Py_ssize_t i {0}; i < PyList_Size(py_artists_list); i++) {
 

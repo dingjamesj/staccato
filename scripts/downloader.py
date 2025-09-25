@@ -8,57 +8,59 @@ import os
 
 def download_youtube_track(url: str, location: str, force_mp3: bool) -> str:
     """Returns the downloaded path if the download was successful, empty string otherwise"""
-
-    # Get the unique file enumerator e.g. the (1) in "duplicatemusicfile (1).mp3"
-    possible_file_paths: list[str] = [
-        f"{location}{os.sep}{extract_youtube_id_from_url(url)}.mp3",
-        f"{location}{os.sep}{extract_youtube_id_from_url(url)}.m4a",
-        f"{location}{os.sep}{extract_youtube_id_from_url(url)}.aac"
-    ]
-    unique_file_enumerator: int = 0
-    while os.path.isfile(possible_file_paths[0]) or os.path.isfile(possible_file_paths[1]) or os.path.isfile(possible_file_paths[2]):
-        unique_file_enumerator = unique_file_enumerator + 1
-        possible_file_paths = [
-            f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).mp3",
-            f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).m4a",
-            f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).aac"
+    try:
+        # Get the unique file enumerator e.g. the (1) in "duplicatemusicfile (1).mp3"
+        possible_file_paths: list[str] = [
+            f"{location}{os.sep}{extract_youtube_id_from_url(url)}.mp3",
+            f"{location}{os.sep}{extract_youtube_id_from_url(url)}.m4a",
+            f"{location}{os.sep}{extract_youtube_id_from_url(url)}.aac"
         ]
+        unique_file_enumerator: int = 0
+        while os.path.isfile(possible_file_paths[0]) or os.path.isfile(possible_file_paths[1]) or os.path.isfile(possible_file_paths[2]):
+            unique_file_enumerator = unique_file_enumerator + 1
+            possible_file_paths = [
+                f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).mp3",
+                f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).m4a",
+                f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).aac"
+            ]
 
-    # Download the track and return the downloaded path
-    ydl_opts: dict = {
-        "format": "m4a/aac/mp3/bestaudio",
-        "paths": {"home": location},
-    }
-    if force_mp3:
-        ydl_opts["format"] = "bestaudio"
-        ydl_opts["postprocessors"] = [{
-            "key": "FFmpegExtractAudio", 
-            "preferredcodec": "mp3"
-        }]
-    
-    if unique_file_enumerator == 0:
-        ydl_opts["outtmpl"] = {
-            "default": "%(id)s.%(ext)s"
+        # Download the track and return the downloaded path
+        ydl_opts: dict = {
+            "format": "m4a/aac/mp3/bestaudio",
+            "paths": {"home": location},
         }
-    else:
-        ydl_opts["outtmpl"] = {
-            "default": f"%(id)s ({unique_file_enumerator}).%(ext)s"
-        }
-
-    with YoutubeDL(ydl_opts) as ydl:
-        video_info: dict = ydl.extract_info(url)
-        # Trim the location of any trailing directory separators
-        trimmed_location: str = location
-        if trimmed_location[-1] == os.sep:
-            trimmed_location = trimmed_location[:-1]
-        # Return the downloaded path
-        downloaded_path: str
-        if unique_file_enumerator == 0:
-            downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
-        else:
-            downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
+        if force_mp3:
+            ydl_opts["format"] = "bestaudio"
+            ydl_opts["postprocessors"] = [{
+                "key": "FFmpegExtractAudio", 
+                "preferredcodec": "mp3"
+            }]
         
-        return downloaded_path
+        if unique_file_enumerator == 0:
+            ydl_opts["outtmpl"] = {
+                "default": "%(id)s.%(ext)s"
+            }
+        else:
+            ydl_opts["outtmpl"] = {
+                "default": f"%(id)s ({unique_file_enumerator}).%(ext)s"
+            }
+
+        with YoutubeDL(ydl_opts) as ydl:
+            video_info: dict = ydl.extract_info(url)
+            # Trim the location of any trailing directory separators
+            trimmed_location: str = location
+            if trimmed_location[-1] == os.sep:
+                trimmed_location = trimmed_location[:-1]
+            # Return the downloaded path
+            downloaded_path: str
+            if unique_file_enumerator == 0:
+                downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
+            else:
+                downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
+            
+            return downloaded_path
+    except:
+        return ""
 
 
 def update_yt_dlp() -> int:
