@@ -1,8 +1,6 @@
 #ifndef PLAYLIST_HPP
 #define PLAYLIST_HPP
 
-#include "util.hpp"
-
 #include <string>
 #include <vector>
 #include <unordered_set>
@@ -13,6 +11,8 @@
 namespace staccato {
 
     struct Track;
+    enum class urltype;
+    enum class sortmode;
 
     class Playlist {
 
