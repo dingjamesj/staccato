@@ -377,6 +377,144 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
 
 }
 
+bool TrackManager::playlist_is_accessible(const std::string& url) {
+
+    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
+    PyObject* py_module = PyImport_Import(py_fetcher);
+    Py_DECREF(py_fetcher);
+    if(py_module == nullptr) {
+
+        return false;
+
+    }
+
+    urltype url_type = get_url_type(url);
+    PyObject* py_func = nullptr;
+    if(url_type == urltype::spotify) {
+
+        py_func = PyObject_GetAttrString(py_module, "can_access_spotify_playlist");
+
+    } else if(url_type == urltype::youtube) {
+
+        py_func = PyObject_GetAttrString(py_module, "can_access_youtube_playlist");
+
+    }
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return false;
+
+    }
+
+    PyObject* py_param = PyUnicode_FromString(url.c_str());
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param, NULL);
+    PyGILState_Release(gstate);
+
+    Py_DECREF(py_func);
+    Py_DECREF(py_param);
+    if(py_return == nullptr || !PyBool_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return false;
+
+    }
+
+    bool is_valid_url = PyObject_IsTrue(py_return) == 1;
+    Py_DECREF(py_return);
+
+    return is_valid_url;
+
+}
+
+std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::string& url) {
+
+    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
+    PyObject* py_module = PyImport_Import(py_fetcher);
+    Py_DECREF(py_fetcher);
+    if(py_module == nullptr) {
+
+        return std::unordered_multiset<Track> {};
+
+    }
+
+    urltype url_type = get_url_type(url);
+    PyObject* py_func = nullptr;
+    if(url_type == urltype::spotify) {
+
+        py_func = PyObject_GetAttrString(py_module, "get_spotify_playlist");
+
+    } else if(url_type == urltype::youtube) {
+
+        py_func = PyObject_GetAttrString(py_module, "get_youtube_playlist");
+
+    }
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return std::unordered_multiset<Track> {};
+
+    }
+
+    PyObject* py_param = PyUnicode_FromString(url.c_str());
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param, NULL);
+    PyGILState_Release(gstate);
+    
+    Py_DECREF(py_func);
+    Py_DECREF(py_param);
+    //Note that the return value should be a list[dict]
+    if(py_return == nullptr || !PyList_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return std::unordered_multiset<Track> {};
+
+    }
+
+    std::unordered_multiset<Track> connected_tracklist {};
+    Py_ssize_t size = PyList_Size(py_return);
+    for(Py_ssize_t i {0}; i < size; i++) {
+
+        PyObject* py_item = PyList_GetItem(py_return, i); //Note that this is a borrowed reference (no need to DECREF)
+        if(!PyDict_Check(py_item)) {
+
+            Py_DECREF(py_return);
+            return std::unordered_multiset<Track> {};
+
+        }
+
+        PyObject* py_artists_list = PyDict_GetItemString(py_item, "artists");
+        if(py_artists_list == nullptr) {
+
+            Py_DECREF(py_return);
+            return std::unordered_multiset<Track> {};
+
+        }
+
+        std::vector<std::string> artists {};
+        for(Py_ssize_t i {0}; i < PyList_Size(py_artists_list); i++) {
+
+            artists.push_back(PyUnicode_AsUTF8(PyList_GetItem(py_artists_list, i)));
+
+        }
+
+        connected_tracklist.insert(Track(
+            PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "title")),
+            artists,
+            PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "album"))
+        ));
+
+    }
+
+    Py_DECREF(py_return);
+    return connected_tracklist;
+
+}
+
 bool TrackManager::path_is_readable_track_file(const std::string& path) {
 
     //Check if the file is an audio file
@@ -641,7 +779,7 @@ int TrackManager::get_playlist_duration(const Playlist& playlist) {
 
 }
 
-bool TrackManager::read_track_dict_from_file() {
+bool TrackManager::get_track_dict_from_file() {
 
     track_dict.clear();
 
@@ -837,7 +975,7 @@ std::vector<std::string> TrackManager::find_extraneous_track_files() {
 
 }
 
-std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::read_basic_playlist_info_from_files() {
+std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get_basic_playlist_info_from_files() {
 
     std::vector<std::tuple<std::string, std::string, std::string>> info {};
 
@@ -913,7 +1051,7 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::rea
 
 }
 
-Playlist TrackManager::read_playlist_from_file(const std::string& id) {
+Playlist TrackManager::get_playlist_from_file(const std::string& id) {
 
     std::ifstream input(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION});
     if(!input.is_open()) {

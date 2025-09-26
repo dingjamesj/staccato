@@ -42,8 +42,6 @@ namespace staccato {
         void remove_online_connection();
         /** Returns the online connection's URL */
         std::string get_online_connection() const;
-        /** Returns the tracklist of the online connection */
-        std::unordered_multiset<Track> get_online_connection_tracklist() const;
 
         //Tracklist
 
@@ -53,6 +51,8 @@ namespace staccato {
         std::vector<Track> get_sorted_tracklist(sortmode sort_mode, bool is_ascending) const;
         /** Adds a track to the tracklist */
         void add_track(const Track& track);
+        /** Adds all tracks not yet in the tracklist that are found in the online connection */
+        void add_tracks_from_online_connection();
         /** Removes a track from the tracklist, returns true if was successfully removed */
         bool remove_track(const Track& track);
         /** Check if a track is in the tracklist */

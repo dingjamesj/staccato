@@ -13,7 +13,6 @@
 #include <fstream>
 #include <taglib/fileref.h>
 #include <vector>
-#include <Python.h>
 
 /* Examples of .stkl and .sply file structures:
 
@@ -84,6 +83,10 @@ namespace staccato {
         static bool download_track(const Track& track, const std::string& youtube_url, bool force_mp3);
         /** (DOES NOT REPLACE) Finds the best matching YouTube URL, downloads it, puts it into staccato and pairs it with the Track object */
         static bool download_track(const Track& track, bool force_mp3);
+        /** Returns whether or not the playlist is accessible */
+        static bool playlist_is_accessible(const std::string& url);
+        /** Returns the tracklist of the online playlist */
+        static std::unordered_multiset<Track> get_online_tracklist(const std::string& url);
 
         //Reading and writing tracks
 
@@ -115,7 +118,7 @@ namespace staccato {
         //Reading and writing the track dictionary
 
         /** Loads track_dict from the .stkl file */
-        static bool read_track_dict_from_file();
+        static bool get_track_dict_from_file();
         /** Serializes track_dict to the .stkl file */
         static bool write_track_dict_to_file();
         /** Tracks in track_dict whose associated file no longer exists */
@@ -126,9 +129,9 @@ namespace staccato {
         //Reading and writing playlists
 
         /** Returns basic info about every playlist (a tuple of the playlist id, name, and cover image file path) */
-        static std::vector<std::tuple<std::string, std::string, std::string>> read_basic_playlist_info_from_files();
+        static std::vector<std::tuple<std::string, std::string, std::string>> get_basic_playlist_info_from_files();
         /** Searches for .sply file with the same name, and returns complete playlist info */
-        static Playlist read_playlist_from_file(const std::string& id);
+        static Playlist get_playlist_from_file(const std::string& id);
         /** Serializes the playlist to its file */
         static bool write_playlist_to_file(const std::string& id, const Playlist& playlist);
 
