@@ -225,6 +225,15 @@ def get_refined_spotify_track_info(raw_info: dict) -> dict:
         artwork_url = raw_info["album"]["images"][0]["url"]
     except:
         pass
+    # Type checking
+    if not isinstance(title, str):
+        title = ""
+    if not isinstance(artists, list[str]):
+        artists = []
+    if not isinstance(album, str):
+        album = ""
+    if not isinstance(artwork_url, str):
+        artwork_url = ""
     return {
         "title": title,
         "artists": artists,
@@ -254,14 +263,20 @@ def get_refined_youtube_track_info(raw_info: dict) -> dict:
     elif "uploader" in raw_info:
         track["artists"] = [raw_info["uploader"]]
     else:
-        track["artists"] = ""
+        track["artists"] = []
     # Album
     if "album" in raw_info:
         track["album"] = raw_info["album"]
     else:
         track["album"] = ""
+    # Type checking
+    if not isinstance(track["title"], str):
+        track["title"] = ""
+    if not isinstance(track["artists"], list[str]):
+        track["artists"] = []
+    if not isinstance(track["album"], str):
+        track["album"] = ""
     return track
-
 
 
 if __name__ == "__main__":

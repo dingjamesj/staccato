@@ -7,10 +7,12 @@
 
 namespace staccato {
 
-    void playlist_testing();
-    void track_manager_passive_testing();
-    void track_manager_active_testing();
     void track_testing();
+    void playlist_testing();
+    void track_manager_passive_local_testing();
+    void track_manager_active_local_testing();
+    void track_manager_passive_online_testing();
+    void track_manager_active_online_testing();
 
 }
 

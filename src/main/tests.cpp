@@ -2,6 +2,12 @@
 
 using namespace staccato;
 
+void staccato::track_testing() {
+
+
+
+}
+
 void staccato::playlist_testing() {
 
     //Notes about testing: 
@@ -118,23 +124,10 @@ void staccato::playlist_testing() {
 
 }
 
-void staccato::track_manager_passive_testing() {
+void staccato::track_manager_passive_local_testing() {
 
     const std::string sample_track_path = "..\\tracks\\90210.mp3";
     const std::string non_music_file_path = "D:\\car\\idiot23.PNG";
-    const std::string normal_spotify_track = "https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a";
-    const std::string unavailable_spotify_track = "https://open.spotify.com/track/2VW3Mcwjgs4NO4P6kx52C0?si=f737371736c74c05";
-    const std::string spotify_podcast = "https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a";
-    const std::string normal_youtube_music_track = "https://www.youtube.com/watch?v=SZiwpL62to8&list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY&index=2";
-    const std::string normal_youtube_non_music_track = "https://www.youtube.com/watch?v=uXwRgnZ990I";
-    const std::string age_restricted_youtube_track = "https://www.youtube.com/watch?v=VTmaf0jggF8";
-    const std::string unavailable_youtube_track = "https://www.youtube.com/watch?v=NPTHZtcSADs";
-    const std::string self_harm_youtube_track = "https://www.youtube.com/watch?v=Y0hl_HRgQtc";
-    const std::string normal_spotify_playlist = "https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=7c38781cb46a493d";
-    const std::string normal_youtube_playlist = "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF";
-    const std::string spotify_playlist_with_unavailable_song = "https://open.spotify.com/playlist/302qOeuyMFtdYFg5owNOiQ?si=32e42f5d179248eb";
-    const std::string private_spotify_playlist_url = "https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=5bce260d95c6436e&pt=c61881f0d2e0b444b89c0519dfe05748";
-    const std::string private_youtube_playlist_url = "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY";
 
     //Accessing external tracks
 
@@ -153,6 +146,45 @@ void staccato::track_manager_passive_testing() {
     std::cout << "- TrackManager::get_local_track_info()" << std::endl;
     local_track = TrackManager::get_local_track_info("");
     std::cout << local_track.string() << std::endl;
+
+    //Reading the track dictionary
+    
+    std::cout << "TrackManager::get_track_dict_from_file()" << std::endl;
+    TrackManager::get_track_dict_from_file();
+    TrackManager::print_track_dict();
+
+    std::cout << "TrackManager::find_extraneous_track_files()" << std::endl;
+    std::vector<std::string> extraneous_track_files = TrackManager::find_extraneous_track_files();
+    for(std::string track_file: extraneous_track_files) {
+
+        std::cout << track_file << std::endl;
+
+    }
+    std::cout << std::endl;
+
+}
+
+void staccato::track_manager_active_local_testing() {
+
+
+
+}
+
+void staccato::track_manager_passive_online_testing() {
+
+    const std::string normal_spotify_track = "https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a";
+    const std::string unavailable_spotify_track = "https://open.spotify.com/track/2VW3Mcwjgs4NO4P6kx52C0?si=f737371736c74c05";
+    const std::string spotify_podcast = "https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a";
+    const std::string normal_youtube_music_track = "https://www.youtube.com/watch?v=SZiwpL62to8&list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY&index=2";
+    const std::string normal_youtube_non_music_track = "https://www.youtube.com/watch?v=uXwRgnZ990I";
+    const std::string age_restricted_youtube_track = "https://www.youtube.com/watch?v=VTmaf0jggF8";
+    const std::string unavailable_youtube_track = "https://www.youtube.com/watch?v=NPTHZtcSADs";
+    const std::string self_harm_youtube_track = "https://www.youtube.com/watch?v=Y0hl_HRgQtc";
+    const std::string normal_spotify_playlist = "https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=7c38781cb46a493d";
+    const std::string normal_youtube_playlist = "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF";
+    const std::string spotify_playlist_with_unavailable_song = "https://open.spotify.com/playlist/302qOeuyMFtdYFg5owNOiQ?si=32e42f5d179248eb";
+    const std::string private_spotify_playlist_url = "https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=5bce260d95c6436e&pt=c61881f0d2e0b444b89c0519dfe05748";
+    const std::string private_youtube_playlist_url = "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY";
 
     std::cout << "+ TrackManager::get_online_track_info() (Normal Spotify track)" << std::endl;
     Track online_track = TrackManager::get_online_track_info(normal_spotify_track);
@@ -295,24 +327,9 @@ void staccato::track_manager_passive_testing() {
     }
     std::cout << std::endl;
 
-    //Reading and writing the track dictionary
-    
-    std::cout << "TrackManager::get_track_dict_from_file()" << std::endl;
-    TrackManager::get_track_dict_from_file();
-    TrackManager::print_track_dict();
-
-    std::cout << "TrackManager::find_extraneous_track_files()" << std::endl;
-    std::vector<std::string> extraneous_track_files = TrackManager::find_extraneous_track_files();
-    for(std::string track_file: extraneous_track_files) {
-
-        std::cout << track_file << std::endl;
-
-    }
-    std::cout << std::endl;
-
 }
 
-void staccato::track_manager_active_testing() {
+void staccato::track_manager_active_online_testing() {
 
 
 
