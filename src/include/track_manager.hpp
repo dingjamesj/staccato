@@ -77,16 +77,16 @@ namespace staccato {
         static Track get_local_track_info(const std::string& path);
         /** Returns metadata of the track accessed from the URL */
         static Track get_online_track_info(const std::string& url);
+        /** Returns whether or not the playlist is accessible */
+        static bool playlist_is_accessible(const std::string& url);
+        /** Returns the tracklist of the online playlist */
+        static std::unordered_multiset<Track> get_online_tracklist(const std::string& url);
         /** (DOES NOT REPLACE) Copies the track file, overwrites the copy's metadata, puts it into staccato, and pairs it with the Track object */
         static bool import_local_track(const std::string& path, const Track& track);
         /** (DOES NOT REPLACE) Downloads the track from the YouTube URL, puts it into staccato and pairs it with the Track object */
         static bool download_track(const Track& track, const std::string& youtube_url, bool force_mp3);
         /** (DOES NOT REPLACE) Finds the best matching YouTube URL, downloads it, puts it into staccato and pairs it with the Track object */
         static bool download_track(const Track& track, bool force_mp3);
-        /** Returns whether or not the playlist is accessible */
-        static bool playlist_is_accessible(const std::string& url);
-        /** Returns the tracklist of the online playlist */
-        static std::unordered_multiset<Track> get_online_tracklist(const std::string& url);
 
         //Reading and writing tracks
 

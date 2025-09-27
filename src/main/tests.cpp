@@ -82,36 +82,36 @@ void staccato::playlist_testing() {
 
     std::cout << "+ Playlist.get_sorted_playlist() (title ascending)" << std::endl;
     std::vector<Track> sorted_tracklist_1 = spotify_playlist.get_sorted_tracklist(sortmode::title, true);
-    for(std::size_t i {0}; i < sorted_tracklist_1.size(); i++) {
+    for(Track track: sorted_tracklist_1) {
 
-        std::cout << sorted_tracklist_1[i].string();
+        std::cout << track.string();
 
     }
     std::cout << std::endl;
 
     std::cout << "+ Playlist.get_sorted_playlist() (title descending)" << std::endl;
     std::vector<Track> sorted_tracklist_2 = spotify_playlist.get_sorted_tracklist(sortmode::title, false);
-    for(std::size_t i {0}; i < sorted_tracklist_2.size(); i++) {
+    for(Track track: sorted_tracklist_2) {
 
-        std::cout << sorted_tracklist_2[i].string();
+        std::cout << track.string();
 
     }
     std::cout << std::endl;
 
     std::cout << "+ Playlist.get_sorted_playlist() (artists ascending)" << std::endl;
     std::vector<Track> sorted_tracklist_3 = spotify_playlist.get_sorted_tracklist(sortmode::artists, true);
-    for(std::size_t i {0}; i < sorted_tracklist_3.size(); i++) {
+    for(Track track: sorted_tracklist_3) {
 
-        std::cout << sorted_tracklist_3[i].string();
+        std::cout << track.string();
 
     }
     std::cout << std::endl;
 
     std::cout << "+ Playlist.get_sorted_playlist() (album ascending)" << std::endl;
     std::vector<Track> sorted_tracklist_4 = spotify_playlist.get_sorted_tracklist(sortmode::album, true);
-    for(std::size_t i {0}; i < sorted_tracklist_4.size(); i++) {
+    for(Track track: sorted_tracklist_4) {
 
-        std::cout << sorted_tracklist_4[i].string();
+        std::cout << track.string();
 
     }
     std::cout << std::endl;
@@ -130,6 +130,11 @@ void staccato::track_manager_passive_testing() {
     const std::string age_restricted_youtube_track = "https://www.youtube.com/watch?v=VTmaf0jggF8";
     const std::string unavailable_youtube_track = "https://www.youtube.com/watch?v=NPTHZtcSADs";
     const std::string self_harm_youtube_track = "https://www.youtube.com/watch?v=Y0hl_HRgQtc";
+    const std::string normal_spotify_playlist = "https://open.spotify.com/playlist/1MBIdnT23Xujh3iHDAURfB?si=7c38781cb46a493d";
+    const std::string normal_youtube_playlist = "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF";
+    const std::string spotify_playlist_with_unavailable_song = "https://open.spotify.com/playlist/302qOeuyMFtdYFg5owNOiQ?si=32e42f5d179248eb";
+    const std::string private_spotify_playlist_url = "https://open.spotify.com/playlist/6Qj4W3ybeItAPg0d5e8XVy?si=5bce260d95c6436e&pt=c61881f0d2e0b444b89c0519dfe05748";
+    const std::string private_youtube_playlist_url = "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY";
 
     //Accessing external tracks
 
@@ -147,7 +152,7 @@ void staccato::track_manager_passive_testing() {
 
     std::cout << "- TrackManager::get_local_track_info()" << std::endl;
     local_track = TrackManager::get_local_track_info("");
-    std::cout << local_track.string() << std::endl << std::endl;
+    std::cout << local_track.string() << std::endl;
 
     std::cout << "+ TrackManager::get_online_track_info() (Normal Spotify track)" << std::endl;
     Track online_track = TrackManager::get_online_track_info(normal_spotify_track);
@@ -169,11 +174,11 @@ void staccato::track_manager_passive_testing() {
     online_track = TrackManager::get_online_track_info(normal_youtube_non_music_track);
     std::cout << online_track.string() << std::endl;
 
-    std::cout << "+ TrackManager::get_online_track_info() (Age-restricted YouTube)" << std::endl;
+    std::cout << "- TrackManager::get_online_track_info() (Age-restricted YouTube)" << std::endl;
     online_track = TrackManager::get_online_track_info(age_restricted_youtube_track);
     std::cout << online_track.string() << std::endl;
 
-    std::cout << "+ TrackManager::get_online_track_info() (Unavailable YouTube video)" << std::endl;
+    std::cout << "- TrackManager::get_online_track_info() (Unavailable YouTube video)" << std::endl;
     online_track = TrackManager::get_online_track_info(unavailable_youtube_track);
     std::cout << online_track.string() << std::endl;
 
@@ -181,11 +186,120 @@ void staccato::track_manager_passive_testing() {
     online_track = TrackManager::get_online_track_info(self_harm_youtube_track);
     std::cout << online_track.string() << std::endl;
 
+    std::cout << "+ TrackManager::playlist_is_accessible() (Spotify)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible(normal_spotify_playlist) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::playlist_is_accessible() (YouTube)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible(normal_youtube_playlist) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Invalid URL)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("aksjdbaksbds2") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Empty parameter)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Private Spotify)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible(private_spotify_playlist_url) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Private YouTube)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible(private_youtube_playlist_url) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Malformed Spotify)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("https://open.spotify.com/plaaylist/3oMkpen2toJFAvPDPml7HC?si=872709bfd3cd4593") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Malformed Spotify)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("https://open.spotify.com/playlist/3oMakpen2toJFAvPDPml7HC?si=872709bfd3cd4593") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Malformed Spotify)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("https://open.spotify.com/") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Malformed YouTube)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("https://www.youtube.com/plaaylist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Malformed YouTube)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("https://www.youtube.com/playlist?list=PLmfSdJj_aZUFD_YvXNxd89Mq5pysTjpMSF") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Malformed YouTube)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible("https://www.youtube.com/") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::playlist_is_accessible() (Spotify playlist with unavailable track)" << std::endl;
+    std::cout << (TrackManager::playlist_is_accessible(spotify_playlist_with_unavailable_song) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::get_online_tracklist() (Spotify)" << std::endl;
+    std::unordered_multiset<Track> tracklist = TrackManager::get_online_tracklist(normal_spotify_playlist);
+    if(tracklist.empty()) {
+
+        std::cout << "[empty]" << std::endl;
+
+    }
+    for(Track track: tracklist) {
+
+        std::cout << track.string();
+
+    }
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::get_online_tracklist() (YouTube)" << std::endl;
+    tracklist = TrackManager::get_online_tracklist(normal_youtube_playlist);
+    if(tracklist.empty()) {
+
+        std::cout << "[empty]" << std::endl;
+
+    }
+    for(Track track: tracklist) {
+
+        std::cout << track.string();
+
+    }
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::get_online_tracklist() (unavailable Spotify)" << std::endl;
+    tracklist = TrackManager::get_online_tracklist(unavailable_spotify_track);
+    if(tracklist.empty()) {
+
+        std::cout << "[empty]" << std::endl;
+
+    }
+    for(Track track: tracklist) {
+
+        std::cout << track.string();
+
+    }
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::get_online_tracklist() (unavailable YouTube)" << std::endl;
+    tracklist = TrackManager::get_online_tracklist(unavailable_youtube_track);
+    if(tracklist.empty()) {
+
+        std::cout << "[empty]" << std::endl;
+
+    }
+    for(Track track: tracklist) {
+
+        std::cout << track.string();
+
+    }
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::get_online_tracklist() (Spotify with unavailable track)" << std::endl;
+    tracklist = TrackManager::get_online_tracklist(spotify_playlist_with_unavailable_song);
+    if(tracklist.empty()) {
+
+        std::cout << "[empty]" << std::endl;
+
+    }
+    for(Track track: tracklist) {
+
+        std::cout << track.string();
+
+    }
+    std::cout << std::endl;
+
     //Reading and writing the track dictionary
     
     std::cout << "TrackManager::get_track_dict_from_file()" << std::endl;
     TrackManager::get_track_dict_from_file();
-    std::cout << std::endl;
+    TrackManager::print_track_dict();
 
     std::cout << "TrackManager::find_extraneous_track_files()" << std::endl;
     std::vector<std::string> extraneous_track_files = TrackManager::find_extraneous_track_files();
