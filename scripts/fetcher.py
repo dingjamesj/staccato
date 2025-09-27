@@ -45,40 +45,12 @@ def get_spotify_playlist(spotify_id: str) -> list[dict]:
         playlist_data: list[dict] = [{}]
         # Note that the Spotify API can only retrieve 100 tracks at a time.
         call_count: int = 0
-        title: str = ""
-        artists: list[str] = []
-        album: str = ""
-        artwork_url: str = ""
         while len(playlist_data) > 0:
             playlist_data = sp.playlist_tracks(playlist_id=spotify_id, market=market, offset=(call_count * 100))["items"]
             for track_data in playlist_data:
-                title = ""
-                artists = []
-                album = ""
-                artwork_url = ""
-                try:
-                    title = track_data["track"]["name"]
-                except:
-                    pass
-                try: 
-                    for artist_data in track_data["track"]["artists"]:
-                        artists.append(artist_data["name"])
-                except:
-                    pass
-                try:
-                    album = track_data["track"]["album"]["name"]
-                except:
-                    pass
-                try:
-                    artwork_url = track_data["track"]["album"]["images"][0]["url"]
-                except:
-                    pass
-                playlist.append({
-                    "title": title,
-                    "artists": artists,
-                    "album": album,
-                    "artwork_url": artwork_url
-                })
+                if "track" not in track_data:
+                    continue
+                playlist.append(get_refined_spotify_track_info(track_data["track"]))
             call_count = call_count + 1
         return playlist
     except Exception as e:
@@ -121,7 +93,7 @@ def can_access_youtube_playlist(url: str) -> bool:
     }
     with YoutubeDL(ydl_opts) as ydl:
         info: dict = ydl.extract_info(url, download=False)
-        return "entries" in info and info is not None
+        return info is not None and "entries" in info and "description" in info and info["channel"] is not None
 
 
 def get_spotify_track(spotify_id: str) -> dict:
@@ -130,28 +102,30 @@ def get_spotify_track(spotify_id: str) -> dict:
         read_api_settings()
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
         track_data: dict = sp.track(track_id=spotify_id, market=market)
-        artists: list = []
-        for artist_data in track_data["artists"]:
-            artists.append(artist_data["name"])
-        return {
-            "title": track_data["name"],
-            "artists": artists,
-            "album": track_data["album"]["name"],
-            "artwork_url": track_data["album"]["images"][0]["url"]
-        }
+        return get_refined_spotify_track_info(track_data)
     except:
         pass
     # Maybe the previous attempt failed because it was a podcast episode?
     try:
         sp = Spotify(auth_manager=SpotifyClientCredentials(client_id=api_keys[0], client_secret=api_keys[1]))
         podcast_data: dict = sp.episode(episode_id=spotify_id, market=market)
+        title: str = ""
+        artwork_url: str = ""
+        try:
+            title = podcast_data["name"]
+        except:
+            pass
+        try:
+            artwork_url = podcast_data["images"][0]["url"]
+        except:
+            pass
         return {
-            "title": podcast_data["name"],
-            "artists": ["Unknown Artists"],
-            "album": "Unknown Album",
-            "artwork_url": podcast_data["images"][0]["url"]
+            "title": title,
+            "artists": [],
+            "album": "",
+            "artwork_url": artwork_url
         }
-    except Exception as e:
+    except:
         return {} # Guess it wasn't a valid track nor a valid podcast episode
 
 
@@ -229,6 +203,36 @@ def calculate_video_score(search_result: dict, index: int, target_title: str, ta
     return score
 
 
+def get_refined_spotify_track_info(raw_info: dict) -> dict:
+    title: str = ""
+    artists: list[str] = []
+    album: str = ""
+    artwork_url: str = ""
+    try:
+        title = raw_info["name"]
+    except:
+        pass
+    try:
+        for artist_data in raw_info["artists"]:
+            artists.append(artist_data["name"])
+    except:
+        pass
+    try:
+        album = raw_info["album"]["name"]
+    except:
+        pass
+    try:
+        artwork_url = raw_info["album"]["images"][0]["url"]
+    except:
+        pass
+    return {
+        "title": title,
+        "artists": artists,
+        "album": album,
+        "artwork_url": artwork_url
+    }
+
+
 def get_refined_youtube_track_info(raw_info: dict) -> dict:
     # Differentiate between a YouTube track and playlist
     if "entries" in raw_info:
@@ -273,4 +277,6 @@ if __name__ == "__main__":
     # Podcast
     # print(get_spotify_track("https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a"))
 
-    print(get_spotify_playlist("https://open.spotify.com/playlist/302qOeuyMFtdYFg5owNOiQ?si=32c98038ea5d4bf3"))
+    print(can_access_youtube_playlist("https://www.youtube.com/"))
+    print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
+    print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=RDEBr7YTNBzoM"))

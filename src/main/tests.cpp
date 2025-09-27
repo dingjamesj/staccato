@@ -222,7 +222,7 @@ void staccato::track_manager_passive_testing() {
     std::cout << "- TrackManager::playlist_is_accessible() (Malformed YouTube)" << std::endl;
     std::cout << (TrackManager::playlist_is_accessible("https://www.youtube.com/") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Spotify playlist with unavailable track)" << std::endl;
+    std::cout << "+ TrackManager::playlist_is_accessible() (Spotify playlist with unavailable track)" << std::endl;
     std::cout << (TrackManager::playlist_is_accessible(spotify_playlist_with_unavailable_song) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
     std::cout << "+ TrackManager::get_online_tracklist() (Spotify)" << std::endl;

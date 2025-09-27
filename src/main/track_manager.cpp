@@ -33,47 +33,22 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
 
     TagLib::FileRef file_ref(path.c_str());
 
-    if(track.title.empty()) {
+    file_ref.tag()->setTitle(track.title);
 
-        file_ref.tag()->setTitle("Unknown Title");
+    std::string artists_str {""};
+    for(std::size_t i {0}; i < track.artists.size(); i++) {
 
-    } else {
+        artists_str += track.artists[i];
+        if(i < track.artists.size() - 1) {
 
-        file_ref.tag()->setTitle(track.title);
-
-    }
-
-    if(track.artists.empty()) {
-
-        file_ref.tag()->setArtist("Unknown Artists");
-
-    } else {
-
-        std::string artists_str {""};
-        for(std::size_t i {0}; i < track.artists.size(); i++) {
-
-            artists_str += track.artists[i];
-            if(i < track.artists.size() - 1) {
-
-                artists_str += ", ";
-
-            }
+            artists_str += ", ";
 
         }
-        
-        file_ref.tag()->setArtist(artists_str);
 
     }
+    file_ref.tag()->setArtist(artists_str);
 
-    if(track.album.empty()) {
-
-        file_ref.tag()->setAlbum("Unknown Album");
-
-    } else {
-
-        file_ref.tag()->setAlbum(track.album);
-
-    }
+    file_ref.tag()->setAlbum(track.album);
 
     return file_ref.save();
 
@@ -142,22 +117,6 @@ Track TrackManager::get_local_track_info(const std::string& path) {
     std::string title = file_ref.tag()->title().to8Bit();
     std::string artist_str = file_ref.tag()->artist().to8Bit();
     std::string album = file_ref.tag()->album().to8Bit();
-
-    if(title.empty()) {
-
-        title = "Unknown Title";
-
-    }
-    if(artist_str.empty()) {
-
-        artist_str = "Unknown Artists";
-
-    }
-    if(album.empty()) {
-
-        album = "Unknown Album";
-
-    }
 
     std::vector<std::string> artists = tokenize_comma_separated_string(artist_str);
 

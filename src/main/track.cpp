@@ -5,10 +5,33 @@
 using namespace staccato;
 
 Track::Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album): 
-    title {title}, 
-    artists {artists}, 
-    album {album} 
-{}
+    title {title.empty() ? "Unknown Title" : title}, 
+    artists {}, 
+    album {album.empty() ? "Unknown Album" : album} 
+{
+
+    if(artists.size() == 0) {
+
+        Track::artists = {"Unknown Artists"};
+        return;
+
+    }
+
+    for(std::string artist: artists) {
+
+        if(artist.empty()) {
+
+            Track::artists.push_back("Unknown Artist");
+
+        } else {
+
+            Track::artists.push_back(artist);
+
+        }
+
+    }
+
+}
 
 Track::Track(): title {""}, artists {}, album {""} {}
 
