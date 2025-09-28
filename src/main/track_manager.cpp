@@ -195,7 +195,7 @@ Track TrackManager::get_online_track_info(const std::string& url) {
 
 }
 
-bool TrackManager::playlist_is_accessible(const std::string& url) {
+bool TrackManager::online_playlist_is_accessible(const std::string& url) {
 
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
@@ -738,7 +738,7 @@ int TrackManager::get_playlist_duration(const Playlist& playlist) {
 
 }
 
-bool TrackManager::get_track_dict_from_file() {
+bool TrackManager::read_track_dict() {
 
     track_dict.clear();
 
@@ -835,7 +835,7 @@ bool TrackManager::get_track_dict_from_file() {
 
 }
 
-bool TrackManager::write_track_dict_to_file() {
+bool TrackManager::serialize_track_dict() {
 
     std::ofstream output(std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
     if(!output.is_open()) {
@@ -907,16 +907,9 @@ std::vector<std::string> TrackManager::find_extraneous_track_files() {
     std::vector<std::string> extraneous_track_files {};
     for(std::filesystem::directory_entry file: std::filesystem::directory_iterator(TRACK_FILES_DIRECTORY)) {
 
-        //Ignore directories and non-audio files
+        //Ignore directories, non-audio files, and corrupted audio files
 
-        if(file.is_directory()) {
-
-            continue;
-
-        }
-
-        TagLib::FileRef file_ref(file.path().c_str());
-        if(file_ref.isNull()) {
+        if(file.is_directory() || !path_is_readable_track_file(file.path().string())) {
 
             continue;
 
@@ -1010,7 +1003,7 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
 }
 
-Playlist TrackManager::get_playlist_from_file(const std::string& id) {
+Playlist TrackManager::get_playlist(const std::string& id) {
 
     std::ifstream input(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION});
     if(!input.is_open()) {
@@ -1133,7 +1126,7 @@ Playlist TrackManager::get_playlist_from_file(const std::string& id) {
 
 }
 
-bool TrackManager::write_playlist_to_file(const std::string& id, const Playlist& playlist) {
+bool TrackManager::serialize_playlist(const std::string& id, const Playlist& playlist) {
 
     std::ofstream output(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION}, std::ios::binary);
     if(!output.is_open()) {

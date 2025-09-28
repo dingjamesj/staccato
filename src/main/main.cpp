@@ -12,7 +12,7 @@ int main() {
     }
 
     // playlist_testing();
-    track_manager_passive_testing();
+    track_manager_passive_local_testing();
 
     Py_FinalizeEx();
 

@@ -48,7 +48,7 @@ Playlist::Playlist(): name {""}, tracklist {}, online_connection {""} {}
 
 bool Playlist::set_online_connection(const std::string& url) {
 
-    if(TrackManager::playlist_is_accessible(url)) {
+    if(TrackManager::online_playlist_is_accessible(url)) {
 
         online_connection = url;
         return true;
