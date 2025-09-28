@@ -126,32 +126,49 @@ void staccato::playlist_testing() {
 
 void staccato::track_manager_passive_local_testing() {
 
-    const std::string sample_track_path = "../tracks/90210.mp3";
+    const std::string music_file_path = "../tracks/90210.mp3";
     const std::string non_music_file_path = "../tracks/idiot23.PNG";
     const std::string invalid_path = "asodiaosi";
-    const std::string corrupted_music_file = "../tracks/corruptedmp3.mp3";
+    const std::string corrupted_music_file_path = "../tracks/corruptedmp3.mp3";
+    const std::string unreachable_music_file_path = ""; //File unreachable by security policy
+    const Track track_in_dict ("Devil In A New Dress", {"Kanye West"}, "My Beautiful Dark Twisted Fantasy");
+    const Track track_not_in_dict ("asiudasd", {"asid"}, "asiodhasodh");
+    const Track empty_track = Track();
 
-    //Reading external tracks
+    //Track dictionary
+    
+    std::cout << "TrackManager::read_track_dict()" << std::endl;
+    TrackManager::read_track_dict();
+    TrackManager::print_track_dict();
+
+    //Reading external tracks (we're using file paths inside the staccato filesystem but that should make no difference)
 
     std::cout << "+ TrackManager::get_local_track_info()" << std::endl;
-    Track local_track = TrackManager::get_local_track_info(sample_track_path);
+    Track local_track = TrackManager::get_local_track_info(music_file_path);
     std::cout << local_track.string() << std::endl;
 
-    std::cout << "- TrackManager::get_local_track_info()" << std::endl;
+    std::cout << "- TrackManager::get_local_track_info() (invalid file path)" << std::endl;
     local_track = TrackManager::get_local_track_info(invalid_path);
     std::cout << local_track.string() << std::endl;
 
-    std::cout << "- TrackManager::get_local_track_info()" << std::endl;
+    std::cout << "- TrackManager::get_local_track_info() (non music file path)" << std::endl;
     local_track = TrackManager::get_local_track_info(non_music_file_path);
     std::cout << local_track.string() << std::endl;
 
-    std::cout << "- TrackManager::get_local_track_info()" << std::endl;
+    std::cout << "- TrackManager::get_local_track_info() (empty file path)" << std::endl;
     local_track = TrackManager::get_local_track_info("");
     std::cout << local_track.string() << std::endl;
 
-    //Reading local tracks
+    std::cout << "- TrackManager::get_local_track_info() (corrupted file)" << std::endl;
+    local_track = TrackManager::get_local_track_info(corrupted_music_file_path);
+    std::cout << local_track.string() << std::endl;
+
+    std::cout << "- TrackManager::get_local_track_info() (unreachable file path due to security policy)" << std::endl;
+    local_track = TrackManager::get_local_track_info(unreachable_music_file_path);
+    std::cout << local_track.string() << std::endl;
+
     std::cout << "+ TrackManager::path_is_readable_track_file()" << std::endl;
-    std::cout << (TrackManager::path_is_readable_track_file(sample_track_path) ? "true" : "false") << std::endl << std::endl;
+    std::cout << (TrackManager::path_is_readable_track_file(music_file_path) ? "true" : "false") << std::endl << std::endl;
 
     std::cout << "- TrackManager::path_is_readable_track_file() (non-music file)" << std::endl;
     std::cout << (TrackManager::path_is_readable_track_file(non_music_file_path) ? "true" : "false") << std::endl << std::endl;
@@ -160,15 +177,68 @@ void staccato::track_manager_passive_local_testing() {
     std::cout << (TrackManager::path_is_readable_track_file(invalid_path) ? "true" : "false") << std::endl << std::endl;
 
     std::cout << "- TrackManager::path_is_readable_track_file() (corrupted mp3 file)" << std::endl;
-    std::cout << (TrackManager::path_is_readable_track_file(corrupted_music_file) ? "true" : "false") << std::endl << std::endl;
+    std::cout << (TrackManager::path_is_readable_track_file(corrupted_music_file_path) ? "true" : "false") << std::endl << std::endl;
 
-    //Reading the track dictionary
-    
-    std::cout << "TrackManager::get_track_dict_from_file()" << std::endl;
-    TrackManager::read_track_dict();
-    TrackManager::print_track_dict();
+    std::cout << "- TrackManager::path_is_readable_track_file() (unreachable file path due to security policy)" << std::endl;
+    std::cout << (TrackManager::path_is_readable_track_file(unreachable_music_file_path) ? "true" : "false") << std::endl << std::endl;
 
-    std::cout << "TrackManager::find_extraneous_track_files()" << std::endl;
+    //Reading internal tracks
+
+    std::cout << "+ TrackManager::track_is_in_dict()" << std::endl;
+    std::cout << (TrackManager::track_is_in_dict(track_in_dict) ? "true" : "false") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::track_is_in_dict() (track that's not in the dict)" << std::endl;
+    std::cout << (TrackManager::track_is_in_dict(track_not_in_dict) ? "true" : "false") << std::endl << std::endl;
+
+    std::cout << "- TrackManager::track_is_in_dict() (empty track)" << std::endl;
+    std::cout << (TrackManager::track_is_in_dict(empty_track) ? "true" : "false") << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::get_track_duration()" << std::endl;
+    std::cout << TrackManager::get_track_file_path(track_in_dict) << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_duration() (track that's not in the dict)" << std::endl;
+    std::cout << TrackManager::get_track_file_path(track_not_in_dict) << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_duration() (empty track)" << std::endl;
+    std::cout << TrackManager::get_track_file_path(empty_track) << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::get_track_bitrate()" << std::endl;
+    std::cout << TrackManager::get_track_bitrate(track_in_dict) << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_bitrate() (track that's not in the dict)" << std::endl;
+    std::cout << TrackManager::get_track_bitrate(track_not_in_dict) << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_bitrate() (empty track)" << std::endl;
+    std::cout << TrackManager::get_track_bitrate(empty_track) << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::get_track_file_ext()" << std::endl;
+    std::cout << TrackManager::get_track_file_ext(track_in_dict) << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_file_ext() (track that's not in the dict)" << std::endl;
+    std::cout << TrackManager::get_track_file_ext(track_not_in_dict) << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_file_ext() (empty track)" << std::endl;
+    std::cout << TrackManager::get_track_file_ext(empty_track) << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::get_track_artwork_raw()" << std::endl;
+    std::cout << TrackManager::get_track_artwork_raw(track_in_dict).size() << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_artwork_raw() (track that's not in the dict)" << std::endl;
+    std::cout << TrackManager::get_track_artwork_raw(track_not_in_dict).size() << std::endl << std::endl;
+
+    std::cout << "- TrackManager::get_track_artwork_raw() (empty track)" << std::endl;
+    std::cout << TrackManager::get_track_artwork_raw(empty_track).size() << std::endl << std::endl;
+
+    std::cout << "+ TrackManager::find_missing_tracks()" << std::endl;
+    std::vector<Track> missing_tracks = TrackManager::find_missing_tracks();
+    for(Track track: missing_tracks) {
+
+        std::cout << track.string();
+
+    }
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::find_extraneous_track_files()" << std::endl;
     std::vector<std::string> extraneous_track_files = TrackManager::find_extraneous_track_files();
     for(std::string track_file: extraneous_track_files) {
 
@@ -181,7 +251,7 @@ void staccato::track_manager_passive_local_testing() {
 
 void staccato::track_manager_active_local_testing() {
 
-
+    
 
 }
 
@@ -233,43 +303,43 @@ void staccato::track_manager_passive_online_testing() {
     online_track = TrackManager::get_online_track_info(self_harm_youtube_track);
     std::cout << online_track.string() << std::endl;
 
-    std::cout << "+ TrackManager::playlist_is_accessible() (Spotify)" << std::endl;
+    std::cout << "+ TrackManager::online_playlist_is_accessible() (Spotify)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible(normal_spotify_playlist) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "+ TrackManager::playlist_is_accessible() (YouTube)" << std::endl;
+    std::cout << "+ TrackManager::online_playlist_is_accessible() (YouTube)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible(normal_youtube_playlist) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Invalid URL)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Invalid URL)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("aksjdbaksbds2") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Empty parameter)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Empty parameter)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Private Spotify)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Private Spotify)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible(private_spotify_playlist_url) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Private YouTube)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Private YouTube)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible(private_youtube_playlist_url) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Malformed Spotify)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Malformed Spotify)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("https://open.spotify.com/plaaylist/3oMkpen2toJFAvPDPml7HC?si=872709bfd3cd4593") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Malformed Spotify)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Malformed Spotify)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("https://open.spotify.com/playlist/3oMakpen2toJFAvPDPml7HC?si=872709bfd3cd4593") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Malformed Spotify)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Malformed Spotify)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("https://open.spotify.com/") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Malformed YouTube)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Malformed YouTube)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("https://www.youtube.com/plaaylist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Malformed YouTube)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Malformed YouTube)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("https://www.youtube.com/playlist?list=PLmfSdJj_aZUFD_YvXNxd89Mq5pysTjpMSF") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "- TrackManager::playlist_is_accessible() (Malformed YouTube)" << std::endl;
+    std::cout << "- TrackManager::online_playlist_is_accessible() (Malformed YouTube)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible("https://www.youtube.com/") ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
-    std::cout << "+ TrackManager::playlist_is_accessible() (Spotify playlist with unavailable track)" << std::endl;
+    std::cout << "+ TrackManager::online_playlist_is_accessible() (Spotify playlist with unavailable track)" << std::endl;
     std::cout << (TrackManager::online_playlist_is_accessible(spotify_playlist_with_unavailable_song) ? "is accessible" : "NOT accessible") << std::endl << std::endl;
 
     std::cout << "+ TrackManager::get_online_tracklist() (Spotify)" << std::endl;
