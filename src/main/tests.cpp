@@ -247,6 +247,36 @@ void staccato::track_manager_passive_local_testing() {
     }
     std::cout << std::endl;
 
+    //Reading local playlists
+
+    std::cout << "+ TrackManager::get_basic_playlist_info_from_files()" << std::endl;
+    std::vector<std::tuple<std::string, std::string, std::string>> basic_info_list = TrackManager::get_basic_playlist_info_from_files();
+    for(std::tuple<std::string, std::string, std::string> info: basic_info_list) {
+
+        std::cout << "ID: " << std::get<0>(info) << std::endl;
+        std::cout << "Name: " << std::get<1>(info) << std::endl;
+        std::cout << "Cover Image: " << std::get<2>(info) << std::endl;
+
+    }
+    std::cout << std::endl;
+
+    Playlist playlist = Playlist();
+    if(basic_info_list.size() > 0) {
+
+        std::cout << "+ TrackManager::get_playlist()" << std::endl;
+        playlist = TrackManager::get_playlist(std::get<0>(basic_info_list[0]));
+        std::cout << playlist.string() << std::endl;
+
+        std::cout << "+ TrackManager::get_playlist_duration()" << std::endl;
+        std::cout << TrackManager::get_playlist_duration(playlist) << std::endl << std::endl;
+
+    } else {
+
+        std::cout << "SKIPPED TEST TrackManager::get_playlist() since no playlists were detected by TrackManager::get_basic_playlist_info_from_files()" << std::endl;
+        std::cout << "SKIPPED TEST TrackManager::get_playlist_duration() since no playlists were detected by TrackManager::get_basic_playlist_info_from_files()" << std::endl;
+
+    }
+
 }
 
 void staccato::track_manager_active_local_testing() {
