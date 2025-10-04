@@ -4,15 +4,33 @@
 
 using namespace staccato;
 
+const std::string& Track::title() const {
+
+    return title_;
+
+}
+
+const std::vector<std::string>& Track::artists() const {
+
+    return artists_;
+
+}
+
+const std::string& Track::album() const {
+
+    return album();
+
+}
+
 Track::Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album): 
-    title {title.empty() ? "Unknown Title" : title}, 
-    artists {}, 
-    album {album.empty() ? "Unknown Album" : album} 
+    title_ {title.empty() ? "Unknown Title" : title}, 
+    artists_ {}, 
+    album_ {album.empty() ? "Unknown Album" : album} 
 {
 
     if(artists.size() == 0) {
 
-        Track::artists = {"Unknown Artists"};
+        Track::artists_ = {"Unknown Artists"};
         return;
 
     }
@@ -21,11 +39,11 @@ Track::Track(const std::string& title, const std::vector<std::string>& artists, 
 
         if(artist.empty()) {
 
-            Track::artists.push_back("Unknown Artist");
+            Track::artists_.push_back("Unknown Artist");
 
         } else {
 
-            Track::artists.push_back(artist);
+            Track::artists_.push_back(artist);
 
         }
 
@@ -33,11 +51,11 @@ Track::Track(const std::string& title, const std::vector<std::string>& artists, 
 
 }
 
-Track::Track(): title {""}, artists {}, album {""} {}
+Track::Track(): title_ {""}, artists_ {}, album_ {""} {}
 
 bool Track::is_empty() const {
 
-    return title.empty() && artists.empty() && album.empty();
+    return title_.empty() && artists_.empty() && album_.empty();
 
 }
 
@@ -50,10 +68,10 @@ std::string Track::string() const {
     }
 
     std::string artists_str {};
-    for(std::size_t i {0}; i < artists.size(); i++) {
+    for(std::size_t i {0}; i < artists_.size(); i++) {
 
-        artists_str += artists[i];
-        if(i < artists.size() - 1) {
+        artists_str += artists_[i];
+        if(i < artists_.size() - 1) {
 
             artists_str += ", ";
 
@@ -61,7 +79,7 @@ std::string Track::string() const {
 
     }
 
-    return title + " by " + artists_str + " from " + album + "\n";
+    return title_ + " by " + artists_str + " from " + album_ + "\n";
     
 }
 
@@ -70,8 +88,8 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
     switch(sort_mode) {
 
     case sortmode::title: {
-        icu::UnicodeString title1 = icu::UnicodeString::fromUTF8(track1.title).toLower();
-        icu::UnicodeString title2 = icu::UnicodeString::fromUTF8(track2.title).toLower();
+        icu::UnicodeString title1 = icu::UnicodeString::fromUTF8(track1.title_).toLower();
+        icu::UnicodeString title2 = icu::UnicodeString::fromUTF8(track2.title_).toLower();
         if(title1 < title2) {
 
             return -1;
@@ -87,22 +105,22 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
         }
     }
     case sortmode::artists: {
-        if(track1.artists.size() == 0 && track2.artists.size() == 0) {
+        if(track1.artists_.size() == 0 && track2.artists_.size() == 0) {
 
             return 0;
 
-        } else if(track1.artists.size() == 0) {
+        } else if(track1.artists_.size() == 0) {
 
             return -1;
 
-        } else if(track2.artists.size() == 0) {
+        } else if(track2.artists_.size() == 0) {
 
             return 1;
 
         }
 
-        icu::UnicodeString artists1 = icu::UnicodeString::fromUTF8(track1.artists[0]).toLower();
-        icu::UnicodeString artists2 = icu::UnicodeString::fromUTF8(track2.artists[0]).toLower();
+        icu::UnicodeString artists1 = icu::UnicodeString::fromUTF8(track1.artists_[0]).toLower();
+        icu::UnicodeString artists2 = icu::UnicodeString::fromUTF8(track2.artists_[0]).toLower();
         if(artists1 < artists2) {
 
             return -1;
@@ -118,8 +136,8 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
         }
     }
     case sortmode::album: {
-        icu::UnicodeString album1 = icu::UnicodeString::fromUTF8(track1.album).toLower();
-        icu::UnicodeString album2 = icu::UnicodeString::fromUTF8(track2.album).toLower();
+        icu::UnicodeString album1 = icu::UnicodeString::fromUTF8(track1.album_).toLower();
+        icu::UnicodeString album2 = icu::UnicodeString::fromUTF8(track2.album_).toLower();
         if(album1 < album2) {
 
             return -1;
@@ -194,7 +212,7 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
 
 bool Track::operator==(const Track& other) const {
 
-    return title == other.title && artists == other.artists && album == other.album;
+    return title_ == other.title_ && artists_ == other.artists_ && album_ == other.album_;
 
 }
 

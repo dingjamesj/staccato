@@ -34,13 +34,14 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
 
     TagLib::FileRef file_ref(path.c_str());
 
-    file_ref.tag()->setTitle(track.title);
+    file_ref.tag()->setTitle(track.title());
 
+    const std::vector<std::string>& track_artists = track.artists();
     std::string artists_str {""};
-    for(std::size_t i {0}; i < track.artists.size(); i++) {
+    for(std::size_t i {0}; i < track_artists.size(); i++) {
 
-        artists_str += track.artists[i];
-        if(i < track.artists.size() - 1) {
+        artists_str += track_artists[i];
+        if(i < track_artists.size() - 1) {
 
             artists_str += ", ";
 
@@ -49,7 +50,7 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
     }
     file_ref.tag()->setArtist(artists_str);
 
-    file_ref.tag()->setAlbum(track.album);
+    file_ref.tag()->setAlbum(track.album());
 
     return file_ref.save();
 
@@ -447,11 +448,12 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
 
     }
 
-    PyObject* py_param_title = PyUnicode_FromString(track.title.c_str());
-    PyObject* py_param_artists = PyList_New(track.artists.size());
-    for(std::size_t i {0}; i < track.artists.size(); i++) {
+    PyObject* py_param_title = PyUnicode_FromString(track.title().c_str());
+    const std::vector<std::string>& track_artists = track.artists();
+    PyObject* py_param_artists = PyList_New(track_artists.size());
+    for(std::size_t i {0}; i < track_artists.size(); i++) {
 
-        PyList_Append(py_param_artists, PyUnicode_FromString(track.artists[i].c_str()));
+        PyList_Append(py_param_artists, PyUnicode_FromString(track_artists[i].c_str()));
 
     }
     
@@ -850,14 +852,14 @@ bool TrackManager::serialize_track_dict() {
 
     for(const std::pair<Track, std::string>& pair: track_dict) {
 
-        output.write(pair.first.title.c_str(), pair.first.title.size());
-        for(const std::string& artist: pair.first.artists) {
+        output.write(pair.first.title().c_str(), pair.first.title().size());
+        for(const std::string& artist: pair.first.artists()) {
 
             output.write(artist.c_str(), artist.size());
 
         }
         output.put('\0');
-        output.write(pair.first.album.c_str(), pair.first.album.size());
+        output.write(pair.first.album().c_str(), pair.first.album().size());
         output.write(pair.second.c_str(), pair.second.size());
 
         if(output.fail()) {
@@ -1143,14 +1145,14 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
     std::unordered_multiset<Track> tracklist = playlist.get_tracklist();
     for(const Track& track: tracklist) {
 
-        output.write(track.title.c_str(), track.title.size());
-        for(const std::string& artist: track.artists) {
+        output.write(track.title().c_str(), track.title().size());
+        for(const std::string& artist: track.artists()) {
 
             output.write(artist.c_str(), artist.size());
 
         }
         output.put('\0');
-        output.write(track.album.c_str(), track.album.size());
+        output.write(track.album().c_str(), track.album().size());
 
         if(output.fail()) {
 
@@ -1185,17 +1187,18 @@ void TrackManager::print_track_dict() {
     for(const std::pair<const staccato::Track, std::string>& key_value: track_dict) {
 
         std::string artists_str {""};
-        for(std::size_t i {0}; i < key_value.first.artists.size(); i++) {
+        const std::vector<std::string>& track_artists = key_value.first.artists();
+        for(std::size_t i {0}; i < track_artists.size(); i++) {
 
-            artists_str += key_value.first.artists[i];
-            if(i < key_value.first.artists.size() - 1) {
+            artists_str += track_artists[i];
+            if(i < track_artists.size() - 1) {
 
                 artists_str += ", ";
 
             }
 
         }
-        std::cout << "K: " << key_value.first.title + " " + artists_str + " " + key_value.first.album << std::endl << "V: " << key_value.second << std::endl;
+        std::cout << "K: " << key_value.first.title() + " " + artists_str + " " + key_value.first.album() << std::endl << "V: " << key_value.second << std::endl;
 
         if(count < track_dict.size() - 1) {
 

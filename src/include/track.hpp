@@ -14,10 +14,15 @@ namespace staccato {
     /** Struct that contains metadata for a track (title, artists, album) */
     struct Track {
 
+    private:
+        std::string title_;
+        std::vector<std::string> artists_;
+        std::string album_;
+
     public:
-        std::string title;
-        std::vector<std::string> artists;
-        std::string album;
+        const std::string& title() const;
+        const std::vector<std::string>& artists() const;
+        const std::string& album() const;
 
         Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album);
         Track();
@@ -43,14 +48,15 @@ template<> struct std::hash<staccato::Track> {
 
     inline std::size_t operator()(const staccato::Track& track) const {
 
+        const std::vector<std::string>& artists = track.artists();
         std::string artists_str {};
-        for(std::size_t i {0}; i < track.artists.size(); i++) {
+        for(std::size_t i {0}; i < artists.size(); i++) {
 
-            artists_str += track.artists[i] + " ";
+            artists_str += artists[i] + " ";
 
         }
 
-        return std::hash<string>()(track.title + " " + artists_str + track.album);
+        return std::hash<string>()(track.title() + " " + artists_str + track.album());
 
     }
 
