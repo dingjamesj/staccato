@@ -10,9 +10,9 @@ std::unordered_map<Track, std::string> TrackManager::track_dict = {};
 
 std::filesystem::path TrackManager::get_unique_filename(std::filesystem::path path) {
 
-    bool path_already_exists = std::filesystem::exists(path);
+    std::string original_file_stem = path.stem().string();
     std::size_t count = {1};
-    while(path_already_exists) {
+    while(std::filesystem::exists(path)) {
     
         if(count > 10000) {
 
@@ -21,7 +21,8 @@ std::filesystem::path TrackManager::get_unique_filename(std::filesystem::path pa
 
         }
 
-        path.replace_filename(std::format("{} ({}){}", path.stem().string(), count, path.extension().string()));
+        path.replace_filename(std::format("{} ({}){}", original_file_stem, count, path.extension().string()));
+        count++;
 
     }
 
@@ -347,7 +348,8 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     std::filesystem::path destination_path = TRACK_FILES_DIRECTORY / source_path.filename();
 
     destination_path = get_unique_filename(destination_path);
-    bool copy_success = std::filesystem::copy_file(source_path, destination_path, std::filesystem::copy_options::skip_existing);
+    std::error_code error;
+    bool copy_success = std::filesystem::copy_file(source_path, destination_path, std::filesystem::copy_options::skip_existing, error);
 
     if(!copy_success) {
 

@@ -194,13 +194,13 @@ void staccato::track_manager_passive_local_testing() {
     std::cout << (TrackManager::track_is_in_dict(empty_track) ? "true" : "false") << std::endl << std::endl;
 
     std::cout << "+ TrackManager::get_track_duration()" << std::endl;
-    std::cout << TrackManager::get_track_file_path(track_in_dict) << std::endl << std::endl;
+    std::cout << TrackManager::get_track_duration(track_in_dict) << std::endl << std::endl;
 
     std::cout << "- TrackManager::get_track_duration() (track that's not in the dict)" << std::endl;
-    std::cout << TrackManager::get_track_file_path(track_not_in_dict) << std::endl << std::endl;
+    std::cout << TrackManager::get_track_duration(track_not_in_dict) << std::endl << std::endl;
 
     std::cout << "- TrackManager::get_track_duration() (empty track)" << std::endl;
-    std::cout << TrackManager::get_track_file_path(empty_track) << std::endl << std::endl;
+    std::cout << TrackManager::get_track_duration(empty_track) << std::endl << std::endl;
 
     std::cout << "+ TrackManager::get_track_bitrate()" << std::endl;
     std::cout << TrackManager::get_track_bitrate(track_in_dict) << std::endl << std::endl;
@@ -281,7 +281,14 @@ void staccato::track_manager_passive_local_testing() {
 
 void staccato::track_manager_active_local_testing() {
 
-    
+    bool success = false;
+    const std::string external_local_track_path = "C:/Users/James/Music/rkargb/Cash In Cash Out (Official Audio).mp3";
+
+    std::cout << "+ TrackManager::import_local_track()" << std::endl;
+    Track imported_track = TrackManager::get_local_track_info(external_local_track_path);
+    success = TrackManager::import_local_track(external_local_track_path, imported_track);
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
 
 }
 
