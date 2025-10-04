@@ -18,7 +18,7 @@ const std::vector<std::string>& Track::artists() const {
 
 const std::string& Track::album() const {
 
-    return album();
+    return album_;
 
 }
 

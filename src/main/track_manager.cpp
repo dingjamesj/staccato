@@ -550,11 +550,24 @@ bool TrackManager::edit_track(const Track& original_track, const Track& new_trac
 
         //(we return true because we only return false if the edit was unsuccessful,
         // since an edit didn't happen, then the edit vacuously was successful)
+        std::cout << "doesn't exist" << std::endl;
         return true;
 
     }
 
-    return write_file_metadata(track_dict.at(original_track), new_track);
+    if(write_file_metadata(track_dict.at(original_track), new_track)) {
+
+        std::unordered_map<staccato::Track, std::string>::node_type map_node = track_dict.extract(original_track);
+        map_node.key() = new_track;
+        track_dict.insert(std::move(map_node));
+
+        return true;
+
+    } else {
+
+        return false;
+
+    }
 
 }
 
@@ -1186,19 +1199,7 @@ void TrackManager::print_track_dict() {
     int count = 0;
     for(const std::pair<const staccato::Track, std::string>& key_value: track_dict) {
 
-        std::string artists_str {""};
-        const std::vector<std::string>& track_artists = key_value.first.artists();
-        for(std::size_t i {0}; i < track_artists.size(); i++) {
-
-            artists_str += track_artists[i];
-            if(i < track_artists.size() - 1) {
-
-                artists_str += ", ";
-
-            }
-
-        }
-        std::cout << "K: " << key_value.first.title() + " " + artists_str + " " + key_value.first.album() << std::endl << "V: " << key_value.second << std::endl;
+        std::cout << "K: " << key_value.first.string() << std::endl << "V: " << key_value.second << std::endl;
 
         if(count < track_dict.size() - 1) {
 
