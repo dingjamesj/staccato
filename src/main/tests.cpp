@@ -286,6 +286,12 @@ void staccato::track_manager_active_local_testing() {
     const Track replacement_track ("Replacement", {"Replacement", "Artists"}, "Replacement Album");
     const std::string artwork_file_path = "D:/car/idiot141.JPG";
 
+    std::cout << "+ TrackManager::read_track_dict()" << std::endl;
+    success = TrackManager::read_track_dict();
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
+    std::cout << std::endl;
+
     std::cout << "+ TrackManager::import_local_track()" << std::endl;
     Track imported_track = TrackManager::get_local_track_info(external_local_track_path);
     success = TrackManager::import_local_track(external_local_track_path, imported_track);
@@ -301,6 +307,25 @@ void staccato::track_manager_active_local_testing() {
 
     std::cout << "+ TrackManager::set_track_artwork()" << std::endl;
     success = TrackManager::set_track_artwork(replacement_track, artwork_file_path);
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::import_local_track()" << std::endl;
+    imported_track = TrackManager::get_local_track_info(external_local_track_path);
+    success = TrackManager::import_local_track(external_local_track_path, imported_track);
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::delete_track_artwork()" << std::endl;
+    success = TrackManager::delete_track_artwork(imported_track);
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::serialize_track_dict()" << std::endl;
+    success = TrackManager::serialize_track_dict();
     std::cout << (success ? "true" : "false") << std::endl;
     TrackManager::print_track_dict();
     std::cout << std::endl;

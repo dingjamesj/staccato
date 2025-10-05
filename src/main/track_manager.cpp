@@ -82,9 +82,10 @@ std::string TrackManager::ifstream_read_file_header(std::ifstream& input) {
     while(!input.eof()) {
 
         c = input.get();
+        
         if(input.fail()) {
 
-            continue;
+            return "";
 
         }
 
@@ -705,7 +706,12 @@ bool TrackManager::set_track_artwork(const Track& track, const std::string& artw
 
     }
 
-    std::ifstream input_stream(artwork_file, std::ios::binary);
+    std::ifstream input_stream (artwork_file, std::ios::binary);
+    if(!input_stream.is_open()) {
+
+        return false;
+
+    }
     std::vector<char> image_data = {std::istreambuf_iterator<char>(input_stream), {}};
     file_ref.setComplexProperties("PICTURE", {
 
@@ -779,15 +785,23 @@ bool TrackManager::read_track_dict() {
 
     }
 
+    std::uint16_t total_count {0};
     std::uint8_t count {0};
     std::string title, curr_artist, album, path {""};
     std::vector<std::string> artists {};
     char c {'\0'};
-    while(!input.eof()) {
+    while(total_count < 65500) {
 
         c = input.get();
+        total_count++;
 
         if(input.fail()) {
+
+            if(input.eof()) {
+
+                break;
+
+            }
 
             return false;
 
@@ -799,6 +813,7 @@ bool TrackManager::read_track_dict() {
             if(c == '\0') {
 
                 count++;
+                total_count = 0;
 
             } else {
 
@@ -830,6 +845,7 @@ bool TrackManager::read_track_dict() {
 
                 //Start reading the album if we got two null chars in a row
                 count++;
+                total_count = 0;
 
             } else if(c == '\0') {
 
@@ -868,18 +884,23 @@ bool TrackManager::serialize_track_dict() {
     }
 
     output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
+    output.put('\0');
 
     for(const std::pair<Track, std::string>& pair: track_dict) {
 
         output.write(pair.first.title().c_str(), pair.first.title().size());
+        output.put('\0');
         for(const std::string& artist: pair.first.artists()) {
 
             output.write(artist.c_str(), artist.size());
+            output.put('\0');
 
         }
         output.put('\0');
         output.write(pair.first.album().c_str(), pair.first.album().size());
+        output.put('\0');
         output.write(pair.second.c_str(), pair.second.size());
+        output.put('\0');
 
         if(output.fail()) {
 
@@ -1159,8 +1180,11 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
     }
 
     output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
+    output.put('\0');
     output.write(playlist.name.c_str(), playlist.name.size());
+    output.put('\0');
     output.write(playlist.online_connection.c_str(), playlist.online_connection.size());
+    output.put('\0');
     std::unordered_multiset<Track> tracklist = playlist.get_tracklist();
     for(const Track& track: tracklist) {
 
