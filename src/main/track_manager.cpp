@@ -693,7 +693,13 @@ bool TrackManager::set_track_artwork(const Track& track, const std::string& artw
 
     std::filesystem::path artwork_file = artwork_file_path;
     std::string file_ext = artwork_file.extension().string();
-    if(file_ext != ".jpg" && file_ext != ".png" && file_ext != ".jpeg") {
+    std::string lowercase_file_ext {""};
+    for(std::size_t i {0}; i < file_ext.size(); i++) {
+
+        lowercase_file_ext.push_back(std::tolower(file_ext[i]));
+
+    }
+    if(lowercase_file_ext != ".jpg" && lowercase_file_ext != ".png" && lowercase_file_ext != ".jpeg") {
 
         return false;
 
@@ -1199,7 +1205,7 @@ void TrackManager::print_track_dict() {
     int count = 0;
     for(const std::pair<const staccato::Track, std::string>& key_value: track_dict) {
 
-        std::cout << "K: " << key_value.first.string() << std::endl << "V: " << key_value.second << std::endl;
+        std::cout << "K: " << key_value.first.string() << "V: " << key_value.second << std::endl;
 
         if(count < track_dict.size() - 1) {
 

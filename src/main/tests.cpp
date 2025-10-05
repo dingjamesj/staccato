@@ -284,6 +284,7 @@ void staccato::track_manager_active_local_testing() {
     bool success = false;
     const std::string external_local_track_path = "C:/Users/James/Music/rargb/Cash In Cash Out (Official Audio).mp3";
     const Track replacement_track ("Replacement", {"Replacement", "Artists"}, "Replacement Album");
+    const std::string artwork_file_path = "D:/car/idiot141.JPG";
 
     std::cout << "+ TrackManager::import_local_track()" << std::endl;
     Track imported_track = TrackManager::get_local_track_info(external_local_track_path);
@@ -294,6 +295,12 @@ void staccato::track_manager_active_local_testing() {
 
     std::cout << "+ TrackManager::edit_track()" << std::endl;
     success = TrackManager::edit_track(imported_track, replacement_track);
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::set_track_artwork()" << std::endl;
+    success = TrackManager::set_track_artwork(replacement_track, artwork_file_path);
     std::cout << (success ? "true" : "false") << std::endl;
     TrackManager::print_track_dict();
     std::cout << std::endl;
