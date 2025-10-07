@@ -1001,15 +1001,24 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
         }
 
+        std::uint16_t total_count {0};
         std::uint8_t count {0};
         std::string name, cover_image_file_path {""};
         char c = '\0';
-        while(!input.eof()) {
+        while(total_count < 65500) {
 
             c = input.get();
+            total_count++;
 
             if(input.fail()) {
 
+                if(input.eof()) {
+
+                    break;
+
+                }
+
+                std::cout << 4 << std::endl;
                 break;
 
             }
@@ -1026,14 +1035,21 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
             if(c == '\0') {
 
-                count++;
+                if(count == 0) {
+
+                    count++;
+                    
+                } else {
+
+                    break;
+
+                }
 
             }
 
         }
 
-        //The reading was unsuccessful if the file ends early
-        if(count != 2) {
+        if(count != 1) {
 
             continue;
 
@@ -1049,7 +1065,8 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
 Playlist TrackManager::get_playlist(const std::string& id) {
 
-    std::ifstream input(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION});
+    std::filesystem::path playlist_files_directory_path = PLAYLIST_FILES_DIRECTORY / std::filesystem::path(id + std::string{PLAYLIST_FILE_EXTENSION});
+    std::ifstream input (playlist_files_directory_path, std::ios::binary);
     if(!input.is_open()) {
 
         return Playlist();
@@ -1065,14 +1082,22 @@ Playlist TrackManager::get_playlist(const std::string& id) {
     }
 
     //Read basic playlist details
+    std::uint16_t total_char_count {0};
     std::uint8_t count {0};
     std::string name, online_connection {""};
     char c = '\0';
-    while(!input.eof()) {
+    while(total_char_count < 65500) {
 
         c = input.get();
+        total_char_count++;
 
         if(input.fail()) {
+
+            if(input.eof()) {
+
+                break;
+
+            }
 
             return Playlist();
 
@@ -1107,9 +1132,22 @@ Playlist TrackManager::get_playlist(const std::string& id) {
     std::string title, curr_artist, album {""};
     std::vector<std::string> artists {};
     count = 0;
-    while(!input.eof()) {
+    while(total_char_count < 65500) {
 
         c = input.get();
+        total_char_count++;
+
+        if(input.fail()) {
+
+            if(input.eof()) {
+
+                break;
+
+            }
+
+            return Playlist();
+
+        }
 
         if(count != 1) {
 
@@ -1172,7 +1210,8 @@ Playlist TrackManager::get_playlist(const std::string& id) {
 
 bool TrackManager::serialize_playlist(const std::string& id, const Playlist& playlist) {
 
-    std::ofstream output(std::string{PLAYLIST_FILES_DIRECTORY} + id + std::string{PLAYLIST_FILE_EXTENSION}, std::ios::binary);
+    std::filesystem::path playlist_files_directory_path = PLAYLIST_FILES_DIRECTORY / std::filesystem::path(id + std::string{PLAYLIST_FILE_EXTENSION});
+    std::ofstream output (playlist_files_directory_path, std::ios::binary);
     if(!output.is_open()) {
 
         return false;
@@ -1189,13 +1228,16 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
     for(const Track& track: tracklist) {
 
         output.write(track.title().c_str(), track.title().size());
+        output.put('\0');
         for(const std::string& artist: track.artists()) {
 
             output.write(artist.c_str(), artist.size());
+            output.put('\0');
 
         }
         output.put('\0');
         output.write(track.album().c_str(), track.album().size());
+        output.put('\0');
 
         if(output.fail()) {
 
@@ -1238,6 +1280,25 @@ void TrackManager::print_track_dict() {
         }
 
         count++;
+
+    }
+
+}
+
+void TrackManager::print_basic_playlists_info() {
+
+    std::vector<std::tuple<std::string, std::string, std::string>> playlists_info = get_basic_playlist_info_from_files();
+    if(playlists_info.size() == 0) {
+
+        std::cout << "[no playlists available]" << std::endl;
+
+    } else {
+
+        for(std::tuple<std::string, std::string, std::string> info: playlists_info) {
+
+            std::cout << std::get<0>(info) << " " << std::get<1>(info) << " " << std::get<2>(info) << std::endl;
+
+        }
 
     }
 

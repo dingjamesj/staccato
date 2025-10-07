@@ -166,6 +166,7 @@ namespace staccato {
         //Debugging
 
         static void print_track_dict();
+        static void print_basic_playlists_info();
 
         //Constexprs
 

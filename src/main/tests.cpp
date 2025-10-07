@@ -330,6 +330,18 @@ void staccato::track_manager_active_local_testing() {
     TrackManager::print_track_dict();
     std::cout << std::endl;
 
+    std::cout << "+ TrackManager::get_basic_playlist_info_from_files()" << std::endl;
+    std::vector<std::tuple<std::string, std::string, std::string>> saved_playlists_info = TrackManager::get_basic_playlist_info_from_files();
+    TrackManager::print_basic_playlists_info();
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::serialize_playlist()" << std::endl;
+    Playlist playlist ("my playlist", {Track("CHAMPAIN & VACAY", {"Travis Scott", "Don Toliver"}, "JACKBOYS 2"), Track("4EVER", {"Clairo"}, "4EVER"), Track("ANTIFRAGILE", {"LE SSERAFIM"}, "UNFORGIVEN")}, "");
+    success = TrackManager::serialize_playlist("playlistid", playlist);
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_basic_playlists_info();
+    std::cout << std::endl;
+
     // std::cout << "+ TrackManager::delete_track()" << std::endl;
     // success = TrackManager::delete_track(imported_track);
     // std::cout << (success ? "true" : "false") << std::endl;
