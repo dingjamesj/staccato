@@ -551,7 +551,6 @@ bool TrackManager::edit_track(const Track& original_track, const Track& new_trac
 
         //(we return true because we only return false if the edit was unsuccessful,
         // since an edit didn't happen, then the edit vacuously was successful)
-        std::cout << "doesn't exist" << std::endl;
         return true;
 
     }
@@ -787,7 +786,7 @@ bool TrackManager::read_track_dict() {
 
     std::uint16_t total_count {0};
     std::uint8_t count {0};
-    std::string title, curr_artist, album, path {""};
+    std::string title {""}, curr_artist {""}, album {""}, path {""};
     std::vector<std::string> artists {};
     char c {'\0'};
     while(total_count < 65500) {
@@ -831,7 +830,7 @@ bool TrackManager::read_track_dict() {
                 default:
                     count = 0;
                     track_dict.insert({Track(title, artists, album), path});
-                    title, curr_artist, album, path = "";
+                    title = curr_artist = album = path = "";
                     artists.clear();
                     break;
 
@@ -1018,7 +1017,6 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
                 }
 
-                std::cout << 4 << std::endl;
                 break;
 
             }
@@ -1115,21 +1113,29 @@ Playlist TrackManager::get_playlist(const std::string& id) {
 
         if(c == '\0') {
 
-            count++;
+            if(count == 0) {
+
+                count++;
+                
+            } else {
+
+                break;
+
+            }
 
         }
 
     }
 
     //Reading unsuccessful if the file ends early
-    if(count != 2) {
+    if(count != 1) {
 
         return Playlist();
 
     }
 
     std::unordered_multiset<Track> tracklist {};
-    std::string title, curr_artist, album {""};
+    std::string title {""}, curr_artist {""}, album {""};
     std::vector<std::string> artists {};
     count = 0;
     while(total_char_count < 65500) {
@@ -1166,13 +1172,18 @@ Playlist TrackManager::get_playlist(const std::string& id) {
                     album.push_back(c);
                     break;
                 default:
-                    count = 0;
-                    tracklist.insert(Track(title, artists, album));
-                    title, curr_artist, album = "";
-                    artists.clear();
                     break;
 
                 }
+
+            }
+
+            if(count > 2) {
+
+                count = 0;
+                tracklist.insert(Track(title, artists, album));
+                title = curr_artist = album = "";
+                artists.clear();
 
             }
 
@@ -1198,7 +1209,7 @@ Playlist TrackManager::get_playlist(const std::string& id) {
     }
 
     //Reading unsuccessful if it ends early
-    if(count != 3) {
+    if(count != 0) {
 
         return Playlist();
 

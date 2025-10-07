@@ -162,7 +162,13 @@ bool Playlist::contains_track(const Track& track) const {
 
 std::string Playlist::string() const {
 
-    std::string str = "PLAYLIST: " + name + "\n";
+    if(is_empty()) {
+
+        return "[empty]\n";
+
+    }
+
+    std::string str = name + "\n";
 
     if(!online_connection.empty()) {
 

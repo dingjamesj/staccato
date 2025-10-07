@@ -342,6 +342,10 @@ void staccato::track_manager_active_local_testing() {
     TrackManager::print_basic_playlists_info();
     std::cout << std::endl;
 
+    std::cout << "+ TrackManager::get_playlist()" << std::endl;
+    playlist = TrackManager::get_playlist("playlistid");
+    std::cout << playlist.string() << std::endl;
+
     // std::cout << "+ TrackManager::delete_track()" << std::endl;
     // success = TrackManager::delete_track(imported_track);
     // std::cout << (success ? "true" : "false") << std::endl;
