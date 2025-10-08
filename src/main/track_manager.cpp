@@ -451,7 +451,7 @@ bool TrackManager::download_track(const Track& track, bool force_mp3) {
 
     PyObject* py_param_title = PyUnicode_FromString(track.title().c_str());
     const std::vector<std::string>& track_artists = track.artists();
-    PyObject* py_param_artists = PyList_New(track_artists.size());
+    PyObject* py_param_artists = PyList_New(0);
     for(std::size_t i {0}; i < track_artists.size(); i++) {
 
         PyList_Append(py_param_artists, PyUnicode_FromString(track_artists[i].c_str()));

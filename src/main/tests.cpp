@@ -515,6 +515,19 @@ void staccato::track_manager_passive_online_testing() {
 
 void staccato::track_manager_active_online_testing() {
 
+    bool success = false;
+    const Track track ("Saint Pablo", {"Kanye West"}, "The Life Of Pablo");
 
+    std::cout << "+ TrackManager::read_track_dict()" << std::endl;
+    success = TrackManager::read_track_dict();
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
+    std::cout << std::endl;
+
+    std::cout << "+ TrackManager::download_track()" << std::endl;
+    success = TrackManager::download_track(track, false);
+    std::cout << (success ? "true" : "false") << std::endl;
+    TrackManager::print_track_dict();
+    std::cout << std::endl;
 
 }

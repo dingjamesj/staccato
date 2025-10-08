@@ -228,7 +228,7 @@ def get_refined_spotify_track_info(raw_info: dict) -> dict:
     # Type checking
     if not isinstance(title, str):
         title = ""
-    if not isinstance(artists, list[str]):
+    if not isinstance(artists, list):
         artists = []
     if not isinstance(album, str):
         album = ""
@@ -272,7 +272,7 @@ def get_refined_youtube_track_info(raw_info: dict) -> dict:
     # Type checking
     if not isinstance(track["title"], str):
         track["title"] = ""
-    if not isinstance(track["artists"], list[str]):
+    if not isinstance(track["artists"], list):
         track["artists"] = []
     if not isinstance(track["album"], str):
         track["album"] = ""
@@ -292,6 +292,7 @@ if __name__ == "__main__":
     # Podcast
     # print(get_spotify_track("https://open.spotify.com/episode/2wd4bRSwcewwFWDyQ9vlEa?si=26d3b6b43b07460a"))
 
-    print(can_access_youtube_playlist("https://www.youtube.com/"))
-    print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
-    print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=RDEBr7YTNBzoM"))
+    # print(can_access_youtube_playlist("https://www.youtube.com/"))
+    # print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
+    # print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=RDEBr7YTNBzoM"))
+    print(get_spotify_track("https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a"))
