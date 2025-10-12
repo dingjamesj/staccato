@@ -16,6 +16,7 @@
 #include <format>
 #include <filesystem>
 #include <vector>
+#include <unordered_map>
 #include <Python.h>
 
 namespace staccato {
@@ -31,9 +32,12 @@ namespace staccato {
         file_ext
     };
 
+    extern std::vector<std::string> comma_containing_phrases;
+
     std::string seconds_to_hms(int seconds);
     void trim_string(std::string& str);
     std::vector<std::string> tokenize_comma_separated_string(const std::string& str);
+    std::vector<std::string> get_artists_vector_from_str(const std::string& str);
     bool init_python();
 
 }

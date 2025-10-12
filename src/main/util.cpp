@@ -1,6 +1,8 @@
 #include "util.hpp"
 #include <iostream>
 
+std::vector<std::string> staccato::comma_containing_phrases {"Tyler, The Creator"};
+
 std::string staccato::seconds_to_hms(int seconds) {
 
     int hours = seconds / 3600;
@@ -45,6 +47,48 @@ std::vector<std::string> staccato::tokenize_comma_separated_string(const std::st
     curr_token = str.substr(begin_index);
     trim_string(curr_token);
     list.push_back(curr_token);
+
+    return list;
+
+}
+
+std::vector<std::string> staccato::get_artists_vector_from_str(const std::string& str) {
+
+    std::vector<std::string> list = tokenize_comma_separated_string(str);
+    for(std::string phrase: comma_containing_phrases) {
+
+        std::vector tokenized_phrase = tokenize_comma_separated_string(phrase);
+        if(tokenized_phrase.size() == 0) {
+
+            continue;
+
+        }
+
+        std::size_t target_token_index {0};
+        for(std::size_t i {0}; i < list.size(); i++) {
+
+            if(list[i] == tokenized_phrase[target_token_index]) {
+
+                target_token_index++;
+
+                if(target_token_index >= tokenized_phrase.size()) {
+
+                    target_token_index = 0;
+                    i -= tokenized_phrase.size() - 1;
+                    list[i] = phrase;
+                    for(std::size_t j {1}; j < tokenized_phrase.size(); j++) {
+
+                        list.erase(list.begin() + i + 1);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
 
     return list;
 
