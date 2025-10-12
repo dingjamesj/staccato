@@ -57,7 +57,7 @@ std::vector<std::string> staccato::get_artists_vector_from_str(const std::string
     std::vector<std::string> list = tokenize_comma_separated_string(str);
     for(std::string phrase: comma_containing_phrases) {
 
-        std::vector tokenized_phrase = tokenize_comma_separated_string(phrase);
+        std::vector<std::string> tokenized_phrase = tokenize_comma_separated_string(phrase);
         if(tokenized_phrase.size() == 0) {
 
             continue;

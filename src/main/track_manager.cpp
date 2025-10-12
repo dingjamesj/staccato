@@ -121,7 +121,7 @@ Track TrackManager::get_local_track_info(const std::string& path) {
     std::string artist_str = file_ref.tag()->artist().to8Bit();
     std::string album = file_ref.tag()->album().to8Bit();
 
-    std::vector<std::string> artists = tokenize_comma_separated_string(artist_str);
+    std::vector<std::string> artists = get_artists_vector_from_str(artist_str);
 
     return Track(title, artists, album);
 
