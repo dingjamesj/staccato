@@ -371,35 +371,35 @@ void staccato::track_manager_passive_online_testing() {
     const std::string private_youtube_playlist_url = "https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY";
 
     std::cout << "+ TrackManager::get_online_track_info() (Normal Spotify track)" << std::endl;
-    Track online_track = TrackManager::get_online_track_info(normal_spotify_track);
+    Track online_track = TrackManager::get_online_track_info(normal_spotify_track).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "+ TrackManager::get_online_track_info() (Unavailable Spotify track)" << std::endl;
-    online_track = TrackManager::get_online_track_info(unavailable_spotify_track);
+    online_track = TrackManager::get_online_track_info(unavailable_spotify_track).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "+ TrackManager::get_online_track_info() (Spotify podcast)" << std::endl;
-    online_track = TrackManager::get_online_track_info(spotify_podcast);
+    online_track = TrackManager::get_online_track_info(spotify_podcast).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "+ TrackManager::get_online_track_info() (YouTube Music)" << std::endl;
-    online_track = TrackManager::get_online_track_info(normal_youtube_music_track);
+    online_track = TrackManager::get_online_track_info(normal_youtube_music_track).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "+ TrackManager::get_online_track_info() (YouTube, non-music)" << std::endl;
-    online_track = TrackManager::get_online_track_info(normal_youtube_non_music_track);
+    online_track = TrackManager::get_online_track_info(normal_youtube_non_music_track).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "- TrackManager::get_online_track_info() (Age-restricted YouTube)" << std::endl;
-    online_track = TrackManager::get_online_track_info(age_restricted_youtube_track);
+    online_track = TrackManager::get_online_track_info(age_restricted_youtube_track).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "- TrackManager::get_online_track_info() (Unavailable YouTube video)" << std::endl;
-    online_track = TrackManager::get_online_track_info(unavailable_youtube_track);
+    online_track = TrackManager::get_online_track_info(unavailable_youtube_track).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "+ TrackManager::get_online_track_info() (Suicide/self-harm YouTube video)" << std::endl;
-    online_track = TrackManager::get_online_track_info(self_harm_youtube_track);
+    online_track = TrackManager::get_online_track_info(self_harm_youtube_track).first;
     std::cout << online_track.string() << std::endl;
 
     std::cout << "+ TrackManager::online_playlist_is_accessible() (Spotify)" << std::endl;
@@ -516,7 +516,7 @@ void staccato::track_manager_passive_online_testing() {
 void staccato::track_manager_active_online_testing() {
 
     bool success = false;
-    const Track track ("Saint Pablo", {"Kanye West"}, "The Life Of Pablo");
+    const Track track ("the BLACK seminole.", {"Lil Yachty", "Diana Gordon"}, "Let's Start Here.");
 
     std::cout << "+ TrackManager::read_track_dict()" << std::endl;
     success = TrackManager::read_track_dict();
@@ -525,7 +525,7 @@ void staccato::track_manager_active_online_testing() {
     std::cout << std::endl;
 
     std::cout << "+ TrackManager::download_track()" << std::endl;
-    success = TrackManager::download_track(track, false);
+    // success = TrackManager::download_track();
     std::cout << (success ? "true" : "false") << std::endl;
     TrackManager::print_track_dict();
     std::cout << std::endl;

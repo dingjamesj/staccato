@@ -101,7 +101,9 @@ namespace staccato {
         static Track get_local_track_info(const std::string& path);
 
         /** Returns metadata of the track accessed from the URL */
-        static Track get_online_track_info(const std::string& url);
+        static std::pair<Track, std::pair<std::string, std::string>> get_online_track_info(const std::string& url);
+        /** Finds the best matching YouTube URL*/
+        static std::string get_best_youtube_url(const Track& track);
 
         //Reading internal tracks
 
@@ -136,9 +138,7 @@ namespace staccato {
         static bool delete_track_artwork(const Track& track);
 
         /** (DOES NOT REPLACE) Downloads the track from the YouTube URL, puts it into staccato and pairs it with the Track object */
-        static bool download_track(const Track& track, const std::string& youtube_url, bool force_mp3);
-        /** (DOES NOT REPLACE) Finds the best matching YouTube URL, downloads it, puts it into staccato and pairs it with the Track object */
-        static bool download_track(const Track& track, bool force_mp3);
+        static bool download_track(const Track& track, const std::string& youtube_url, const std::pair<std::string, std::string>& artwork_urls, bool force_mp3);
 
         //Reading and writing local playlists + reading online playlists
         

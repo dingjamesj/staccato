@@ -208,6 +208,7 @@ def get_refined_spotify_track_info(raw_info: dict) -> dict:
     artists: list[str] = []
     album: str = ""
     artwork_url: str = ""
+    mini_artwork_url: str = ""
     try:
         title = raw_info["name"]
     except:
@@ -225,6 +226,11 @@ def get_refined_spotify_track_info(raw_info: dict) -> dict:
         artwork_url = raw_info["album"]["images"][0]["url"]
     except:
         pass
+    try:
+        if len(raw_info["album"]["images"]) > 1:
+            mini_artwork_url = raw_info["album"]["images"][-1]["url"]
+    except:
+        pass
     # Type checking
     if not isinstance(title, str):
         title = ""
@@ -234,11 +240,14 @@ def get_refined_spotify_track_info(raw_info: dict) -> dict:
         album = ""
     if not isinstance(artwork_url, str):
         artwork_url = ""
+    if not isinstance(mini_artwork_url, str):
+        mini_artwork_url = ""
     return {
         "title": title,
         "artists": artists,
         "album": album,
-        "artwork_url": artwork_url
+        "artwork_url": artwork_url,
+        "mini_artwork_url": mini_artwork_url
     }
 
 
