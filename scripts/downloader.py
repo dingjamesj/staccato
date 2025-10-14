@@ -6,7 +6,15 @@ import sys
 
 import os
 
-def download_youtube_track(url: str, location: str, force_mp3: bool) -> str:
+from mutagen.id3 import ID3, APIC
+
+import urllib.request
+from http.client import HTTPResponse
+from urllib.error import HTTPError
+
+import imghdr
+
+def download_youtube_track(url: str, artwork_urls: tuple[str], location: str, force_mp3: bool) -> str:
     """Returns the downloaded path if the download was successful, empty string otherwise"""
     try:
         # Get the unique file enumerator e.g. the (1) in "duplicatemusicfile (1).mp3"
@@ -57,10 +65,35 @@ def download_youtube_track(url: str, location: str, force_mp3: bool) -> str:
                 downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
             else:
                 downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
-            
+            set_track_artworks(downloaded_path, artwork_urls)
             return downloaded_path
     except:
         return ""
+
+
+def set_track_artworks(track_path: str, artwork_urls: tuple[str]) -> bool:
+    try:
+        id3: ID3 = ID3(track_path)
+        for artwork_url in artwork_urls:
+            response: HTTPResponse = urllib.request.urlopen(artwork_url)
+            image_data: bytes = response.read()
+            image_type = imghdr.what(None, image_data)
+            image_type_str: str = ""
+            if image_type:
+                image_type_str = f"image/{image_type}"
+            else:
+                return False
+            id3.add(APIC(
+                encoding=3,
+                mime=image_type_str,
+                type=3,
+                desc="",
+                data=image_data
+            ))
+        id3.save()
+    except:
+        return False
+    return True
 
 
 def update_yt_dlp() -> int:

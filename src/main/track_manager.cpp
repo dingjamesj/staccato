@@ -450,15 +450,19 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     }
 
     PyObject* py_param_url = PyUnicode_FromString(youtube_url.c_str());
+    PyObject* py_param_artwork_urls = PyTuple_New(2);
+    PyTuple_SetItem(py_param_artwork_urls, 0, PyUnicode_FromString(artwork_urls.first.c_str()));
+    PyTuple_SetItem(py_param_artwork_urls, 1, PyUnicode_FromString(artwork_urls.second.c_str()));
     PyObject* py_param_track_files_directory = PyUnicode_FromString(std::string(TRACK_FILES_DIRECTORY).c_str());
     PyObject* py_param_force_mp3 = PyBool_FromLong(force_mp3);
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_track_files_directory, py_param_force_mp3, NULL);
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_artwork_urls, py_param_track_files_directory, py_param_force_mp3, NULL);
     PyGILState_Release(gstate);
 
     Py_DECREF(py_func);
     Py_DECREF(py_param_url);
+    Py_DECREF(py_param_artwork_urls);
     Py_DECREF(py_param_track_files_directory);
     Py_DECREF(py_param_force_mp3);
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
