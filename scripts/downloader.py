@@ -6,7 +6,7 @@ import sys
 
 import os
 
-from mutagen.id3 import ID3, APIC
+from mutagen.id3 import ID3, APIC, ID3NoHeaderError, PictureType
 
 import urllib.request
 from http.client import HTTPResponse
@@ -14,7 +14,7 @@ from urllib.error import HTTPError
 
 import imghdr
 
-def download_youtube_track(url: str, artwork_urls: tuple[str], location: str, force_mp3: bool) -> str:
+def download_youtube_track(url: str, artwork_url: str, location: str, force_mp3: bool) -> str:
     """Returns the downloaded path if the download was successful, empty string otherwise"""
     try:
         # Get the unique file enumerator e.g. the (1) in "duplicatemusicfile (1).mp3"
@@ -62,36 +62,48 @@ def download_youtube_track(url: str, artwork_urls: tuple[str], location: str, fo
             # Return the downloaded path
             downloaded_path: str
             if unique_file_enumerator == 0:
-                downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]}.{video_info["ext"]}"
+                downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]}"
             else:
-                downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator}).{video_info["ext"]}"
-            set_track_artworks(downloaded_path, artwork_urls)
+                downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator})"
+            if force_mp3:
+                downloaded_path = downloaded_path + ".mp3"
+            else:
+                downloaded_path = downloaded_path + f".{video_info["ext"]}"
+            print(set_track_artworks(downloaded_path, artwork_url))
             return downloaded_path
     except:
         return ""
 
 
-def set_track_artworks(track_path: str, artwork_urls: tuple[str]) -> bool:
+def set_track_artworks(track_path: str, artwork_url: str) -> bool:
     try:
-        id3: ID3 = ID3(track_path)
-        for artwork_url in artwork_urls:
-            response: HTTPResponse = urllib.request.urlopen(artwork_url)
-            image_data: bytes = response.read()
-            image_type = imghdr.what(None, image_data)
-            image_type_str: str = ""
-            if image_type:
-                image_type_str = f"image/{image_type}"
-            else:
-                return False
-            id3.add(APIC(
-                encoding=3,
-                mime=image_type_str,
-                type=3,
-                desc="",
-                data=image_data
-            ))
-        id3.save()
-    except:
+        id3: ID3
+        try:
+            id3 = ID3(track_path)
+        except ID3NoHeaderError:
+            id3 = ID3()
+            id3.save(track_path)
+            id3 = ID3(track_path)
+        print(f"artwork url: {artwork_url}")
+        response: HTTPResponse = urllib.request.urlopen(artwork_url)
+        image_data: bytes = response.read()
+        image_type = imghdr.what(None, image_data)
+        image_type_str: str = ""
+        if image_type:
+            image_type_str = f"image/{image_type}"
+            print(f"image_type: {image_type}")
+        else:
+            return False
+        id3.add(APIC(
+            encoding=3,
+            mime=image_type_str,
+            type=PictureType.COVER_FRONT,
+            desc="Cover",
+            data=image_data
+        ))
+        id3.save(v2_version=3)
+    except Exception as e:
+        print(e)
         return False
     return True
 
@@ -137,4 +149,9 @@ def extract_youtube_id_from_url(url: str) -> str:
 
 
 if __name__ == "__main__":
-    print(download_youtube_track("https://www.youtube.com/watch?v=ss5msvokUkY", "D:\\"))
+    print(download_youtube_track(
+        url="https://www.youtube.com/watch?v=ss5msvokUkY",
+        artwork_url="https://i.scdn.co/image/ab67616d0000b273dfc2f59568272de50a257f2f",
+        location="D:\\",
+        force_mp3=True
+    ))

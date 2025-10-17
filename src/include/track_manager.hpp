@@ -138,7 +138,7 @@ namespace staccato {
         static bool delete_track_artwork(const Track& track);
 
         /** (DOES NOT REPLACE) Downloads the track from the YouTube URL, puts it into staccato and pairs it with the Track object */
-        static bool download_track(const Track& track, const std::string& youtube_url, const std::pair<std::string, std::string>& artwork_urls, bool force_mp3);
+        static bool download_track(const Track& track, const std::string& youtube_url, const std::string& artwork_urls, bool force_mp3);
 
         //Reading and writing local playlists + reading online playlists
         
