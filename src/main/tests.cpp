@@ -516,7 +516,9 @@ void staccato::track_manager_passive_online_testing() {
 void staccato::track_manager_active_online_testing() {
 
     bool success = false;
-    const Track track ("the BLACK seminole.", {"Lil Yachty", "Diana Gordon"}, "Let's Start Here.");
+    const Track track ("ODD Front", {"LOOΠΔ / ODD EYE CIRCLE"}, "Max & Match");
+    const std::string youtube_url {"https://www.youtube.com/watch?v=ffMfBDkmlz8"};
+    const std::string artwork_url {"https://i.scdn.co/image/ab67616d0000b273fb3c690920c69107439c2866"};
 
     std::cout << "+ TrackManager::read_track_dict()" << std::endl;
     success = TrackManager::read_track_dict();
@@ -525,7 +527,7 @@ void staccato::track_manager_active_online_testing() {
     std::cout << std::endl;
 
     std::cout << "+ TrackManager::download_track()" << std::endl;
-    // success = TrackManager::download_track()
+    success = TrackManager::download_track(track, youtube_url, artwork_url, false, false);
     std::cout << (success ? "true" : "false") << std::endl;
     TrackManager::print_track_dict();
     std::cout << std::endl;

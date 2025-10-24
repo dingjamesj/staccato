@@ -421,7 +421,7 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     
 }
 
-bool TrackManager::download_track(const Track& track, const std::string& youtube_url, const std::string& artwork_url, bool force_mp3) {
+bool TrackManager::download_track(const Track& track, const std::string& youtube_url, const std::string& artwork_url, bool force_mp3, bool force_opus) {
 
     if(track_dict.contains(track)) {
 
@@ -453,9 +453,10 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     PyObject* py_param_artwork_url = PyUnicode_FromString(artwork_url.c_str());
     PyObject* py_param_track_files_directory = PyUnicode_FromString(std::string(TRACK_FILES_DIRECTORY).c_str());
     PyObject* py_param_force_mp3 = PyBool_FromLong(force_mp3);
+    PyObject* py_param_force_opus = PyBool_FromLong(force_opus);
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_artwork_url, py_param_track_files_directory, py_param_force_mp3, NULL);
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_artwork_url, py_param_track_files_directory, py_param_force_mp3, py_param_force_opus, NULL);
     PyGILState_Release(gstate);
 
     Py_DECREF(py_func);
@@ -463,6 +464,7 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     Py_DECREF(py_param_artwork_url);
     Py_DECREF(py_param_track_files_directory);
     Py_DECREF(py_param_force_mp3);
+    Py_DECREF(py_param_force_opus);
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);

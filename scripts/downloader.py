@@ -6,8 +6,15 @@ import sys
 
 import os
 
+import base64
+
+from mutagen import File
 from mutagen.id3 import ID3, APIC, ID3NoHeaderError, PictureType
 from mutagen.mp4 import MP4, MP4Cover
+from mutagen.flac import Picture
+from mutagen.ogg import OggFileType
+from mutagen.oggopus import OggOpus
+from mutagen.oggvorbis import OggVorbis
 
 import urllib.request
 from http.client import HTTPResponse
@@ -21,19 +28,20 @@ def download_youtube_track(url: str, artwork_url: str, location: str, force_mp3:
     Downloads an M4A (with AAC codec) by default, but options are included for MP3 and WEBM (with Opus codec)"""
     try:
         # Get the unique file enumerator e.g. the (1) in "duplicatemusicfile (1).mp3"
-        possible_file_paths: list[str] = [
-            f"{location}{os.sep}{extract_youtube_id_from_url(url)}.mp3",
-            f"{location}{os.sep}{extract_youtube_id_from_url(url)}.m4a",
-            f"{location}{os.sep}{extract_youtube_id_from_url(url)}.aac"
-        ]
+        predicted_file_path: str
+        predicted_file_ext: str
+        if not force_mp3 and not force_opus:
+            predicted_file_ext = ".m4a"
+        elif force_opus:
+            predicted_file_ext = ".ogg"
+        else:
+            predicted_file_ext = ".mp3"
+        predicted_file_path = f"{location}{os.sep}{extract_youtube_id_from_url(url)}{predicted_file_ext}"
+        
         unique_file_enumerator: int = 0
-        while os.path.isfile(possible_file_paths[0]) or os.path.isfile(possible_file_paths[1]) or os.path.isfile(possible_file_paths[2]):
+        while os.path.isfile(predicted_file_path):
             unique_file_enumerator = unique_file_enumerator + 1
-            possible_file_paths = [
-                f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).mp3",
-                f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).m4a",
-                f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}).aac"
-            ]
+            predicted_file_path = f"{location}{os.sep}{extract_youtube_id_from_url(url)} ({unique_file_enumerator}){predicted_file_ext}"
 
         # Download the track and return the downloaded path
         ydl_opts: dict = {
@@ -50,8 +58,8 @@ def download_youtube_track(url: str, artwork_url: str, location: str, force_mp3:
         if force_opus:
             ydl_opts["format"] = "bestaudio"
             ydl_opts["postprocessors"] = [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "opus"
+                "key": "FFmpegVideoRemuxer",
+                "preferedformat": "ogg"
             }]
         
         if unique_file_enumerator == 0:
@@ -77,6 +85,8 @@ def download_youtube_track(url: str, artwork_url: str, location: str, force_mp3:
                 downloaded_path = f"{trimmed_location}{os.sep}{video_info["id"]} ({unique_file_enumerator})"
             if force_mp3:
                 downloaded_path = downloaded_path + ".mp3"
+            elif force_opus:
+                downloaded_path = downloaded_path + ".ogg"
             else:
                 downloaded_path = downloaded_path + f".{video_info["ext"]}"
             # Embed track artwork
@@ -88,8 +98,8 @@ def download_youtube_track(url: str, artwork_url: str, location: str, force_mp3:
                 set_track_artwork_id3(downloaded_path, artwork_url)
             elif path_extension == ".wav":
                 set_track_artwork_riff(downloaded_path, artwork_url)
-            elif path_extension == ".opus" or path_extension == ".ogg" or path_extension == ".flac":
-                set_track_artwork_vorbis(downloaded_path, artwork_url)
+            elif path_extension == ".ogg":
+                set_track_artwork_ogg(downloaded_path, artwork_url)
             # Return the downloaded path
             return downloaded_path
     except:
@@ -151,9 +161,37 @@ def set_track_artwork_riff(track_path: str, artwork_url: str) -> bool:
     return False
 
 
-def set_track_artwork_vorbis(track_path: str, artwork_url: str) -> bool:
-    # Unimplemented
-    return False
+def set_track_artwork_ogg(track_path: str, artwork_url: str) -> bool:
+    try:
+        audio_file: File = File(track_path)
+        ogg: OggFileType
+        if type(audio_file) == OggOpus:
+            ogg = OggOpus(track_path)
+        elif type(audio_file) == OggVorbis:
+            ogg = OggVorbis(track_path)
+        
+        response: HTTPResponse = urllib.request.urlopen(artwork_url)
+        image_data: bytes = response.read()
+        image_type: str = imghdr.what(None, image_data)
+        artwork: Picture = Picture()
+        artwork.data = image_data
+        if image_type == "jpeg":
+            artwork.mime = "image/jpeg"
+        elif image_type == "png":
+            artwork.mime = "image/png"
+        artwork.desc = "Cover"
+        artwork.type = 3
+
+        picture_data: bytes = artwork.write()
+        encoded_data: bytes = base64.b64encode(picture_data)
+        comment_data: str = encoded_data.decode("ascii")
+
+        ogg["metadata_block_picture"] = [comment_data]
+        ogg.save()
+    except:
+        print("False")
+        return False
+    return True
 
 
 def update_yt_dlp() -> int:
@@ -201,5 +239,6 @@ if __name__ == "__main__":
         url="https://www.youtube.com/watch?v=ss5msvokUkY",
         artwork_url="https://i.scdn.co/image/ab67616d0000b273dfc2f59568272de50a257f2f",
         location="D:\\",
-        force_mp3=False
+        force_mp3=False,
+        force_opus=False
     ))
