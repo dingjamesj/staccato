@@ -623,16 +623,59 @@ int TrackManager::get_track_bitrate(const Track& track) {
 
 }
 
-std::string TrackManager::get_track_file_ext(const Track& track) {
+audiotype TrackManager::get_track_file_type(const Track& track) {
 
     if(!track_dict.contains(track)) {
 
-        return "";
+        return audiotype::unsupported;
 
     }
 
     std::filesystem::path path = track_dict.at(track);
-    return path.extension().string();
+
+    TagLib::MP4::File m4a (path.c_str());
+    if(m4a.isValid()) {
+
+        return audiotype::m4a;
+
+    }
+
+    TagLib::MPEG::File mp3 (path.c_str());
+    if(mp3.isValid()){
+
+        return audiotype::mp3;
+
+    }
+
+    TagLib::Ogg::Opus::File opus (path.c_str());
+    if(opus.isValid()){
+
+        return audiotype::opus;
+
+    }
+
+    TagLib::Ogg::Vorbis::File vorbis (path.c_str());
+    if(vorbis.isValid()) {
+
+        return audiotype::vorbis;
+
+    }
+
+    TagLib::RIFF::WAV::File wav (path.c_str());
+    if(wav.isValid()) {
+
+        return audiotype::wav;
+
+    }
+
+    TagLib::FLAC::File flac (path.c_str());
+    if(flac.isValid()) {
+
+        return audiotype::flac;
+
+    }
+
+    return audiotype::unsupported;
 
 }
 

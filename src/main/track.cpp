@@ -186,9 +186,9 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
 
         }
     }
-    case sortmode::file_ext: {
-        icu::UnicodeString ext1 = icu::UnicodeString::fromUTF8(TrackManager::get_track_file_ext(track1)).toLower();
-        icu::UnicodeString ext2 = icu::UnicodeString::fromUTF8(TrackManager::get_track_file_ext(track2)).toLower();
+    case sortmode::file_codec: {
+        icu::UnicodeString ext1 = icu::UnicodeString::fromUTF8(audio_type_to_string(TrackManager::get_track_file_type(track1))).toLower();
+        icu::UnicodeString ext2 = icu::UnicodeString::fromUTF8(audio_type_to_string(TrackManager::get_track_file_type(track2))).toLower();
         if(ext1 < ext2) {
 
             return -1;

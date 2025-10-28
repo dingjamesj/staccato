@@ -211,14 +211,14 @@ void staccato::track_manager_passive_local_testing() {
     std::cout << "- TrackManager::get_track_bitrate() (empty track)" << std::endl;
     std::cout << TrackManager::get_track_bitrate(empty_track) << std::endl << std::endl;
 
-    std::cout << "+ TrackManager::get_track_file_ext()" << std::endl;
-    std::cout << TrackManager::get_track_file_ext(track_in_dict) << std::endl << std::endl;
+    std::cout << "+ TrackManager::get_track_file_type()" << std::endl;
+    std::cout << TrackManager::get_track_file_type(track_in_dict) << std::endl << std::endl;
 
-    std::cout << "- TrackManager::get_track_file_ext() (track that's not in the dict)" << std::endl;
-    std::cout << TrackManager::get_track_file_ext(track_not_in_dict) << std::endl << std::endl;
+    std::cout << "- TrackManager::get_track_file_type() (track that's not in the dict)" << std::endl;
+    std::cout << TrackManager::get_track_file_type(track_not_in_dict) << std::endl << std::endl;
 
-    std::cout << "- TrackManager::get_track_file_ext() (empty track)" << std::endl;
-    std::cout << TrackManager::get_track_file_ext(empty_track) << std::endl << std::endl;
+    std::cout << "- TrackManager::get_track_file_type() (empty track)" << std::endl;
+    std::cout << TrackManager::get_track_file_type(empty_track) << std::endl << std::endl;
 
     std::cout << "+ TrackManager::get_track_artwork_raw()" << std::endl;
     std::cout << TrackManager::get_track_artwork_raw(track_in_dict).size() << std::endl << std::endl;

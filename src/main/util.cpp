@@ -94,6 +94,31 @@ std::vector<std::string> staccato::get_artists_vector_from_str(const std::string
 
 }
 
+std::string staccato::audio_type_to_string(const staccato::audiotype& audio_type) {
+
+    switch(audio_type) {
+
+    case staccato::audiotype::m4a:
+        return "m4a";
+    case staccato::audiotype::mp3:
+        return "mp3";
+    case staccato::audiotype::opus:
+        return "opus";
+    case staccato::audiotype::vorbis:
+        return "vorbis";
+    case staccato::audiotype::wav:
+        return "wav";
+    case staccato::audiotype::flac:
+        return "flac";
+    case staccato::audiotype::unsupported:
+        return "[unsupported file type]";
+    default:
+        return "[YOU FORGOT TO INCLUDE THIS AUDIO TYPE IN THE OPERATOR << METHOD]";
+
+    }
+
+}
+    
 bool staccato::init_python() {
 
     PyConfig config;
@@ -133,5 +158,12 @@ bool staccato::init_python() {
     PyRun_SimpleString(("import sys; sys.path.append('" + relative_path_to_scripts + "')").c_str());
 
     return !(bool) PyStatus_Exception(status);
+
+}
+
+std::ostream& operator<<(std::ostream& os, const staccato::audiotype& audio_type) {
+
+    os << audio_type_to_string(audio_type);
+    return os;
 
 }

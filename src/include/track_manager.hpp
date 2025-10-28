@@ -12,6 +12,14 @@
 #include <iostream>
 #include <fstream>
 #include <taglib/fileref.h>
+#include <tfile.h>
+#include <mp4file.h>
+#include <mpegfile.h>
+#include <oggfile.h>
+#include <opusfile.h>
+#include <vorbisfile.h>
+#include <wavfile.h>
+#include <flacfile.h>
 #include <vector>
 
 /* Examples of .stkl and .sply file structures:
@@ -116,7 +124,7 @@ namespace staccato {
         /** Returns the bitrate of the track's file in kbps */
         static int get_track_bitrate(const Track& track);
         /** Returns the file extension of the track's file */
-        static std::string get_track_file_ext(const Track& track);
+        static audiotype get_track_file_type(const Track& track);
         /** Searches for the track in the dictionary, then returns the raw artwork metadata of the track's file */
         static std::vector<char> get_track_artwork_raw(const Track& track);
         /** Tracks in track_dict whose associated file no longer exists */
