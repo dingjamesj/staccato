@@ -282,7 +282,7 @@ void staccato::track_manager_passive_local_testing() {
 void staccato::track_manager_active_local_testing() {
 
     bool success = false;
-    const std::string external_local_track_path = "C:/Users/James/Music/rargb/Cash In Cash Out (Official Audio).mp3";
+    const std::string external_local_track_path = "D:\\ss5msvokUkY.ogg";
     const Track replacement_track ("Replacement", {"Replacement", "Artists"}, "Replacement Album");
     const std::string artwork_file_path = "D:/car/idiot141.JPG";
 

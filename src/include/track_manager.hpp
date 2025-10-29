@@ -109,7 +109,7 @@ namespace staccato {
         static Track get_local_track_info(const std::string& path);
 
         /** Returns metadata of the track accessed from the URL */
-        static std::pair<Track, std::pair<std::string, std::string>> get_online_track_info(const std::string& url);
+        static std::pair<Track, std::string> get_online_track_info(const std::string& url);
         /** Finds the best matching YouTube URL*/
         static std::string get_best_youtube_url(const Track& track);
 

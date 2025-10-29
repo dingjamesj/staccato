@@ -127,7 +127,7 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
 }
 
-std::pair<Track, std::pair<std::string, std::string>> TrackManager::get_online_track_info(const std::string& url) {
+std::pair<Track, std::string> TrackManager::get_online_track_info(const std::string& url) {
 
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
@@ -177,8 +177,7 @@ std::pair<Track, std::pair<std::string, std::string>> TrackManager::get_online_t
     PyObject* py_album = PyDict_GetItemString(py_return, "album");
     PyObject* py_artists_list = PyDict_GetItemString(py_return, "artists");
     PyObject* py_artwork_url = PyDict_GetItemString(py_return, "artwork_url");
-    PyObject* py_mini_artwork_url = PyDict_GetItemString(py_return, "mini_artwork_url");
-    if(!py_title || !py_artists_list || !py_album || !py_artwork_url || !py_mini_artwork_url) {
+    if(!py_title || !py_artists_list || !py_album || !py_artwork_url) {
 
         Py_DECREF(py_return);
         return {Track(), {"", ""}};
@@ -198,7 +197,7 @@ std::pair<Track, std::pair<std::string, std::string>> TrackManager::get_online_t
         PyUnicode_AsUTF8(py_album)
     );
     Py_DECREF(py_return);
-    return {track, {PyUnicode_AsUTF8(py_artwork_url), PyUnicode_AsUTF8(py_mini_artwork_url)}};
+    return {track, PyUnicode_AsUTF8(py_artwork_url)};
 
 }
 
