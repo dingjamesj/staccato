@@ -5,6 +5,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 from yt_dlp import YoutubeDL
 
+import musicbrainzngs
+
 # Note: you need to prefix the file location with "../" when running python from C++
 # SETTINGS_FILE_LOCATION: str = "staccatoapikeys.txt"
 SETTINGS_FILE_LOCATION: str = "../staccatoapikeys.txt"
@@ -142,6 +144,38 @@ def get_youtube_track(url: str) -> dict:
             return get_refined_youtube_track_info(info)
     except:
         return {}
+
+
+def get_artwork_url_from_musicbrainz(lead_artist: str, album: str) -> str:
+    try:
+        musicbrainzngs.set_useragent(app="staccato", version="development")
+        releases: dict = musicbrainzngs.search_release_groups(album + " " + lead_artist)
+        if "release-group-list" not in releases:
+            return ""
+        release_list: list = releases["release-group-list"]
+        if len(release_list) <= 0:
+            return ""
+        if "id" not in release_list[0]:
+            return ""
+
+        images: dict = musicbrainzngs.get_release_group_image_list(release_list[0]["id"])
+        if "images" not in images:
+            return ""
+        image_list: list = images["images"]
+        if len(image_list) <= 0:
+            return ""
+        if "thumbnails" not in image_list[0]:
+            return ""
+        image_info: dict = image_list[0]["thumbnails"]
+
+        if "500" in image_info:
+            return image_info["500"]
+        elif "large" in image_info:
+            return image_info["large"]
+        else:
+            return next(iter(image_info.values()))
+    except:
+        return ""
 
 
 def find_best_youtube_url(title: str, artists: list[str]) -> str:
@@ -296,3 +330,4 @@ if __name__ == "__main__":
     # print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
     # print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=RDEBr7YTNBzoM"))
     # print(get_spotify_track("https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a"))
+    print(get_artwork_url_from_musicbrainz("Playboi Carti", "Whole Lotta Red"))
