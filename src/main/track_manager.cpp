@@ -116,27 +116,17 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
-        return {Track(), {"", ""}};
+        return {Track(), ""};
 
     }
 
-    urltype url_type = get_url_type(url);
-    PyObject* py_func = nullptr;
-    if(url_type == urltype::spotify) {
-
-        py_func = PyObject_GetAttrString(py_module, "get_spotify_track");
-
-    } else if(url_type == urltype::youtube) {
-
-        py_func = PyObject_GetAttrString(py_module, "get_youtube_track");
-
-    }
+    PyObject* py_func = PyObject_GetAttrString(py_module, "get_track");
     Py_DECREF(py_module);
     //Check if the python function was found
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        return {Track(), {"", ""}};
+        return {Track(), ""};
 
     }
 
@@ -151,7 +141,7 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     if(py_return == nullptr || !PyDict_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        return {Track(), {"", ""}};
+        return {Track(), ""};
 
     }
 
@@ -162,7 +152,7 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     if(!py_title || !py_artists_list || !py_album || !py_artwork_url) {
 
         Py_DECREF(py_return);
-        return {Track(), {"", ""}};
+        return {Track(), ""};
 
     }
 

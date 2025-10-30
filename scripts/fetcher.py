@@ -98,6 +98,14 @@ def can_access_youtube_playlist(url: str) -> bool:
         return info is not None and "entries" in info and "description" in info and info["channel"] is not None
 
 
+def get_track(url: str) -> dict:
+    if "spotify.com" in url:
+        return get_spotify_track(url)
+    if "youtube.com" in url or "youtu.be" in url:
+        return get_youtube_track(url)
+    return {}
+
+
 def get_spotify_track(spotify_id: str) -> dict:
     """ID includes URL, URI, and alphanumeric ID"""
     try:
