@@ -118,6 +118,24 @@ std::string staccato::audio_type_to_string(const staccato::audiotype& audio_type
     }
 
 }
+
+staccato::urltype staccato::get_url_type(const std::string& url) {
+
+    if(url.find("spotify.com") != std::string::npos) {
+
+        return urltype::spotify;
+
+    }
+
+    if(url.find("youtube.com") != std::string::npos || url.find("youtu.be") != std::string::npos) {
+
+        return urltype::youtube;
+
+    }
+
+    return urltype::unknown;
+
+}
     
 bool staccato::init_python() {
 

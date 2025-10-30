@@ -94,23 +94,38 @@ namespace staccato {
 
         //Helper functions
 
+        /// @brief Adds enumerators to repeated file names (e.g. "Repeated File Name.mp3" and "Repeated File Name (1).mp3")
+        /// @param path 
+        /// @return A filesystem::path object with a unique file name
         static std::filesystem::path get_unique_filename(std::filesystem::path path);
+        /// @param path 
+        /// @param track 
+        /// @return `true` if the write was successful, `false` otherwise
         static bool write_file_metadata(const std::string& path, const Track& track);
-        static urltype get_url_type(const std::string& url);
+        /// @brief .stkl and .sply files all have the same file header that marks it as a staccato file. The header is a constexpr string that's defined somewhere else in this file.
+        /// @param input 
+        /// @return The file header from the staccato file
         static std::string ifstream_read_file_header(std::ifstream& input);
 
         public:
 
         //Reading local and online external tracks
 
-        /** Returns if the track file is readable */
+        /// @param path 
+        /// @return `true` if the file associated with the Track in the track dict is a readable audio file, `false` otherwise
         static bool path_is_readable_track_file(const std::string& path);
-        /** Returns metadata of the track accessed from the local file system */
+        /// @brief Gets info about a track from a local source (i.e. a file from the hard drive)
+        /// @param path 
+        /// @return A Track object representing the local track
         static Track get_local_track_info(const std::string& path);
 
-        /** Returns metadata of the track accessed from the URL */
+        /// @brief *(Calls python function "fetcher.get_[streaming service]_track")* Gets info about a track from an online source
+        /// @param url 
+        /// @return A Track object representing the online track
         static std::pair<Track, std::string> get_online_track_info(const std::string& url);
-        /** Finds the best matching YouTube URL*/
+        /// @brief *(Calls python function "fetcher.find_best_youtube_url")* Searches for a YouTube video that matches best with the Track info. 
+        /// @param track 
+        /// @return A YouTube URL
         static std::string get_best_youtube_url(const Track& track);
 
         //Reading internal tracks

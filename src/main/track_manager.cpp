@@ -56,24 +56,6 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
 
 }
 
-urltype TrackManager::get_url_type(const std::string& url) {
-
-    if(url.find("spotify.com") != std::string::npos) {
-
-        return urltype::spotify;
-
-    }
-
-    if(url.find("youtube.com") != std::string::npos || url.find("youtu.be") != std::string::npos) {
-
-        return urltype::youtube;
-
-    }
-
-    return urltype::unknown;
-
-}
-
 std::string TrackManager::ifstream_read_file_header(std::ifstream& input) {
 
     //Read file header

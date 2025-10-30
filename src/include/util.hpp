@@ -41,6 +41,7 @@ namespace staccato {
     std::vector<std::string> tokenize_comma_separated_string(const std::string& str);
     std::vector<std::string> get_artists_vector_from_str(const std::string& str);
     std::string audio_type_to_string(const audiotype& audio_type);
+    urltype get_url_type(const std::string& url);
     bool init_python();
 
 }
