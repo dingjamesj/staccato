@@ -146,19 +146,57 @@ def get_youtube_track(url: str) -> dict:
         return {}
 
 
-def get_artwork_url_from_musicbrainz(lead_artist: str, album: str) -> str:
+def get_artwork_url_from_musicbrainz(album: str = "", lead_artist: str = "", title: str = "") -> str:
     try:
         musicbrainzngs.set_useragent(app="staccato", version="development")
-        releases: dict = musicbrainzngs.search_release_groups(album + " " + lead_artist)
-        if "release-group-list" not in releases:
-            return ""
-        release_list: list = releases["release-group-list"]
-        if len(release_list) <= 0:
-            return ""
-        if "id" not in release_list[0]:
-            return ""
+        release_group_id: str = ""
+        
+        if album != "":
+            release_groups: dict = {}
+            if lead_artist != "":
+                release_groups = musicbrainzngs.search_release_groups(query=album, artist=lead_artist)
+            else:
+                release_groups = musicbrainzngs.search_release_groups(query=album)
+            
+            if "release-group-list" not in release_groups:
+                return ""
+            release_list: list = release_groups["release-group-list"]
+            if len(release_list) <= 0:
+                return ""
+            if "id" not in release_list[0]:
+                return ""
+            release_group_id = release_list[0]["id"]
+        elif title != "":
+            recordings: dict = {}
+            if lead_artist != "":
+                recordings = musicbrainzngs.search_recordings(query=title, artist=lead_artist)
+            else:
+                recordings = musicbrainzngs.search_recordings(query=title)
+            
+            if "recording-list" not in recordings:
+                return ""
+            if len(recordings["recording-list"]) <= 0:
+                return ""
+            if "release-list" not in recordings["recording-list"][0]:
+                return ""
+            if len(recordings["recording-list"][0]["release-list"]) <= 0:
+                return ""
+            
+            most_accurate_release: dict = {}
+            for release in recordings["recording-list"][0]["release-list"]:
+                if "country" in release and release["country"] == "US":
+                    most_accurate_release = release
+                    break
+            if most_accurate_release == {}:
+                most_accurate_release = recordings["recording-list"][0]["release-list"][0]
+            
+            if "release-group" not in most_accurate_release:
+                return ""
+            if "id" not in most_accurate_release["release-group"]:
+                return ""
+            release_group_id = most_accurate_release["release-group"]["id"]
 
-        images: dict = musicbrainzngs.get_release_group_image_list(release_list[0]["id"])
+        images: dict = musicbrainzngs.get_release_group_image_list(release_group_id)
         if "images" not in images:
             return ""
         image_list: list = images["images"]
@@ -310,12 +348,24 @@ def get_refined_youtube_track_info(raw_info: dict) -> dict:
         track["artists"] = []
     if not isinstance(track["album"], str):
         track["album"] = ""
+    # Artwork URL
+    if track["album"] != "":
+        if "artists" in raw_info and len(track["artists"]) > 0:
+            track["artwork_url"] = get_artwork_url_from_musicbrainz(lead_artist=track["artists"][0], album=track["album"])
+        else:
+            track["artwork_url"] = get_artwork_url_from_musicbrainz(album=track["album"])
+    elif "artists" in raw_info and track["title"] != "":
+        track["artwork_url"] = get_artwork_url_from_musicbrainz(lead_artist=track["artists"][0], title=track["title"])
+    else:
+        track["artwork_url"] = ""
+    # Done
     return track
 
 
 if __name__ == "__main__":
     read_api_settings()
     # print(get_youtube_track("https://www.youtube.com/watch?v=bu7nU9Mhpyo"))
+    # print(get_youtube_track("https://www.youtube.com/watch?v=DoPErQwgfg8"))
     # print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
     # print(get_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD4_T3E6jPbd6Z8n1zv_cRY"))
 
@@ -330,4 +380,11 @@ if __name__ == "__main__":
     # print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=PLmfSdJj_ZUFD_YvXNxd89Mq5pysTjpMSF"))
     # print(can_access_youtube_playlist("https://www.youtube.com/playlist?list=RDEBr7YTNBzoM"))
     # print(get_spotify_track("https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a"))
-    print(get_artwork_url_from_musicbrainz("Playboi Carti", "Whole Lotta Red"))
+
+    # print(get_artwork_url_from_musicbrainz(lead_artist="JACKBOYS", title="OUT WEST"))
+    # print(get_artwork_url_from_musicbrainz(lead_artist="Sabrina Carpenter", title="Taste"))
+    # print(get_artwork_url_from_musicbrainz(lead_artist="Childish Gambino", title="Survive"))
+    # print(get_artwork_url_from_musicbrainz(lead_artist="Playboi Carti", album="Whole Lotta Red"))
+    # print(get_artwork_url_from_musicbrainz(lead_artist="LE SSERAFIM", album="CRAZY"))
+    print(get_artwork_url_from_musicbrainz(album="JACKBOYS 2", lead_artist="JACKBOYS"))
+
