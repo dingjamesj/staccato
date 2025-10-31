@@ -7,7 +7,7 @@ set(CMAKE_PREFIX_PATH C:/Qt/6.9.1/mingw_64)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 qt_standard_project_setup(REQUIRES 6.5)
 
-file(GLOB SOURCES "src/main/*.cpp")
+file(GLOB SOURCES "src/*.cpp")
 qt_add_executable(staccato ${SOURCES})
 target_include_directories(staccato PRIVATE "src/include")
 target_include_directories(staccato PRIVATE "src/python")
