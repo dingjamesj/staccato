@@ -14,6 +14,7 @@ namespace staccato {
     enum class urltype;
     enum class sortmode;
 
+    /// @brief Contains a name, an online connection URL, and a tracklist. Note that playlists also have IDs associated with them, but this is simply stored in the .sply file names.
     class Playlist {
 
     private:
@@ -26,46 +27,82 @@ namespace staccato {
         std::string name;
         std::string online_connection;
 
+        /// @brief Creates a Playlist object
+        /// @param name 
+        /// @param tracklist 
+        /// @param online_connection 
         Playlist(
             const std::string& name, 
             const std::unordered_multiset<Track>& tracklist, 
             const std::string& online_connection
         );
 
+        /// @brief Creates an empty Playlist object. Encountering an empty Playlist object should signify that an error occurred.
         Playlist();
 
-        //Connections
+        //==================================
+        //        ONLINE CONNECTIONS        
+        //==================================
 
-        /** If the URL is valid, then it is set as the online connection. Returns false if the URL isn't valid*/
+        /// @brief Only sets the online connection if the URL leads to an accessible online playlist
+        /// @param url 
+        /// @return `true` if the connection is set (i.e. if the URL leads to an accessible online playlist), `false` otherwise
         bool set_online_connection(const std::string& url);
-        /** Removes the online connection */
+
+        /// @brief Removes the online connection
         void remove_online_connection();
-        /** Returns the online connection's URL */
+
+        /// @return The online connection URL
         std::string get_online_connection() const;
 
-        //Tracklist
+        //==================================
+        //       TRACKLIST FUNCTIONS
+        //==================================
 
-        /** Returns a const ref to the tracklist as an unordered_multiset */
+        /// @return A const ref to the tracklist as an unordered_multiset
         const std::unordered_multiset<Track>& get_tracklist() const;
-        /** Returns a sorted tracklist as a vector */
+
+        /// @brief Takes the tracklist and sorts it based on an attribute. Note that some attributes require usage of TrackManager.
+        /// @param sort_mode The attribute to sort the tracklist with (e.g. track title, duration, bitrate)
+        /// @param is_ascending Decides if the sort is ascending or descending
+        /// @return A *brand new* vector containing the sorted tracklist
         std::vector<Track> get_sorted_tracklist(sortmode sort_mode, bool is_ascending) const;
-        /** Adds a track to the tracklist */
+
+        /// @brief Adds a track to the tracklist
+        /// @param track 
         void add_track(const Track& track);
-        /** Adds all tracks not yet in the tracklist that are found in the online connection */
-        void add_tracks_from_online_connection();
-        /** Removes a track from the tracklist, returns true if was successfully removed */
+
+        /// @brief Removes a track from the tracklist
+        /// @param track 
+        /// @return `true` if successfully removed, `false` otherwise (e.g. `false` if the track wasn't in the tracklist)
         bool remove_track(const Track& track);
-        /** Check if a track is in the tracklist */
+
+        /// @param track 
+        /// @return `true` if the track is in the tracklist, `false` otherwise
         bool contains_track(const Track& track) const;
-        /** Returns a string representation of this playlist */
-        std::string string() const;
-        /** Returns if the playlist is empty (denoting an invalid playlist) */
+
+        //----- REQUIRES THE INTERNET -----
+
+        /// @brief Adds all tracks from the online connection that aren't already in the tracklist
+        void add_tracks_from_online_connection();
+
+        //==================================
+        //               MISC               
+        //==================================
+
+        /// @brief Used to see if an error was encountered (empty Playlist objects should signify that an error occurred)
+        /// @return `true` if this Playlist object is empty, `false` otherwise
         bool is_empty() const;
+        
+        /// @return A string representation of this Playlist object
+        std::string string() const;
+        
 
     };
 
 }
 
+//For debugging purposes
 std::ostream& operator<<(std::ostream& os, const staccato::Playlist& track);
 
 #endif
