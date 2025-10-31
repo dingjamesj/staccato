@@ -136,6 +136,13 @@ namespace staccato {
         /// @return A YouTube URL
         static std::string get_best_youtube_url(const Track& track);
 
+        /// @brief *(Calls python function "fetcher.get_artwork_url_from_musicbrainz")* Searches for a release group on musicbrainz that contains the track described by the params, and gets its cover artwork URL
+        /// @param title 
+        /// @param lead_artist 
+        /// @param album 
+        /// @return An online URL to an image resource, an empty string if an image wasn't found
+        static std::string get_musicbrainz_artwork_url(const std::string& title, const std::string& lead_artist, const std::string& album);
+
         //=====================================================================================
         //                               READING INTERNAL TRACKS                               
         //=====================================================================================
