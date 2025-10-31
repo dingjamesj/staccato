@@ -14,6 +14,8 @@ I will update the README and turn it into an actual README when the project is a
 
 ### Program Structure
 
+All functions that require usage of the internet are written in the python scripts.
+
 #### The `Track` struct
 - Serves as ONLY a container of information
 - Most functions on Tracks will be in the `TrackManager` class/namespace

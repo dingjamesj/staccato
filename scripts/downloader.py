@@ -23,6 +23,7 @@ import imageio_ffmpeg
 
 import imghdr
 
+# Exposed to C++
 def download_youtube_track(url: str, artwork_url: str, location: str, force_mp3: bool = False, force_opus: bool = False) -> str:
     """Returns the downloaded path if the download was successful, empty string otherwise. 
     Downloads an M4A (with AAC codec) by default, but options are included for MP3 and WEBM (with Opus codec)"""
@@ -194,6 +195,7 @@ def set_track_artwork_ogg(track_path: str, artwork_url: str) -> bool:
     return True
 
 
+# Exposed to C++
 def update_yt_dlp() -> int:
     """Return 0 if update was successful, 1 if no update was needed, and -1 if update failed"""
     pip_install_result: CompletedProcess[str] = subprocess.run(

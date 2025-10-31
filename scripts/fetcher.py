@@ -15,8 +15,8 @@ NUM_ACCEPTED_SEARCHES: int = 3
 api_keys: list[str] = []
 market: str = ""
 
-# In the order of client id, client secret, and market
 def read_api_settings():
+    """In the order of client id, client secret, and market"""
     global market
     try:
         with open(SETTINGS_FILE_LOCATION, "r") as file:
@@ -36,6 +36,16 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
             file.writelines(f"{client_id}\n{client_secret}\n{market}")
     except IOError as e:
         print(e)
+
+
+# Exposed to C++
+def get_playlist(url: str) -> list[dict]:
+    url_type: str = get_url_type(url)
+    if url_type == "spotify":
+        return get_spotify_playlist(url)
+    if url_type == "youtube":
+        return get_youtube_playlist(url)
+    return []
 
 
 def get_spotify_playlist(spotify_id: str) -> list[dict]:
@@ -78,6 +88,16 @@ def get_youtube_playlist(url: str) -> list[dict]:
         return tracklist
 
 
+# Exposed to C++
+def can_access_playlist(url: str) -> bool:
+    url_type: str = get_url_type(url)
+    if url_type == "spotify":
+        return can_access_spotify_playlist(url)
+    if url_type == "youtube":
+        return can_access_youtube_playlist(url)
+    return False
+
+
 def can_access_spotify_playlist(spotify_id: str) -> bool:
     read_api_settings()
     try:
@@ -98,10 +118,12 @@ def can_access_youtube_playlist(url: str) -> bool:
         return info is not None and "entries" in info and "description" in info and info["channel"] is not None
 
 
+# Exposed to C++
 def get_track(url: str) -> dict:
-    if "spotify.com" in url:
+    url_type: str = get_url_type(url)
+    if url_type == "spotify":
         return get_spotify_track(url)
-    if "youtube.com" in url or "youtu.be" in url:
+    if url_type == "youtube":
         return get_youtube_track(url)
     return {}
 
@@ -154,6 +176,7 @@ def get_youtube_track(url: str) -> dict:
         return {}
 
 
+# Exposed to C++
 def get_artwork_url_from_musicbrainz(album: str = "", lead_artist: str = "", title: str = "") -> str:
     try:
         musicbrainzngs.set_useragent(app="staccato", version="development")
@@ -224,6 +247,7 @@ def get_artwork_url_from_musicbrainz(album: str = "", lead_artist: str = "", tit
         return ""
 
 
+# Exposed to C++
 def find_best_youtube_url(title: str, artists: list[str]) -> str:
     try: 
         artists_str: str = ""
@@ -257,8 +281,8 @@ def find_best_youtube_url(title: str, artists: list[str]) -> str:
     except:
         return ""
 
-# How well a video's info matches up with the target track information.
 def calculate_video_score(search_result: dict, index: int, target_title: str, target_artists: str) -> int:
+    """ How well a video's info matches up with the target track information. """
     video_title: str = search_result["title"].lower()
     video_channel: str = search_result["channel"].lower()
     video_desc: str = search_result["description"].lower()
@@ -368,6 +392,14 @@ def get_refined_youtube_track_info(raw_info: dict) -> dict:
         track["artwork_url"] = ""
     # Done
     return track
+
+
+def get_url_type(url: str) -> str:
+    if "spotify.com" in url:
+        return "spotify"
+    if "youtube.com" in url or "youtu.be" in url:
+        return "youtube"
+    return ""
 
 
 if __name__ == "__main__":

@@ -90,7 +90,7 @@ namespace staccato {
 
         private:
 
-        static std::unordered_map<Track, std::string> track_dict; //The dict that maps all Tracks to a file path
+        static std::unordered_map<Track, std::string> track_dict; //The unordered_map that maps all Tracks to a file path
 
         //Helper functions
 
@@ -98,10 +98,12 @@ namespace staccato {
         /// @param path 
         /// @return A filesystem::path object with a unique file name
         static std::filesystem::path get_unique_filename(std::filesystem::path path);
+
         /// @param path 
         /// @param track 
         /// @return `true` if the write was successful, `false` otherwise
         static bool write_file_metadata(const std::string& path, const Track& track);
+        
         /// @brief .stkl and .sply files all have the same file header that marks it as a staccato file. The header is a constexpr string that's defined somewhere else in this file.
         /// @param input 
         /// @return The file header from the staccato file
@@ -109,90 +111,176 @@ namespace staccato {
 
         public:
 
-        //Reading local and online external tracks
+        //=====================================================================================
+        //                               READING EXTERNAL TRACKS                               
+        //=====================================================================================
 
         /// @param path 
         /// @return `true` if the file associated with the Track in the track dict is a readable audio file, `false` otherwise
         static bool path_is_readable_track_file(const std::string& path);
+
         /// @brief Gets info about a track from a local source (i.e. a file from the hard drive)
         /// @param path 
         /// @return A Track object representing the local track
         static Track get_local_track_info(const std::string& path);
 
-        /// @brief *(Calls python function "fetcher.get_[streaming service]_track")* Gets info about a track from an online source
+        //------------------------------- REQUIRES THE INTERNET -------------------------------
+
+        /// @brief *(Calls python function "fetcher.get_track")* Gets info about a track from an online source
         /// @param url 
         /// @return A Track object representing the online track
         static std::pair<Track, std::string> get_online_track_info(const std::string& url);
+
         /// @brief *(Calls python function "fetcher.find_best_youtube_url")* Searches for a YouTube video that matches best with the Track info. 
         /// @param track 
         /// @return A YouTube URL
         static std::string get_best_youtube_url(const Track& track);
 
-        //Reading internal tracks
+        //=====================================================================================
+        //                               READING INTERNAL TRACKS                               
+        //=====================================================================================
 
-        /** Returns if the track is in the dictionary */
+        /// @brief Checks if staccato has an associated audio file for the Track object
+        /// @param track 
+        /// @return `true` if the track is a key in the track dictionary, `false` otherwise
         static bool track_is_in_dict(const Track& track);
-        /** Returns the track's file path that's stored in the dictionary */
+
+        /// @param track 
+        /// @return The path to the Track object's associated audio file as a string, empty string if the Track object has no associated audio file
         static std::string get_track_file_path(const Track& track);
-        /** Returns the duration of the track's file */
+
+        /// @param track 
+        /// @return The duration in seconds of the Track object's associated audio file, `0` if the Track object has no associated audio file
         static int get_track_duration(const Track& track);
-        /** Returns the bitrate of the track's file in kbps */
+
+        /// @param track 
+        /// @return The bitrate of the Track object's associated audio file in kbps, `0` if the Track object has no associated audio file
         static int get_track_bitrate(const Track& track);
-        /** Returns the file extension of the track's file */
+
+        /// @param track 
+        /// @return The file type of the Track object's associated audio file (supported types can be found in the enum `staccato::audiotype`)
         static audiotype get_track_file_type(const Track& track);
-        /** Searches for the track in the dictionary, then returns the raw artwork metadata of the track's file */
+
+        /// @param track 
+        /// @return The embedded artwork of the Track object's associated audio file as a vector of bytes (chars)
         static std::vector<char> get_track_artwork_raw(const Track& track);
-        /** Tracks in track_dict whose associated file no longer exists */
+
+        /// @brief To keep staccato's file tracking in sync, this should be ran in the background when staccato starts
+        /// @return A vector of Tracks that are keys in the track dict and whose corresponding audio files are no longer accessible
         static std::vector<Track> find_missing_tracks();
-        /** Track file paths that do not have an associated Track in track_dict */
+
+        /// @brief To keep staccato's file tracking in sync, this should be ran in the background when staccato starts
+        /// @return A vector of strings that are paths to audio files in staccato's "tracks" directory that aren't in the track dict (i.e. untracked audio files that were manually placed in the "tracks" directory by the user)
         static std::vector<std::string> find_extraneous_track_files();
 
-        //Adding, modifying, and deleting internal tracks
+        //=====================================================================================
+        //                   ADDING, MODIFYING, AND DELETING INTERNAL TRACKS                   
+        //=====================================================================================
 
-        /** (DOES NOT REPLACE) Copies the track file, overwrites the copy's metadata, puts it into staccato, and pairs it with the Track object */
+        /// @brief Imports an audio file from the local filesystem by copying the file into staccato's "track" directory, writing its metadata according to param `track`, and then adding `track` and the copied file into the track dict. DOES NOTHING IF `track` ALREADY EXISTS IN THE TRACK DICT.
+        /// @param path 
+        /// @param track 
+        /// @return `true` if copying the audio file was successful, `false` otherwise. NOTE : returns `true` if `track` is already a key in the track dict (vacuously since copying the audio file wasn't attempted)
         static bool import_local_track(const std::string& path, const Track& track);
-        /** Deletes the track's file and removes the track key-value pair from the dictionary */
+
+        /// @brief Removes the param `track` from the track dict and deletes its associated audio file
+        /// @param track 
+        /// @return `true` if deleting the audio file was successful, `false` otherwise. NOTE : returns `true` if `track` is not in the track dict (vacuously since the deletion wasn't attempted)
         static bool delete_track(const Track& track);
-        /** Finds the key original_track and replaces it with new_track, then updates the track file's metadata accordingly */
+
+        /// @brief Edits a track-file pair by overwriting `original_track`'s audio file's metadata according to `new_track` and then replacing `original_track` with `new_track` in the track dict
+        /// @param original_track The Track object to modify
+        /// @param new_track A Track object containing the new metadata info
+        /// @return `true` if the edit overwriting the audio file was successful, `false` otherwise. NOTE : returns `true` if `original_track` is not in the track dict or if `new_track` is already in the track dict (vacuously since editing the metadata wasn't attempted)
         static bool edit_track(const Track& original_track, const Track& new_track);
-        /** Searches for the track in the dictionary, then writes the track's file's artwork metadata */
+
+        /// @brief Sets a track's audio file's embedded artwork to an image from the local filesystem
+        /// @param track 
+        /// @param artwork_file_path The path to an image file (JPEG and PNG accepted)
+        /// @return `true` if embedding the artwork was successful, `false` otherwise. NOTE : returns `true` if `track` is not in the track dict (vacuously since setting the artwork wasn't attempted)
         static bool set_track_artwork(const Track& track, const std::string& artwork_file_path);
-        /** Searches for the track in the dictionary, then deletes the track's file's artwork metadata */
+
+        /// @brief Deletes a track's audio file's embedded artwork
+        /// @param track 
+        /// @return `true` if deleting the artwork was successful, `false` otherwise. NOTE : returns `true` if `track` is not in the track dict (vacuously since deleting the artwork wasn't attempted)
         static bool delete_track_artwork(const Track& track);
 
-        /** (DOES NOT REPLACE) Downloads the track from the YouTube URL, puts it into staccato and pairs it with the Track object */
+        //------------------------------- REQUIRES THE INTERNET -------------------------------
+
+        /// @brief *(Calls python function "downloader.download_youtube_track")* Downloads an audio file from YouTube, puts it into staccato's "track" directory, and adds param `track` and the downloaded file path to the track dict. DOES NOTHING IF `track` ALREADY EXISTS IN THE TRACK DICT.
+        /// @param track The track metadata to put into the track dict and to set the downloaded audio file metadata to
+        /// @param youtube_url YouTube video URL to download from
+        /// @param artwork_url URL to an online image resource
+        /// @param force_mp3 Forces the audio file to be an mp3
+        /// @param force_opus Forces the audio file to be an ogg file with opus codec
+        /// @return `true` if the download was successful, `false` otherwise (e.g. unable to download video, python error). NOTE : returns `true` if `track` is already in the track dict (vacuously since a download wasn't attempted)
         static bool download_track(const Track& track, const std::string& youtube_url, const std::string& artwork_url, bool force_mp3, bool force_opus);
 
-        //Reading and writing local playlists + reading online playlists
+        //=====================================================================================
+        //                        PLAYLISTS MANAGEMENT (LOCAL & ONLINE)                        
+        //=====================================================================================
         
-        /** Returns basic info about every playlist (a tuple of the playlist id, name, and cover image file path) */
+        /// @brief This is when you want to know what playlists are saved in staccato (you don't want complete information including tracklist for each of them)
+        /// @return A vector of tuples that contain each playlist's ID, name, and file path to the cover image
         static std::vector<std::tuple<std::string, std::string, std::string>> get_basic_playlist_info_from_files();
-        /** Searches for .sply file with the same name, and returns complete playlist info */
+
+        /// @brief Gets complete information about a singular playlist (including the tracklist)
+        /// @param id (A playlist's ID is actually just the .sply filename's stem)
+        /// @return A Playlist object containing complete information about the playlist
         static Playlist get_playlist(const std::string& id);
-        /** Returns the summed duration of each track in the playlist */
+
+        /// @brief Reads through each track in the tracklist and finds the track's associated file's audio length
+        /// @param playlist 
+        /// @return The total duration in seconds of the playlist
         static int get_playlist_duration(const Playlist& playlist);
-        /** Serializes the playlist to its file */
+
+        /// @brief Writes the playlist to its .sply file (creating one if needed)
+        /// @param id (What the .sply filename's stem will be)
+        /// @param playlist
+        /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_playlist(const std::string& id, const Playlist& playlist);
         
-        /** Returns whether or not the online playlist is accessible */
+        //------------------------------- REQUIRES THE INTERNET -------------------------------
+
+        /// @brief *(Calls python function "fetcher.can_access_playlist")*
+        /// @param url 
+        /// @return `true` if the online playlist is accessible, `false` otherwise
         static bool online_playlist_is_accessible(const std::string& url);
-        /** Returns the tracklist of the online playlist */
+        
+        /// @brief *(Calls python function "fetcher.get_playlist")*
+        /// @param url 
+        /// @return The online playlist's tracklist as an unordered multiset of Track objects, an empty unordered multiset if accessing the playlist was unsuccessful
         static std::unordered_multiset<Track> get_online_tracklist(const std::string& url);
 
-        //Track dictionary management
+        //=====================================================================================
+        //                             TRACK DICTIONARY MANAGEMENT                             
+        //=====================================================================================
 
         /** Loads track_dict from the .stkl file */
+
+        /// @brief Reads the .stkl file and loads its information to the static field `track_dict` (declaration found somewhere else in this header file)
+        /// @return `true` if the read was successful, `false` otherwise
         static bool read_track_dict();
-        /** Serializes track_dict to the .stkl file */
+
+        /// @brief Writes the track dict from the static field `track_dict` to the .stkl file (declaration of `track_dict` found somewhere else in this header file)
+        /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_track_dict();
 
-        //Debugging
+        //=====================================================================================
+        //                                      DEBUGGING                                      
+        //=====================================================================================
 
+        /// @brief Prints the track dict to `std::cout`
         static void print_track_dict();
+
+        /// @brief Prints basic info about all playlists in staccato to `std::cout`
         static void print_basic_playlists_info();
 
-        //Constexprs
+        //=====================================================================================
+        //                                      CONSTANTS                                      
+        //=====================================================================================
 
+        /// @brief The header that appears on all .sply files and on the .stkl file. Should be in the format: "staccato[version number]"
         static constexpr std::string_view FILE_HEADER {"staccato1"};
 
         #if(DEVELOPMENT_BUILD)

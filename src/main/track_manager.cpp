@@ -236,17 +236,7 @@ bool TrackManager::online_playlist_is_accessible(const std::string& url) {
 
     }
 
-    urltype url_type = get_url_type(url);
-    PyObject* py_func = nullptr;
-    if(url_type == urltype::spotify) {
-
-        py_func = PyObject_GetAttrString(py_module, "can_access_spotify_playlist");
-
-    } else if(url_type == urltype::youtube) {
-
-        py_func = PyObject_GetAttrString(py_module, "can_access_youtube_playlist");
-
-    }
+    PyObject* py_func = PyObject_GetAttrString(py_module, "can_access_playlist");
     Py_DECREF(py_module);
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
@@ -288,17 +278,7 @@ std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::str
 
     }
 
-    urltype url_type = get_url_type(url);
-    PyObject* py_func = nullptr;
-    if(url_type == urltype::spotify) {
-
-        py_func = PyObject_GetAttrString(py_module, "get_spotify_playlist");
-
-    } else if(url_type == urltype::youtube) {
-
-        py_func = PyObject_GetAttrString(py_module, "get_youtube_playlist");
-
-    }
+    PyObject* py_func = PyObject_GetAttrString(py_module, "get_playlist");
     Py_DECREF(py_module);
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
@@ -396,8 +376,8 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
 
     if(track_dict.contains(track)) {
 
-        //(we return true because we only return false if the import was unsuccessful,
-        // since an import didn't happen, then the import vacuously was successful)
+        //(we return true because we only return false if the download was unsuccessful,
+        // since an download didn't happen, then the download vacuously was successful)
         return true;
 
     }
