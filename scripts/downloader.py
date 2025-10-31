@@ -196,8 +196,8 @@ def set_track_artwork_ogg(track_path: str, artwork_url: str) -> bool:
 
 
 # Exposed to C++
-def update_yt_dlp() -> int:
-    """Return 0 if update was successful, 1 if no update was needed, and -1 if update failed"""
+def update_libraries() -> str:
+    """Returns a string representation of the update status (failure, success, already up to date)"""
     pip_install_result: CompletedProcess[str] = subprocess.run(
         [sys.executable, "-m", "pip", "install", "--upgrade", "pip"], 
         capture_output=True, 
@@ -210,10 +210,10 @@ def update_yt_dlp() -> int:
     )
     
     if pip_install_result.returncode != 0 or yt_dlp_install_result.returncode != 0:
-        return -1
+        return "UPDATE FAILED"
     if ("already satisfied" in pip_install_result.stdout) and ("already satisfied" in yt_dlp_install_result.stdout):
-        return 1
-    return 0
+        return "ALREADY UP TO DATE"
+    return "UPDATED SUCCESSFULLY"
 
 
 def extract_youtube_id_from_url(url: str) -> str:

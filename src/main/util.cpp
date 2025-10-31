@@ -179,6 +179,45 @@ bool staccato::init_python() {
 
 }
 
+std::string staccato::update_python_libraries() {
+
+    PyObject* py_downloader = PyUnicode_DecodeFSDefault("downloader");
+    PyObject* py_module = PyImport_Import(py_downloader);
+    Py_DECREF(py_downloader);
+    if(py_module == nullptr) {
+
+        return "";
+
+    }
+
+    PyObject* py_func = PyObject_GetAttrString(py_module, "update_libraries");
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return "";
+
+    }
+
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, NULL);
+    PyGILState_Release(gstate);
+
+    Py_DECREF(py_func);
+    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return "";
+
+    }
+
+    std::string update_status {PyUnicode_AsUTF8(py_return)};
+    Py_DECREF(py_return);
+    return update_status;
+
+}
+
 std::ostream& operator<<(std::ostream& os, const staccato::audiotype& audio_type) {
 
     os << audio_type_to_string(audio_type);
