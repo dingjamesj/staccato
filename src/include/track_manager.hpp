@@ -270,10 +270,10 @@ namespace staccato {
         //                                      DEBUGGING                                      
         //=====================================================================================
 
-        /// @brief Prints the track dict to `std::cout`
+        /// @brief Prints the track dict to std::cout
         static void print_track_dict();
 
-        /// @brief Prints basic info about all playlists in staccato to `std::cout`
+        /// @brief Prints basic info about all playlists in staccato to std::cout
         static void print_basic_playlists_info();
 
         //=====================================================================================
