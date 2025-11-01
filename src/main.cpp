@@ -1,24 +1,45 @@
-#include "tests.hpp"
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include "util.hpp"
+#include <iostream>
 
 using namespace staccato;
 
-int main() {
+int main(int argc, char* argv[]) {
 
     bool init_success = init_python();
     if(!init_success) {
 
-        return false;
+        return 1;
 
     }
 
-    // playlist_testing();
-    // track_manager_passive_local_testing();
-    // track_manager_active_local_testing();
-    track_manager_passive_online_testing();
-    // track_manager_active_online_testing();
+    QGuiApplication app (argc, argv);
+    QQmlApplicationEngine engine;
 
-    Py_FinalizeEx();
+    QObject::connect(
+        QCoreApplication::instance(),
+        &QCoreApplication::aboutToQuit,
+        []() {
+            std::cout << "Closing python" << std::endl;
+            Py_FinalizeEx();
+        }
+    );
 
-    return 0;
+    QObject::connect(
+        &engine, 
+        &QQmlApplicationEngine::objectCreationFailed, 
+        &app, 
+        []() {
+            QCoreApplication::exit(-1);
+        },
+        Qt::QueuedConnection
+    );
+    
+    engine.loadFromModule("staccatogui", "main");
+
+    // Py_FinalizeEx();
+
+    return app.exec();
 
 }
