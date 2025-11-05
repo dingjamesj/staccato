@@ -22,7 +22,6 @@ int main(int argc, char* argv[]) {
         QCoreApplication::instance(),
         &QCoreApplication::aboutToQuit,
         []() {
-            std::cout << "Closing python" << std::endl;
             Py_FinalizeEx();
         }
     );
