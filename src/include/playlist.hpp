@@ -6,7 +6,6 @@
 #include <unordered_set>
 #include <filesystem>
 #include <iostream>
-#include <Python.h>
 
 namespace staccato {
 

@@ -1,6 +1,7 @@
+#include "util.hpp"
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "util.hpp"
 #include <iostream>
 
 using namespace staccato;
@@ -10,7 +11,7 @@ int main(int argc, char* argv[]) {
     bool init_success = init_python();
     if(!init_success) {
 
-        return 1;
+        return 2;
 
     }
 
