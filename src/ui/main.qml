@@ -30,13 +30,13 @@ ApplicationWindow {
             id: mainPanel
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.preferredWidth: parent.width * 26 / 60
+            Layout.preferredWidth: parent.width * 30 / 60
         }
         QueuePanel {
             id: queuePanel
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.preferredWidth: parent.width * 17 / 60
+            Layout.preferredWidth: parent.width * 13 / 60
         }
     }
 }
