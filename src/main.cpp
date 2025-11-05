@@ -37,9 +37,7 @@ int main(int argc, char* argv[]) {
         Qt::QueuedConnection
     );
     
-    engine.loadFromModule("staccatogui", "main");
-
-    // Py_FinalizeEx();
+    engine.loadFromModule("staccato", "Main");
 
     return app.exec();
 

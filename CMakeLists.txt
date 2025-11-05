@@ -17,10 +17,10 @@ qt_add_executable(staccato ${SOURCES})
 
 qt_policy(SET QTP0004 NEW)
 qt_add_qml_module(staccato
-    URI staccatogui
+    URI staccato
     VERSION 0.1
     QML_FILES
-        src/ui/main.qml
+        src/ui/Main.qml
     RESOURCES
 )
 
@@ -32,7 +32,7 @@ set_target_properties(staccato PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+    # WIN32_EXECUTABLE TRUE
 )
 
 target_include_directories(staccato PRIVATE "src/include")
