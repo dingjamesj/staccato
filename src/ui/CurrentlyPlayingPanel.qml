@@ -1,13 +1,19 @@
 import QtQuick
 import QtQuick.Effects
+import QtQuick.Controls
 
 Rectangle {
     id: container
-    color: "#ff0000"
+    color: "#1e1e1e"
 
     FontLoader {
         id: interFont
         source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
+    }
+
+    FontLoader {
+        id: interItalicFont
+        source: "qrc:/staccato/src/ui/resources/Inter-Italic-VariableFont_opsz,wght.ttf"
     }
 
     //=========================================
@@ -22,24 +28,24 @@ Rectangle {
         width: parent.width * 364 / 425
         height: parent.width * 364 / 425
         radius: 22
-        color: "#ffff00"
+        color: "#2b2b2b"
     }
 
     Image {
         id: artwork
-        source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: parent.height * 8 / 165
         width: parent.width * 364 / 425
         height: parent.width * 364 / 425
-        fillMode: Image.PreserveAspectFit
         visible: false
+        source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
+        fillMode: Image.PreserveAspectFit
     }
 
     MultiEffect {
-        source: artwork
         anchors.fill: artwork
+        source: artwork
         maskEnabled: true
         maskSource: mask
     }
@@ -63,14 +69,67 @@ Rectangle {
     //               TRACK INFO               
     //=========================================
 
-    Text {
+    ScrollView {
+        id: trackTitle
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: artworkBackground.bottom
         anchors.topMargin: parent.height * 4 / 165
-        text: "Track Title"
-        font.family: interFont.name
-        font.pointSize: 48
-        color: "#ffffff"
+        anchors.left: artworkBackground.left
+        anchors.right: artworkBackground.right
+        clip: true
+        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+        ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+        Component.onCompleted: {
+            trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
+        }
+
+        Text {
+            id: trackTitleText
+            anchors.fill: parent
+            text: "Track Title aoludshauidhauisshd"
+            font.family: interFont.name
+            font.pointSize: 38
+            font.bold: true
+            color: "#ffffff"
+        }
     }
 
+    ScrollView {
+        id: trackArtists
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: trackTitle.bottom
+        anchors.topMargin: 3
+        Component.onCompleted: {
+            trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
+        }
+
+        Text {
+            id: trackArtistsText
+            anchors.fill: parent
+            text: "Track Artists"
+            font.family: interFont.name
+            font.pointSize: 15
+            color: "#9a9a9a"
+        }
+    }
+
+    ScrollView {
+        id: trackAlbum
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: trackArtists.bottom
+        anchors.topMargin: 5
+        Component.onCompleted: {
+            trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
+        }
+
+        Text {
+            id: trackAlbumText
+            anchors.fill: parent
+            text: "Track Album"
+            font.family: interFont.name
+            font.italic: true
+            font.pointSize: 15
+            color: "#9a9a9a"
+        }
+    }
 }
