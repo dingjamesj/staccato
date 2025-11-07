@@ -5,6 +5,15 @@ Rectangle {
     id: container
     color: "#ff0000"
 
+    FontLoader {
+        id: interFont
+        source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
+    }
+
+    //=========================================
+    //                COVER ART                
+    //=========================================
+
     Rectangle {
         id: artworkBackground
         anchors.horizontalCenter: parent.horizontalCenter
@@ -18,7 +27,7 @@ Rectangle {
 
     Image {
         id: artwork
-        source: "file:///D:/car/nonidiots/piggo58.jpg"
+        source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: parent.height * 8 / 165
@@ -49,4 +58,19 @@ Rectangle {
             color: "black"
         }
     }
+
+    //=========================================
+    //               TRACK INFO               
+    //=========================================
+
+    Text {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: artworkBackground.bottom
+        anchors.topMargin: parent.height * 4 / 165
+        text: "Track Title"
+        font.family: interFont.name
+        font.pointSize: 48
+        color: "#ffffff"
+    }
+
 }

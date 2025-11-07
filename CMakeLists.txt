@@ -25,6 +25,10 @@ qt_add_qml_module(staccato
         src/ui/CurrentlyPlayingPanel.qml
         src/ui/QueuePanel.qml
     RESOURCES
+        src/ui/resources/piggo58.jpg
+        src/ui/resources/Inter-VariableFont_opsz,wght.ttf
+        src/ui/resources/Inter-Italic-VariableFont_opsz,wght.ttf
+    RESOURCE_PREFIX /
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
