@@ -8,6 +8,7 @@ set(QT_QML_GENERATE_QMLLS_INI ON)
 set(QT_QML_GENERATE_QMLTYPES ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Svg)
 find_package(ICU REQUIRED COMPONENTS uc i18n)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
@@ -29,6 +30,12 @@ qt_add_qml_module(staccato
         src/ui/resources/piggo58.jpg
         src/ui/resources/Inter-VariableFont_opsz,wght.ttf
         src/ui/resources/Inter-Italic-VariableFont_opsz,wght.ttf
+        src/ui/resources/play.svg
+        src/ui/resources/rewind.svg
+        src/ui/resources/skip.svg
+        src/ui/resources/shuffle.svg
+        src/ui/resources/loop.svg
+        src/ui/resources/pause.svg
     RESOURCE_PREFIX /
 )
 
@@ -48,6 +55,7 @@ target_include_directories(staccato PRIVATE "C:/msys64/ucrt64/include/taglib")
 target_link_directories(staccato PRIVATE "C:/msys64/ucrt64/lib")
 target_link_libraries(staccato PRIVATE
     Qt6::Quick
+    Qt6::Svg
     tag
     ICU::uc ICU::i18n
     Python3::Python
