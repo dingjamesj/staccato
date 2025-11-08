@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 ApplicationWindow {
@@ -27,15 +27,16 @@ ApplicationWindow {
             Layout.row: 0
             Layout.column: 0
             Layout.preferredWidth: parent.width * 17 / 60
-            Layout.preferredHeight: parent.height * 21 / 25
+            Layout.preferredHeight: parent.height * 0.82
         }
+
         Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.row: 1
             Layout.column: 0
             Layout.preferredWidth: parent.width * 17 / 60
-            Layout.preferredHeight: parent.height * 4 / 25
+            Layout.preferredHeight: parent.height * 0.18
 
             ControlBarPanel {
                 id: controlBarPanel
@@ -44,6 +45,7 @@ ApplicationWindow {
                 height: parent.height
             }
         }
+
         MainPanel {
             id: mainPanel
             Layout.fillHeight: true
@@ -52,6 +54,7 @@ ApplicationWindow {
             Layout.rowSpan: 2
             Layout.preferredWidth: parent.width * 30 / 60
         }
+
         QueuePanel {
             id: queuePanel
             Layout.fillHeight: true

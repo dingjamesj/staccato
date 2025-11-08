@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Effects
-import QtQuick.Controls
+import QtQuick.Controls.Basic
 
 Column {
     id: container
@@ -148,7 +148,7 @@ Column {
 
     Column {
         id: trackFileInfoContainer
-        spacing: 8
+        spacing: 9
 
         Rectangle {
             id: fileType
