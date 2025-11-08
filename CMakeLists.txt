@@ -24,6 +24,7 @@ qt_add_qml_module(staccato
         src/ui/MainPanel.qml
         src/ui/CurrentlyPlayingPanel.qml
         src/ui/QueuePanel.qml
+        src/ui/ControlBarPanel.qml
     RESOURCES
         src/ui/resources/piggo58.jpg
         src/ui/resources/Inter-VariableFont_opsz,wght.ttf

@@ -4,9 +4,9 @@ import QtQuick.Controls
 
 Column {
     id: container
-    spacing: width * 8 / 85
-    leftPadding: width * 6 / 85
-    rightPadding: width * 6 / 85
+    spacing: height * 0.05
+    leftPadding: width * 5 / 85
+    rightPadding: width * 5 / 85
     topPadding: width * 10 / 85
 
     FontLoader {
@@ -145,9 +145,10 @@ Column {
     //=========================================
     //             TRACK FILE INFO             
     //=========================================
+
     Column {
         id: trackFileInfoContainer
-        spacing: 10
+        spacing: 8
 
         Rectangle {
             id: fileType
