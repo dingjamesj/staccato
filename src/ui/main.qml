@@ -10,7 +10,7 @@ ApplicationWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: "#1E1E1E"
+        color: "#1e1e1e"
     }
 
     GridLayout {

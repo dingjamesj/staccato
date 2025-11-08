@@ -2,9 +2,12 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
 
-Rectangle {
+Column {
     id: container
-    color: "#1e1e1e"
+    spacing: width * 4 / 85
+    leftPadding: width * 6 / 85
+    rightPadding: width * 6 / 85
+    topPadding: width * 8 / 85
 
     FontLoader {
         id: interFont
@@ -23,45 +26,39 @@ Rectangle {
     Rectangle {
         id: artworkBackground
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: parent.height * 8 / 165
-        width: parent.width * 364 / 425
-        height: parent.width * 364 / 425
+        width: parent.width - container.leftPadding - container.leftPadding
+        height: width
         radius: 22
         color: "#2b2b2b"
-    }
 
-    Image {
-        id: artwork
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: parent.height * 8 / 165
-        width: parent.width * 364 / 425
-        height: parent.width * 364 / 425
-        visible: false
-        source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
-        fillMode: Image.PreserveAspectFit
-    }
+        Image {
+            id: artwork
+            anchors.fill: parent
+            visible: false
+            source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
+            fillMode: Image.PreserveAspectFit
+        }
 
-    MultiEffect {
-        anchors.fill: artwork
-        source: artwork
-        maskEnabled: true
-        maskSource: mask
-    }
+        MultiEffect {
+            anchors.fill: artwork
+            source: artwork
+            maskEnabled: true
+            maskSource: mask
+        }
 
-    Item {
-        id: mask
-        width: artwork.width
-        height: artwork.height
-        layer.enabled: true
-        visible: false
-
-        Rectangle {
+        Item {
+            id: mask
             width: artwork.width
             height: artwork.height
-            radius: 22
-            color: "black"
+            layer.enabled: true
+            visible: false
+
+            Rectangle {
+                width: artwork.width
+                height: artwork.height
+                radius: 22
+                color: "black"
+            }
         }
     }
 
@@ -69,67 +66,79 @@ Rectangle {
     //               TRACK INFO               
     //=========================================
 
-    ScrollView {
-        id: trackTitle
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: artworkBackground.bottom
-        anchors.topMargin: parent.height * 4 / 165
-        anchors.left: artworkBackground.left
-        anchors.right: artworkBackground.right
-        clip: true
-        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-        ScrollBar.vertical.policy: ScrollBar.AlwaysOff
-        Component.onCompleted: {
-            trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
+    Column {
+        id: trackInfoContainer
+        spacing: 3
+
+        ScrollView {
+            id: trackTitle
+            width: container.width - container.leftPadding - container.leftPadding
+            clip: true
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+            Component.onCompleted: {
+                trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
+            }
+
+            TextEdit {
+                id: trackTitleText
+                width: container.width - container.leftPadding - container.leftPadding
+                text: "Track Title"
+                horizontalAlignment: TextEdit.AlignHCenter
+                font.family: interFont.name
+                font.pointSize: 38
+                font.bold: true
+                wrapMode: Text.NoWrap
+                readOnly: true
+                color: "#ffffff"
+            }
         }
 
-        Text {
-            id: trackTitleText
-            anchors.fill: parent
-            text: "Track Title aoludshauidhauisshd"
-            font.family: interFont.name
-            font.pointSize: 38
-            font.bold: true
-            color: "#ffffff"
-        }
-    }
+        ScrollView {
+            id: trackArtists
+            width: container.width - container.leftPadding - container.leftPadding
+            clip: true
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+            Component.onCompleted: {
+                trackArtists.contentItem.boundsBehavior = Flickable.StopAtBounds
+            }
 
-    ScrollView {
-        id: trackArtists
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: trackTitle.bottom
-        anchors.topMargin: 3
-        Component.onCompleted: {
-            trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
-        }
-
-        Text {
-            id: trackArtistsText
-            anchors.fill: parent
-            text: "Track Artists"
-            font.family: interFont.name
-            font.pointSize: 15
-            color: "#9a9a9a"
-        }
-    }
-
-    ScrollView {
-        id: trackAlbum
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: trackArtists.bottom
-        anchors.topMargin: 5
-        Component.onCompleted: {
-            trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
+            TextEdit {
+                id: trackArtistsText
+                width: container.width - container.leftPadding - container.leftPadding
+                text: "Track Artists"
+                horizontalAlignment: TextEdit.AlignHCenter
+                font.family: interFont.name
+                font.pointSize: 15
+                wrapMode: Text.NoWrap
+                readOnly: true
+                color: "#9a9a9a"
+            }
         }
 
-        Text {
-            id: trackAlbumText
-            anchors.fill: parent
-            text: "Track Album"
-            font.family: interFont.name
-            font.italic: true
-            font.pointSize: 15
-            color: "#9a9a9a"
+        ScrollView {
+            id: trackAlbum
+            width: container.width - container.leftPadding - container.leftPadding
+            clip: true
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+            Component.onCompleted: {
+                trackAlbum.contentItem.boundsBehavior = Flickable.StopAtBounds
+            }
+
+            TextEdit {
+                id: trackAlbumText
+                width: container.width - container.leftPadding - container.leftPadding
+                text: "Track Album"
+                horizontalAlignment: TextEdit.AlignHCenter
+                font.family: interFont.name
+                font.italic: true
+                font.pointSize: 15
+                wrapMode: Text.NoWrap
+                readOnly: true
+                color: "#9a9a9a"
+            }
         }
     }
 }
