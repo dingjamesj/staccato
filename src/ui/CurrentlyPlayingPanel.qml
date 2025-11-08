@@ -4,10 +4,10 @@ import QtQuick.Controls
 
 Column {
     id: container
-    spacing: width * 4 / 85
+    spacing: width * 8 / 85
     leftPadding: width * 6 / 85
     rightPadding: width * 6 / 85
-    topPadding: width * 8 / 85
+    topPadding: width * 10 / 85
 
     FontLoader {
         id: interFont
@@ -26,7 +26,7 @@ Column {
     Rectangle {
         id: artworkBackground
         anchors.horizontalCenter: parent.horizontalCenter
-        width: parent.width - container.leftPadding - container.leftPadding
+        width: parent.width - container.leftPadding - container.rightPadding
         height: width
         radius: 22
         color: "#2b2b2b"
@@ -71,74 +71,119 @@ Column {
         spacing: 3
 
         ScrollView {
-            id: trackTitle
-            width: container.width - container.leftPadding - container.leftPadding
+            id: title
+            width: container.width - container.leftPadding - container.rightPadding
             clip: true
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOff
             Component.onCompleted: {
-                trackTitle.contentItem.boundsBehavior = Flickable.StopAtBounds
+                title.contentItem.boundsBehavior = Flickable.StopAtBounds
             }
 
             TextEdit {
-                id: trackTitleText
-                width: container.width - container.leftPadding - container.leftPadding
-                text: "Track Title"
+                id: titleText
+                width: container.width - container.leftPadding - container.rightPadding
+                text: "After Hours"
                 horizontalAlignment: TextEdit.AlignHCenter
                 font.family: interFont.name
-                font.pointSize: 38
+                font.pointSize: 33
                 font.bold: true
-                wrapMode: Text.NoWrap
+                wrapMode: TextEdit.NoWrap
                 readOnly: true
                 color: "#ffffff"
             }
         }
 
         ScrollView {
-            id: trackArtists
-            width: container.width - container.leftPadding - container.leftPadding
+            id: artists
+            width: container.width - container.leftPadding - container.rightPadding
             clip: true
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOff
             Component.onCompleted: {
-                trackArtists.contentItem.boundsBehavior = Flickable.StopAtBounds
+                artists.contentItem.boundsBehavior = Flickable.StopAtBounds
             }
 
             TextEdit {
-                id: trackArtistsText
-                width: container.width - container.leftPadding - container.leftPadding
+                id: artistsText
+                width: container.width - container.leftPadding - container.rightPadding
                 text: "Track Artists"
                 horizontalAlignment: TextEdit.AlignHCenter
                 font.family: interFont.name
                 font.pointSize: 15
-                wrapMode: Text.NoWrap
+                wrapMode: TextEdit.NoWrap
                 readOnly: true
                 color: "#9a9a9a"
             }
         }
 
         ScrollView {
-            id: trackAlbum
-            width: container.width - container.leftPadding - container.leftPadding
+            id: album
+            width: container.width - container.leftPadding - container.rightPadding
             clip: true
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOff
             Component.onCompleted: {
-                trackAlbum.contentItem.boundsBehavior = Flickable.StopAtBounds
+                album.contentItem.boundsBehavior = Flickable.StopAtBounds
             }
 
             TextEdit {
-                id: trackAlbumText
-                width: container.width - container.leftPadding - container.leftPadding
+                id: albumText
+                width: container.width - container.leftPadding - container.rightPadding
                 text: "Track Album"
                 horizontalAlignment: TextEdit.AlignHCenter
                 font.family: interFont.name
                 font.italic: true
                 font.pointSize: 15
-                wrapMode: Text.NoWrap
+                wrapMode: TextEdit.NoWrap
                 readOnly: true
                 color: "#9a9a9a"
             }
+        }
+    }
+
+    //=========================================
+    //             TRACK FILE INFO             
+    //=========================================
+    Column {
+        id: trackFileInfoContainer
+        spacing: 10
+
+        Rectangle {
+            id: fileType
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 67
+            height: 36
+            radius: height / 2
+            color: "#d04ea5"
+
+            TextEdit {
+                id: fileTypeText
+                width: parent.width
+                height: parent.height
+                text: "M4A"
+                horizontalAlignment: TextEdit.AlignHCenter
+                verticalAlignment: TextEdit.AlignVCenter
+                font.family: interFont.name
+                font.pointSize: 13
+                font.weight: Font.ExtraBold
+                wrapMode: TextEdit.NoWrap
+                readOnly: true
+                color: "#ffffff"
+            }
+        }
+
+        TextEdit {
+            id: advancedInfoText
+            width: container.width - container.leftPadding - container.rightPadding
+            text: "124 kbps   44.1 kHz"
+            horizontalAlignment: TextEdit.AlignHCenter
+            font.family: interFont.name
+            font.pointSize: 13
+            font.bold: true
+            wrapMode: TextEdit.NoWrap
+            readOnly: true
+            color: "#ffffff"
         }
     }
 }
