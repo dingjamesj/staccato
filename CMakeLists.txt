@@ -37,6 +37,9 @@ qt_add_qml_module(staccato
         src/ui/resources/shuffle.svg
         src/ui/resources/loop.svg
         src/ui/resources/pause.svg
+        src/ui/resources/list.svg
+        src/ui/resources/grid.svg
+        src/ui/resources/plus.svg
     RESOURCE_PREFIX /
 )
 
