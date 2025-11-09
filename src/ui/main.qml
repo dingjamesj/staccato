@@ -26,7 +26,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.row: 0
             Layout.column: 0
-            Layout.preferredWidth: parent.width * 17 / 60
+            Layout.preferredWidth: 380
             Layout.preferredHeight: parent.height * 0.82
         }
 
@@ -35,7 +35,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.row: 1
             Layout.column: 0
-            Layout.preferredWidth: parent.width * 17 / 60
+            Layout.preferredWidth: 380
             Layout.preferredHeight: parent.height * 0.18
 
             ControlBarPanel {
@@ -46,13 +46,17 @@ ApplicationWindow {
             }
         }
 
-        MainPanel {
+        StackView {
             id: mainPanel
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.column: 1
             Layout.rowSpan: 2
-            Layout.preferredWidth: parent.width * 30 / 60
+            Layout.preferredWidth: parent.width - 380 - 290
+
+            initialItem: HomePanel {
+                anchors.fill: parent
+            }
         }
 
         QueuePanel {
@@ -61,7 +65,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.column: 2
             Layout.rowSpan: 2
-            Layout.preferredWidth: parent.width * 13 / 60
+            Layout.preferredWidth: 290
         }
     }
 }

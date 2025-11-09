@@ -12,6 +12,10 @@ Rectangle {
         source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
     }
 
+    //=========================================
+    //               CONTROL BAR               
+    //=========================================
+
     Rectangle {
         id: controlsPanel
         width: parent.width * 0.84
@@ -101,8 +105,12 @@ Rectangle {
         }
     }
 
+    //=========================================
+    //             PROGRESS SLIDER             
+    //=========================================
+
     Column {
-        id: progressBarPanel
+        id: progressSliderPanel
         width: parent.width * 0.84
         height: parent.height * 0.25
         anchors.bottom: parent.bottom
@@ -112,7 +120,7 @@ Rectangle {
 
         Item {
             id: timestamps
-            width: progressBarPanel.width
+            width: progressSliderPanel.width
             height: 10
 
             Text {
@@ -141,7 +149,7 @@ Rectangle {
         }
 
         Slider {
-            id: progressBar
+            id: progressSlider
             width: parent.width
             height: 8
             value: 1
@@ -149,16 +157,16 @@ Rectangle {
             rightPadding: 0
             background: Rectangle {
                 id: progressBarBackground
-                x: progressBar.leftPadding
-                y: progressBar.topPadding + progressBar.availableHeight / 2 - height / 2
-                width: progressBar.availableWidth
+                x: progressSlider.leftPadding
+                y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
+                width: progressSlider.availableWidth
                 height: parent.height
                 radius: height / 2
                 color: "#80005d"
 
                 Rectangle {
                     id: progressBarFilling
-                    width: progressBar.visualPosition * parent.width
+                    width: progressSlider.visualPosition * parent.width
                     height: parent.height
                     radius: height / 2
                     color: "#ffb9ff"
@@ -166,13 +174,13 @@ Rectangle {
             }
             handle: Rectangle {
                 id: progressBarHandle
-                x: progressBar.leftPadding + progressBar.visualPosition * (progressBar.availableWidth - width)
-                y: progressBar.topPadding + progressBar.availableHeight / 2 - height / 2
+                x: progressSlider.leftPadding + progressSlider.visualPosition * (progressSlider.availableWidth - width)
+                y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
                 width: 16
                 height: width
                 radius: width / 2
                 color: "#ffffff"
-                visible: progressBar.hovered | progressBar.pressed
+                visible: progressSlider.hovered | progressSlider.pressed
             }
         }
     }

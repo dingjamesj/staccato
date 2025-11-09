@@ -7,7 +7,7 @@ Column {
     spacing: height * 0.05
     leftPadding: width * 5 / 85
     rightPadding: width * 5 / 85
-    topPadding: width * 10 / 85
+    topPadding: height * 0.048 / 0.82
 
     FontLoader {
         id: interFont
