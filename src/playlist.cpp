@@ -37,14 +37,15 @@ Playlist::Playlist(
     const std::string& online_connection
 ): 
     name {name},
-    tracklist {tracklist}
+    tracklist {tracklist},
+    last_played_time {0}
 {
 
     set_online_connection(online_connection);
 
 }
 
-Playlist::Playlist(): name {""}, tracklist {}, online_connection {""} {}
+Playlist::Playlist(): name {""}, tracklist {}, online_connection {""}, last_played_time {0} {}
 
 bool Playlist::set_online_connection(const std::string& url) {
 
@@ -193,9 +194,15 @@ std::string Playlist::string() const {
 
 }
 
+void Playlist::set_last_played_time_to_now() {
+
+    last_played_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+}
+
 bool Playlist::is_empty() const {
 
-    return name == "" && tracklist.size() == 0 && online_connection == "";
+    return name == "" && tracklist.size() == 0 && online_connection == "" && last_played_time == 0;
 
 }
 

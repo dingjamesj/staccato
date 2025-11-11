@@ -263,8 +263,6 @@ namespace staccato {
         //                             TRACK DICTIONARY MANAGEMENT                             
         //=====================================================================================
 
-        /** Loads track_dict from the .stkl file */
-
         /// @brief Reads the .stkl file and loads its information to the static field `track_dict` (declaration found somewhere else in this header file)
         /// @return `true` if the read was successful, `false` otherwise
         static bool read_track_dict();
@@ -272,6 +270,28 @@ namespace staccato {
         /// @brief Writes the track dict from the static field `track_dict` to the .stkl file (declaration of `track_dict` found somewhere else in this header file)
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_track_dict();
+
+        //=====================================================================================
+        //                              RECENT ACTIVITY MANAGEMENT                             
+        //=====================================================================================
+
+        /// @brief Used for getting the queue from the last staccato session, so that the user can continue where they left off
+        /// @return A tuple of: the queue name, if the queue is repeating, and the queue's tracklist
+        static std::tuple<std::string, bool, std::vector<Track>> get_saved_queue();
+
+        /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off
+        /// @param queue_name 
+        /// @param is_repeating 
+        /// @param tracklist 
+        /// @return `true` if the serialization was successful, `false` otherwise
+        static bool serialize_queue(std::string queue_name, bool is_repeating, std::vector<Track> tracklist);
+
+        //TODO: make functions that record recenthly played playlists ONLY (no tracks)
+        //I am making the decision that we will not give the option to sort pinned playlists/tracks by recently played
+        //That way we just need to store recently played playlists
+
+        //However we will need to let the user order their pinned things in a custom order
+        //We will do this by changing the order in which the pinned things are stored in the settings file
 
         //=====================================================================================
         //                                      DEBUGGING                                      

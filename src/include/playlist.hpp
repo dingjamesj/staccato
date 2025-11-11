@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <filesystem>
 #include <iostream>
+#include <chrono>
 
 namespace staccato {
 
@@ -18,13 +19,14 @@ namespace staccato {
 
     private:
         std::unordered_multiset<Track> tracklist;
+        std::string online_connection;
+        std::int64_t last_played_time;
         
         //Helper functions
         static urltype get_url_type(const std::string& url);
 
     public:
         std::string name;
-        std::string online_connection;
 
         /// @brief Creates a Playlist object
         /// @param name 
@@ -88,6 +90,9 @@ namespace staccato {
         //==================================
         //               MISC               
         //==================================
+
+        /// @brief Sets the last played time of this playlist to the current time
+        void set_last_played_time_to_now();
 
         /// @brief Used to see if an error was encountered (empty Playlist objects should signify that an error occurred)
         /// @return `true` if this Playlist object is empty, `false` otherwise

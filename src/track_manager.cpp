@@ -1273,7 +1273,7 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
     output.put('\0');
     output.write(playlist.name.c_str(), playlist.name.size());
     output.put('\0');
-    output.write(playlist.online_connection.c_str(), playlist.online_connection.size());
+    output.write(playlist.get_online_connection().c_str(), playlist.get_online_connection().size());
     output.put('\0');
     std::unordered_multiset<Track> tracklist = playlist.get_tracklist();
     for(const Track& track: tracklist) {
