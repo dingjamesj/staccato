@@ -18,15 +18,15 @@ namespace staccato {
     class Playlist {
 
     private:
-        std::unordered_multiset<Track> tracklist;
-        std::string online_connection;
-        std::int64_t last_played_time;
+        std::string name_;
+        std::unordered_multiset<Track> tracklist_;
+        std::string online_connection_;
+        std::int64_t last_played_time_;
         
         //Helper functions
         static urltype get_url_type(const std::string& url);
 
     public:
-        std::string name;
 
         /// @brief Creates a Playlist object
         /// @param name 
@@ -54,14 +54,14 @@ namespace staccato {
         void remove_online_connection();
 
         /// @return The online connection URL
-        std::string get_online_connection() const;
+        std::string online_connection() const;
 
         //==================================
         //       TRACKLIST FUNCTIONS
         //==================================
 
         /// @return A const ref to the tracklist as an unordered_multiset
-        const std::unordered_multiset<Track>& get_tracklist() const;
+        const std::unordered_multiset<Track>& tracklist() const;
 
         /// @brief Takes the tracklist and sorts it based on an attribute. Note that some attributes require usage of TrackManager.
         /// @param sort_mode The attribute to sort the tracklist with (e.g. track title, duration, bitrate)
@@ -91,6 +91,12 @@ namespace staccato {
         //               MISC               
         //==================================
 
+        const std::string& name() const;
+
+        void set_name(std::string name);
+
+        int64_t last_played_time() const;
+
         /// @brief Sets the last played time of this playlist to the current time
         void set_last_played_time_to_now();
 
@@ -100,7 +106,6 @@ namespace staccato {
         
         /// @return A string representation of this Playlist object
         std::string string() const;
-        
 
     };
 

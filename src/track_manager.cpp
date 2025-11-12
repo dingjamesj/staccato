@@ -794,7 +794,7 @@ bool TrackManager::delete_track_artwork(const Track& track) {
 int TrackManager::get_playlist_duration(const Playlist& playlist) {
 
     int total_duration = 0;
-    const std::unordered_multiset<Track>& tracklist = playlist.get_tracklist();
+    const std::unordered_multiset<Track>& tracklist = playlist.tracklist();
     std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.cbegin();
     for(; iter != tracklist.end(); iter++) {
 
@@ -1271,11 +1271,11 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
     output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
     output.put('\0');
-    output.write(playlist.name.c_str(), playlist.name.size());
+    output.write(playlist.name().c_str(), playlist.name().size());
     output.put('\0');
-    output.write(playlist.get_online_connection().c_str(), playlist.get_online_connection().size());
+    output.write(playlist.online_connection().c_str(), playlist.online_connection().size());
     output.put('\0');
-    std::unordered_multiset<Track> tracklist = playlist.get_tracklist();
+    std::unordered_multiset<Track> tracklist = playlist.tracklist();
     for(const Track& track: tracklist) {
 
         output.write(track.title().c_str(), track.title().size());

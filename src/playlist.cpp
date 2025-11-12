@@ -36,22 +36,22 @@ Playlist::Playlist(
     const std::unordered_multiset<Track>& tracklist, 
     const std::string& online_connection
 ): 
-    name {name},
-    tracklist {tracklist},
-    last_played_time {0}
+    name_ {name},
+    tracklist_ {tracklist},
+    last_played_time_ {0}
 {
 
     set_online_connection(online_connection);
 
 }
 
-Playlist::Playlist(): name {""}, tracklist {}, online_connection {""}, last_played_time {0} {}
+Playlist::Playlist(): name_ {""}, tracklist_ {}, online_connection_ {""}, last_played_time_ {0} {}
 
 bool Playlist::set_online_connection(const std::string& url) {
 
     if(TrackManager::online_playlist_is_accessible(url)) {
 
-        online_connection = url;
+        online_connection_ = url;
         return true;
 
     }
@@ -62,25 +62,25 @@ bool Playlist::set_online_connection(const std::string& url) {
 
 void Playlist::remove_online_connection() {
 
-    online_connection = "";
+    online_connection_ = "";
 
 }
 
-std::string Playlist::get_online_connection() const {
+std::string Playlist::online_connection() const {
 
-    return online_connection;
+    return online_connection_;
 
 }
 
-const std::unordered_multiset<Track>& Playlist::get_tracklist() const {
+const std::unordered_multiset<Track>& Playlist::tracklist() const {
 
-    return tracklist;
+    return tracklist_;
 
 }
 
 std::vector<Track> Playlist::get_sorted_tracklist(sortmode sort_mode, bool is_ascending) const {
 
-    std::vector sorted_tracklist(tracklist.begin(), tracklist.end());
+    std::vector sorted_tracklist (tracklist_.begin(), tracklist_.end());
 
     auto comparator_lambda = [sort_mode, is_ascending](const Track& track1, const Track& track2) {
 
@@ -117,47 +117,59 @@ std::vector<Track> Playlist::get_sorted_tracklist(sortmode sort_mode, bool is_as
 
 void Playlist::add_track(const Track& track) {
 
-    tracklist.insert(track);
+    tracklist_.insert(track);
 
 }
 
 void Playlist::add_tracks_from_online_connection() {
 
-    std::unordered_multiset<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection);
+    std::unordered_multiset<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection_);
     std::unordered_multiset<Track>::iterator iter = online_tracklist.begin();
     while(iter != online_tracklist.end()) {
 
-        if(tracklist.contains(*iter)) {
+        if(tracklist_.contains(*iter)) {
 
             iter++;
             continue;
 
         }
 
-        tracklist.insert(*iter);
+        tracklist_.insert(*iter);
         iter++;
 
     }
 
 }
 
+const std::string& Playlist::name() const {
+
+    return name_;
+
+}
+
+void Playlist::set_name(std::string name) {
+
+    name_ = name;
+
+}
+
 bool Playlist::remove_track(const Track& track) {
 
-    std::unordered_multiset<staccato::Track>::iterator iter = tracklist.find(track);
-    if(iter == tracklist.end()) {
+    std::unordered_multiset<staccato::Track>::iterator iter = tracklist_.find(track);
+    if(iter == tracklist_.end()) {
 
         return false;
 
     }
 
-    tracklist.erase(iter);
+    tracklist_.erase(iter);
     return true;
 
 }
 
 bool Playlist::contains_track(const Track& track) const {
 
-    return tracklist.contains(track);
+    return tracklist_.contains(track);
 
 }
 
@@ -169,11 +181,11 @@ std::string Playlist::string() const {
 
     }
 
-    std::string str = name + "\n";
+    std::string str = name_ + "\n";
 
-    if(!online_connection.empty()) {
+    if(!online_connection_.empty()) {
 
-        str += online_connection + "\n";
+        str += online_connection_ + "\n";
 
     } else {
 
@@ -181,10 +193,10 @@ std::string Playlist::string() const {
 
     }
 
-    str += std::format("Num. tracks: {}\n", tracklist.size());
+    str += std::format("Num. tracks: {}\n", tracklist_.size());
 
-    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.begin();
-    for(; iter != tracklist.end(); iter++) {
+    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist_.begin();
+    for(; iter != tracklist_.end(); iter++) {
 
         str += (*iter).string();
 
@@ -194,15 +206,21 @@ std::string Playlist::string() const {
 
 }
 
+int64_t Playlist::last_played_time() const {
+
+    return last_played_time_;
+
+}
+
 void Playlist::set_last_played_time_to_now() {
 
-    last_played_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    last_played_time_ = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 }
 
 bool Playlist::is_empty() const {
 
-    return name == "" && tracklist.size() == 0 && online_connection == "" && last_played_time == 0;
+    return name_ == "" && tracklist_.size() == 0 && online_connection_ == "" && last_played_time_ == 0;
 
 }
 
