@@ -32,31 +32,30 @@ urltype Playlist::get_url_type(const std::string& url) {
 //===========================
 
 Playlist::Playlist(
-    const std::string& name, 
+    const QString& name, 
     const std::unordered_multiset<Track>& tracklist, 
-    const std::string& online_connection
+    const QString& online_connection,
+    QObject* parent
 ): 
-    name_ {name},
+    name_ (name),
     tracklist_ {tracklist},
-    last_played_time_ {0}
+    last_played_time_ {0},
+    QObject(parent)
 {
 
     set_online_connection(online_connection);
 
 }
 
-Playlist::Playlist(): name_ {""}, tracklist_ {}, online_connection_ {""}, last_played_time_ {0} {}
+Playlist::Playlist(QObject* parent): name_ (""), tracklist_ {}, online_connection_ (""), last_played_time_ {0}, QObject(parent) {}
 
-bool Playlist::set_online_connection(const std::string& url) {
+void Playlist::set_online_connection(const QString& url) {
 
-    if(TrackManager::online_playlist_is_accessible(url)) {
+    if(TrackManager::online_playlist_is_accessible(url.toStdString())) {
 
         online_connection_ = url;
-        return true;
 
     }
-
-    return false;
 
 }
 
@@ -66,7 +65,7 @@ void Playlist::remove_online_connection() {
 
 }
 
-std::string Playlist::online_connection() const {
+const QString& Playlist::online_connection() const {
 
     return online_connection_;
 
@@ -123,7 +122,7 @@ void Playlist::add_track(const Track& track) {
 
 void Playlist::add_tracks_from_online_connection() {
 
-    std::unordered_multiset<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection_);
+    std::unordered_multiset<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection_.toStdString());
     std::unordered_multiset<Track>::iterator iter = online_tracklist.begin();
     while(iter != online_tracklist.end()) {
 
@@ -141,13 +140,13 @@ void Playlist::add_tracks_from_online_connection() {
 
 }
 
-const std::string& Playlist::name() const {
+const QString& Playlist::name() const {
 
     return name_;
 
 }
 
-void Playlist::set_name(std::string name) {
+void Playlist::set_name(const QString& name) {
 
     name_ = name;
 
@@ -181,11 +180,11 @@ std::string Playlist::string() const {
 
     }
 
-    std::string str = name_ + "\n";
+    std::string str = name_.toStdString() + "\n";
 
-    if(!online_connection_.empty()) {
+    if(!online_connection_.isEmpty()) {
 
-        str += online_connection_ + "\n";
+        str += online_connection_.toStdString() + "\n";
 
     } else {
 

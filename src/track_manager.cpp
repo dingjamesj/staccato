@@ -34,10 +34,10 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
 
     TagLib::FileRef file_ref(path.c_str());
 
-    file_ref.tag()->setTitle(track.title());
+    file_ref.tag()->setTitle(track.title().toStdString());
 
-    const std::vector<std::string>& track_artists = track.artists();
-    std::string artists_str {""};
+    const QVector<QString>& track_artists = track.artists();
+    QString artists_str {""};
     for(std::size_t i {0}; i < track_artists.size(); i++) {
 
         artists_str += track_artists[i];
@@ -48,9 +48,9 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
         }
 
     }
-    file_ref.tag()->setArtist(artists_str);
+    file_ref.tag()->setArtist(artists_str.toStdString());
 
-    file_ref.tag()->setAlbum(track.album());
+    file_ref.tag()->setAlbum(track.album().toStdString());
 
     return file_ref.save();
 
@@ -116,7 +116,7 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
-        return {Track(), ""};
+        return std::make_pair(Track(), std::string {""});
 
     }
 
@@ -126,7 +126,7 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        return {Track(), ""};
+        return std::make_pair(Track(), std::string {""});
 
     }
 
@@ -141,7 +141,7 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     if(py_return == nullptr || !PyDict_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        return {Track(), ""};
+        return std::make_pair(Track(), std::string {""});
 
     }
 
@@ -152,7 +152,7 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     if(!py_title || !py_artists_list || !py_album || !py_artwork_url) {
 
         Py_DECREF(py_return);
-        return {Track(), ""};
+        return std::make_pair(Track(), std::string {""});
 
     }
 
@@ -169,7 +169,7 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
         PyUnicode_AsUTF8(py_album)
     );
     Py_DECREF(py_return);
-    return {track, PyUnicode_AsUTF8(py_artwork_url)};
+    return std::make_pair(track, std::string {PyUnicode_AsUTF8(py_artwork_url)});
 
 }
 
@@ -195,12 +195,12 @@ std::string TrackManager::get_best_youtube_url(const Track& track) {
 
     }
 
-    PyObject* py_param_title = PyUnicode_FromString(track.title().c_str());
-    const std::vector<std::string>& track_artists = track.artists();
+    PyObject* py_param_title = PyUnicode_FromString(track.title().toStdString().c_str());
+    const QVector<QString>& track_artists = track.artists();
     PyObject* py_param_artists = PyList_New(0);
     for(std::size_t i {0}; i < track_artists.size(); i++) {
 
-        PyList_Append(py_param_artists, PyUnicode_FromString(track_artists[i].c_str()));
+        PyList_Append(py_param_artists, PyUnicode_FromString(track_artists[i].toStdString().c_str()));
 
     }
     
@@ -413,7 +413,7 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     }
 
     std::string new_track_path = destination_path.string();
-    track_dict.insert({track, new_track_path});
+    track_dict[track] = new_track_path;
     return write_file_metadata(new_track_path, track);
     
 }
@@ -471,7 +471,7 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
 
     std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
     Py_DECREF(py_return);
-    track_dict.insert({track, downloaded_path});
+    track_dict[track] = downloaded_path;
     return write_file_metadata(downloaded_path, track);
 
 }
@@ -554,9 +554,9 @@ bool TrackManager::edit_track(const Track& original_track, const Track& new_trac
 
     if(write_file_metadata(track_dict.at(original_track), new_track)) {
 
-        std::unordered_map<staccato::Track, std::string>::node_type map_node = track_dict.extract(original_track);
-        map_node.key() = new_track;
-        track_dict.insert(std::move(map_node));
+        std::string file_location = track_dict[original_track];
+        track_dict.erase(original_track);
+        track_dict[new_track] = file_location;
 
         return true;
 
@@ -869,7 +869,7 @@ bool TrackManager::read_track_dict() {
                     break;
                 default:
                     count = 0;
-                    track_dict.insert({Track(title, artists, album), path});
+                    track_dict[Track(title, artists, album)] = path;
                     title = curr_artist = album = path = "";
                     artists.clear();
                     break;
@@ -925,20 +925,20 @@ bool TrackManager::serialize_track_dict() {
     output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
     output.put('\0');
 
-    for(const std::pair<Track, std::string>& pair: track_dict) {
+    for(std::unordered_map<staccato::Track, std::string>::iterator i = track_dict.begin(); i != track_dict.end(); i++) {
 
-        output.write(pair.first.title().c_str(), pair.first.title().size());
+        output.write(i->first.title().toUtf8().constData(), i->first.title().size());
         output.put('\0');
-        for(const std::string& artist: pair.first.artists()) {
+        for(const QString& artist: i->first.artists()) {
 
-            output.write(artist.c_str(), artist.size());
+            output.write(artist.toUtf8().constData(), artist.size());
             output.put('\0');
 
         }
         output.put('\0');
-        output.write(pair.first.album().c_str(), pair.first.album().size());
+        output.write(i->first.album().toUtf8().constData(), i->first.album().size());
         output.put('\0');
-        output.write(pair.second.c_str(), pair.second.size());
+        output.write(i->second.c_str(), i->second.size());
         output.put('\0');
 
         if(output.fail()) {
@@ -964,11 +964,11 @@ bool TrackManager::serialize_track_dict() {
 std::vector<Track> TrackManager::find_missing_tracks() {
 
     std::vector<Track> missing_tracks {};
-    for(const std::pair<Track, std::string>& pair: track_dict) {
+    for(std::unordered_map<staccato::Track, std::string>::iterator i = track_dict.begin(); i != track_dict.end(); i++) {
 
-        if(!path_is_readable_track_file(pair.second)) {
+        if(!path_is_readable_track_file(i->second)) {
 
-            missing_tracks.push_back(pair.first);
+            missing_tracks.push_back(i->first);
 
         }
 
@@ -981,9 +981,9 @@ std::vector<Track> TrackManager::find_missing_tracks() {
 std::vector<std::string> TrackManager::find_extraneous_track_files() {
 
     std::unordered_set<std::filesystem::path> paths_in_dict {};
-    for(const std::pair<Track, std::string>& pair: track_dict) {
+    for(std::unordered_map<staccato::Track, std::string>::iterator i = track_dict.begin(); i != track_dict.end(); i++) {
 
-        paths_in_dict.insert(std::filesystem::path(pair.second));
+        paths_in_dict.insert(std::filesystem::path(i->second));
 
     }
 
@@ -1255,7 +1255,7 @@ Playlist TrackManager::get_playlist(const std::string& id) {
 
     }
 
-    return Playlist(name, tracklist, online_connection);
+    return Playlist(QString::fromStdString(name), tracklist, QString::fromStdString(online_connection));
 
 }
 
@@ -1271,23 +1271,23 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
     output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
     output.put('\0');
-    output.write(playlist.name().c_str(), playlist.name().size());
+    output.write(playlist.name().toUtf8().constData(), playlist.name().size());
     output.put('\0');
-    output.write(playlist.online_connection().c_str(), playlist.online_connection().size());
+    output.write(playlist.online_connection().toUtf8().constData(), playlist.online_connection().size());
     output.put('\0');
     std::unordered_multiset<Track> tracklist = playlist.tracklist();
     for(const Track& track: tracklist) {
 
-        output.write(track.title().c_str(), track.title().size());
+        output.write(track.title().toUtf8().constData(), track.title().size());
         output.put('\0');
-        for(const std::string& artist: track.artists()) {
+        for(const QString& artist: track.artists()) {
 
-            output.write(artist.c_str(), artist.size());
+            output.write(artist.toUtf8().constData(), artist.size());
             output.put('\0');
 
         }
         output.put('\0');
-        output.write(track.album().c_str(), track.album().size());
+        output.write(track.album().toUtf8().constData(), track.album().size());
         output.put('\0');
 
         if(output.fail()) {

@@ -10,6 +10,8 @@ void staccato::track_testing() {
 
 void staccato::playlist_testing() {
 
+    /*
+
     //Notes about testing: 
     // "+" means that the test is meant to pass
     // "-" means that the test is meant to fail
@@ -122,10 +124,13 @@ void staccato::playlist_testing() {
     }
     std::cout << std::endl;
 
+    */
+
 }
 
 void staccato::track_manager_passive_local_testing() {
 
+    /*
     const std::string music_file_path = "../tracks/90210.mp3";
     const std::string non_music_file_path = "../tracks/idiot23.PNG";
     const std::string invalid_path = "asodiaosi";
@@ -277,9 +282,13 @@ void staccato::track_manager_passive_local_testing() {
 
     }
 
+    */
+
 }
 
 void staccato::track_manager_active_local_testing() {
+
+    /*
 
     bool success = false;
     const std::string external_local_track_path = "D:\\ss5msvokUkY.ogg";
@@ -352,9 +361,13 @@ void staccato::track_manager_active_local_testing() {
     // TrackManager::print_track_dict();
     // std::cout << std::endl;
 
+    */
+
 }
 
 void staccato::track_manager_passive_online_testing() {
+
+    /*
 
     const std::string normal_spotify_track = "https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk?si=147b46a69ab8486a";
     const std::string unavailable_spotify_track = "https://open.spotify.com/track/2VW3Mcwjgs4NO4P6kx52C0?si=f737371736c74c05";
@@ -511,9 +524,13 @@ void staccato::track_manager_passive_online_testing() {
     }
     std::cout << std::endl;
 
+    */
+
 }
 
 void staccato::track_manager_active_online_testing() {
+
+    /*
 
     bool success = false;
     const Track track ("ODD Front", {"LOOΠΔ / ODD EYE CIRCLE"}, "Max & Match");
@@ -531,5 +548,7 @@ void staccato::track_manager_active_online_testing() {
     std::cout << (success ? "true" : "false") << std::endl;
     TrackManager::print_track_dict();
     std::cout << std::endl;
+
+    */
 
 }

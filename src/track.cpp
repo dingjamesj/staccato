@@ -1,49 +1,49 @@
-#include "track.hpp"
-#include "util.hpp"
 #include "track_manager.hpp"
+#include "util.hpp"
 
 using namespace staccato;
 
-const std::string& Track::title() const {
+const QString& Track::title() const {
 
     return title_;
 
 }
 
-const std::vector<std::string>& Track::artists() const {
+const QVector<QString>& Track::artists() const {
 
     return artists_;
 
 }
 
-const std::string& Track::album() const {
+const QString& Track::album() const {
 
     return album_;
 
 }
 
-Track::Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album): 
-    title_ {title.empty() ? "Unknown Title" : title}, 
+Track::Track(const QString& title, const QVector<QString>& artists, const QString& album, QObject* parent): 
+    title_ (title.isEmpty() ? "Unknown Title" : title), 
     artists_ {}, 
-    album_ {album.empty() ? "Unknown Album" : album} 
+    album_ (album.isEmpty() ? "Unknown Album" : album),
+    QObject(parent)
 {
 
     if(artists.size() == 0) {
 
-        Track::artists_ = {"Unknown Artists"};
+        artists_ = {"Unknown Artists"};
         return;
 
     }
 
-    for(std::string artist: artists) {
+    for(const QString& artist: artists) {
 
-        if(artist.empty()) {
+        if(artist.isEmpty()) {
 
-            Track::artists_.push_back("Unknown Artist");
+            artists_.push_back("Unknown Artist");
 
         } else {
 
-            Track::artists_.push_back(artist);
+            artists_.push_back(artist);
 
         }
 
@@ -51,11 +51,11 @@ Track::Track(const std::string& title, const std::vector<std::string>& artists, 
 
 }
 
-Track::Track(): title_ {""}, artists_ {}, album_ {""} {}
+Track::Track(QObject* parent): title_ (""), artists_ {}, album_ (""), QObject(parent) {}
 
 bool Track::is_empty() const {
 
-    return title_.empty() && artists_.empty() && album_.empty();
+    return title_.isEmpty() && artists_.isEmpty() && album_.isEmpty();
 
 }
 
@@ -67,7 +67,7 @@ std::string Track::string() const {
 
     }
 
-    std::string artists_str {};
+    QString artists_str {};
     for(std::size_t i {0}; i < artists_.size(); i++) {
 
         artists_str += artists_[i];
@@ -79,7 +79,7 @@ std::string Track::string() const {
 
     }
 
-    return title_ + " by " + artists_str + " from " + album_ + "\n";
+    return (title_ + " by " + artists_str + " from " + album_ + "\n").toStdString();
     
 }
 
@@ -88,8 +88,9 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
     switch(sort_mode) {
 
     case sortmode::title: {
-        icu::UnicodeString title1 = icu::UnicodeString::fromUTF8(track1.title_).toLower();
-        icu::UnicodeString title2 = icu::UnicodeString::fromUTF8(track2.title_).toLower();
+        QString title1 = track1.title_.toLower();
+        QString title2 = track2.title_.toLower();
+        
         if(title1 < title2) {
 
             return -1;
@@ -119,8 +120,8 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
 
         }
 
-        icu::UnicodeString artists1 = icu::UnicodeString::fromUTF8(track1.artists_[0]).toLower();
-        icu::UnicodeString artists2 = icu::UnicodeString::fromUTF8(track2.artists_[0]).toLower();
+        QString artists1 = track1.artists_[0].toLower();
+        QString artists2 = track2.artists_[0].toLower();
         if(artists1 < artists2) {
 
             return -1;
@@ -136,8 +137,8 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
         }
     }
     case sortmode::album: {
-        icu::UnicodeString album1 = icu::UnicodeString::fromUTF8(track1.album_).toLower();
-        icu::UnicodeString album2 = icu::UnicodeString::fromUTF8(track2.album_).toLower();
+        QString album1 = track1.album_.toLower();
+        QString album2 = track2.album_.toLower();
         if(album1 < album2) {
 
             return -1;
@@ -187,8 +188,8 @@ int Track::compare(const Track& track1, const Track& track2, sortmode sort_mode)
         }
     }
     case sortmode::file_codec: {
-        icu::UnicodeString ext1 = icu::UnicodeString::fromUTF8(audio_type_to_string(TrackManager::get_track_file_type(track1))).toLower();
-        icu::UnicodeString ext2 = icu::UnicodeString::fromUTF8(audio_type_to_string(TrackManager::get_track_file_type(track2))).toLower();
+        QString ext1 = QString::fromStdString(audio_type_to_string(TrackManager::get_track_file_type(track1))).toLower();
+        QString ext2 = QString::fromStdString(audio_type_to_string(TrackManager::get_track_file_type(track2))).toLower();
         if(ext1 < ext2) {
 
             return -1;

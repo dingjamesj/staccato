@@ -6,35 +6,43 @@
 #include <vector>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
+#include <QObject>
+#include <QtQml>
 
 namespace staccato {
 
     enum class sortmode;
 
     /// @brief A container for basic information about a track: its title, artists, and album (or "release group" e.g. EP, single release, etc.)
-    struct Track {
+    class Track: public QObject {
+
+        Q_OBJECT
+        QML_ELEMENT
+        Q_PROPERTY(QString title READ title)
+        Q_PROPERTY(QVector<QString> artists READ artists)
+        Q_PROPERTY(QString album READ album)
 
     private:
-        std::string title_;
-        std::vector<std::string> artists_;
-        std::string album_;
+        QString title_;
+        QVector<QString> artists_;
+        QString album_;
 
     public:
         /// @return The track title
-        const std::string& title() const;
+        const QString& title() const;
         /// @return The track's artists
-        const std::vector<std::string>& artists() const;
+        const QVector<QString>& artists() const;
         /// @return The track's "release group" (e.g. album, EP, single release, etc.)
-        const std::string& album() const;
+        const QString& album() const;
 
         /// @brief Creates a Track object
         /// @param title 
         /// @param artists 
         /// @param album 
-        Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album);
+        explicit Track(const QString& title, const QVector<QString>& artists, const QString& album, QObject* parent = nullptr);
 
         /// @brief Creates an empty Track object. Encountering an empty Track object should signify that an error occurred.
-        Track();
+        explicit Track(QObject* parent = nullptr);
 
         /// @brief Used to see if an error was encountered (empty Track objects should signify that an error occurred)
         /// @return `true` if this Track object is empty, `false` otherwise
@@ -66,15 +74,15 @@ template<> struct std::hash<staccato::Track> {
 
     inline std::size_t operator()(const staccato::Track& track) const {
 
-        const std::vector<std::string>& artists = track.artists();
-        std::string artists_str {};
+        const QVector<QString>& artists = track.artists();
+        QString artists_str ("");
         for(std::size_t i {0}; i < artists.size(); i++) {
 
             artists_str += artists[i] + " ";
 
         }
 
-        return std::hash<string>()(track.title() + " " + artists_str + track.album());
+        return qHash(track.title() + " " + artists_str + track.album());
 
     }
 

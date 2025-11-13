@@ -2,8 +2,6 @@
 #define TESTS_HPP
 
 #include "track_manager.hpp"
-#include "track.hpp"
-#include "playlist.hpp"
 
 namespace staccato {
 

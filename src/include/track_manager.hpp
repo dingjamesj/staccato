@@ -1,9 +1,9 @@
 #ifndef TRACK_MANAGER_HPP
 #define TRACK_MANAGER_HPP
 
+#include "util.hpp"
 #include "track.hpp"
 #include "playlist.hpp"
-#include "util.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -102,12 +102,12 @@ namespace staccato {
         /// @param path 
         /// @param track 
         /// @return `true` if the write was successful, `false` otherwise
-        static bool write_file_metadata(const std::string& path, const Track& track);
+        static bool write_file_metadata(const QString& path, const Track& track);
         
         /// @brief .stkl and .sply files all have the same file header that marks it as a staccato file. The header is a constexpr string that's defined somewhere else in this file.
         /// @param input 
         /// @return The file header from the staccato file
-        static std::string ifstream_read_file_header(std::ifstream& input);
+        static QString ifstream_read_file_header(std::ifstream& input);
 
         public:
 
@@ -117,31 +117,31 @@ namespace staccato {
 
         /// @param path 
         /// @return `true` if the file associated with the Track in the track dict is a readable audio file, `false` otherwise
-        static bool path_is_readable_track_file(const std::string& path);
+        static bool path_is_readable_track_file(const QString& path);
 
         /// @brief Gets info about a track from a local source (i.e. a file from the hard drive)
         /// @param path 
         /// @return A Track object representing the local track
-        static Track get_local_track_info(const std::string& path);
+        static Track get_local_track_info(const QString& path);
 
         //------------------------------- REQUIRES THE INTERNET -------------------------------
 
         /// @brief *(Calls python function "fetcher.get_track")* Gets info about a track from an online source
         /// @param url 
         /// @return A Track object representing the online track
-        static std::pair<Track, std::string> get_online_track_info(const std::string& url);
+        static QPair<Track, QString> get_online_track_info(const QString& url);
 
         /// @brief *(Calls python function "fetcher.find_best_youtube_url")* Searches for a YouTube video that matches best with the Track info. 
         /// @param track 
         /// @return A YouTube URL
-        static std::string get_best_youtube_url(const Track& track);
+        static QString get_best_youtube_url(const Track& track);
 
         /// @brief *(Calls python function "fetcher.get_artwork_url_from_musicbrainz")* Searches for a release group on musicbrainz that contains the track described by the params, and gets its cover artwork URL
         /// @param title 
         /// @param lead_artist 
         /// @param album 
         /// @return An online URL to an image resource, an empty string if an image wasn't found
-        static std::string get_musicbrainz_artwork_url(const std::string& title, const std::string& lead_artist, const std::string& album);
+        static QString get_musicbrainz_artwork_url(const QString& title, const QString& lead_artist, const QString& album);
 
         //=====================================================================================
         //                               READING INTERNAL TRACKS                               
@@ -154,7 +154,7 @@ namespace staccato {
 
         /// @param track 
         /// @return The path to the Track object's associated audio file as a string, empty string if the Track object has no associated audio file
-        static std::string get_track_file_path(const Track& track);
+        static QString get_track_file_path(const Track& track);
 
         /// @param track 
         /// @return The duration in seconds of the Track object's associated audio file, `0` if the Track object has no associated audio file
@@ -170,15 +170,15 @@ namespace staccato {
 
         /// @param track 
         /// @return The embedded artwork of the Track object's associated audio file as a vector of bytes (chars)
-        static std::vector<char> get_track_artwork_raw(const Track& track);
+        static QByteArray get_track_artwork_raw(const Track& track);
 
         /// @brief To keep staccato's file tracking in sync, this should be ran in the background when staccato starts
         /// @return A vector of Tracks that are keys in the track dict and whose corresponding audio files are no longer accessible
-        static std::vector<Track> find_missing_tracks();
+        static QVector<Track> find_missing_tracks();
 
         /// @brief To keep staccato's file tracking in sync, this should be ran in the background when staccato starts
         /// @return A vector of strings that are paths to audio files in staccato's "tracks" directory that aren't in the track dict (i.e. untracked audio files that were manually placed in the "tracks" directory by the user)
-        static std::vector<std::string> find_extraneous_track_files();
+        static QVector<std::string> find_extraneous_track_files();
 
         //=====================================================================================
         //                   ADDING, MODIFYING, AND DELETING INTERNAL TRACKS                   
@@ -229,7 +229,7 @@ namespace staccato {
         
         /// @brief This is when you want to know what playlists are saved in staccato (you don't want complete information including tracklist for each of them)
         /// @return A vector of tuples that contain each playlist's ID, name, and file path to the cover image
-        static std::vector<std::tuple<std::string, std::string, std::string>> get_basic_playlist_info_from_files();
+        static QVector<QVector3D<QString>> get_basic_playlist_info_from_files();
 
         /// @brief Gets complete information about a singular playlist (including the tracklist)
         /// @param id (A playlist's ID is actually just the .sply filename's stem)
@@ -272,7 +272,7 @@ namespace staccato {
         static bool serialize_track_dict();
 
         //=====================================================================================
-        //                              RECENT ACTIVITY MANAGEMENT                             
+        //                         RECENT ACTIVITY, SETTINGS MANAGEMENT                        
         //=====================================================================================
 
         /// @brief Used for getting the queue from the last staccato session, so that the user can continue where they left off
@@ -286,12 +286,9 @@ namespace staccato {
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_queue(std::string queue_name, bool is_repeating, std::vector<Track> tracklist);
 
-        //TODO: make functions that record recenthly played playlists ONLY (no tracks)
-        //I am making the decision that we will not give the option to sort pinned playlists/tracks by recently played
-        //That way we just need to store recently played playlists
-
-        //However we will need to let the user order their pinned things in a custom order
-        //We will do this by changing the order in which the pinned things are stored in the settings file
+        /// @brief Used to get the pinned playlists/tracks
+        /// @return A vector of the pinned playlists & tracks as a vector of QObjects
+        static std::vector<QObject> get_pinned_items();
 
         //=====================================================================================
         //                                      DEBUGGING                                      

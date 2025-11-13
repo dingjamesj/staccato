@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <iostream>
 #include <chrono>
+#include <QObject>
+#include <QtQml>
 
 namespace staccato {
 
@@ -15,12 +17,17 @@ namespace staccato {
     enum class sortmode;
 
     /// @brief Contains a name, an online connection URL, and a tracklist. Note that playlists also have IDs associated with them, but this is simply stored in the .sply file names.
-    class Playlist {
+    class Playlist: public QObject {
+
+        Q_OBJECT
+        QML_ELEMENT
+        Q_PROPERTY(QString name READ name WRITE set_name)
+        Q_PROPERTY(QString onlineConnection READ online_connection WRITE set_online_connection)
 
     private:
-        std::string name_;
+        QString name_;
         std::unordered_multiset<Track> tracklist_;
-        std::string online_connection_;
+        QString online_connection_;
         std::int64_t last_played_time_;
         
         //Helper functions
@@ -32,14 +39,15 @@ namespace staccato {
         /// @param name 
         /// @param tracklist 
         /// @param online_connection 
-        Playlist(
-            const std::string& name, 
+        explicit Playlist(
+            const QString& name, 
             const std::unordered_multiset<Track>& tracklist, 
-            const std::string& online_connection
+            const QString& online_connection,
+            QObject* parent = nullptr
         );
 
         /// @brief Creates an empty Playlist object. Encountering an empty Playlist object should signify that an error occurred.
-        Playlist();
+        explicit Playlist(QObject* parent = nullptr);
 
         //==================================
         //        ONLINE CONNECTIONS        
@@ -47,14 +55,13 @@ namespace staccato {
 
         /// @brief Only sets the online connection if the URL leads to an accessible online playlist
         /// @param url 
-        /// @return `true` if the connection is set (i.e. if the URL leads to an accessible online playlist), `false` otherwise
-        bool set_online_connection(const std::string& url);
+        void set_online_connection(const QString& url);
 
         /// @brief Removes the online connection
         void remove_online_connection();
 
         /// @return The online connection URL
-        std::string online_connection() const;
+        const QString& online_connection() const;
 
         //==================================
         //       TRACKLIST FUNCTIONS
@@ -91,9 +98,9 @@ namespace staccato {
         //               MISC               
         //==================================
 
-        const std::string& name() const;
+        const QString& name() const;
 
-        void set_name(std::string name);
+        void set_name(const QString& name);
 
         int64_t last_played_time() const;
 
