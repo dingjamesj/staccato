@@ -1042,7 +1042,7 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
         std::uint16_t total_count {0};
         std::uint8_t count {0};
-        std::string name, cover_image_file_path {""};
+        std::string name, online_connection {""};
         char c = '\0';
         while(total_count < 65500) {
 
@@ -1067,7 +1067,7 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
             } else if(count == 1) {
 
-                cover_image_file_path.push_back(c);
+                online_connection.push_back(c);
 
             }
 
@@ -1093,7 +1093,7 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
         }
 
-        info.push_back({id, name, cover_image_file_path});
+        info.push_back({id, name, online_connection});
         
     }
 

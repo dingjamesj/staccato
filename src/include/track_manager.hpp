@@ -91,6 +91,8 @@ namespace staccato {
         private:
 
         static std::unordered_map<Track, std::string> track_dict; //The unordered_map that maps all Tracks to a file path
+        static std::vector<Track> track_queue; //The currently playing queue
+        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items; //A list of Playlists and Tracks that are pinned by the user. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
 
         //Helper functions
 
@@ -284,14 +286,35 @@ namespace staccato {
         /// @param is_repeating 
         /// @param tracklist 
         /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_queue(std::string queue_name, bool is_repeating, std::vector<Track> tracklist);
+        static bool serialize_queue(std::string queue_name, bool is_repeating);
 
-        //TODO: make functions that record recenthly played playlists ONLY (no tracks)
-        //I am making the decision that we will not give the option to sort pinned playlists/tracks by recently played
-        //That way we just need to store recently played playlists
+        /// @brief Returns data about the pinned items, and updates the static property `pinned_items`
+        /// @return A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album.
+        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> get_pinned_items();
 
-        //However we will need to let the user order their pinned things in a custom order
-        //We will do this by changing the order in which the pinned things are stored in the settings file
+        /// @brief Adds a playlist to the `pinned_items` property (does not serialize to the file system)
+        /// @param id 
+        /// @return `true` if the playlist was not already pinned, `false` otherwise
+        static bool add_pinned_playlist(const std::string& id);
+
+        /// @brief Removes a playlist from the `pinned_items` property (does not serialize to the file system)
+        /// @param id 
+        /// @return `false` if the playlist was not pinned, `true` otherwise
+        static bool remove_pinned_playlist(const std::string& id);
+
+        /// @brief Adds a track to the `pinned_items` property (does not serialize to the file system)
+        /// @param track 
+        /// @return `true` if the playlist was not already pinned, `false` otherwise
+        static bool add_pinned_track(const Track& track);
+
+        /// @brief Removes a track from the `pinned_items` property (does not serialize to the file system)
+        /// @param track 
+        /// @return `false` if the track was not pinned, `true` otherwise
+        static bool remove_pinned_track(const Track& track);
+
+        /// @brief Serializes the `pinned_items` property to the file system (specifically the settings file)
+        /// @return `true` if the serialization was successful, `false` otherwise
+        static bool serialize_pinned_items();
 
         //=====================================================================================
         //                                      DEBUGGING                                      

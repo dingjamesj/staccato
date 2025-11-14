@@ -7,17 +7,19 @@
 
 namespace staccato {
 
-    class QtTrack: public QObject {
+    class TrackManagerInterface: public QObject {
 
         Q_OBJECT
         QML_ELEMENT
+        QML_UNCREATABLE("")
 
-    }
+        public:
 
-    class QtPlaylist: public QObject{
+        Q_INVOKABLE
+        QVector<QVariantList> get_pinned_items();
 
-        Q_OBJECT
-        QML_ELEMENT
+        Q_INVOKABLE
+        QVector<QVector<QString>> get_basic_playlists_info();
 
     }
 
