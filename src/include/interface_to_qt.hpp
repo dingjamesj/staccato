@@ -2,18 +2,22 @@
 #define QT_INTERFACE_HPP
 
 #include "track_manager.hpp"
-#include <qt6/QtQmlIntegration/qqmlintegration.h>
+#include <QObject>
+#include <QtQml>
 
 namespace staccato {
 
-    class InterfaceToQt: public QObject {
+    class QtTrack: public QObject {
 
         Q_OBJECT
         QML_ELEMENT
-        QML_SINGLETON
 
-        public:
-        
+    }
+
+    class QtPlaylist: public QObject{
+
+        Q_OBJECT
+        QML_ELEMENT
 
     }
 
