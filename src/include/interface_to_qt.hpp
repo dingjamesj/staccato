@@ -1,7 +1,6 @@
 #ifndef QT_INTERFACE_HPP
 #define QT_INTERFACE_HPP
 
-#include "track_manager.hpp"
 #include <QObject>
 #include <QtQml>
 
@@ -10,7 +9,7 @@ namespace staccato {
     class TrackManagerInterface: public QObject {
 
         Q_OBJECT
-        QML_ELEMENT
+        QML_NAMED_ELEMENT(TrackManage)
         QML_UNCREATABLE("")
 
         public:
@@ -21,7 +20,7 @@ namespace staccato {
         Q_INVOKABLE
         QVector<QVector<QString>> get_basic_playlists_info();
 
-    }
+    };
 
 }
 

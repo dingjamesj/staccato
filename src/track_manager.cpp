@@ -1310,6 +1310,13 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
 }
 
+std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> TrackManager::get_pinned_items() {
+
+    return {};
+
+}
+
+
 void TrackManager::print_track_dict() {
 
     if(track_dict.empty()) {
