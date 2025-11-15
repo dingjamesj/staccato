@@ -15,10 +15,10 @@ namespace staccato {
         public:
 
         Q_INVOKABLE
-        QVector<QVariantList> get_pinned_items();
+        QList<QVariantList> get_pinned_items();
 
         Q_INVOKABLE
-        QVector<QVector<QString>> get_basic_playlists_info();
+        QList<QStringList> get_basic_playlists_info();
 
     };
 
