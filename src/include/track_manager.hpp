@@ -21,6 +21,7 @@
 #include <wavfile.h>
 #include <flacfile.h>
 #include <vector>
+#include <bit>
 
 /* Examples of .stkl and .sply file structures:
 
@@ -52,6 +53,7 @@ Playlist name
 \0
 Online connection
 \0
+Playlist size (as a uint64_t, which has a fixed number of bytes, so no need for a null char to end it)
 Track title 1
 \0
 Artist 1
@@ -110,6 +112,12 @@ namespace staccato {
         /// @param input 
         /// @return The file header from the staccato file
         static std::string ifstream_read_file_header(std::ifstream& input);
+
+        /// @brief Reads a uint64 given a binary file input stream
+        /// @param input 
+        /// @param input_failed_flag A pass-by-reference boolean
+        /// @return The uint64 that was read. If the reading failed, then `input_failed_flag` will be `true` and this will return 0
+        static std::uint64_t read_next_uint64(std::ifstream& input, bool& input_failed_flag);
 
         public:
 
@@ -230,8 +238,8 @@ namespace staccato {
         //=====================================================================================
         
         /// @brief This is when you want to know what playlists are saved in staccato (you don't want complete information including tracklist for each of them)
-        /// @return A vector of tuples that contain each playlist's ID, name, and file path to the cover image
-        static std::vector<std::tuple<std::string, std::string, std::string>> get_basic_playlist_info_from_files();
+        /// @return A vector of tuples that contain each playlist's ID, name, size, and online connection
+        static std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> get_basic_playlist_info_from_files();
 
         /// @brief Gets complete information about a singular playlist (including the tracklist)
         /// @param id (A playlist's ID is actually just the .sply filename's stem)

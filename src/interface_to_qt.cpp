@@ -27,12 +27,17 @@ QList<QVariantList> TrackManagerInterface::get_pinned_items() {
 
 QList<QStringList> TrackManagerInterface::get_basic_playlists_info() {
 
-    std::vector<std::tuple<std::string, std::string, std::string>> playlists = TrackManager::get_basic_playlist_info_from_files();
+    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> playlists = TrackManager::get_basic_playlist_info_from_files();
 
     QList<QStringList> qt_playlists {};
-    for(std::tuple<std::string, std::string, std::string> playlist: playlists) {
+    for(std::tuple<std::string, std::string, std::string, std::uint64_t> playlist: playlists) {
 
-        qt_playlists.push_back({QString::fromStdString(std::get<0>(playlist)), QString::fromStdString(std::get<1>(playlist)), QString::fromStdString(std::get<2>(playlist))});
+        qt_playlists.push_back({
+            QString::fromStdString(std::get<0>(playlist)), 
+            QString::fromStdString(std::get<1>(playlist)), 
+            QString::fromStdString(std::get<2>(playlist)), 
+            QString::fromStdString(std::to_string(std::get<3>(playlist)))
+        });
 
     }
 

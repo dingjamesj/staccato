@@ -85,6 +85,57 @@ std::string TrackManager::ifstream_read_file_header(std::ifstream& input) {
     
 }
 
+std::uint64_t TrackManager::read_next_uint64(std::ifstream& input, bool& input_failed_flag) {
+
+    std::uint64_t size {0};
+    input_failed_flag = false;
+
+    if constexpr(std::endian::native == std::endian::big) {
+
+        for(std::size_t i {0}; i < 8; i++) {
+
+            std::uint64_t byte = input.get();
+            if(input.fail()) {
+
+                input_failed_flag = true;
+                break;
+
+            }
+
+            byte <<= 8 * (7 - i);
+            size += byte;
+
+        }
+
+    } else {
+
+        for(std::size_t i {0}; i < 8; i++) {
+
+            std::uint64_t byte = input.get();
+            if(input.fail()) {
+
+                input_failed_flag = true;
+                break;
+
+            }
+
+            byte <<= 8 * i;
+            size += byte;
+
+        }
+
+    }
+
+    if(input_failed_flag) {
+
+        return 0;
+
+    }
+
+    return size;
+
+}
+
 //===========================
 //  PUBLIC ACCESS FUNCTIONS
 //===========================
@@ -1010,9 +1061,9 @@ std::vector<std::string> TrackManager::find_extraneous_track_files() {
 
 }
 
-std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get_basic_playlist_info_from_files() {
+std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> TrackManager::get_basic_playlist_info_from_files() {
 
-    std::vector<std::tuple<std::string, std::string, std::string>> info {};
+    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> info {};
 
     for(std::filesystem::directory_entry file: std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY)) {
 
@@ -1093,7 +1144,15 @@ std::vector<std::tuple<std::string, std::string, std::string>> TrackManager::get
 
         }
 
-        info.push_back({id, name, online_connection});
+        bool uint64_input_failed {false};
+        std::uint64_t size = read_next_uint64(input, uint64_input_failed);
+        if(uint64_input_failed) {
+
+            continue;
+
+        }
+
+        info.push_back({id, name, online_connection, size});
         
     }
 
@@ -1169,6 +1228,14 @@ Playlist TrackManager::get_playlist(const std::string& id) {
 
     //Reading unsuccessful if the file ends early
     if(count != 1) {
+
+        return Playlist();
+
+    }
+
+    bool uint64_input_failed {false};
+    std::uint64_t size = read_next_uint64(input, uint64_input_failed);
+    if(uint64_input_failed) {
 
         return Playlist();
 
@@ -1275,6 +1342,8 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
     output.put('\0');
     output.write(playlist.online_connection().c_str(), playlist.online_connection().size());
     output.put('\0');
+    std::uint64_t playlist_size = playlist.tracklist().size();
+    output.write(reinterpret_cast<const char*>(&playlist_size), sizeof(std::uint64_t));
     std::unordered_multiset<Track> tracklist = playlist.tracklist();
     for(const Track& track: tracklist) {
 
@@ -1345,16 +1414,16 @@ void TrackManager::print_track_dict() {
 
 void TrackManager::print_basic_playlists_info() {
 
-    std::vector<std::tuple<std::string, std::string, std::string>> playlists_info = get_basic_playlist_info_from_files();
+    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> playlists_info = get_basic_playlist_info_from_files();
     if(playlists_info.size() == 0) {
 
         std::cout << "[no playlists available]" << std::endl;
 
     } else {
 
-        for(std::tuple<std::string, std::string, std::string> info: playlists_info) {
+        for(std::tuple<std::string, std::string, std::string, std::uint64_t> info: playlists_info) {
 
-            std::cout << std::get<0>(info) << " " << std::get<1>(info) << " " << std::get<2>(info) << std::endl;
+            std::cout << std::get<0>(info) << " " << std::get<1>(info) << " " << std::get<2>(info) << " " << std::get<3>(info) << std::endl;
 
         }
 

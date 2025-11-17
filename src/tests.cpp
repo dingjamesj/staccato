@@ -250,8 +250,8 @@ void staccato::track_manager_passive_local_testing() {
     //Reading local playlists
 
     std::cout << "+ TrackManager::get_basic_playlist_info_from_files()" << std::endl;
-    std::vector<std::tuple<std::string, std::string, std::string>> basic_info_list = TrackManager::get_basic_playlist_info_from_files();
-    for(std::tuple<std::string, std::string, std::string> info: basic_info_list) {
+    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> basic_info_list = TrackManager::get_basic_playlist_info_from_files();
+    for(std::tuple<std::string, std::string, std::string, std::uint64_t> info: basic_info_list) {
 
         std::cout << "ID: " << std::get<0>(info) << std::endl;
         std::cout << "Name: " << std::get<1>(info) << std::endl;
@@ -331,7 +331,7 @@ void staccato::track_manager_active_local_testing() {
     std::cout << std::endl;
 
     std::cout << "+ TrackManager::get_basic_playlist_info_from_files()" << std::endl;
-    std::vector<std::tuple<std::string, std::string, std::string>> saved_playlists_info = TrackManager::get_basic_playlist_info_from_files();
+    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> saved_playlists_info = TrackManager::get_basic_playlist_info_from_files();
     TrackManager::print_basic_playlists_info();
     std::cout << std::endl;
 
