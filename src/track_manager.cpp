@@ -1234,7 +1234,7 @@ Playlist TrackManager::get_playlist(const std::string& id) {
     }
 
     bool uint64_input_failed {false};
-    std::uint64_t size = read_next_uint64(input, uint64_input_failed);
+    read_next_uint64(input, uint64_input_failed);
     if(uint64_input_failed) {
 
         return Playlist();
