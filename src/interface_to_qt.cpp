@@ -3,7 +3,7 @@
 
 using namespace staccato;
 
-QList<QVariantList> TrackManagerInterface::get_pinned_items() {
+QList<QVariantList> StaccatoInterface::get_pinned_items() {
     
     std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = TrackManager::get_pinned_items();
 
@@ -25,7 +25,7 @@ QList<QVariantList> TrackManagerInterface::get_pinned_items() {
 
 }
 
-QList<QStringList> TrackManagerInterface::get_basic_playlists_info() {
+QList<QStringList> StaccatoInterface::get_basic_playlists_info() {
 
     std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> playlists = TrackManager::get_basic_playlist_info_from_files();
 

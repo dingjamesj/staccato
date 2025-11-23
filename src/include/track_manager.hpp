@@ -65,6 +65,29 @@ Track title 2
 \0
 ...
 
+settings.config file format: (note that this is a text file, as opposed to a binary file)
+
+[PINNED]
+"playlist" or "track"     <-- Depending on if this pinned item is a playlist or a track
+Playlist ID
+Playlist name
+Playlist size
+Online connection
+
+"playlist" or "track"
+Playlist ID
+Playlist name
+Playlist size             <-- Note that this pinned playlist has no online connection 
+ 
+"playlist" or "track"
+Track title
+Track album
+Track artist 1
+Track artist 2
+
+"playlist" or "track"
+...
+
 */
 
 /* Familiarize yourself with some terminology:
@@ -349,12 +372,14 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"..\\playlists\\images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"..\\tracks\\trackdict.stkl"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.config"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"../playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"../tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"../playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"../tracks/trackdict.stkl"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.config"};
         #endif
 
         #else
@@ -365,12 +390,14 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\trackdict.stkl"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.stkl"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
         #endif
 
         #endif

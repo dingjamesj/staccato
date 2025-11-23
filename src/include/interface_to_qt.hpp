@@ -6,10 +6,10 @@
 
 namespace staccato {
 
-    class TrackManagerInterface: public QObject {
+    class StaccatoInterface: public QObject {
 
         Q_OBJECT
-        QML_NAMED_ELEMENT(TrackManage)
+        QML_NAMED_ELEMENT(Staccato)
         QML_UNCREATABLE("")
 
         public:

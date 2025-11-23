@@ -861,7 +861,7 @@ bool TrackManager::read_track_dict() {
 
     track_dict.clear();
 
-    std::ifstream input(std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
+    std::ifstream input (std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
     if(!input.is_open()) {
 
         return false;
@@ -1381,7 +1381,100 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
 std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> TrackManager::get_pinned_items() {
 
-    return {};
+    std::ifstream input {std::string(STACCATO_SETTINGS_PATH)};
+    std::string text {};
+
+    while(std::getline(input, text)) {
+
+        if(text == "[PINNED]") {
+
+            break;
+
+        }
+
+    }
+
+    std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items {};
+    bool is_track {0};
+    std::string property_1 {}; //Either the playlist name or the track title
+    std::vector<std::string> property_2 {}; //Either the playlist size & online connection or the track artists
+    std::string property_3 {}; //Either the playlist ID or the track album
+
+    for(std::size_t i {0}; i < 4; i++) {
+
+        if(!std::getline(input, text)) {
+
+            break;
+
+        }
+
+        switch(i) {
+
+        case 0:
+            if(text == "playlist") {
+
+                is_track = false;
+
+            } else {
+
+                is_track = true;
+
+            }
+            break;
+        case 1:
+            if(is_track) {
+
+                property_1 = text;
+
+            } else {
+
+                property_3 = text;
+
+            }
+            break;
+        case 2:
+            if(is_track) {
+
+                property_3 = text;
+
+            } else {
+
+                property_1 = text;
+
+            }
+            break;
+        case 3:
+            property_2.clear();
+            while(std::getline(input, text)) {
+
+                if(text == "") {
+
+                    break;
+
+                }
+
+                property_2.push_back(text);
+
+            }
+
+            //When reading a pinned playlist that has no online connection, property_2 will have length 1 and only contain the playlist size.
+            //However, for playlists without an online connection, property_2 should still have length 2, and have an empty string for the online connection.
+            if(!is_track && property_2.size() == 1) {
+
+                property_2.push_back("");
+
+            }
+
+            pinned_items.push_back({is_track, property_1, property_2, property_3});
+            break;
+        default:
+            break;
+
+        }
+
+    }
+
+    return pinned_items;
 
 }
 
