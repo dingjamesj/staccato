@@ -117,7 +117,7 @@ namespace staccato {
 
         static std::unordered_map<Track, std::string> track_dict; //The unordered_map that maps all Tracks to a file path
         static std::vector<Track> track_queue; //The currently playing queue
-        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items; //A list of Playlists and Tracks that are pinned by the user. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
+        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items; //A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
 
         //Helper functions
 
@@ -319,14 +319,13 @@ namespace staccato {
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_queue(std::string queue_name, bool is_repeating);
 
-        /// @brief Returns data about the pinned items, and updates the static property `pinned_items`
-        /// @return A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album.
-        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> get_pinned_items();
+        /// @brief Reads data about the pinned items, and updates the static property `pinned_items`
+        static void read_pinned_items();
 
         /// @brief Adds a playlist to the `pinned_items` property (does not serialize to the file system)
         /// @param id 
         /// @return `true` if the playlist was not already pinned, `false` otherwise
-        static bool add_pinned_playlist(const std::string& id);
+        static bool add_pinned_playlist(const std::string& id, const std::string& name, std::uint64_t size, const std::string& online_connection);
 
         /// @brief Removes a playlist from the `pinned_items` property (does not serialize to the file system)
         /// @param id 

@@ -1379,7 +1379,7 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
 }
 
-std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> TrackManager::get_pinned_items() {
+void TrackManager::read_pinned_items() {
 
     std::ifstream input {std::string(STACCATO_SETTINGS_PATH)};
     std::string text {};
@@ -1394,7 +1394,7 @@ std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>
 
     }
 
-    std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items {};
+    pinned_items.clear();
     bool is_track {0};
     std::string property_1 {}; //Either the playlist name or the track title
     std::vector<std::string> property_2 {}; //Either the playlist size & online connection or the track artists
@@ -1474,10 +1474,54 @@ std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>
 
     }
 
-    return pinned_items;
+}
+
+bool TrackManager::add_pinned_playlist(const std::string& id, const std::string& name, std::uint64_t size, const std::string& online_connection) {
+
+    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: pinned_items) {
+
+        if(std::get<0>(item)) {
+
+            continue;
+
+        }
+
+        if(std::get<3>(item) == id) {
+
+            return false;
+
+        }
+
+    }
+
+    std::string size_str = std::to_string(size);
+    pinned_items.push_back({false, name, {size_str, online_connection}, id});
 
 }
 
+bool TrackManager::remove_pinned_playlist(const std::string& id) {
+
+    const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& pinned_items_ref = pinned_items;
+    for(std::size_t i {0}; i < pinned_items_ref.size(); i++) {
+
+        if(std::get<0>(pinned_items_ref[i])) {
+
+            continue;
+
+        }
+
+        if(std::get<3>(pinned_items_ref[i]) == id) {
+
+            pinned_items.erase(pinned_items.begin() + i);
+            return true;
+
+        }
+
+    }
+
+    return false;
+
+}
 
 void TrackManager::print_track_dict() {
 
