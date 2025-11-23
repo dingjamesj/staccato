@@ -327,20 +327,20 @@ namespace staccato {
         /// @return `true` if the playlist was not already pinned, `false` otherwise
         static bool add_pinned_playlist(const std::string& id, const std::string& name, std::uint64_t size, const std::string& online_connection);
 
-        /// @brief Removes a playlist from the `pinned_items` property (does not serialize to the file system)
-        /// @param id 
-        /// @return `false` if the playlist was not pinned, `true` otherwise
-        static bool remove_pinned_playlist(const std::string& id);
-
         /// @brief Adds a track to the `pinned_items` property (does not serialize to the file system)
         /// @param track 
         /// @return `true` if the playlist was not already pinned, `false` otherwise
         static bool add_pinned_track(const Track& track);
 
-        /// @brief Removes a track from the `pinned_items` property (does not serialize to the file system)
-        /// @param track 
-        /// @return `false` if the track was not pinned, `true` otherwise
-        static bool remove_pinned_track(const Track& track);
+        /// @brief Removes an item from the `pinned_items` property (does not serialize to the file system)
+        /// @param id 
+        /// @return `false` if the index is out of bounds, `true` otherwise
+        static bool remove_pinned_item(std::size_t index);
+
+        /// @brief Moves the pinned item at `original_index` to `new_index`
+        /// @param original_index 
+        /// @param new_index 
+        static void move_pinned_item(std::size_t original_index, std::size_t new_index);
 
         /// @brief Serializes the `pinned_items` property to the file system (specifically the settings file)
         /// @return `true` if the serialization was successful, `false` otherwise

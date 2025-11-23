@@ -1499,27 +1499,16 @@ bool TrackManager::add_pinned_playlist(const std::string& id, const std::string&
 
 }
 
-bool TrackManager::remove_pinned_playlist(const std::string& id) {
+bool TrackManager::remove_pinned_item(std::size_t index) {
 
-    const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& pinned_items_ref = pinned_items;
-    for(std::size_t i {0}; i < pinned_items_ref.size(); i++) {
+    if(index >= pinned_items.size()) {
 
-        if(std::get<0>(pinned_items_ref[i])) {
-
-            continue;
-
-        }
-
-        if(std::get<3>(pinned_items_ref[i]) == id) {
-
-            pinned_items.erase(pinned_items.begin() + i);
-            return true;
-
-        }
+        return false;
 
     }
 
-    return false;
+    pinned_items.erase(pinned_items.begin() + index);
+    return true;
 
 }
 
