@@ -319,8 +319,12 @@ namespace staccato {
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_queue(std::string queue_name, bool is_repeating);
 
-        /// @brief Reads data about the pinned items, and updates the static property `pinned_items`
-        static void read_pinned_items();
+        /// @brief Reads the settings (updates the `pinned_items` property)
+        static void read_settings();
+
+        /// @brief Used to get the pinned items
+        /// @return Returns a const ref of the `pinned_items` field
+        static const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& get_pinned_items();
 
         /// @brief Adds a playlist to the `pinned_items` property (does not serialize to the file system)
         /// @param id 
@@ -340,11 +344,12 @@ namespace staccato {
         /// @brief Moves the pinned item at `original_index` to `new_index`
         /// @param original_index 
         /// @param new_index 
-        static void move_pinned_item(std::size_t original_index, std::size_t new_index);
+        /// @return `false` if either index is out of bounds, `true` otherwise
+        static bool move_pinned_item(std::size_t original_index, std::size_t new_index);
 
         /// @brief Serializes the `pinned_items` property to the file system (specifically the settings file)
         /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_pinned_items();
+        static bool serialize_settings();
 
         //=====================================================================================
         //                                      DEBUGGING                                      

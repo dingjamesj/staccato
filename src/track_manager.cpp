@@ -2,7 +2,9 @@
 
 using namespace staccato;
 
-std::unordered_map<Track, std::string> TrackManager::track_dict = {};
+std::unordered_map<Track, std::string> TrackManager::track_dict {};
+std::vector<Track> TrackManager::track_queue {};
+std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> TrackManager::pinned_items {};
 
 //====================
 //  HELPER FUNCTIONS
@@ -1379,7 +1381,7 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
 }
 
-void TrackManager::read_pinned_items() {
+void TrackManager::read_settings() {
 
     std::ifstream input {std::string(STACCATO_SETTINGS_PATH)};
     std::string text {};
@@ -1476,6 +1478,12 @@ void TrackManager::read_pinned_items() {
 
 }
 
+const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& TrackManager::get_pinned_items() {
+
+    return pinned_items;
+
+}
+
 bool TrackManager::add_pinned_playlist(const std::string& id, const std::string& name, std::uint64_t size, const std::string& online_connection) {
 
     for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: pinned_items) {
@@ -1496,6 +1504,30 @@ bool TrackManager::add_pinned_playlist(const std::string& id, const std::string&
 
     std::string size_str = std::to_string(size);
     pinned_items.push_back({false, name, {size_str, online_connection}, id});
+    return true;
+
+}
+
+bool TrackManager::add_pinned_track(const Track& track) {
+
+    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: pinned_items) {
+
+        if(!std::get<0>(item)) {
+
+            continue;
+
+        }
+
+        if(std::get<1>(item) == track.title() && std::get<2>(item) == track.artists() && std::get<3>(item) == track.album()) {
+
+            return false;
+
+        }
+
+    }
+
+    pinned_items.push_back({true, track.title(), track.artists(), track.album()});
+    return true;
 
 }
 
@@ -1508,6 +1540,28 @@ bool TrackManager::remove_pinned_item(std::size_t index) {
     }
 
     pinned_items.erase(pinned_items.begin() + index);
+    return true;
+
+}
+
+bool TrackManager::move_pinned_item(std::size_t original_index, std::size_t new_index) {
+
+    if(original_index >= pinned_items.size() || new_index >= pinned_items.size()) {
+
+        return false;
+
+    }
+
+    if(original_index > new_index) {
+
+        std::rotate(pinned_items.begin() + new_index, pinned_items.begin() + original_index, pinned_items.begin() + original_index + 1);
+
+    } else if(original_index < new_index) {
+
+        std::rotate(pinned_items.begin() + original_index, pinned_items.begin() + original_index + 1, pinned_items.begin() + new_index + 1);
+
+    }
+
     return true;
 
 }
