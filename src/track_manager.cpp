@@ -3,7 +3,8 @@
 using namespace staccato;
 
 std::unordered_map<Track, std::string> TrackManager::track_dict {};
-std::vector<Track> TrackManager::track_queue {};
+std::vector<Track> TrackManager::main_queue {};
+std::vector<Track> TrackManager::added_queue {};
 std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> TrackManager::pinned_items {};
 
 //====================
@@ -861,8 +862,6 @@ int TrackManager::get_playlist_duration(const Playlist& playlist) {
 
 bool TrackManager::read_track_dict() {
 
-    track_dict.clear();
-
     std::ifstream input (std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
     if(!input.is_open()) {
 
@@ -876,6 +875,8 @@ bool TrackManager::read_track_dict() {
         return false;
 
     }
+
+    track_dict.clear();
 
     std::uint16_t total_count {0};
     std::uint8_t count {0};
@@ -968,7 +969,7 @@ bool TrackManager::read_track_dict() {
 
 bool TrackManager::serialize_track_dict() {
 
-    std::ofstream output(std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
+    std::ofstream output (std::string{TRACK_DICTIONARY_PATH}, std::ios::binary);
     if(!output.is_open()) {
 
         return false;
@@ -1378,6 +1379,98 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
     output.close();
     return true;
+
+}
+
+bool TrackManager::serialize_queue(std::string main_queue_playlist_id, std::uint64_t position, bool is_playing_added_queue) {
+
+    std::ofstream output (std::string(QUEUE_STORAGE_PATH), std::ios::binary);
+    if(!output.is_open()) {
+
+        return false;
+
+    }
+
+    output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
+    output.put('\0');
+    output.write(main_queue_playlist_id.c_str(), main_queue_playlist_id.size());
+    output.put('\0');
+    output.write(reinterpret_cast<const char*>(&position), sizeof(std::uint64_t));
+    output.write(reinterpret_cast<const char*>(&is_playing_added_queue), sizeof(bool));
+    for(const Track& track: main_queue) {
+
+        output.write(track.title().c_str(), track.title().size());
+        output.put('\0');
+        for(const std::string& artist: track.artists()) {
+
+            output.write(artist.c_str(), artist.size());
+            output.put('\0');
+
+        }
+        output.put('\0');
+        output.write(track.album().c_str(), track.album().size());
+        output.put('\0');
+
+        if(output.fail()) {
+
+            return false;
+
+        }
+
+    }
+    output.put('\0');
+    for(const Track& track: added_queue) {
+
+        output.write(track.title().c_str(), track.title().size());
+        output.put('\0');
+        for(const std::string& artist: track.artists()) {
+
+            output.write(artist.c_str(), artist.size());
+            output.put('\0');
+
+        }
+        output.put('\0');
+        output.write(track.album().c_str(), track.album().size());
+        output.put('\0');
+
+        if(output.fail()) {
+
+            return false;
+
+        }
+
+    }
+
+    output.flush();
+    if(output.fail()) {
+
+        return false;
+
+    }
+
+    output.close();
+    return true;
+
+}
+
+std::tuple<std::string, std::uint64_t, bool> TrackManager::read_saved_queue() {
+
+    std::ifstream input (std::string{QUEUE_STORAGE_PATH}, std::ios::binary);
+    if(!input.is_open()) {
+
+        return {"", -1, false};
+
+    }
+
+    std::string header = ifstream_read_file_header(input);
+    if(header != std::string(FILE_HEADER)) {
+
+        return {"", -1, false};
+
+    }
+
+    main_queue.clear();
+    added_queue.clear();
 
 }
 
