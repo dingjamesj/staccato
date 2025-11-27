@@ -1453,6 +1453,60 @@ bool TrackManager::serialize_queue(std::string main_queue_playlist_id, std::uint
 
 }
 
+bool TrackManager::serialize_settings() {
+
+    std::ofstream output {std::string(STACCATO_SETTINGS_PATH)};
+    if(!output.is_open()) {
+
+        return false;
+
+    }
+
+    output << "[PINNED]\n";
+    for(std::tuple<bool, std::string, std::vector<std::string>, std::string> item: pinned_items) {
+
+        if(std::get<0>(item)) {
+
+            output << "track\n";
+            output << std::get<1>(item) + "\n";
+            output << std::get<3>(item) + "\n";
+
+        } else {
+
+            output << "playlist\n";
+            output << std::get<3>(item) + "\n";
+            output << std::get<1>(item) + "\n";
+
+        }
+
+        for(const std::string& str: std::get<2>(item)) {
+
+            output << str + "\n";
+
+        }
+
+        output << "\n";
+
+        if(output.fail()) {
+
+            return false;
+
+        }
+
+    }
+
+    output.flush();
+    if(output.fail()) {
+
+        return false;
+
+    }
+
+    output.close();
+    return true;
+
+}
+
 std::tuple<std::string, std::uint64_t, std::uint64_t> TrackManager::read_saved_queue() {
 
     std::ifstream input (std::string{QUEUE_STORAGE_PATH}, std::ios::binary);
@@ -1617,6 +1671,12 @@ std::tuple<std::string, std::uint64_t, std::uint64_t> TrackManager::read_saved_q
 void TrackManager::read_settings() {
 
     std::ifstream input {std::string(STACCATO_SETTINGS_PATH)};
+    if(!input.is_open()) {
+
+        return;
+
+    }
+
     std::string text {};
 
     while(std::getline(input, text)) {
