@@ -1182,14 +1182,14 @@ Playlist TrackManager::get_playlist(const std::string& id) {
     }
 
     //Read basic playlist details
-    std::uint16_t total_char_count {0};
+    std::uint16_t total_count {0};
     std::uint8_t count {0};
     std::string name, online_connection {""};
     char c = '\0';
-    while(total_char_count < 65500) {
+    while(total_count < 65500) {
 
         c = input.get();
-        total_char_count++;
+        total_count++;
 
         if(input.fail()) {
 
@@ -1248,10 +1248,10 @@ Playlist TrackManager::get_playlist(const std::string& id) {
     std::string title {""}, curr_artist {""}, album {""};
     std::vector<std::string> artists {};
     count = 0;
-    while(total_char_count < 65500) {
+    while(total_count < 65500) {
 
         c = input.get();
-        total_char_count++;
+        total_count++;
 
         if(input.fail()) {
 
@@ -1382,7 +1382,7 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
 }
 
-bool TrackManager::serialize_queue(std::string main_queue_playlist_id, std::uint64_t position, bool is_playing_added_queue) {
+bool TrackManager::serialize_queue(std::string main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
 
     std::ofstream output (std::string(QUEUE_STORAGE_PATH), std::ios::binary);
     if(!output.is_open()) {
@@ -1395,8 +1395,8 @@ bool TrackManager::serialize_queue(std::string main_queue_playlist_id, std::uint
     output.put('\0');
     output.write(main_queue_playlist_id.c_str(), main_queue_playlist_id.size());
     output.put('\0');
-    output.write(reinterpret_cast<const char*>(&position), sizeof(std::uint64_t));
-    output.write(reinterpret_cast<const char*>(&is_playing_added_queue), sizeof(bool));
+    output.write(reinterpret_cast<const char*>(&main_position), sizeof(std::uint64_t));
+    output.write(reinterpret_cast<const char*>(&added_position), sizeof(std::uint64_t));
     for(const Track& track: main_queue) {
 
         output.write(track.title().c_str(), track.title().size());
@@ -1453,24 +1453,164 @@ bool TrackManager::serialize_queue(std::string main_queue_playlist_id, std::uint
 
 }
 
-std::tuple<std::string, std::uint64_t, bool> TrackManager::read_saved_queue() {
+std::tuple<std::string, std::uint64_t, std::uint64_t> TrackManager::read_saved_queue() {
 
     std::ifstream input (std::string{QUEUE_STORAGE_PATH}, std::ios::binary);
     if(!input.is_open()) {
 
-        return {"", -1, false};
+        return {"", -1, -1};
 
     }
 
     std::string header = ifstream_read_file_header(input);
     if(header != std::string(FILE_HEADER)) {
 
-        return {"", -1, false};
+        return {"", -1, -1};
 
     }
 
     main_queue.clear();
     added_queue.clear();
+
+    std::uint16_t total_count {0};
+    std::string main_queue_playlist_id {""};
+    std::uint64_t main_position {0}, added_position {0};
+
+    char c = '\0';
+    while(total_count < 65500) {
+
+        c = input.get();
+        total_count++;
+        
+        if(input.fail()) {
+
+            //Input should not fail AND input should not be EOF at this point of the reading
+            return {"", -1, -1};
+
+        }
+
+        main_queue_playlist_id.push_back(c);
+
+        if(c == '\0') {
+
+            break;
+
+        }
+
+    }
+
+    bool uint64_input_failed {false};
+    main_position = read_next_uint64(input, uint64_input_failed);
+    if(uint64_input_failed) {
+
+        return {"", -1, -1};
+
+    }
+    added_position = read_next_uint64(input, uint64_input_failed);
+    if(uint64_input_failed) {
+
+        return {"", -1, -1};
+
+    }
+
+    bool is_on_added_queue {false};
+    std::uint8_t count {0};
+    std::string title {""}, curr_artist {""}, album {""};
+    std::vector<std::string> artists {};
+    while(total_count < 65500) {
+
+        c = input.get();
+        total_count++;
+
+        if(input.fail()) {
+
+            if(input.eof()) {
+
+                break;
+
+            }
+
+            return {"", -1, -1};
+
+        }
+
+        if(count != 1) {
+
+            if(c == '\0') {
+
+                count++;
+
+                //Remember, double null chars separate the main queue's last album and the added queue's first title.
+                //If we encounter a null char when the title is empty, that means no title was read, and hence the
+                //previous char was a null char-- forming double null chars.
+                if(title.size() == 0) {
+
+                    is_on_added_queue = true;
+
+                }
+
+            } else {
+
+                switch(count) {
+
+                case 0:
+                    title.push_back(c);
+                    break;
+                case 2:
+                    album.push_back(c);
+                default:
+                    break;
+
+                }
+
+            }
+
+            if(count > 2) {
+
+                count = 0;
+                if(is_on_added_queue) {
+
+                    added_queue.push_back(Track(title, artists, album));
+
+                } else {
+
+                    main_queue.push_back(Track(title, artists, album));
+
+                }
+
+                title = curr_artist = album = "";
+                artists.clear();
+
+            }
+
+        } else {
+
+            if(c == '\0' && curr_artist.empty()) {
+
+                count++;
+
+            } else if(c == '\0') {
+
+                artists.push_back(curr_artist);
+                curr_artist = "";
+
+            } else {
+
+                curr_artist.push_back(c);
+
+            }
+
+        }
+
+    }
+
+    if(count != 0) {
+
+        return {"", -1, -1};
+
+    }
+
+    return {main_queue_playlist_id, main_position, added_position};
 
 }
 

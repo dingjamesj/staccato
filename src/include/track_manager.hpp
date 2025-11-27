@@ -30,38 +30,74 @@ NOTE: new lines are only there for visual purposes---they don't exist in the act
 
 .stkl file format:
 
-File version
-Track title 1
+File header
+\0
+Title 1
 \0
 Artist 1
 \0
 Artist 2
 \0
 \0      <-- Note that two null chars separate the artists list and the album since one null char separates each artist.
-Album
+Album 1
 \0
 Path 1
 \0
-Track title 2
+Title 2
 \0
 ...
 
 .sply file format:
 
-File version
+File header
+\0
 Playlist name
 \0
 Online connection
 \0
 Playlist size (as a uint64_t, which has a fixed number of bytes, so no need for a null char to end it)
-Track title 1
+Title 1
 \0
 Artist 1
 \0
 \0      <-- Again, note that two null chars separate the artists list and the album since one null char separates each artist.
-Album
+Album 1
 \0
-Track title 2
+Title 2
+\0
+...
+
+queue.dat file format:
+
+File version
+\0
+Main queue's playlist ID
+\0
+Main queue position
+Added queue position
+Main queue title 1     <-- Beginning of main queue tracklist
+\0
+Main queue artist 1
+\0
+Main queue artist 2
+\0
+\0                     <-- Again, note that double null chars signify the end of the artists list
+Main queue album
+\0
+Main queue track title 2
+\0
+Main queue artist 2
+\0
+\0
+Main queue album 2
+\0
+\0                   <-- End of main queue tracklist signified by double null chars
+Added queue title 1  <-- Beginning of added queue tracklist
+\0
+Added queue artist 1
+\0
+\0
+Added queue album 1
 \0
 ...
 
@@ -90,6 +126,8 @@ Track artist 2
 
 */
 
+
+
 /* Familiarize yourself with some terminology:
 
 Internal tracks  -- Audio files that staccato has a record of (specifically in the .stkl "track dictionary" file).
@@ -106,6 +144,16 @@ Online playlists -- A playlist from an online streaming service. Only exists onl
 Track dictionary -- The core part of staccato's file tracking system. It maps Tracks (so a title, artist, and album)
                     to file paths, and it is serialized as the .stkl file found in the "tracks" directory. In this
                     documentation, it might also be referred to as "the track dict" or "the .stkl file."
+
+Main/added queue -- When a user hits "play" on a playlist, the playlist's tracklist is put into the "main queue."
+                    When a user adds individual tracks to the queue (e.g. using the "add to queue" feature), those
+                    tracks are added to the "added queue." In the app, the added queue tracks should be played before
+                    main queue tracks, but the added queue tracks are not kept in the queue (i.e. when an added 
+                    track is finished playing, it leaves the queue and rewinding will not play it).
+                    The reason for this queue separation is to allow for shuffling and unshuffling mid-queue. 
+                    Think about it: how would you unshuffle a queue if the user added tracks that aren't from the
+                    original playlist?
+                    Final note: this queue behavior emulates Spotify's queue behavior.
 
 */
 
@@ -311,14 +359,14 @@ namespace staccato {
 
         /// @brief Used for getting the queue from the last staccato session, so that the user can continue where they left off
         /// @return A tuple of the saved main queue's playlist ID, queue position number, and if the position is on the added or main queue (`true` for added queue)
-        static std::tuple<std::string, std::uint64_t, bool> read_saved_queue();
+        static std::tuple<std::string, std::uint64_t, std::uint64_t> read_saved_queue();
 
         /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off
         /// @param main_queue_playlist_id 
-        /// @param position
-        /// @param is_playing_added_queue
+        /// @param main_position
+        /// @param added_position
         /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_queue(std::string main_queue_playlist_id, std::uint64_t position, bool is_playing_added_queue);
+        static bool serialize_queue(std::string main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position);
 
         /// @brief Reads the settings (updates the `pinned_items` property)
         static void read_settings();
