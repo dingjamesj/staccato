@@ -224,3 +224,83 @@ std::ostream& operator<<(std::ostream& os, const staccato::audiotype& audio_type
     return os;
 
 }
+
+std::uint64_t staccato::read_next_uint64(std::ifstream& input, bool& input_failed_flag) {
+
+    std::uint64_t size {0};
+    input_failed_flag = false;
+
+    if constexpr(std::endian::native == std::endian::big) {
+
+        for(std::size_t i {0}; i < 8; i++) {
+
+            std::uint64_t byte = input.get();
+            if(input.fail()) {
+
+                input_failed_flag = true;
+                break;
+
+            }
+
+            byte <<= 8 * (7 - i);
+            size += byte;
+
+        }
+
+    } else {
+
+        for(std::size_t i {0}; i < 8; i++) {
+
+            std::uint64_t byte = input.get();
+            if(input.fail()) {
+
+                input_failed_flag = true;
+                break;
+
+            }
+
+            byte <<= 8 * i;
+            size += byte;
+
+        }
+
+    }
+
+    if(input_failed_flag) {
+
+        return 0;
+
+    }
+
+    return size;
+
+}
+
+std::string staccato::ifstream_read_file_header(std::ifstream& input) {
+
+    //Read file header
+    char c = '\0';
+    std::string header {""};
+    while(!input.eof()) {
+
+        c = input.get();
+        
+        if(input.fail()) {
+
+            return "";
+
+        }
+
+        if(c == '\0') {
+
+            break;
+
+        }
+
+        header.push_back(c);
+
+    }
+
+    return header;
+    
+}

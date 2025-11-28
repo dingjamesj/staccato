@@ -4,6 +4,7 @@
 #include "track.hpp"
 #include "playlist.hpp"
 #include "util.hpp"
+#include "app_manager.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -164,9 +165,6 @@ namespace staccato {
         private:
 
         static std::unordered_map<Track, std::string> track_dict; //The unordered_map that maps all Tracks to a file path
-        static std::vector<Track> main_queue; //The "main" tracklist that is playing-- in other words, the currently playing playlist
-        static std::vector<Track> added_queue; //The tracklist composed of tracks that the user manually added using the "add to queue" feature
-        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items; //A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
 
         //Helper functions
 
@@ -179,17 +177,6 @@ namespace staccato {
         /// @param track 
         /// @return `true` if the write was successful, `false` otherwise
         static bool write_file_metadata(const std::string& path, const Track& track);
-        
-        /// @brief .stkl and .sply files all have the same file header that marks it as a staccato file. The header is a constexpr string that's defined somewhere else in this file.
-        /// @param input 
-        /// @return The file header from the staccato file
-        static std::string ifstream_read_file_header(std::ifstream& input);
-
-        /// @brief Reads a uint64 given a binary file input stream
-        /// @param input 
-        /// @param input_failed_flag A pass-by-reference boolean
-        /// @return The uint64 that was read. If the reading failed, then `input_failed_flag` will be `true` and this will return 0
-        static std::uint64_t read_next_uint64(std::ifstream& input, bool& input_failed_flag);
 
         public:
 
@@ -354,53 +341,6 @@ namespace staccato {
         static bool serialize_track_dict();
 
         //=====================================================================================
-        //                              RECENT ACTIVITY MANAGEMENT                             
-        //=====================================================================================
-
-        /// @brief Used for getting the queue from the last staccato session, so that the user can continue where they left off
-        /// @return A tuple of the saved main queue's playlist ID, queue position number, and if the position is on the added or main queue (`true` for added queue)
-        static std::tuple<std::string, std::uint64_t, std::uint64_t> read_saved_queue();
-
-        /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off
-        /// @param main_queue_playlist_id 
-        /// @param main_position
-        /// @param added_position
-        /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_queue(std::string main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position);
-
-        /// @brief Reads the settings (updates the `pinned_items` property)
-        static void read_settings();
-
-        /// @brief Used to get the pinned items
-        /// @return Returns a const ref of the `pinned_items` field
-        static const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& get_pinned_items();
-
-        /// @brief Adds a playlist to the `pinned_items` property (does not serialize to the file system)
-        /// @param id 
-        /// @return `true` if the playlist was not already pinned, `false` otherwise
-        static bool add_pinned_playlist(const std::string& id, const std::string& name, std::uint64_t size, const std::string& online_connection);
-
-        /// @brief Adds a track to the `pinned_items` property (does not serialize to the file system)
-        /// @param track 
-        /// @return `true` if the playlist was not already pinned, `false` otherwise
-        static bool add_pinned_track(const Track& track);
-
-        /// @brief Removes an item from the `pinned_items` property (does not serialize to the file system)
-        /// @param id 
-        /// @return `false` if the index is out of bounds, `true` otherwise
-        static bool remove_pinned_item(std::size_t index);
-
-        /// @brief Moves the pinned item at `original_index` to `new_index`
-        /// @param original_index 
-        /// @param new_index 
-        /// @return `false` if either index is out of bounds, `true` otherwise
-        static bool move_pinned_item(std::size_t original_index, std::size_t new_index);
-
-        /// @brief Serializes the `pinned_items` property to the file system (specifically the settings file)
-        /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_settings();
-
-        //=====================================================================================
         //                                      DEBUGGING                                      
         //=====================================================================================
 
@@ -414,9 +354,6 @@ namespace staccato {
         //                                      CONSTANTS                                      
         //=====================================================================================
 
-        /// @brief The header that appears on all .sply files and on the .stkl file. Should be in the format: "staccato[version number]"
-        static constexpr std::string_view FILE_HEADER {"staccato1"};
-
         #if(DEVELOPMENT_BUILD)
 
         #if defined(_WIN32) || defined(_WIN64)
@@ -425,16 +362,12 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"..\\playlists\\images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"..\\tracks\\trackdict.stkl"};
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"..\\queue.dat"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"../playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"../tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"../playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"../tracks/trackdict.stkl"};
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"../queue.dat"};
         #endif
 
         #else
@@ -445,16 +378,12 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\trackdict.stkl"};
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"queue.dat"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.stkl"};
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"queue.dat"};
         #endif
 
         #endif

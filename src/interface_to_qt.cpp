@@ -1,11 +1,12 @@
 #include "track_manager.hpp"
+#include "app_manager.hpp"
 #include "interface_to_qt.hpp"
 
 using namespace staccato;
 
 QList<QVariantList> StaccatoInterface::get_pinned_items() {
     
-    std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = TrackManager::get_pinned_items();
+    std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = AppManager::get_pinned_items();
 
     QList<QVariantList> qt_pinned_items {};
     for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: pinned_items) {

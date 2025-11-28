@@ -1,23 +1,13 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
-// =========================================================================================
-// 
-//                SET TO TRUE DURING DEVELOPMENT, SET TO FALSE WHEN DEPLOYED.             
-//   USED TO ADJUST FOR THE DIFFERENCE BETWEEN DEVELOPMENT AND DEPLOYED PROJECT STRUCTURE.
-// 
-// =========================================================================================
-
-#define DEVELOPMENT_BUILD true
-
-// =========================================================================================
-
 #include <string>
 #include <format>
 #include <filesystem>
 #include <vector>
 #include <unordered_map>
 #include <Python.h>
+#include <fstream>
 
 namespace staccato {
 
@@ -70,6 +60,17 @@ namespace staccato {
     /// @brief *(Calls python function "downloader.update_libraries")* Updates python libraries (e.g. pip, yt-dlp)
     /// @return The status of the update (failure, success, already up to date) as a string, empty string if a python error occurred
     std::string update_python_libraries();
+
+    /// @brief Reads a uint64 given a binary file input stream
+    /// @param input 
+    /// @param input_failed_flag A pass-by-reference boolean
+    /// @return The uint64 that was read. If the reading failed, then `input_failed_flag` will be `true` and this will return 0
+    std::uint64_t read_next_uint64(std::ifstream& input, bool& input_failed_flag);
+
+    /// @brief .stkl and .sply files all have the same file header that marks it as a staccato file. The header is a constexpr string that's defined somewhere else in this file.
+    /// @param input 
+    /// @return The file header from the staccato file
+    std::string ifstream_read_file_header(std::ifstream& input);
 
 }
 
