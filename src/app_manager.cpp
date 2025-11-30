@@ -6,7 +6,7 @@ std::vector<Track> AppManager::main_queue {};
 std::vector<Track> AppManager::added_queue {};
 std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> AppManager::pinned_items {};
 
-bool AppManager::serialize_queue(std::string main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
+bool AppManager::serialize_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
 
     std::ofstream output (std::string(QUEUE_STORAGE_PATH), std::ios::binary);
     if(!output.is_open()) {
@@ -131,19 +131,19 @@ bool AppManager::serialize_settings() {
 
 }
 
-std::tuple<std::string, std::uint64_t, std::uint64_t> AppManager::read_saved_queue() {
+bool AppManager::read_last_session_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position) {
 
     std::ifstream input (std::string{QUEUE_STORAGE_PATH}, std::ios::binary);
     if(!input.is_open()) {
 
-        return {"", -1, -1};
+        return false;
 
     }
 
     std::string header = ifstream_read_file_header(input);
     if(header != std::string(FILE_HEADER)) {
 
-        return {"", -1, -1};
+        return false;
 
     }
 
@@ -151,8 +151,8 @@ std::tuple<std::string, std::uint64_t, std::uint64_t> AppManager::read_saved_que
     added_queue.clear();
 
     std::uint16_t total_count {0};
-    std::string main_queue_playlist_id {""};
-    std::uint64_t main_position {0}, added_position {0};
+    main_queue_playlist_id.clear();
+    main_position = added_position = 0;
 
     char c = '\0';
     while(total_count < 65500) {
@@ -163,7 +163,7 @@ std::tuple<std::string, std::uint64_t, std::uint64_t> AppManager::read_saved_que
         if(input.fail()) {
 
             //Input should not fail AND input should not be EOF at this point of the reading
-            return {"", -1, -1};
+            return false;
 
         }
 
@@ -181,13 +181,13 @@ std::tuple<std::string, std::uint64_t, std::uint64_t> AppManager::read_saved_que
     main_position = read_next_uint64(input, uint64_input_failed);
     if(uint64_input_failed) {
 
-        return {"", -1, -1};
+        return false;
 
     }
     added_position = read_next_uint64(input, uint64_input_failed);
     if(uint64_input_failed) {
 
-        return {"", -1, -1};
+        return false;
 
     }
 
@@ -208,7 +208,7 @@ std::tuple<std::string, std::uint64_t, std::uint64_t> AppManager::read_saved_que
 
             }
 
-            return {"", -1, -1};
+            return false;
 
         }
 
@@ -284,11 +284,23 @@ std::tuple<std::string, std::uint64_t, std::uint64_t> AppManager::read_saved_que
 
     if(count != 0) {
 
-        return {"", -1, -1};
+        return false;
 
     }
 
-    return {main_queue_playlist_id, main_position, added_position};
+    return true;
+
+}
+
+const std::vector<Track>& AppManager::get_saved_main_queue() {
+
+    return main_queue;
+
+}
+
+const std::vector<Track>& AppManager::get_saved_added_queue() {
+
+    return added_queue;
 
 }
 

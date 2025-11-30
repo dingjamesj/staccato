@@ -30,18 +30,26 @@ namespace staccato {
 
         public:
 
-        /// @brief Used for getting the queue from the last staccato session, so that the user can continue where they left off
-        /// @return A tuple of the saved main queue's playlist ID, queue position number, and if the position is on the added or main queue (`true` for added queue)
-        static std::tuple<std::string, std::uint64_t, std::uint64_t> read_saved_queue();
+        /// @brief Used for reading the queue from the last staccato session's saved data, so that the user can continue where they left off. Should be ran once at the beginning of the program.
+        /// @return A tuple of the saved main queue's playlist ID, main queue position, and added queue position.
+        static bool read_last_session_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position);
 
-        /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off
+        /// @brief Used to get the saved main queue from the last session (should be used once at the beginning of the program)
+        /// @return A const ref to the main queue Track vector
+        static const std::vector<Track>& get_saved_main_queue();
+
+        /// @brief Used to get the saved added queue from the last session (should be used once at the beginning of the program)
+        /// @return A const ref to the added queue Track vector
+        static const std::vector<Track>& get_saved_added_queue();
+
+        /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off. Should be ran once at the end of the program.
         /// @param main_queue_playlist_id 
         /// @param main_position
         /// @param added_position
         /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_queue(std::string main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position);
+        static bool serialize_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position);
 
-        /// @brief Reads the settings (updates the `pinned_items` property)
+        /// @brief Reads the settings (updates the `pinned_items` property). Should only be called at the beginning of the program since settings are stored as static variables at runtime.
         static void read_settings();
 
         /// @brief Used to get the pinned items
@@ -84,20 +92,20 @@ namespace staccato {
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"..\\queue.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"..\\last_session_data.dat"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"../queue.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"../last_session_data.dat"};
         #endif
 
         #else
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"queue.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"last_session_data.dat"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"queue.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"last_session_data.dat"};
         #endif
 
         #endif

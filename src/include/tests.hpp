@@ -13,6 +13,8 @@ namespace staccato {
     void track_manager_active_local_testing();
     void track_manager_passive_online_testing();
     void track_manager_active_online_testing();
+    void app_manager_passive_testing();
+    void app_manager_active_testing();
 
 }
 

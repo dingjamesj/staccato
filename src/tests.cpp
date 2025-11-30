@@ -533,3 +533,48 @@ void staccato::track_manager_active_online_testing() {
     std::cout << std::endl;
 
 }
+
+void staccato::app_manager_passive_testing() {
+
+    std::cout << "AppManager::read_saved_queue()" << std::endl;
+    std::string main_queue_playlist_id {""};
+    std::uint64_t main_position {0}, added_position {0};
+    bool success = AppManager::read_last_session_data(main_queue_playlist_id, main_position, added_position);
+    std::cout << main_queue_playlist_id << " " << main_position << " " << added_position << std::endl;
+    std::cout << "MAIN QUEUE:" << std::endl;
+    for(const Track& track: AppManager::get_saved_main_queue()) {
+
+        std::cout << track.string();
+
+    }
+    std::cout << "ADDED QUEUE:" << std::endl;
+    for(const Track& track: AppManager::get_saved_added_queue()) {
+
+        std::cout << track.string();
+
+    }
+
+    std::cout << "AppManager::read_settings()" << std::endl;
+    AppManager::read_settings();
+    std::cout << "PINNED ITEMS:" << std::endl;
+    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: AppManager::get_pinned_items()) {
+
+        std::cout << std::get<0>(item) << " " << std::get<1>(item) << " " << std::get<3>(item) << std::endl;
+
+        for(std::string str: std::get<2>(item)) {
+
+            std::cout << str << " ";
+
+        }
+
+        std::cout << std::endl;
+        
+    }
+
+}
+
+void staccato::app_manager_active_testing() {
+
+    
+
+}
