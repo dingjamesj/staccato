@@ -42,6 +42,10 @@ namespace staccato {
         /// @return A const ref to the added queue Track vector
         static const std::vector<Track>& get_saved_added_queue();
 
+        static void set_main_queue(const std::vector<Track>& tracklist);
+
+        static void set_added_queue(const std::vector<Track>& tracklist);
+
         /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off. Should be ran once at the end of the program.
         /// @param main_queue_playlist_id 
         /// @param main_position

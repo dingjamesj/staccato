@@ -304,6 +304,28 @@ const std::vector<Track>& AppManager::get_saved_added_queue() {
 
 }
 
+void AppManager::set_main_queue(const std::vector<Track>& tracklist) {
+
+    main_queue.clear();
+    for(const Track& track: tracklist) {
+
+        main_queue.push_back(track);
+
+    }
+
+}
+
+void AppManager::set_added_queue(const std::vector<Track>& tracklist) {
+
+    added_queue.clear();
+    for(const Track& track: tracklist) {
+
+        added_queue.push_back(track);
+
+    }
+
+}
+
 void AppManager::read_settings() {
 
     std::ifstream input {std::string(STACCATO_SETTINGS_PATH)};
