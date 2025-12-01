@@ -42,9 +42,32 @@ namespace staccato {
         /// @return A const ref to the added queue Track vector
         static const std::vector<Track>& get_saved_added_queue();
 
+        /// @brief Used to set the main queue
+        /// @param tracklist 
         static void set_main_queue(const std::vector<Track>& tracklist);
 
-        static void set_added_queue(const std::vector<Track>& tracklist);
+        /// @brief Removes the main queue track at an index
+        /// @param index
+        /// @return `false` if the index is out of bounds, `true` otherwise
+        static bool remove_main_queue_track(std::size_t index);
+
+        /// @brief Used to add tracks to the added queue
+        /// @param tracklist 
+        static void push_back_added_queue(const Track& track);
+
+        /// @brief Used to remove tracks from the added queue
+        static void pop_front_added_queue();
+
+        /// @brief Removes the added queue track at an index
+        /// @param index
+        /// @return `false` if the index is out of bounds, `true` otherwise
+        static bool remove_added_queue_track(std::size_t index);
+
+        /// @brief In the added queue, moves the track at `original_index` to `new_index`
+        /// @param original_index 
+        /// @param new_index 
+        /// @return `false` if either index is out of bounds, `true` otherwise
+        static bool move_added_queue_track(std::size_t original_index, std::size_t new_index);
 
         /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off. Should be ran once at the end of the program.
         /// @param main_queue_playlist_id 

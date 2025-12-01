@@ -315,14 +315,49 @@ void AppManager::set_main_queue(const std::vector<Track>& tracklist) {
 
 }
 
-void AppManager::set_added_queue(const std::vector<Track>& tracklist) {
+bool AppManager::remove_main_queue_track(std::size_t index) {
 
-    added_queue.clear();
-    for(const Track& track: tracklist) {
+    main_queue.erase(main_queue.begin() + index);
 
-        added_queue.push_back(track);
+}
+
+void AppManager::push_back_added_queue(const Track& track) {
+
+    added_queue.push_back(track);
+
+}
+
+void AppManager::pop_front_added_queue() {
+
+    added_queue.erase(added_queue.begin());
+
+}
+
+bool AppManager::remove_added_queue_track(std::size_t index) {
+
+    added_queue.erase(added_queue.begin() + index);
+
+}
+
+bool AppManager::move_added_queue_track(std::size_t original_index, std::size_t new_index) {
+
+    if(original_index >= added_queue.size() || new_index >= added_queue.size() || original_index < 0 || new_index < 0) {
+
+        return false;
 
     }
+
+    if(original_index > new_index) {
+
+        std::rotate(added_queue.begin() + new_index, added_queue.begin() + original_index, added_queue.begin() + original_index + 1);
+
+    } else if(original_index < new_index) {
+
+        std::rotate(added_queue.begin() + original_index, added_queue.begin() + original_index + 1, added_queue.begin() + new_index + 1);
+
+    }
+
+    return true;
 
 }
 
@@ -497,7 +532,7 @@ bool AppManager::remove_pinned_item(std::size_t index) {
 
 bool AppManager::move_pinned_item(std::size_t original_index, std::size_t new_index) {
 
-    if(original_index >= pinned_items.size() || new_index >= pinned_items.size()) {
+    if(original_index >= pinned_items.size() || new_index >= pinned_items.size() || original_index < 0 || new_index < 0) {
 
         return false;
 
