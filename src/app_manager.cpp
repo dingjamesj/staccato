@@ -317,7 +317,37 @@ void AppManager::set_main_queue(const std::vector<Track>& tracklist) {
 
 bool AppManager::remove_main_queue_track(std::size_t index) {
 
+    if(index < 0 || index >= main_queue.size()) {
+
+        return false;
+
+    }
+
     main_queue.erase(main_queue.begin() + index);
+
+    return true;
+
+}
+
+bool AppManager::move_main_queue_track(std::size_t original_index, std::size_t new_index) {
+
+    if(original_index >= main_queue.size() || new_index >= main_queue.size() || original_index < 0 || new_index < 0) {
+
+        return false;
+
+    }
+
+    if(original_index > new_index) {
+
+        std::rotate(main_queue.begin() + new_index, main_queue.begin() + original_index, main_queue.begin() + original_index + 1);
+
+    } else if(original_index < new_index) {
+
+        std::rotate(main_queue.begin() + original_index, main_queue.begin() + original_index + 1, main_queue.begin() + new_index + 1);
+
+    }
+
+    return true;
 
 }
 
@@ -335,7 +365,15 @@ void AppManager::pop_front_added_queue() {
 
 bool AppManager::remove_added_queue_track(std::size_t index) {
 
+    if(index < 0 || index >= added_queue.size()) {
+
+        return false;
+
+    }
+    
     added_queue.erase(added_queue.begin() + index);
+
+    return true;
 
 }
 
@@ -549,5 +587,43 @@ bool AppManager::move_pinned_item(std::size_t original_index, std::size_t new_in
     }
 
     return true;
+
+}
+
+void AppManager::print_main_queue() {
+
+    for(const Track& track: main_queue) {
+
+        std::cout << track.string();
+
+    }
+
+}
+
+void AppManager::print_added_queue() {
+
+    for(const Track& track: added_queue) {
+
+        std::cout << track.string();
+
+    }
+
+}
+
+void AppManager::print_pinned_items() {
+
+    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string> item: pinned_items) {
+
+        std::cout << (std::get<0>(item) ? "Track" : "Playlist") << std::endl;
+        std::cout << std::get<1>(item) << std::endl;
+        for(const std::string& str: std::get<2>(item)) {
+
+            std::cout << str << std::endl;
+
+        }
+        std::cout << std::get<3>(item) << std::endl;
+        std::cout << std::endl;
+
+    }
 
 }

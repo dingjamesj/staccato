@@ -164,7 +164,8 @@ namespace staccato {
 
         private:
 
-        static std::unordered_map<Track, std::string> track_dict; //The unordered_map that maps all Tracks to a file path
+        /// @brief The unordered map that maps all Tracks to a file path as a std::string
+        static std::unordered_map<Track, std::string> track_dict;
 
         //Helper functions
 

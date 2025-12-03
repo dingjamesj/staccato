@@ -575,6 +575,71 @@ void staccato::app_manager_passive_testing() {
 
 void staccato::app_manager_active_testing() {
 
+    std::cout << "AppManager::push_back_added_queue(), AppManager::set_main_queue()" << std::endl;
+
+    AppManager::push_back_added_queue(Track("CRAZY", {"LE SSERAFIM"}, "CRAZY"));
+    AppManager::push_back_added_queue(Track("a lot", {"21 Savage"}, "i am > i was"));
+    AppManager::push_back_added_queue(Track("awkyfud", {"sidug"}, "asidu"));
+    AppManager::push_back_added_queue(Track("A Cold Sunday", {"Lil Yachty"}, "A Cold Sunday"));
+    AppManager::push_back_added_queue(Track("Passionfruit", {"Drake"}, "More Life"));
+
+    AppManager::set_main_queue({
+        Track("aosduhuaiusdh", {"aosdhaudh"}, "aousdh"),
+        Track("Mask Off", {"Future"}, "FUTURE"),
+        Track("Supernatural", {"NewJeans"}, "Supernatural"),
+        Track("Kill Jay Z", {"JAY-Z"}, "4:44"),
+        Track("Summer Bummer (feat. A$AP Rocky & Playboi Carti)", {"Lana Del Rey", "A$AP Rocky", "Playboi Carti"}, "Lust For Life")
+    });
+
+    AppManager::print_main_queue();
+    std::cout << std::endl;
+    AppManager::print_added_queue();
+    std::cout << std::endl;
+
+    std::cout << "AppManager::remove_main_queue_track(), AppManager::remove_added_queue_track()" << std::endl;
+    std::cout << (AppManager::remove_main_queue_track(0) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::remove_main_queue_track(-1) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::remove_main_queue_track(10) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::remove_added_queue_track(2) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::remove_added_queue_track(20) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::remove_added_queue_track(-20) ? "true" : "false") << std::endl;
+
+    std::cout << "AppManager::move_main_queue_track(), AppManager::move_added_queue_track()" << std::endl;
+
+    AppManager::move_main_queue_track(1, 2);
+    AppManager::move_added_queue_track(3, 0);
+
+    AppManager::print_main_queue();
+    std::cout << std::endl;
+    AppManager::print_added_queue();
+    std::cout << std::endl;
     
+    std::cout << "AppManager::serialize_session_data()" << std::endl;
+    bool success = AppManager::serialize_session_data("total_id", 3, 2);
+    std::cout << (success ? "Successful serialization" : "FAILED serialization") << std::endl;
+    std::string main_queue_playlist_id {""};
+    std::uint64_t main_position {0}, added_position {0};
+    AppManager::read_last_session_data(main_queue_playlist_id, main_position, added_position);
+    std::cout << main_queue_playlist_id << " " << main_position << " " << added_position << std::endl;
+    AppManager::print_main_queue();
+    std::cout << "---------------------------" << std::endl;
+    AppManager::print_added_queue();
+    std::cout << std::endl;
+
+    std::cout << "AppManager::add_pinned_playlist(), AppManager::add_pinned_track()" << std::endl;
+    std::cout << (AppManager::add_pinned_playlist("id1", "name1", 3, "online_connection") ? "true" : "false") << std::endl;     //true
+    std::cout << (AppManager::add_pinned_playlist("id1", "name2", 1, "online_connectionasud") ? "true" : "false") << std::endl; //false
+    std::cout << (AppManager::add_pinned_playlist("id2", "name2", 1, "online_connection2") ? "true" : "false") << std::endl;    //true
+    std::cout << (AppManager::add_pinned_track(Track("track1", {"artists1"}, "album1")) ? "true" : "false") << std::endl;       //true
+    std::cout << (AppManager::add_pinned_track(Track("track1", {"artists1"}, "album1")) ? "true" : "false") << std::endl;       //false
+    std::cout << (AppManager::add_pinned_track(Track("track2", {"artists2"}, "album2")) ? "true" : "false") << std::endl;       //true
+    std::cout << (AppManager::add_pinned_playlist("id3", "name3", 1, "online_connection3") ? "true" : "false") << std::endl;    //true
+    std::cout << (AppManager::add_pinned_playlist("id4", "name4", 1, "online_connection3") ? "true" : "false") << std::endl;    //true
+    std::cout << std::endl;
+
+    std::cout << "AppManager::remove_pinned_item()" << std::endl;
+    std::cout << (AppManager::remove_pinned_item(5) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::remove_pinned_item(-5) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::remove_pinned_item(50) ? "true" : "false") << std::endl;
 
 }

@@ -24,9 +24,14 @@ namespace staccato {
 
         private:
 
-        static std::vector<Track> main_queue; //The "main" tracklist that is playing-- in other words, the currently playing playlist
-        static std::vector<Track> added_queue; //The tracklist composed of tracks that the user manually added using the "add to queue" feature
-        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items; //A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
+        /// @brief The "main" tracklist that is playing-- in other words, the currently playing playlist
+        static std::vector<Track> main_queue;
+
+        /// @brief The tracklist composed of tracks that the user manually added using the "add to queue" feature
+        static std::vector<Track> added_queue;
+
+        /// @brief A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
+        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items;
 
         public:
 
@@ -50,6 +55,12 @@ namespace staccato {
         /// @param index
         /// @return `false` if the index is out of bounds, `true` otherwise
         static bool remove_main_queue_track(std::size_t index);
+
+        /// @brief In the main queue, moves the track at `original_index` to `new_index`
+        /// @param original_index 
+        /// @param new_index 
+        /// @return `false` if either index is out of bounds, `true` otherwise
+        static bool move_main_queue_track(std::size_t original_index, std::size_t new_index);
 
         /// @brief Used to add tracks to the added queue
         /// @param tracklist 
@@ -107,6 +118,19 @@ namespace staccato {
         /// @brief Serializes the `pinned_items` property to the file system (specifically the settings file)
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_settings();
+
+        //=====================================================================================
+        //                                      DEBUGGING                                      
+        //=====================================================================================
+
+        /// @brief Prints the main queue tracklist to std::cout in order
+        static void print_main_queue();
+
+        /// @brief Prints the added queue tracklist to std::cout in order
+        static void print_added_queue();
+
+        /// @brief Prints the pinned items to std::cout in order
+        static void print_pinned_items();
 
         //=====================================================================================
         //                                      CONSTANTS                                      
