@@ -604,10 +604,15 @@ void staccato::app_manager_active_testing() {
     std::cout << (AppManager::remove_added_queue_track(20) ? "true" : "false") << std::endl;
     std::cout << (AppManager::remove_added_queue_track(-20) ? "true" : "false") << std::endl;
 
+    AppManager::print_main_queue();
+    std::cout << std::endl;
+    AppManager::print_added_queue();
+    std::cout << std::endl;
+
     std::cout << "AppManager::move_main_queue_track(), AppManager::move_added_queue_track()" << std::endl;
 
-    AppManager::move_main_queue_track(1, 2);
-    AppManager::move_added_queue_track(3, 0);
+    std::cout << (AppManager::move_main_queue_track(1, 2) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::move_added_queue_track(3, 0) ? "true" : "false") << std::endl;
 
     AppManager::print_main_queue();
     std::cout << std::endl;
@@ -615,8 +620,7 @@ void staccato::app_manager_active_testing() {
     std::cout << std::endl;
     
     std::cout << "AppManager::serialize_session_data()" << std::endl;
-    bool success = AppManager::serialize_session_data("total_id", 3, 2);
-    std::cout << (success ? "Successful serialization" : "FAILED serialization") << std::endl;
+    std::cout << (AppManager::serialize_session_data("total_id", 3, 2) ? "Successful serialization" : "FAILED serialization") << std::endl;
     std::string main_queue_playlist_id {""};
     std::uint64_t main_position {0}, added_position {0};
     AppManager::read_last_session_data(main_queue_playlist_id, main_position, added_position);
@@ -637,9 +641,28 @@ void staccato::app_manager_active_testing() {
     std::cout << (AppManager::add_pinned_playlist("id4", "name4", 1, "online_connection3") ? "true" : "false") << std::endl;    //true
     std::cout << std::endl;
 
+    AppManager::print_pinned_items();
+    std::cout << std::endl;
+
     std::cout << "AppManager::remove_pinned_item()" << std::endl;
     std::cout << (AppManager::remove_pinned_item(5) ? "true" : "false") << std::endl;
     std::cout << (AppManager::remove_pinned_item(-5) ? "true" : "false") << std::endl;
     std::cout << (AppManager::remove_pinned_item(50) ? "true" : "false") << std::endl;
+
+    AppManager::print_pinned_items();
+    std::cout << std::endl;
+
+    std::cout << "AppManager::move_pinned_item()" << std::endl;
+    std::cout << (AppManager::move_pinned_item(3, 2) ? "true" : "false") << std::endl;
+    std::cout << (AppManager::move_pinned_item(30, 2) ? "true" : "false") << std::endl;
+
+    AppManager::print_pinned_items();
+    std::cout << std::endl;
+
+    std::cout << "AppManager::serialize_settings()" << std::endl;
+    std::cout << (AppManager::serialize_settings() ? "true" : "false") << std::endl;
+    AppManager::read_settings();
+    AppManager::print_pinned_items();
+    std::cout << std::endl;
 
 }
