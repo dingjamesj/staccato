@@ -580,15 +580,15 @@ void staccato::app_manager_active_testing() {
     AppManager::push_back_added_queue(Track("CRAZY", {"LE SSERAFIM"}, "CRAZY"));
     AppManager::push_back_added_queue(Track("a lot", {"21 Savage"}, "i am > i was"));
     AppManager::push_back_added_queue(Track("awkyfud", {"sidug"}, "asidu"));
-    AppManager::push_back_added_queue(Track("A Cold Sunday", {"Lil Yachty"}, "A Cold Sunday"));
+    AppManager::push_back_added_queue(Track("Around Me (feat. Don Toliver)", {"Metro Boomin", "Don Toliver"}, "A Cold Sunday"));
     AppManager::push_back_added_queue(Track("Passionfruit", {"Drake"}, "More Life"));
 
     AppManager::set_main_queue({
         Track("aosduhuaiusdh", {"aosdhaudh"}, "aousdh"),
         Track("Mask Off", {"Future"}, "FUTURE"),
         Track("Supernatural", {"NewJeans"}, "Supernatural"),
-        Track("Kill Jay Z", {"JAY-Z"}, "4:44"),
-        Track("Summer Bummer (feat. A$AP Rocky & Playboi Carti)", {"Lana Del Rey", "A$AP Rocky", "Playboi Carti"}, "Lust For Life")
+        Track("Summer Bummer (feat. A$AP Rocky & Playboi Carti)", {"Lana Del Rey", "A$AP Rocky", "Playboi Carti"}, "Lust For Life"),
+        Track("Kill Jay Z", {"JAY-Z"}, "4:44")
     });
 
     AppManager::print_main_queue();
@@ -631,14 +631,14 @@ void staccato::app_manager_active_testing() {
     std::cout << std::endl;
 
     std::cout << "AppManager::add_pinned_playlist(), AppManager::add_pinned_track()" << std::endl;
-    std::cout << (AppManager::add_pinned_playlist("id1", "name1", 3, "online_connection") ? "true" : "false") << std::endl;     //true
-    std::cout << (AppManager::add_pinned_playlist("id1", "name2", 1, "online_connectionasud") ? "true" : "false") << std::endl; //false
-    std::cout << (AppManager::add_pinned_playlist("id2", "name2", 1, "online_connection2") ? "true" : "false") << std::endl;    //true
-    std::cout << (AppManager::add_pinned_track(Track("track1", {"artists1"}, "album1")) ? "true" : "false") << std::endl;       //true
-    std::cout << (AppManager::add_pinned_track(Track("track1", {"artists1"}, "album1")) ? "true" : "false") << std::endl;       //false
-    std::cout << (AppManager::add_pinned_track(Track("track2", {"artists2"}, "album2")) ? "true" : "false") << std::endl;       //true
-    std::cout << (AppManager::add_pinned_playlist("id3", "name3", 1, "online_connection3") ? "true" : "false") << std::endl;    //true
-    std::cout << (AppManager::add_pinned_playlist("id4", "name4", 1, "online_connection3") ? "true" : "false") << std::endl;    //true
+    std::cout << (AppManager::add_pinned_playlist("id1", "name1", 3, "online_connection") ? "passed" : "failed") << std::endl;
+    std::cout << (AppManager::add_pinned_playlist("id1", "name2", 1, "online_connectionasud") ? "failed" : "passed") << std::endl;
+    std::cout << (AppManager::add_pinned_playlist("id2", "name2", 1, "") ? "passed" : "failed") << std::endl;
+    std::cout << (AppManager::add_pinned_track(Track("track1", {"artists1", "artists12"}, "album1")) ? "passed" : "failed") << std::endl;
+    std::cout << (AppManager::add_pinned_track(Track("track1", {"artists1", "artists12"}, "album1")) ? "failed" : "passed") << std::endl;
+    std::cout << (AppManager::add_pinned_track(Track("track2", {"artists2"}, "album2")) ? "passed" : "failed") << std::endl;
+    std::cout << (AppManager::add_pinned_playlist("id3", "name3", 1, "online_connection3") ? "passed" : "failed") << std::endl;
+    std::cout << (AppManager::add_pinned_playlist("id4", "name4", 1, "online_connection3") ? "passed" : "failed") << std::endl;
     std::cout << std::endl;
 
     AppManager::print_pinned_items();

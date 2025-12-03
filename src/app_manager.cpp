@@ -105,6 +105,12 @@ bool AppManager::serialize_settings() {
 
         for(const std::string& str: std::get<2>(item)) {
 
+            if(str.empty()) {
+
+                continue;
+
+            }
+            
             output << str + "\n";
 
         }
@@ -224,6 +230,7 @@ bool AppManager::read_last_session_data(std::string& main_queue_playlist_id, std
                 if(title.size() == 0) {
 
                     is_on_added_queue = true;
+                    count--;
 
                 }
 
@@ -426,9 +433,10 @@ void AppManager::read_settings() {
     std::vector<std::string> property_2 {}; //Either the playlist size & online connection or the track artists
     std::string property_3 {}; //Either the playlist ID or the track album
 
-    for(std::size_t i {0}; i < 4; i++) {
+    std::size_t i {0};
+    while(true) {
 
-        if(!std::getline(input, text)) {
+        if(!std::getline(input, text) || text.empty() || text[0] == '[') {
 
             break;
 
@@ -471,6 +479,7 @@ void AppManager::read_settings() {
             break;
         case 3:
             property_2.clear();
+            property_2.push_back(text);
             while(std::getline(input, text)) {
 
                 if(text == "") {
@@ -497,6 +506,9 @@ void AppManager::read_settings() {
             break;
 
         }
+
+        i++;
+        i %= 4;
 
     }
 
@@ -618,7 +630,7 @@ void AppManager::print_pinned_items() {
         std::cout << std::get<1>(item) << std::endl;
         for(const std::string& str: std::get<2>(item)) {
 
-            std::cout << str << std::endl;
+            std::cout << (str.empty() ? "[empty]" : str) << std::endl;
 
         }
         std::cout << std::get<3>(item) << std::endl;

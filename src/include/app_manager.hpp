@@ -18,6 +18,81 @@
 #include <fstream>
 #include <vector>
 
+/*
+
+queue.dat file format:
+
+File version
+\0
+Main queue's playlist ID
+\0
+Main queue position
+Added queue position
+Main queue title 1     <-- Beginning of main queue tracklist
+\0
+Main queue artist 1
+\0
+Main queue artist 2
+\0
+\0                     <-- Again, note that double null chars signify the end of the artists list
+Main queue album
+\0
+Main queue track title 2
+\0
+Main queue artist 2
+\0
+\0
+Main queue album 2
+\0
+\0                   <-- End of main queue tracklist signified by double null chars
+Added queue title 1  <-- Beginning of added queue tracklist
+\0
+Added queue artist 1
+\0
+\0
+Added queue album 1
+\0
+...
+
+settings.config file format: (note that this is a text file, as opposed to a binary file)
+
+[PINNED]
+"playlist" or "track"     <-- Depending on if this pinned item is a playlist or a track
+Playlist ID
+Playlist name
+Playlist size
+Online connection
+
+"playlist" or "track"
+Playlist ID
+Playlist name
+Playlist size             <-- Note that this pinned playlist has no online connection 
+ 
+"playlist" or "track"
+Track title
+Track album
+Track artist 1
+Track artist 2
+
+"playlist" or "track"
+...
+
+*/
+
+/* Familiarize yourself with some terminology:
+
+Main/added queue -- When a user hits "play" on a playlist, the playlist's tracklist is put into the "main queue."
+                    When a user adds individual tracks to the queue (e.g. using the "add to queue" feature), those
+                    tracks are added to the "added queue." In the app, the added queue tracks should be played before
+                    main queue tracks, but the added queue tracks are not kept in the queue (i.e. when an added 
+                    track is finished playing, it leaves the queue and rewinding will not play it).
+                    The reason for this queue separation is to allow for shuffling and unshuffling mid-queue. 
+                    Think about it: how would you unshuffle a queue if the user added tracks that aren't from the
+                    original playlist?
+                    Final note: this queue behavior emulates Spotify's queue behavior.
+
+*/
+
 namespace staccato {
 
     class AppManager {
