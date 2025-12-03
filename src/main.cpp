@@ -8,6 +8,8 @@ using namespace staccato;
 
 int main(int argc, char* argv[]) {
 
+    AppManager::read_settings();
+
     bool init_success = init_python();
     if(!init_success) {
 

@@ -114,13 +114,13 @@ namespace staccato {
         /// @return A tuple of the saved main queue's playlist ID, main queue position, and added queue position.
         static bool read_last_session_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position);
 
-        /// @brief Used to get the saved main queue from the last session (should be used once at the beginning of the program)
+        /// @brief Used to get the main queue
         /// @return A const ref to the main queue Track vector
-        static const std::vector<Track>& get_saved_main_queue();
+        static const std::vector<Track>& get_main_queue();
 
-        /// @brief Used to get the saved added queue from the last session (should be used once at the beginning of the program)
+        /// @brief Used to get the added queue
         /// @return A const ref to the added queue Track vector
-        static const std::vector<Track>& get_saved_added_queue();
+        static const std::vector<Track>& get_added_queue();
 
         /// @brief Used to set the main queue
         /// @param tracklist 

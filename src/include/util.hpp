@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_map>
 #include <Python.h>
+#include <iostream>
 #include <fstream>
 
 namespace staccato {

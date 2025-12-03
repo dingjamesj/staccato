@@ -542,13 +542,13 @@ void staccato::app_manager_passive_testing() {
     bool success = AppManager::read_last_session_data(main_queue_playlist_id, main_position, added_position);
     std::cout << main_queue_playlist_id << " " << main_position << " " << added_position << std::endl;
     std::cout << "MAIN QUEUE:" << std::endl;
-    for(const Track& track: AppManager::get_saved_main_queue()) {
+    for(const Track& track: AppManager::get_main_queue()) {
 
         std::cout << track.string();
 
     }
     std::cout << "ADDED QUEUE:" << std::endl;
-    for(const Track& track: AppManager::get_saved_added_queue()) {
+    for(const Track& track: AppManager::get_added_queue()) {
 
         std::cout << track.string();
 

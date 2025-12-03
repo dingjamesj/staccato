@@ -299,13 +299,13 @@ bool AppManager::read_last_session_data(std::string& main_queue_playlist_id, std
 
 }
 
-const std::vector<Track>& AppManager::get_saved_main_queue() {
+const std::vector<Track>& AppManager::get_main_queue() {
 
     return main_queue;
 
 }
 
-const std::vector<Track>& AppManager::get_saved_added_queue() {
+const std::vector<Track>& AppManager::get_added_queue() {
 
     return added_queue;
 

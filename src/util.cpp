@@ -1,5 +1,4 @@
 #include "util.hpp"
-#include <iostream>
 
 std::vector<std::string> staccato::comma_containing_phrases {"Tyler, The Creator"};
 

@@ -46,3 +46,17 @@ QList<QStringList> StaccatoInterface::get_basic_playlists_info() {
 
 }
 
+QVariantList StaccatoInterface::read_last_session_data() {
+
+    std::string main_queue_playlist_id {""};
+    std::uint64_t main_position {0}, added_position {0};
+
+    if(AppManager::read_last_session_data(main_queue_playlist_id, main_position, added_position)) {
+
+        return {QVariant(QString::fromStdString(main_queue_playlist_id)), QVariant(main_position), QVariant(added_position)};
+
+    }
+
+    return {QVariant(QString::fromStdString("")), QVariant(0), QVariant(0)};
+
+}
