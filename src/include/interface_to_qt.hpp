@@ -24,13 +24,10 @@ namespace staccato {
         QVariantList read_last_session_data();
 
         Q_INVOKABLE
-        QList<QVariantList> get_saved_main_queue();
-
-        //TODO check that you can use QVariantList in QML
-        //TODO port to here the get_added_queue and get_main_queue functions
+        QList<QVariantList> get_main_queue();
 
         Q_INVOKABLE
-        // QList<Q get_added_queue();
+        QList<QVariantList> get_added_queue();
 
     };
 

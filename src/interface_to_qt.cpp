@@ -60,3 +60,43 @@ QVariantList StaccatoInterface::read_last_session_data() {
     return {QVariant(QString::fromStdString("")), QVariant(0), QVariant(0)};
 
 }
+
+QList<QVariantList> StaccatoInterface::get_main_queue() {
+
+    QList<QVariantList> tracklist {};
+    for(const Track& track: AppManager::get_main_queue()) {
+
+        QStringList artists {};
+        for(const std::string& artist_std_str: track.artists()) {
+
+            artists.append(QString::fromStdString(artist_std_str));
+
+        }
+
+        tracklist.append({QVariant(QString::fromStdString(track.title())), QVariant(artists), QVariant(QString::fromStdString(track.album()))});
+
+    }
+
+    return tracklist;
+
+}
+
+QList<QVariantList> StaccatoInterface::get_added_queue() {
+
+    QList<QVariantList> tracklist {};
+    for(const Track& track: AppManager::get_added_queue()) {
+
+        QStringList artists {};
+        for(const std::string& artist_std_str: track.artists()) {
+
+            artists.append(QString::fromStdString(artist_std_str));
+
+        }
+
+        tracklist.append({QVariant(QString::fromStdString(track.title())), QVariant(artists), QVariant(QString::fromStdString(track.album()))});
+
+    }
+
+    return tracklist;
+
+}
