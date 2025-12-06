@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls.Basic
-import staccato
 import "homePanel.js" as Logic
 
 Column {
@@ -10,6 +9,10 @@ Column {
     rightPadding: 10
     topPadding: height * 0.048
     bottomPadding: 25
+
+    Component.onCompleted: {
+        Logic.testFunction();
+    }
 
     FontLoader {
         id: interFont
