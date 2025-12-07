@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import "homePanel.js" as Logic
+import staccato
 
 Column {
     id: container

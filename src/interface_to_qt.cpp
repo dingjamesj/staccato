@@ -4,6 +4,12 @@
 
 using namespace staccato;
 
+void StaccatoInterface::readSettings() {
+
+    AppManager::read_settings();
+
+}
+
 QList<QVariantList> StaccatoInterface::get_pinned_items() {
     
     std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = AppManager::get_pinned_items();

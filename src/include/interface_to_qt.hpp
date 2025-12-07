@@ -15,6 +15,9 @@ namespace staccato {
         public:
 
         Q_INVOKABLE
+        void readSettings();
+
+        Q_INVOKABLE
         QList<QVariantList> get_pinned_items();
 
         Q_INVOKABLE
