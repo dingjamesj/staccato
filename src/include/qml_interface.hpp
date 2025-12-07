@@ -9,8 +9,8 @@ namespace staccato {
     class StaccatoInterface: public QObject {
 
         Q_OBJECT
-        QML_NAMED_ELEMENT(Staccato)
-        QML_UNCREATABLE("DO NOT CREATE THIS JAWN")
+        QML_ELEMENT
+        QML_UNCREATABLE("The C++ to QML interface is not a creatable object.")
 
         public:
 

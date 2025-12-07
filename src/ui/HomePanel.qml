@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import "homePanel.js" as Logic
-import staccato
 
 Column {
     id: container
@@ -13,7 +12,6 @@ Column {
 
     Component.onCompleted: {
         Logic.testFunction();
-        Staccato.readSettings();
     }
 
     FontLoader {
