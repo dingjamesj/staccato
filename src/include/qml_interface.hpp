@@ -1,5 +1,5 @@
-#ifndef QT_INTERFACE_HPP
-#define QT_INTERFACE_HPP
+#ifndef QML_INTERFACE_HPP
+#define QML_INTERFACE_HPP
 
 #include <QObject>
 #include <QtQml>
@@ -10,7 +10,7 @@ namespace staccato {
 
         Q_OBJECT
         QML_NAMED_ELEMENT(Staccato)
-        QML_UNCREATABLE("")
+        QML_UNCREATABLE("DO NOT CREATE THIS JAWN")
 
         public:
 
@@ -18,19 +18,19 @@ namespace staccato {
         void readSettings();
 
         Q_INVOKABLE
-        QList<QVariantList> get_pinned_items();
+        QList<QVariantList> getPinnedItems();
 
         Q_INVOKABLE
-        QList<QStringList> get_basic_playlists_info();
+        QList<QStringList> getBasicPlaylistsInfo();
 
         Q_INVOKABLE
-        QVariantList read_last_session_data();
+        QVariantList readLastSessionData();
 
         Q_INVOKABLE
-        QList<QVariantList> get_main_queue();
+        QList<QVariantList> getMainQueue();
 
         Q_INVOKABLE
-        QList<QVariantList> get_added_queue();
+        QList<QVariantList> getAddedQueue();
 
     };
 

@@ -1,4 +1,6 @@
-#include "track_manager.hpp"
+#include "app_manager.hpp"
+#include "util.hpp"
+#include "qml_interface.hpp"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -19,6 +21,9 @@ int main(int argc, char* argv[]) {
 
     QGuiApplication app (argc, argv);
     QQmlApplicationEngine engine;
+
+    StaccatoInterface cpp_to_qt_interface;
+    engine.rootContext()->setContextProperty("Staccato", &cpp_to_qt_interface);
 
     QObject::connect(
         QCoreApplication::instance(),

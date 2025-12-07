@@ -13,6 +13,7 @@ Column {
 
     Component.onCompleted: {
         Logic.testFunction();
+        Staccato.readSettings();
     }
 
     FontLoader {

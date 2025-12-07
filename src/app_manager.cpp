@@ -1,3 +1,5 @@
+#include "track.hpp"
+#include "util.hpp"
 #include "app_manager.hpp"
 
 using namespace staccato;

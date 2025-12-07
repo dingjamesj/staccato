@@ -42,8 +42,8 @@ qt_add_qml_module(staccato
         src/ui/resources/grid.svg
         src/ui/resources/plus.svg
     SOURCES
-        src/interface_to_qt.cpp
-        src/include/interface_to_qt.hpp
+        src/qml_interface.cpp
+        src/include/qml_interface.hpp
     RESOURCE_PREFIX /
 )
 

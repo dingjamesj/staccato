@@ -1,3 +1,8 @@
+#include "track.hpp"
+#include "playlist.hpp"
+#include "track_manager.hpp"
+#include "app_manager.hpp"
+#include "util.hpp"
 #include "tests.hpp"
 
 using namespace staccato;

@@ -10,9 +10,6 @@
 
 // =========================================================================================
 
-#include "track.hpp"
-#include "util.hpp"
-
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -94,6 +91,8 @@ Main/added queue -- When a user hits "play" on a playlist, the playlist's trackl
 */
 
 namespace staccato {
+
+    struct Track;
 
     class AppManager {
 

@@ -1,11 +1,6 @@
 #ifndef TRACK_MANAGER_HPP
 #define TRACK_MANAGER_HPP
 
-#include "track.hpp"
-#include "playlist.hpp"
-#include "util.hpp"
-#include "app_manager.hpp"
-
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -92,6 +87,10 @@ Track dictionary -- The core part of staccato's file tracking system. It maps Tr
 */
 
 namespace staccato {
+
+    struct Track;
+    class Playlist;
+    enum class audiotype;
     
     class TrackManager {
 

@@ -1,16 +1,18 @@
 #include "track_manager.hpp"
 #include "app_manager.hpp"
-#include "interface_to_qt.hpp"
+#include "track.hpp"
+#include "qml_interface.hpp"
 
 using namespace staccato;
 
 void StaccatoInterface::readSettings() {
 
+    std::cout << "readSettings called" << std::endl;
     AppManager::read_settings();
 
 }
 
-QList<QVariantList> StaccatoInterface::get_pinned_items() {
+QList<QVariantList> StaccatoInterface::getPinnedItems() {
     
     std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = AppManager::get_pinned_items();
 
@@ -32,7 +34,7 @@ QList<QVariantList> StaccatoInterface::get_pinned_items() {
 
 }
 
-QList<QStringList> StaccatoInterface::get_basic_playlists_info() {
+QList<QStringList> StaccatoInterface::getBasicPlaylistsInfo() {
 
     std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> playlists = TrackManager::get_basic_playlist_info_from_files();
 
@@ -52,7 +54,7 @@ QList<QStringList> StaccatoInterface::get_basic_playlists_info() {
 
 }
 
-QVariantList StaccatoInterface::read_last_session_data() {
+QVariantList StaccatoInterface::readLastSessionData() {
 
     std::string main_queue_playlist_id {""};
     std::uint64_t main_position {0}, added_position {0};
@@ -67,7 +69,7 @@ QVariantList StaccatoInterface::read_last_session_data() {
 
 }
 
-QList<QVariantList> StaccatoInterface::get_main_queue() {
+QList<QVariantList> StaccatoInterface::getMainQueue() {
 
     QList<QVariantList> tracklist {};
     for(const Track& track: AppManager::get_main_queue()) {
@@ -87,7 +89,7 @@ QList<QVariantList> StaccatoInterface::get_main_queue() {
 
 }
 
-QList<QVariantList> StaccatoInterface::get_added_queue() {
+QList<QVariantList> StaccatoInterface::getAddedQueue() {
 
     QList<QVariantList> tracklist {};
     for(const Track& track: AppManager::get_added_queue()) {
