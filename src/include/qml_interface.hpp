@@ -32,6 +32,9 @@ namespace staccato {
         Q_INVOKABLE
         QList<QVariantList> getAddedQueue();
 
+        Q_INVOKABLE
+        QString getTrackFilePath(const QString& title, const QStringList& artists, const QString& album);
+
     };
 
 }

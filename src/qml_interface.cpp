@@ -107,3 +107,18 @@ QList<QVariantList> StaccatoInterface::getAddedQueue() {
     return tracklist;
 
 }
+
+QString StaccatoInterface::getTrackFilePath(const QString& title, const QStringList& artists, const QString& album) {
+
+    std::vector<std::string> artists_std {};
+    for(const QString& artist: artists) {
+
+        artists_std.push_back(artist.toStdString());
+
+    }
+
+    Track track (title.toStdString(), artists_std, album.toStdString());
+    std::string file_path_std = TrackManager::get_track_file_path(track);
+    return QString::fromStdString(file_path_std);
+
+}
