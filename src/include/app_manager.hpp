@@ -217,20 +217,20 @@ namespace staccato {
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"..\\last_session_data.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"..\\lastsession.dat"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"../last_session_data.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"../lastsession.dat"};
         #endif
 
         #else
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"last_session_data.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"lastsession.dat"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"last_session_data.dat"};
+        static constexpr std::string_view QUEUE_STORAGE_PATH {"lastsession.dat"};
         #endif
 
         #endif

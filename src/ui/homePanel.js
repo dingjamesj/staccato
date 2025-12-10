@@ -1,6 +1,20 @@
-function testFunction() {
+function loadPinnedItems(pinnedItemsPanel) {
 
-    console.log("Hello this is a test function from JavaScript!");
+    console.log("loadPinnedItems()");
     Staccato.readSettings();
+    let pinnedItems = Staccato.getPinnedItems();
+    if(pinnedItems.length <= 0) {
+
+        pinnedItemsPanel.visible = false
+        return;
+
+    }
+
+    pinnedItemsPanel.visible = true
+    for(let i = 0; i < pinnedItems.length; i++) {
+
+        console.log(pinnedItems[i]);
+        
+    }
 
 }

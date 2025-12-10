@@ -7,7 +7,6 @@ using namespace staccato;
 
 void StaccatoInterface::readSettings() {
 
-    std::cout << "readSettings called" << std::endl;
     AppManager::read_settings();
 
 }

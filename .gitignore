@@ -10,6 +10,8 @@ temp/
 playlists/
 tracks/
 external/
+lastsession.dat
+settings.config
 
 
 **/.qmlls.ini
