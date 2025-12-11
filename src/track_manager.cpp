@@ -659,7 +659,13 @@ std::vector<char> TrackManager::get_track_artwork_raw(const Track& track) {
 
     }
 
-    TagLib::FileRef file_ref(track_dict.at(track).c_str());
+    return get_track_artwork_raw(track_dict.at(track));
+
+}
+
+std::vector<char> TrackManager::get_track_artwork_raw(const std::string& audio_file_path) {
+
+    TagLib::FileRef file_ref(audio_file_path.c_str());
     if(file_ref.isNull()) {
 
         return std::vector<char>();
