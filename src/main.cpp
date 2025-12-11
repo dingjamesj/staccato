@@ -1,6 +1,7 @@
 #include "app_manager.hpp"
 #include "util.hpp"
 #include "qml_interface.hpp"
+#include "audio_file_image_provider.hpp"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -24,6 +25,7 @@ int main(int argc, char* argv[]) {
 
     StaccatoInterface cpp_to_qt_interface;
     engine.rootContext()->setContextProperty("Staccato", &cpp_to_qt_interface);
+    engine.addImageProvider(QLatin1String("audioFile"), new AudioFileImageProvider);
 
     QObject::connect(
         QCoreApplication::instance(),

@@ -173,11 +173,11 @@ namespace staccato {
         /// @brief Short form of `get_track_artwork_raw(get_track_file_path(track))`
         /// @param track 
         /// @return The embedded artwork of the Track object's associated audio file as a vector of bytes (chars)
-        static std::vector<char> get_track_artwork_raw(const Track& track);
+        static const char* get_track_artwork_raw(const Track& track);
 
         /// @param audio_file_path 
         /// @return The embedded artwork of the audio file as a vector of bytes (chars)
-        static std::vector<char> get_track_artwork_raw(const std::string& audio_file_path);
+        static const char* get_track_artwork_raw(const std::string& audio_file_path);
 
         /// @brief To keep staccato's file tracking in sync, this should be ran in the background when staccato starts
         /// @return A vector of Tracks that are keys in the track dict and whose corresponding audio files are no longer accessible

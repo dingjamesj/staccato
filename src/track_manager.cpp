@@ -651,11 +651,11 @@ audiotype TrackManager::get_track_file_type(const Track& track) {
 
 }
 
-std::vector<char> TrackManager::get_track_artwork_raw(const Track& track) {
+const char* TrackManager::get_track_artwork_raw(const Track& track) {
 
     if(!track_dict.contains(track)) {
 
-        return std::vector<char>();
+        return nullptr;
 
     }
 
@@ -663,33 +663,24 @@ std::vector<char> TrackManager::get_track_artwork_raw(const Track& track) {
 
 }
 
-std::vector<char> TrackManager::get_track_artwork_raw(const std::string& audio_file_path) {
+const char* TrackManager::get_track_artwork_raw(const std::string& audio_file_path) {
 
     TagLib::FileRef file_ref(audio_file_path.c_str());
     if(file_ref.isNull()) {
 
-        return std::vector<char>();
+        return nullptr;
 
     }
 
     TagLib::List<TagLib::VariantMap> picture_properties = file_ref.complexProperties("PICTURE");
 
-    TagLib::Variant value = picture_properties.front().value("data");
-    if(value.type() == TagLib::Variant::ByteVector) {
+    TagLib::ByteVector data = picture_properties.front().value("data").toByteVector();
 
-        const char* data = value.value<TagLib::ByteVector>().data();
-        std::vector<char> return_vector {};
-        for(std::size_t i = 0; data[i] != '\0'; i++) {
+    const char* raw_data = data.data();
 
-            return_vector.push_back(data[i]);
+    std::cout << "I am gooning " << sizeof(raw_data) << std::endl;
 
-        }
-
-        return return_vector;
-
-    }
-
-    return std::vector<char>();
+    return std::move(raw_data);
 
 }
 

@@ -225,15 +225,6 @@ void staccato::track_manager_passive_local_testing() {
     std::cout << "- TrackManager::get_track_file_type() (empty track)" << std::endl;
     std::cout << TrackManager::get_track_file_type(empty_track) << std::endl << std::endl;
 
-    std::cout << "+ TrackManager::get_track_artwork_raw()" << std::endl;
-    std::cout << TrackManager::get_track_artwork_raw(track_in_dict).size() << std::endl << std::endl;
-
-    std::cout << "- TrackManager::get_track_artwork_raw() (track that's not in the dict)" << std::endl;
-    std::cout << TrackManager::get_track_artwork_raw(track_not_in_dict).size() << std::endl << std::endl;
-
-    std::cout << "- TrackManager::get_track_artwork_raw() (empty track)" << std::endl;
-    std::cout << TrackManager::get_track_artwork_raw(empty_track).size() << std::endl << std::endl;
-
     std::cout << "+ TrackManager::find_missing_tracks()" << std::endl;
     std::vector<Track> missing_tracks = TrackManager::find_missing_tracks();
     for(Track track: missing_tracks) {
