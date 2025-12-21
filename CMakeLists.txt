@@ -30,6 +30,7 @@ qt_add_qml_module(staccato
         src/ui/homePanel.js
     RESOURCES
         src/ui/resources/piggo58.jpg
+        src/ui/resources/placeholder.jpg
         src/ui/resources/Inter-VariableFont_opsz,wght.ttf
         src/ui/resources/Inter-Italic-VariableFont_opsz,wght.ttf
         src/ui/resources/play.svg

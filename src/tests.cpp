@@ -278,7 +278,7 @@ void staccato::track_manager_passive_local_testing() {
 void staccato::track_manager_active_local_testing() {
 
     bool success = false;
-    const std::string external_local_track_path = "D:\\ss5msvokUkY.ogg";
+    const std::string external_local_track_path = "D:\\ss5msvokUkY.mp3";
     const Track replacement_track ("Replacement", {"Replacement", "Artists"}, "Replacement Album");
     const std::string artwork_file_path = "D:/car/idiot141.JPG";
 
@@ -290,6 +290,7 @@ void staccato::track_manager_active_local_testing() {
 
     std::cout << "+ TrackManager::import_local_track()" << std::endl;
     Track imported_track = TrackManager::get_local_track_info(external_local_track_path);
+    std::cout << imported_track.string() << std::endl;
     success = TrackManager::import_local_track(external_local_track_path, imported_track);
     std::cout << (success ? "true" : "false") << std::endl;
     TrackManager::print_track_dict();

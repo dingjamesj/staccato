@@ -674,11 +674,30 @@ const char* TrackManager::get_track_artwork_raw(const std::string& audio_file_pa
 
     TagLib::List<TagLib::VariantMap> picture_properties = file_ref.complexProperties("PICTURE");
 
+    std::size_t count {0};
+    for(const TagLib::VariantMap& property: picture_properties) {
+
+        std::cout << count << ": " << std::endl;
+        for(const std::pair<const TagLib::String&, const TagLib::Variant&>& pair: property) {
+
+            std::cout << pair.first << ": ";
+            if(pair.first != "data") {
+
+                std::cout << pair.second;
+
+            }
+            
+            std::cout << std::endl;
+
+        }
+
+        count++;
+
+    }
+
     TagLib::ByteVector data = picture_properties.front().value("data").toByteVector();
 
     const char* raw_data = data.data();
-
-    std::cout << "I am gooning " << sizeof(raw_data) << std::endl;
 
     return std::move(raw_data);
 
