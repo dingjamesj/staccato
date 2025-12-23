@@ -695,8 +695,13 @@ const char* TrackManager::get_track_artwork_raw(const std::string& audio_file_pa
 
     }
 
-    TagLib::ByteVector data = picture_properties.front().value("data").toByteVector();
+    if(picture_properties.isEmpty() || picture_properties.front().isEmpty() || picture_properties.front().value("data").isEmpty()) {
 
+        return nullptr;
+
+    }
+
+    TagLib::ByteVector data = picture_properties.front().value("data").toByteVector();
     const char* raw_data = data.data();
 
     return std::move(raw_data);
