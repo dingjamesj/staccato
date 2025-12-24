@@ -1,8 +1,8 @@
 #include "track.hpp"
 #include "playlist.hpp"
+#include "util.hpp"
 #include "track_manager.hpp"
 #include "app_manager.hpp"
-#include "util.hpp"
 
 using namespace staccato;
 
@@ -651,24 +651,24 @@ audiotype TrackManager::get_track_file_type(const Track& track) {
 
 }
 
-const char* TrackManager::get_track_artwork_raw(const Track& track) {
+QPixmap TrackManager::get_track_artwork(const Track& track) {
 
     if(!track_dict.contains(track)) {
 
-        return nullptr;
+        return QPixmap();
 
     }
 
-    return get_track_artwork_raw(track_dict.at(track));
+    return get_track_artwork(track_dict.at(track));
 
 }
 
-const char* TrackManager::get_track_artwork_raw(const std::string& audio_file_path) {
+QPixmap TrackManager::get_track_artwork(const std::string& audio_file_path) {
 
     TagLib::FileRef file_ref(audio_file_path.c_str());
     if(file_ref.isNull()) {
 
-        return nullptr;
+        return QPixmap();
 
     }
 
@@ -697,14 +697,19 @@ const char* TrackManager::get_track_artwork_raw(const std::string& audio_file_pa
 
     if(picture_properties.isEmpty() || picture_properties.front().isEmpty() || picture_properties.front().value("data").isEmpty()) {
 
-        return nullptr;
+        return QPixmap();
 
     }
 
     TagLib::ByteVector data = picture_properties.front().value("data").toByteVector();
-    const char* raw_data = data.data();
+    QPixmap pixmap;
+    if(!pixmap.loadFromData(QByteArray(data.data(), data.size()))) {
 
-    return std::move(raw_data);
+        return QPixmap();
+
+    }
+
+    return pixmap;
 
 }
 

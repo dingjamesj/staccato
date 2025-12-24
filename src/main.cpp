@@ -1,6 +1,6 @@
 #include "app_manager.hpp"
-#include "track_manager.hpp"
 #include "util.hpp"
+#include "track_manager.hpp"
 #include "qml_interface.hpp"
 #include "audio_file_image_provider.hpp"
 #include "tests.hpp"
