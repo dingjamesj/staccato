@@ -31,6 +31,7 @@ Column {
         topPadding: 0
         bottomPadding: 0
 
+        //Header containing the text "Pinned" and view buttons
         Row {
             id: pinnedItemsHeader
             width: container.width - container.leftPadding - container.rightPadding
@@ -65,6 +66,12 @@ Column {
                 icon.color: "#ffffff"
                 icon.source: "qrc:/staccato/src/ui/resources/list.svg"
             }
+        }
+
+        ItemButtonPanel {
+            artworkSource: "D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
+            name: "STARGAZING"
+            description: "43 songs"
         }
     }
 

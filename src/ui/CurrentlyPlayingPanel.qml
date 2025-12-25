@@ -36,12 +36,12 @@ Column {
             anchors.fill: parent
             visible: false
             // source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
-            // source: "image://audioFile/C:/Users/James/Music/rargb/Playboi Carti - R.I.P. but the intro transcends you.mp3"
+            source: "image://audioFile/C:/Users/James/Music/rargb/Playboi Carti - R.I.P. but the intro transcends you.mp3"
             // source: "image://audioFile/C:/Users/James/Music/rargb/Rockstar.mp3"
             // source: "image://audioFile/C:/Users/James/Music/file_example_MP3_2MG.mp3"
             // source: "image://audioFile/C:/Users/James/Music/file_exampale_MP3_2MG.mp3"
             // source: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-            source: "image://audioFile/D:/ss5msvokUkY.ogg"
+            // source: "image://audioFile/D:/ss5msvokUkY.ogg"
             fillMode: Image.PreserveAspectFit
         }
 

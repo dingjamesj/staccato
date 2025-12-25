@@ -13,7 +13,15 @@ function loadPinnedItems(pinnedItemsPanel) {
     pinnedItemsPanel.visible = true
     for(let i = 0; i < pinnedItems.length; i++) {
 
-        console.log(pinnedItems[i]);
+        if(pinnedItems[i][0] === false) {
+
+            //Is a playlist
+
+        } else {
+
+            //Is a track
+
+        }
         
     }
 
