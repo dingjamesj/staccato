@@ -2,9 +2,6 @@ import QtQuick
 
 Rectangle {
     id: container
-    width: 200
-    height: 100
-    radius: 10
     color: "#303030"
 
     readonly property int spacing: 8
@@ -17,20 +14,15 @@ Rectangle {
         source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
     }
 
-    Rectangle {
+    RoundedImage {
         id: artworkBackground
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: parent.spacing
         width: height
         height: parent.height - parent.spacing * 2
-        color: "#2b2b2b"
-
-        Image {
-            id: artwork
-            anchors.fill: parent
-            source: "image://audioFile/" + container.artworkSource
-        }
+        radius: parent.radius
+        source: "image://audioFile/" + container.artworkSource
     }
 
     Column {
@@ -43,6 +35,7 @@ Rectangle {
 
         Text {
             id: nameText
+            width: parent.width
             height: implicitHeight
             text: container.name
             font.family: interFont.name
@@ -50,10 +43,13 @@ Rectangle {
             font.weight: Font.Bold
             color: "#ffffff"
             verticalAlignment: Text.AlignVCenter
+            clip: true
+            elide: Text.ElideRight
         }
 
         Text {
             id: descriptionText
+            width: parent.width
             height: implicitHeight
             text: container.description
             font.family: interFont.name
@@ -61,6 +57,8 @@ Rectangle {
             font.weight: Font.Normal
             color: "#9a9a9a"
             verticalAlignment: Text.AlignTop
+            clip: true
+            elide: Text.ElideRight
         }
     }
 }

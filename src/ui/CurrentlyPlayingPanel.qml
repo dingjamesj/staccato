@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Controls.Basic
 
 Column {
@@ -23,49 +22,19 @@ Column {
     //                COVER ART                
     //=========================================
 
-    Rectangle {
-        id: artworkBackground
+    RoundedImage {
+        id: artwork
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - container.leftPadding - container.rightPadding
         height: width
         radius: 22
-        color: "#2b2b2b"
-
-        Image {
-            id: artwork
-            anchors.fill: parent
-            visible: false
-            // source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
-            source: "image://audioFile/C:/Users/James/Music/rargb/Playboi Carti - R.I.P. but the intro transcends you.mp3"
-            // source: "image://audioFile/C:/Users/James/Music/rargb/Rockstar.mp3"
-            // source: "image://audioFile/C:/Users/James/Music/file_example_MP3_2MG.mp3"
-            // source: "image://audioFile/C:/Users/James/Music/file_exampale_MP3_2MG.mp3"
-            // source: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-            // source: "image://audioFile/D:/ss5msvokUkY.ogg"
-            fillMode: Image.PreserveAspectFit
-        }
-
-        MultiEffect {
-            anchors.fill: artwork
-            source: artwork
-            maskEnabled: true
-            maskSource: mask
-        }
-
-        Item {
-            id: mask
-            width: artwork.width
-            height: artwork.height
-            layer.enabled: true
-            visible: false
-
-            Rectangle {
-                width: artwork.width
-                height: artwork.height
-                radius: 22
-                color: "black"
-            }
-        }
+        // source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
+        source: "image://audioFile/C:/Users/James/Music/rargb/Playboi Carti - R.I.P. but the intro transcends you.mp3"
+        // source: "image://audioFile/C:/Users/James/Music/rargb/Rockstar.mp3"
+        // source: "image://audioFile/C:/Users/James/Music/file_example_MP3_2MG.mp3"
+        // source: "image://audioFile/C:/Users/James/Music/file_exampale_MP3_2MG.mp3"
+        // source: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
+        // source: "image://audioFile/D:/ss5msvokUkY.ogg"
     }
 
     //=========================================
