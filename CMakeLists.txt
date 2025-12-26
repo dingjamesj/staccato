@@ -28,7 +28,7 @@ qt_add_qml_module(staccato
         src/ui/ControlBarPanel.qml
         src/ui/HomePanel.qml
         src/ui/homePanel.js
-        src/ui/ItemButtonPanel.qml
+        src/ui/ArtworkTextButton.qml
         src/ui/RoundedImage.qml
     RESOURCES
         src/ui/resources/piggo58.jpg

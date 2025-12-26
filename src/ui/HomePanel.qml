@@ -68,12 +68,13 @@ Column {
             }
         }
 
-        ItemButtonPanel {
+        ArtworkTextButton {
             id: testingItemButtonPanel
             width: 200
             height: 100
             radius: 10
-            artworkSource: "D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
+            color: "#303030"
+            artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
             name: "STARGAZING"
             description: "43 songs"
         }

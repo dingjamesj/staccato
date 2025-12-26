@@ -2,16 +2,50 @@ import QtQuick
 
 Rectangle {
     id: container
-    color: "#303030"
 
     readonly property int spacing: 8
     required property string artworkSource
     required property string name
     required property string description
+    property int nameTextSize: 18
+    property int descriptionTextSize: 12
+    property color originalColor: color
+    property color hoverColor: Qt.lighter(originalColor, 1.2)
+    property color pressedColor: Qt.lighter(originalColor, 1.5)
+    signal clicked()
+    signal doubleClicked()
 
     FontLoader {
         id: interFont
         source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
+    }
+
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+        onClicked: parent.clicked()
+        onDoubleClicked: parent.doubleClicked()
+        onEntered: () => {container.originalColor = container.color; container.color = container.hoverColor}
+        onExited: () => {
+            if(!this.pressed) {
+
+                container.color = container.originalColor
+
+            }
+        }
+        onPressed: () => {container.color = container.pressedColor}
+        onReleased: () => {
+            if(containsMouse) {
+
+                container.color = container.hoverColor
+            
+            } else {
+
+                container.color = container.originalColor
+
+            }
+        }
     }
 
     RoundedImage {
@@ -22,7 +56,7 @@ Rectangle {
         width: height
         height: parent.height - parent.spacing * 2
         radius: parent.radius
-        source: "image://audioFile/" + container.artworkSource
+        source: container.artworkSource
     }
 
     Column {
@@ -39,7 +73,7 @@ Rectangle {
             height: implicitHeight
             text: container.name
             font.family: interFont.name
-            font.pointSize: 18
+            font.pointSize: container.nameTextSize
             font.weight: Font.Bold
             color: "#ffffff"
             verticalAlignment: Text.AlignVCenter
@@ -53,7 +87,7 @@ Rectangle {
             height: implicitHeight
             text: container.description
             font.family: interFont.name
-            font.pointSize: 12
+            font.pointSize: container.descriptionTextSize
             font.weight: Font.Normal
             color: "#9a9a9a"
             verticalAlignment: Text.AlignTop
