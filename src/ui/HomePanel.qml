@@ -35,7 +35,7 @@ Column {
         Row {
             id: pinnedItemsHeader
             width: container.width - container.leftPadding - container.rightPadding
-            height: 30
+            height: implicitHeight
             spacing: 9
 
             Text {

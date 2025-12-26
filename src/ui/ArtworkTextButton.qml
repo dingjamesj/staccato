@@ -8,7 +8,7 @@ Rectangle {
     required property string name
     required property string description
     property int nameTextSize: 18
-    property int descriptionTextSize: 12
+    property int descriptionTextSize: 10
     property color originalColor: color
     property color hoverColor: Qt.lighter(originalColor, 1.2)
     property color pressedColor: Qt.lighter(originalColor, 1.5)
@@ -26,9 +26,16 @@ Rectangle {
         hoverEnabled: true
         onClicked: parent.clicked()
         onDoubleClicked: parent.doubleClicked()
-        onEntered: () => {container.originalColor = container.color; container.color = container.hoverColor}
+        onEntered: () => {
+            if(!pressed) {
+
+                container.originalColor = container.color;
+                container.color = container.hoverColor;
+                
+            }
+        }
         onExited: () => {
-            if(!this.pressed) {
+            if(!pressed) {
 
                 container.color = container.originalColor
 

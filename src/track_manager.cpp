@@ -673,28 +673,6 @@ QPixmap TrackManager::get_track_artwork(const std::string& audio_file_path) {
     }
 
     TagLib::List<TagLib::VariantMap> picture_properties = file_ref.complexProperties("PICTURE");
-
-    std::size_t count {0};
-    for(const TagLib::VariantMap& property: picture_properties) {
-
-        std::cout << count << ": " << std::endl;
-        for(const std::pair<const TagLib::String&, const TagLib::Variant&>& pair: property) {
-
-            std::cout << pair.first << ": ";
-            if(pair.first != "data") {
-
-                std::cout << pair.second;
-
-            }
-            
-            std::cout << std::endl;
-
-        }
-
-        count++;
-
-    }
-
     if(picture_properties.isEmpty() || picture_properties.front().isEmpty() || picture_properties.front().value("data").isEmpty()) {
 
         return QPixmap();

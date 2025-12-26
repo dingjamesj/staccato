@@ -1,6 +1,5 @@
 function loadPinnedItems(pinnedItemsPanel) {
 
-    console.log("loadPinnedItems()");
     Staccato.readSettings();
     let pinnedItems = Staccato.getPinnedItems();
     if(pinnedItems.length <= 0) {

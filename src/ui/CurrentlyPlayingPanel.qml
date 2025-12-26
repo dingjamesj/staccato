@@ -3,10 +3,11 @@ import QtQuick.Controls.Basic
 
 Column {
     id: container
-    spacing: height * 0.05
+    spacing: (height - artwork.height - trackInfoContainer.height - editingButtonsContainer.height - trackFileInfoContainer.height - topPadding - bottomPadding) / 3
     leftPadding: width * 5 / 85
     rightPadding: width * 5 / 85
     topPadding: height * 0.048 / 0.82
+    bottomPadding: height * 0.01 / 0.82
 
     FontLoader {
         id: interFont
@@ -28,13 +29,7 @@ Column {
         width: parent.width - container.leftPadding - container.rightPadding
         height: width
         radius: 22
-        // source: "qrc:/staccato/src/ui/resources/piggo58.jpg"
-        source: "image://audioFile/C:/Users/James/Music/rargb/Playboi Carti - R.I.P. but the intro transcends you.mp3"
-        // source: "image://audioFile/C:/Users/James/Music/rargb/Rockstar.mp3"
-        // source: "image://audioFile/C:/Users/James/Music/file_example_MP3_2MG.mp3"
-        // source: "image://audioFile/C:/Users/James/Music/file_exampale_MP3_2MG.mp3"
-        // source: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-        // source: "image://audioFile/D:/ss5msvokUkY.ogg"
+        source: ""
     }
 
     //=========================================
@@ -43,6 +38,7 @@ Column {
 
     Column {
         id: trackInfoContainer
+        height: implicitHeight
         spacing: 3
 
         ScrollView {
@@ -61,7 +57,7 @@ Column {
                 text: "After Hours"
                 horizontalAlignment: TextEdit.AlignHCenter
                 font.family: interFont.name
-                font.pointSize: 33
+                font.pointSize: 30
                 font.bold: true
                 wrapMode: TextEdit.NoWrap
                 readOnly: true
@@ -118,16 +114,45 @@ Column {
     }
 
     //=========================================
+    //           EDIT TRACK BUTTONS            
+    //=========================================
+
+    Row {
+        id: editingButtonsContainer
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: implicitWidth
+        height: implicitHeight
+        spacing: 30
+
+        Button {
+            id: editButton
+            width: 50
+            height: 50
+            text: "Edit"
+        }
+
+        Button {
+            id: redownloadButton
+            width: 50
+            height: 50
+            text: "Redownload"
+        }
+    }
+
+    //=========================================
     //             TRACK FILE INFO             
     //=========================================
 
-    Column {
+    Row {
         id: trackFileInfoContainer
-        spacing: 9
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: implicitWidth
+        height: implicitHeight
+        spacing: 15
 
         Rectangle {
             id: fileType
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
             width: 67
             height: 36
             radius: height / 2
@@ -151,7 +176,8 @@ Column {
 
         TextEdit {
             id: advancedInfoText
-            width: container.width - container.leftPadding - container.rightPadding
+            anchors.verticalCenter: parent.verticalCenter
+            width: implicitWidth
             text: "124 kbps   44.1 kHz"
             horizontalAlignment: TextEdit.AlignHCenter
             font.family: interFont.name

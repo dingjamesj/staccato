@@ -18,11 +18,11 @@ Rectangle {
 
     Rectangle {
         id: controlsPanel
-        width: parent.width * 0.84
-        height: parent.height * 0.38
         anchors.top: parent.top
         anchors.topMargin: parent.width * 0.08
         anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width * 0.84
+        height: parent.height * 0.38
         radius: height / 2
         color: "#80005d"
 
@@ -35,9 +35,9 @@ Rectangle {
 
             Button {
                 id: loopButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.2 * 0.94
                 height: parent.height * 0.7
-                anchors.verticalCenter: parent.verticalCenter
                 background: Rectangle {
                     color: "transparent"
                 }
@@ -49,9 +49,9 @@ Rectangle {
 
             Button {
                 id: rewindButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.2 * 0.94
                 height: parent.height * 0.7
-                anchors.verticalCenter: parent.verticalCenter
                 background: Rectangle {
                     color: "transparent"
                 }
@@ -63,9 +63,9 @@ Rectangle {
 
             Button {
                 id: playButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.2 * 0.94
                 height: parent.height * 0.85
-                anchors.verticalCenter: parent.verticalCenter
                 background: Rectangle {
                     color: "transparent"
                 }
@@ -77,9 +77,9 @@ Rectangle {
 
             Button {
                 id: skipButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.2 * 0.94
                 height: parent.height * 0.7
-                anchors.verticalCenter: parent.verticalCenter
                 background: Rectangle {
                     color: "transparent"
                 }
@@ -91,9 +91,9 @@ Rectangle {
 
             Button {
                 id: shuffleButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.2 * 0.94
                 height: parent.height * 0.7
-                anchors.verticalCenter: parent.verticalCenter
                 background: Rectangle {
                     color: "transparent"
                 }
@@ -111,11 +111,11 @@ Rectangle {
 
     Column {
         id: progressSliderPanel
-        width: parent.width * 0.84
-        height: parent.height * 0.25
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 8
         anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width * 0.84
+        height: parent.height * 0.25
         spacing: 12
 
         Item {
@@ -125,8 +125,8 @@ Rectangle {
 
             Text {
                 id: timeElapsedText
-                width: 20
                 anchors.left: parent.left
+                width: 20
                 text: "24:00:00"
                 horizontalAlignment: Text.AlignLeft
                 font.family: interFont.name
@@ -137,8 +137,8 @@ Rectangle {
 
             Text {
                 id: timeRemainingText
-                width: 20
                 anchors.right: parent.right
+                width: 20
                 text: "-24:00:00"
                 horizontalAlignment: Text.AlignRight
                 font.family: interFont.name
