@@ -48,13 +48,13 @@ Column {
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOff
             Component.onCompleted: {
-                title.contentItem.boundsBehavior = Flickable.StopAtBounds
+                contentItem.boundsBehavior = Flickable.StopAtBounds;
             }
 
             TextEdit {
                 id: titleText
                 width: container.width - container.leftPadding - container.rightPadding
-                text: "After Hours"
+                text: "Track Title"
                 horizontalAlignment: TextEdit.AlignHCenter
                 font.family: interFont.name
                 font.pointSize: 30
@@ -72,7 +72,7 @@ Column {
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOff
             Component.onCompleted: {
-                artists.contentItem.boundsBehavior = Flickable.StopAtBounds
+                contentItem.boundsBehavior = Flickable.StopAtBounds;
             }
 
             TextEdit {
@@ -95,7 +95,7 @@ Column {
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOff
             Component.onCompleted: {
-                album.contentItem.boundsBehavior = Flickable.StopAtBounds
+                contentItem.boundsBehavior = Flickable.StopAtBounds;
             }
 
             TextEdit {

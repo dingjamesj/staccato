@@ -26,7 +26,7 @@ Rectangle {
         hoverEnabled: true
         onClicked: parent.clicked()
         onDoubleClicked: parent.doubleClicked()
-        onEntered: () => {
+        onEntered: {
             if(!pressed) {
 
                 container.originalColor = container.color;
@@ -34,15 +34,17 @@ Rectangle {
                 
             }
         }
-        onExited: () => {
+        onExited: {
             if(!pressed) {
 
                 container.color = container.originalColor
 
             }
         }
-        onPressed: () => {container.color = container.pressedColor}
-        onReleased: () => {
+        onPressed: {
+            container.color = container.pressedColor
+        }
+        onReleased: {
             if(containsMouse) {
 
                 container.color = container.hoverColor
