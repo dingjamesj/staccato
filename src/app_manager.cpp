@@ -88,6 +88,18 @@ bool AppManager::serialize_settings() {
 
     }
 
+    output << "[SORT]\n";
+    output << "PINNED\n";
+    output << pinned_items_sort_mode << "\n";
+    output << "\n";
+
+    output << "[ZOOM]\n";
+    output << "PINNED\n";
+    output << pinned_items_zoom_level << "\n";
+    output << "PLAYLISTS\n";
+    output << playlists_zoom_level << "\n";
+    output << "\n";
+
     output << "[PINNED]\n";
     for(std::tuple<bool, std::string, std::vector<std::string>, std::string> item: pinned_items) {
 
@@ -418,6 +430,68 @@ void AppManager::read_settings() {
     }
 
     std::string text {};
+
+    //Reading the UI sort modes:
+
+    pinned_items_sort_mode = "CUSTOM";
+    while(std::getline(input, text)) {
+
+        if(text == "[SORT]") {
+
+            break;
+
+        }
+
+    }
+
+    while(std::getline(input, text) && !text.empty()) {
+
+        if(text == "PINNED" && std::getline(input, text)) {
+
+            pinned_items_sort_mode = text;
+
+        }
+
+    }
+
+    //Reading the UI zoom levels:
+
+    pinned_items_zoom_level = playlists_zoom_level = 1;
+    while(std::getline(input, text)) {
+
+        if(text == "[ZOOM]") {
+
+            break;
+
+        }
+
+    }
+
+    while(std::getline(input, text) && !text.empty()) {
+
+        if(text == "PINNED" && std::getline(input, text)) {
+
+            try {
+
+                pinned_items_zoom_level = std::stoi(text);
+
+            } catch (const std::exception&) {}
+
+        }
+
+        if(text == "PLAYLISTS" && std::getline(input, text)) {
+
+            try {
+
+                playlists_zoom_level = std::stoi(text);
+
+            } catch (const std::exception&) {}
+
+        }
+
+    }
+
+    //Reading the pinned items:
 
     while(std::getline(input, text)) {
 

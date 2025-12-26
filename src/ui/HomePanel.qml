@@ -11,7 +11,7 @@ Column {
     bottomPadding: 25
 
     Component.onCompleted: {
-        Logic.loadPinnedItems(pinnedItemsPanel);
+        Logic.startup(pinnedItemsPanel);
     }
 
     FontLoader {
@@ -42,7 +42,7 @@ Column {
 
             Text {
                 id: pinnedItemsHeaderText
-                width: pinnedItemsHeader.width - pinnedItemsHeader.spacing - pinnedItemsViewButton.width
+                width: pinnedItemsHeader.width - pinnedItemsHeader.spacing - pinnedItemsZoomButton.width
                 text: "Pinned"
                 font.family: interFont.name
                 font.pointSize: 24
@@ -51,9 +51,9 @@ Column {
                 color: "#ffffff"
             }
 
-            //Toggles between grid and list view
+            //Zoom button
             Button {
-                id: pinnedItemsViewButton
+                id: pinnedItemsZoomButton
                 width: 35
                 height: 35
                 padding: 3
@@ -227,7 +227,7 @@ Column {
             
             Text {
                 id: playlistsHeaderText
-                width: playlistsHeader.width - playlistsHeader.spacing - playlistsViewButton.width
+                width: playlistsHeader.width - playlistsHeader.spacing - playlistsZoomButton.width
                 height: 45
                 text: "Your Playlists"
                 font.family: interFont.name
@@ -237,9 +237,9 @@ Column {
                 color: "#ffffff"
             }
 
-            //Toggles between list & grid view
+            //Zoom button
             Button {
-                id: playlistsViewButton
+                id: playlistsZoomButton
                 width: 35
                 height: 35
                 padding: 3

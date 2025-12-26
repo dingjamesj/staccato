@@ -22,6 +22,7 @@ qt_add_qml_module(staccato
     VERSION 0.1
     QML_FILES
         src/ui/Main.qml
+        src/ui/main.js
         src/ui/TracklistPanel.qml
         src/ui/CurrentlyPlayingPanel.qml
         src/ui/QueuePanel.qml

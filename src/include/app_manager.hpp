@@ -53,6 +53,15 @@ Added queue album 1
 
 settings.config file format: (note that this is a text file, as opposed to a binary file)
 
+[SORT]
+PINNED: CUSTOM  <-- options are CUSTOM and ALPHA
+
+[ZOOM]
+PINNED
+1                   <-- Ranges from 0 to 2
+PLAYLISTS
+1                   <-- Again ranges from 0 to 2
+
 [PINNED]
 "playlist" or "track"     <-- Depending on if this pinned item is a playlist or a track
 Playlist ID
@@ -106,6 +115,15 @@ namespace staccato {
 
         /// @brief A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
         static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items;
+
+        /// @brief The zoom level of the pinned items UI
+        static int pinned_items_zoom_level;
+
+        /// @brief The zoom level of the playlists UI
+        static int playlists_zoom_level;
+
+        /// @brief The sort mode of the pinned items UI
+        static std::string pinned_items_sort_mode;
 
         public:
 
@@ -165,7 +183,7 @@ namespace staccato {
         static void read_settings();
 
         /// @brief Used to get the pinned items
-        /// @return Returns a const ref of the `pinned_items` field
+        /// @return A const ref of the `pinned_items` field
         static const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& get_pinned_items();
 
         /// @brief Adds a playlist to the `pinned_items` property (does not serialize to the file system)
@@ -188,6 +206,30 @@ namespace staccato {
         /// @param new_index 
         /// @return `false` if either index is out of bounds, `true` otherwise
         static bool move_pinned_item(std::size_t original_index, std::size_t new_index);
+
+        /// @brief Used to get the pinned items UI zoom level
+        /// @return The `pinned_items_zoom_level` field
+        static int get_pinned_items_zoom_level();
+        
+        /// @brief Used to get the playlists UI zoom level
+        /// @return The `playlists_zoom_level` field
+        static int get_playlists_zoom_level();
+
+        /// @brief Used to get the pinned items UI sort mode
+        /// @return The `pinned_items_sort_mode` field
+        static std::string get_pinned_items_sort_mode();
+
+        /// @brief Used to set the pinned items UI zoom level
+        /// @param zoom_level 
+        static void set_pinned_items_zoom_level(int zoom_level);
+
+        /// @brief Used to set the playlists UI zoom level
+        /// @param zoom_level
+        static void set_playlists_zoom_level(int zoom_level);
+
+        /// @brief Used to set the pinned items UI sort mode
+        /// @param sort_mode 
+        static void set_pinned_items_sort_mode(const std::string& sort_mode);
 
         /// @brief Serializes the `pinned_items` property to the file system (specifically the settings file)
         /// @return `true` if the serialization was successful, `false` otherwise

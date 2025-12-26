@@ -1,12 +1,17 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import "main.js" as Logic
 
 ApplicationWindow {
     width: 1350
     height: 810
     visible: true
     title: ""
+
+    Component.onCompleted: {
+        Logic.startup();
+    }
 
     Rectangle {
         anchors.fill: parent

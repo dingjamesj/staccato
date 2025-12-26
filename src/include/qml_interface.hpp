@@ -35,6 +35,24 @@ namespace staccato {
         Q_INVOKABLE
         QString getTrackFilePath(const QString& title, const QStringList& artists, const QString& album);
 
+        Q_INVOKABLE
+        int getPinnedItemsZoomLevel();
+
+        Q_INVOKABLE
+        int getPlaylistsZoomLevel();
+
+        Q_INVOKABLE
+        QString getPinnedItemsSortMode();
+
+        Q_INVOKABLE
+        void setPinnedItemsZoomLevel(int zoomLevel);
+
+        Q_INVOKABLE
+        void setPlaylistsZoomLevel(int zoomLevel);
+
+        Q_INVOKABLE
+        void setPinnedItemsSortMode(QString sortMode);
+
     };
 
 }

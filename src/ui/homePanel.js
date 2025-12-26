@@ -1,6 +1,14 @@
-function loadPinnedItems(pinnedItemsPanel) {
+var pinnedItemsZoomLevel = 1;
 
-    Staccato.readSettings();
+export function setPinnedItemsZoomLevel(zoomLevel) {
+
+    pinnedItemsZoomLevel = zoomLevel;
+
+}
+
+function startup(pinnedItemsPanel) {
+
+    console.log("HOME PANEL STARTUP");
     let pinnedItems = Staccato.getPinnedItems();
     if(pinnedItems.length <= 0) {
 
