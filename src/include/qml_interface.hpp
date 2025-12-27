@@ -10,7 +10,7 @@ namespace staccato {
 
         Q_OBJECT
         QML_ELEMENT
-        QML_UNCREATABLE("The C++ to QML interface is not a creatable object.")
+        QML_SINGLETON
 
         public:
 

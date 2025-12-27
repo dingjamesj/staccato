@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
-import "main.js" as Logic
+import "main.mjs" as Logic
 
 ApplicationWindow {
     width: 1350
@@ -10,7 +10,7 @@ ApplicationWindow {
     title: ""
 
     Component.onCompleted: {
-        Logic.startup();
+        Logic.startup(StaccatoInterface);
     }
 
     Rectangle {

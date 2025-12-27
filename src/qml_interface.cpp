@@ -122,3 +122,39 @@ QString StaccatoInterface::getTrackFilePath(const QString& title, const QStringL
     return QString::fromStdString(file_path_std);
 
 }
+
+int StaccatoInterface::getPinnedItemsZoomLevel() {
+
+    return AppManager::get_pinned_items_zoom_level();
+
+}
+
+int StaccatoInterface::getPlaylistsZoomLevel() {
+
+    return AppManager::get_playlists_zoom_level();
+
+}
+
+QString StaccatoInterface::getPinnedItemsSortMode() {
+
+    return QString::fromStdString(AppManager::get_pinned_items_sort_mode());
+
+}
+
+void StaccatoInterface::setPinnedItemsZoomLevel(int zoomLevel) {
+
+    AppManager::set_pinned_items_zoom_level(zoomLevel);
+
+}
+
+void StaccatoInterface::setPlaylistsZoomLevel(int zoomLevel) {
+
+    AppManager::set_playlists_zoom_level(zoomLevel);
+
+}
+
+void StaccatoInterface::setPinnedItemsSortMode(QString sortMode) {
+
+    AppManager::set_pinned_items_sort_mode(sortMode.toStdString());
+
+}

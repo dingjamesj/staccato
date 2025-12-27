@@ -7,6 +7,9 @@ using namespace staccato;
 std::vector<Track> AppManager::main_queue {};
 std::vector<Track> AppManager::added_queue {};
 std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> AppManager::pinned_items {};
+int AppManager::pinned_items_zoom_level {1};
+int AppManager::playlists_zoom_level {1};
+std::string AppManager::pinned_items_sort_mode {"CUSTOM"};
 
 bool AppManager::serialize_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
 
@@ -433,7 +436,6 @@ void AppManager::read_settings() {
 
     //Reading the UI sort modes:
 
-    pinned_items_sort_mode = "CUSTOM";
     while(std::getline(input, text)) {
 
         if(text == "[SORT]") {
@@ -456,7 +458,6 @@ void AppManager::read_settings() {
 
     //Reading the UI zoom levels:
 
-    pinned_items_zoom_level = playlists_zoom_level = 1;
     while(std::getline(input, text)) {
 
         if(text == "[ZOOM]") {
@@ -675,6 +676,42 @@ bool AppManager::move_pinned_item(std::size_t original_index, std::size_t new_in
     }
 
     return true;
+
+}
+
+int AppManager::get_pinned_items_zoom_level() {
+
+    return pinned_items_zoom_level;
+
+}
+
+int AppManager::get_playlists_zoom_level() {
+
+    return playlists_zoom_level;
+
+}
+
+std::string AppManager::get_pinned_items_sort_mode() {
+
+    return pinned_items_sort_mode;
+
+}
+
+void AppManager::set_pinned_items_zoom_level(int zoom_level) {
+
+    pinned_items_zoom_level = zoom_level;
+
+}
+
+void AppManager::set_playlists_zoom_level(int zoom_level) {
+
+    playlists_zoom_level = zoom_level;
+
+}
+
+void AppManager::set_pinned_items_sort_mode(const std::string& sort_mode) {
+
+    pinned_items_sort_mode = sort_mode;
 
 }
 

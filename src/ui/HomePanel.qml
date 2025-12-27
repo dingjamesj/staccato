@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
-import "homePanel.js" as Logic
+import staccato
+import "homePanel.mjs" as Logic
 
 Column {
     id: container
@@ -11,7 +12,7 @@ Column {
     bottomPadding: 25
 
     Component.onCompleted: {
-        Logic.startup(pinnedItemsPanel);
+        Logic.startup(StaccatoInterface, pinnedItemsPanel);
     }
 
     FontLoader {

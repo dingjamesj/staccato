@@ -28,8 +28,6 @@ int main(int argc, char* argv[]) {
     QGuiApplication app (argc, argv);
     QQmlApplicationEngine engine;
 
-    StaccatoInterface cpp_to_qt_interface;
-    engine.rootContext()->setContextProperty("Staccato", &cpp_to_qt_interface);
     engine.addImageProvider(QLatin1String("audioFile"), new AudioFileImageProvider);
 
     QObject::connect(
