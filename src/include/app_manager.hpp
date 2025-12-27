@@ -125,6 +125,14 @@ namespace staccato {
         /// @brief The sort mode of the pinned items UI
         static std::string pinned_items_sort_mode;
 
+        //Helper functions
+
+        static void read_settings_sort_modes(std::ifstream& input, std::string& text);
+
+        static void read_settings_zoom_levels(std::ifstream& input, std::string& text);
+
+        static void read_settings_pinned_items(std::ifstream& input, std::string& text);
+
         public:
 
         /// @brief Used for reading the queue from the last staccato session's saved data, so that the user can continue where they left off. Should be ran once at the beginning of the program.

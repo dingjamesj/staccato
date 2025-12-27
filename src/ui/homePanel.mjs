@@ -6,18 +6,18 @@ export function setPinnedItemsZoomLevel(zoomLevel) {
 
 }
 
-export function startup(staccatoInterface, pinnedItemsPanel) {
+export function startup(staccatoInterface, pinnedItemsPanel, pinnedItemsHeader) {
 
     console.log("HOME PANEL STARTUP");
     let pinnedItems = staccatoInterface.getPinnedItems();
     if(pinnedItems.length <= 0) {
 
-        pinnedItemsPanel.visible = false
+        pinnedItemsPanel.visible = false;
         return;
 
     }
 
-    pinnedItemsPanel.visible = true
+    pinnedItemsPanel.visible = true;
     for(let i = 0; i < pinnedItems.length; i++) {
 
         if(pinnedItems[i][0] === false) {

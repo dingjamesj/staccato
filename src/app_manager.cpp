@@ -434,17 +434,27 @@ void AppManager::read_settings() {
 
     std::string text {};
 
-    //Reading the UI sort modes:
-
     while(std::getline(input, text)) {
 
         if(text == "[SORT]") {
 
-            break;
+            read_settings_sort_modes(input, text);
+
+        } else if(text == "[ZOOM]") {
+
+            read_settings_zoom_levels(input, text);
+
+        } else if(text == "[PINNED]") {
+
+            read_settings_pinned_items(input, text);
 
         }
 
     }
+
+}
+
+void AppManager::read_settings_sort_modes(std::ifstream& input, std::string& text) {
 
     while(std::getline(input, text) && !text.empty()) {
 
@@ -456,17 +466,9 @@ void AppManager::read_settings() {
 
     }
 
-    //Reading the UI zoom levels:
+}
 
-    while(std::getline(input, text)) {
-
-        if(text == "[ZOOM]") {
-
-            break;
-
-        }
-
-    }
+void AppManager::read_settings_zoom_levels(std::ifstream& input, std::string& text) {
 
     while(std::getline(input, text) && !text.empty()) {
 
@@ -492,17 +494,9 @@ void AppManager::read_settings() {
 
     }
 
-    //Reading the pinned items:
+}
 
-    while(std::getline(input, text)) {
-
-        if(text == "[PINNED]") {
-
-            break;
-
-        }
-
-    }
+void AppManager::read_settings_pinned_items(std::ifstream& input, std::string& text) {
 
     pinned_items.clear();
     bool is_track {0};

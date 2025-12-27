@@ -43,7 +43,7 @@ Column {
 
             Text {
                 id: pinnedItemsHeaderText
-                width: pinnedItemsHeader.width - pinnedItemsHeader.spacing - pinnedItemsZoomButton.width
+                width: pinnedItemsHeader.width - pinnedItemsZoomButton.width - pinnedItemsSortModeButton.width - parent.spacing * 2
                 text: "Pinned"
                 font.family: interFont.name
                 font.pointSize: 24
@@ -55,6 +55,23 @@ Column {
             //Zoom button
             Button {
                 id: pinnedItemsZoomButton
+                width: 35
+                height: 35
+                padding: 3
+                anchors.verticalCenter: parent.verticalCenter
+                background: Rectangle {
+                    width: parent.width
+                    height: parent.height
+                    radius: 8
+                    color: "#434343"
+                }
+                icon.color: "#ffffff"
+                icon.source: "qrc:/staccato/src/ui/resources/list.svg"
+            }
+
+            //Sort mode button
+            Button {
+                id: pinnedItemsSortModeButton
                 width: 35
                 height: 35
                 padding: 3
@@ -111,96 +128,6 @@ Column {
                 }
                 ArtworkTextButton {
                     id: testingItemButtonPanel4
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel3
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel2
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel1
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel17
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel16
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel15
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel14
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel13
-                    width: 200
-                    height: 100
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel12
                     width: 200
                     height: 100
                     radius: 10
