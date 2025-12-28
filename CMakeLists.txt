@@ -22,13 +22,13 @@ qt_add_qml_module(staccato
     VERSION 0.1
     QML_FILES
         src/ui/Main.qml
-        src/ui/main.mjs
+        src/ui/main.js
         src/ui/TracklistPanel.qml
         src/ui/CurrentlyPlayingPanel.qml
         src/ui/QueuePanel.qml
         src/ui/ControlBarPanel.qml
         src/ui/HomePanel.qml
-        src/ui/homePanel.mjs
+        src/ui/homePanel.js
         src/ui/ArtworkTextButton.qml
         src/ui/RoundedImage.qml
     RESOURCES

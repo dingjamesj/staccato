@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     QGuiApplication app (argc, argv);
     QQmlApplicationEngine engine;
 
-    engine.addImageProvider(QLatin1String("audioFile"), new AudioFileImageProvider);
+    engine.addImageProvider(QLatin1String("audiofile"), new AudioFileImageProvider);
 
     QObject::connect(
         QCoreApplication::instance(),

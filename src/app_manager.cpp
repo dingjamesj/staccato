@@ -1,5 +1,6 @@
 #include "track.hpp"
 #include "util.hpp"
+#include "track_manager.hpp"
 #include "app_manager.hpp"
 
 using namespace staccato;
@@ -706,6 +707,54 @@ void AppManager::set_playlists_zoom_level(int zoom_level) {
 void AppManager::set_pinned_items_sort_mode(const std::string& sort_mode) {
 
     pinned_items_sort_mode = sort_mode;
+
+}
+
+std::string AppManager::get_playlist_image_path(const std::string& playlist_id) {
+
+    std::filesystem::path jpg_path = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".jpg");
+    if(std::ifstream(jpg_path).good()) {
+
+        return jpg_path.string();
+
+    }
+
+    std::filesystem::path png_path = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".png");
+    if(std::ifstream(png_path).good()) {
+
+        return png_path.string();
+
+    }
+
+    std::filesystem::path jpeg_path = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".jpeg");
+    if(std::ifstream(jpeg_path).good()) {
+
+        return jpeg_path.string();
+
+    }
+
+    std::filesystem::path jpg_path_caps = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".JPG");
+    if(std::ifstream(jpg_path_caps).good()) {
+
+        return jpg_path_caps.string();
+
+    }
+
+    std::filesystem::path png_path_caps = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".PNG");
+    if(std::ifstream(png_path_caps).good()) {
+
+        return png_path_caps.string();
+
+    }
+
+    std::filesystem::path jpeg_path_caps = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".JPEG");
+    if(std::ifstream(jpeg_path_caps).good()) {
+
+        return jpeg_path_caps.string();
+
+    }
+
+    return "qrc" + std::string(PLACEHOLDER_ART_PATH);
 
 }
 

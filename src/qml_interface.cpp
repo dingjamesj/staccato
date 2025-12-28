@@ -25,7 +25,12 @@ QList<QVariantList> StaccatoInterface::getPinnedItems() {
 
         }
         
-        qt_pinned_items.push_back({QVariant(std::get<0>(item)), QVariant(QString::fromStdString(std::get<1>(item))), QVariant(properties), QVariant(QString::fromStdString(std::get<3>(item)))});
+        qt_pinned_items.push_back({
+            QVariant(std::get<0>(item)),
+            QVariant(QString::fromStdString(std::get<1>(item))),
+            QVariant(properties),
+            QVariant(QString::fromStdString(std::get<3>(item)))
+        });
 
     }
 
@@ -123,6 +128,12 @@ QString StaccatoInterface::getTrackFilePath(const QString& title, const QStringL
 
 }
 
+QString StaccatoInterface::getPlaylistImagePath(const QString& id) {
+
+    return QString::fromStdString(AppManager::get_playlist_image_path(id.toStdString()));
+
+}
+
 int StaccatoInterface::getPinnedItemsZoomLevel() {
 
     return AppManager::get_pinned_items_zoom_level();
@@ -153,7 +164,7 @@ void StaccatoInterface::setPlaylistsZoomLevel(int zoomLevel) {
 
 }
 
-void StaccatoInterface::setPinnedItemsSortMode(QString sortMode) {
+void StaccatoInterface::setPinnedItemsSortMode(const QString& sortMode) {
 
     AppManager::set_pinned_items_sort_mode(sortMode.toStdString());
 

@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
-import "main.mjs" as Logic
+import "main.js" as Logic
 
 ApplicationWindow {
     width: 1350

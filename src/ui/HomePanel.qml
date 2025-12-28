@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import staccato
-import "homePanel.mjs" as Logic
+import "homePanel.js" as Logic
 
 Column {
     id: container
@@ -12,7 +12,7 @@ Column {
     bottomPadding: 25
 
     Component.onCompleted: {
-        Logic.startup(StaccatoInterface, pinnedItemsPanel);
+        Logic.startup(StaccatoInterface, pinnedItemsPanel, pinnedItemsContainer);
     }
 
     FontLoader {
@@ -88,7 +88,7 @@ Column {
         }
 
         ScrollView {
-            id: pinnedItemsContainer
+            id: pinnedItemsScrollView
             width: parent.width
             height: parent.height - pinnedItemsHeader.height - parent.topPadding - parent.bottomPadding - spacing
             anchors.left: parent.left
@@ -101,18 +101,19 @@ Column {
             }
 
             Flow {
-                id: pinnedItems
-                width: pinnedItemsContainer.width
+                id: pinnedItemsContainer
+                width: parent.width
                 spacing: 8
                 flow: Flow.LeftToRight
 
+                /*
                 ArtworkTextButton {
                     id: testingItemButtonPanel
                     width: 200
                     height: 100
                     radius: 10
                     color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
+                    artworkSource: "file:///D:/Programming/C++/staccato/playlists/images/id1.png"
                     name: "STARGAZING"
                     description: "43 songs"
                 }
@@ -136,6 +137,7 @@ Column {
                     name: "STARGAZING"
                     description: "43 songs"
                 }
+                */
             }
         }
     }

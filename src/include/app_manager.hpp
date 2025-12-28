@@ -113,7 +113,7 @@ namespace staccato {
         /// @brief The tracklist composed of tracks that the user manually added using the "add to queue" feature
         static std::vector<Track> added_queue;
 
-        /// @brief A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, and ID. If it represents a Track, the other parts represent the title, artists, and album. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
+        /// @brief A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, ID, and its artwork's absolute file path. If it represents a Track, the other parts represent the title, artists, album, and its audio file's absolute path. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
         static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items;
 
         /// @brief The zoom level of the pinned items UI
@@ -127,10 +127,19 @@ namespace staccato {
 
         //Helper functions
 
+        /// @brief Reads the sort mode settings for the UI (i.e. custom order, alphabetical, by title, by artist, etc.)
+        /// @param input 
+        /// @param text 
         static void read_settings_sort_modes(std::ifstream& input, std::string& text);
 
+        /// @brief Reads the zoom settings for the UI (e.g. how big the playlist tiles are for the playlist selection menu)
+        /// @param input 
+        /// @param text 
         static void read_settings_zoom_levels(std::ifstream& input, std::string& text);
 
+        /// @brief Reads the pinned items
+        /// @param input 
+        /// @param text 
         static void read_settings_pinned_items(std::ifstream& input, std::string& text);
 
         public:
@@ -243,6 +252,11 @@ namespace staccato {
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_settings();
 
+        /// @brief Used to find the absolute path of the playlist image, since the path could have various file extensions
+        /// @param playlist_id 
+        /// @return The absolute path of the playlist image
+        static std::string get_playlist_image_path(const std::string& playlist_id);
+
         //=====================================================================================
         //                                      DEBUGGING                                      
         //=====================================================================================
@@ -262,15 +276,19 @@ namespace staccato {
 
         /// @brief The header that appears on all .sply files and on the .stkl file. Should be in the format: "staccato[version number]"
         static constexpr std::string_view FILE_HEADER {"staccato1"};
+        
+        static constexpr std::string_view PLACEHOLDER_ART_PATH {":/staccato/src/ui/resources/placeholder.jpg"};
 
         #if(DEVELOPMENT_BUILD)
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.config"};
         static constexpr std::string_view QUEUE_STORAGE_PATH {"..\\lastsession.dat"};
+        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"..\\playlists\\images"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.config"};
         static constexpr std::string_view QUEUE_STORAGE_PATH {"../lastsession.dat"};
+        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"../playlists/images"};
         #endif
 
         #else
@@ -278,9 +296,11 @@ namespace staccato {
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
         static constexpr std::string_view QUEUE_STORAGE_PATH {"lastsession.dat"};
+        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
         static constexpr std::string_view QUEUE_STORAGE_PATH {"lastsession.dat"};
+        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
         #endif
 
         #endif

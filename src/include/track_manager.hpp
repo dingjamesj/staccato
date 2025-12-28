@@ -1,6 +1,15 @@
 #ifndef TRACK_MANAGER_HPP
 #define TRACK_MANAGER_HPP
 
+// =========================================================================================
+// 
+//                SET TO TRUE DURING DEVELOPMENT, SET TO FALSE WHEN DEPLOYED.             
+//   USED TO ADJUST FOR THE DIFFERENCE BETWEEN DEVELOPMENT AND DEPLOYED PROJECT STRUCTURE.
+
+#define DEVELOPMENT_BUILD true
+
+// =========================================================================================
+
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -300,13 +309,11 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"..\\playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"..\\tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"..\\playlists\\images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"..\\tracks\\trackdict.stkl"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"../playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"../tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"../playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"../tracks/trackdict.stkl"};
         #endif
 
@@ -316,13 +323,11 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\trackdict.stkl"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
         static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
         static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.stkl"};
         #endif
 
