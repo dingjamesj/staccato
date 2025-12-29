@@ -12,12 +12,18 @@ Rectangle {
     property int textSize: 18
     property var textStyle: Font.Normal
     property int spacing: 8
+    property bool enableDoubleClick: false
 
     signal clicked()
     signal doubleClicked()
 
     Component.onCompleted: {
         color = defaultColor
+        if(enableDoubleClick) {
+
+            mouseArea.doubleClicked.connect(container.doubleClicked);
+
+        }
     }
 
     FontLoader {
@@ -30,7 +36,6 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: container.clicked()
-        onDoubleClicked: container.doubleClicked()
         onEntered: {
             if(!pressed) {
 

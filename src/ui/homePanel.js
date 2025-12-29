@@ -56,31 +56,6 @@ function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContain
     }
 
     let component = Qt.createComponent("ArtworkTextButton.qml");
-    let buttonWidth = 0;
-    let nameTextSize = 0;
-    let descriptionTextSize = 0;
-    switch(pinnedItemsZoomLevel) {
-    
-    case 0:
-        //List view
-        break;
-    case 1:
-        buttonWidth = (pinnedItemsContainer.width - pinnedItemsContainer.spacing - pinnedItemsContainer.spacing) / 3;
-        nameTextSize = 12;
-        descriptionTextSize = 8;
-        break;
-    case 2:
-        buttonWidth = (pinnedItemsContainer.width - pinnedItemsContainer.spacing) / 2;
-        nameTextSize = 16;
-        descriptionTextSize = 10;
-        break;
-    default:
-        buttonWidth = (pinnedItemsContainer.width - pinnedItemsContainer.spacing - pinnedItemsContainer.spacing) / 3;
-        nameTextSize = 12;
-        descriptionTextSize = 8;
-        break;
-    
-    }
 
     let artworkSource = "";
     let description = "";
@@ -122,19 +97,15 @@ function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContain
         }
 
         let object = component.createObject(pinnedItemsContainer, {
-            width: buttonWidth,
-            height: buttonWidth / 3,
-            radius: 10,
-            spacing: buttonWidth / 40,
             defaultColor: "#303030",
             artworkSource: artworkSource,
             name: pinnedItems[i][1],
             description: description,
-            nameTextSize: nameTextSize,
-            descriptionTextSize: descriptionTextSize,
         });
         
     }
+
+    updateItemsZoomLevel(pinnedItemsContainer, pinnedItemsZoomLevel);
 
 }
 
@@ -143,20 +114,28 @@ function updateItemsZoomLevel(itemsContainer, zoomLevel) {
     console.log(zoomLevel);
 
     let buttonWidth = 0;
+    let buttonHeight = 0;
+    let buttonRadius = 0;
+    let buttonSpacing = 0; //Spacing of the button's internal components
     let nameTextSize = 0;
     let descriptionTextSize = 0;
     switch(zoomLevel) {
     
     case 0:
-        //List view
-        return;
+        buttonWidth = itemsContainer.width;
+        buttonRadius = 6;
+        nameTextSize = 12;
+        descriptionTextSize = 8;
+        break;
     case 1:
         buttonWidth = (itemsContainer.width - itemsContainer.spacing - itemsContainer.spacing) / 3;
+        buttonRadius = 8;
         nameTextSize = 12;
         descriptionTextSize = 8;
         break;
     case 2:
         buttonWidth = (itemsContainer.width - itemsContainer.spacing) / 2;
+        buttonRadius = 10;
         nameTextSize = 16;
         descriptionTextSize = 10;
         break;
@@ -168,13 +147,18 @@ function updateItemsZoomLevel(itemsContainer, zoomLevel) {
     
     }
 
+    buttonHeight = (zoomLevel === 0) ? 45 : buttonWidth / 3;
+    buttonSpacing = (zoomLevel === 0) ? 7 : buttonWidth / 40;
+
     for(let i = 0; i < itemsContainer.children.length; i++) {
 
         itemsContainer.children[i].width = buttonWidth;
-        itemsContainer.children[i].height = buttonWidth / 3;
-        itemsContainer.children[i].spacing = buttonWidth / 40;
+        itemsContainer.children[i].height = buttonHeight;
+        itemsContainer.children[i].radius = buttonRadius;
+        itemsContainer.children[i].spacing = buttonSpacing;
+        itemsContainer.children[i].nameTextSize = nameTextSize;
+        itemsContainer.children[i].descriptionTextSize = descriptionTextSize;
 
     }
-    console.log("");
 
 }
