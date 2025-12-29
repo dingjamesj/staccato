@@ -12,7 +12,7 @@ Column {
     bottomPadding: 25
 
     Component.onCompleted: {
-        Logic.startup(StaccatoInterface, pinnedItemsPanel, pinnedItemsContainer);
+        Logic.startup(StaccatoInterface, pinnedItemsPanel);
     }
 
     FontLoader {
@@ -84,6 +84,7 @@ Column {
                 }
                 icon.color: "#ffffff"
                 icon.source: "qrc:/staccato/src/ui/resources/list.svg"
+                onClicked: Logic.loadPinnedItems(StaccatoInterface, pinnedItemsPanel, pinnedItemsContainer)
             }
         }
 
@@ -106,11 +107,15 @@ Column {
                 spacing: 8
                 flow: Flow.LeftToRight
 
+                onWidthChanged: {
+                    Logic.loadPinnedItems(StaccatoInterface, pinnedItemsPanel, pinnedItemsContainer);
+                }
+
                 /*
                 ArtworkTextButton {
                     id: testingItemButtonPanel
-                    width: 200
-                    height: 100
+                    width: (parent.width - parent.spacing - parent.spacing) / 3
+                    height: width / 2
                     radius: 10
                     color: "#303030"
                     artworkSource: "file:///D:/Programming/C++/staccato/playlists/images/id1.png"
@@ -119,8 +124,8 @@ Column {
                 }
                 ArtworkTextButton {
                     id: testingItemButtonPanel5
-                    width: 200
-                    height: 100
+                    width: (parent.width - parent.spacing - parent.spacing) / 3
+                    height: width / 2
                     radius: 10
                     color: "#303030"
                     artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
@@ -129,8 +134,8 @@ Column {
                 }
                 ArtworkTextButton {
                     id: testingItemButtonPanel4
-                    width: 200
-                    height: 100
+                    width: (parent.width - parent.spacing - parent.spacing) / 3
+                    height: width / 2
                     radius: 10
                     color: "#303030"
                     artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"

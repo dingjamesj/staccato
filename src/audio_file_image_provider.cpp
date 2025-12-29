@@ -8,13 +8,9 @@ AudioFileImageProvider::AudioFileImageProvider(): QQuickImageProvider(QQuickImag
 
 QPixmap AudioFileImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) {
 
-    std::cout << std::endl << "CALLED" << std::endl << std::endl;
-
     QPixmap pixmap = TrackManager::get_track_artwork(id.toStdString());
 
     if(pixmap.isNull()) {
-
-        std::cout << "pingle fart" << std::endl;
 
         pixmap.load(AppManager::PLACEHOLDER_ART_PATH.data());
         if(size != nullptr) {
@@ -22,8 +18,6 @@ QPixmap AudioFileImageProvider::requestPixmap(const QString &id, QSize *size, co
             *size = QSize(100, 100);
 
         }
-
-        std::cout << "shit" << std::endl;
 
         return pixmap;
 

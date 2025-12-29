@@ -3,7 +3,7 @@ import QtQuick
 Rectangle {
     id: container
 
-    readonly property int spacing: 8
+    property int spacing: 8
     required property string artworkSource
     required property string name
     required property string description
@@ -72,7 +72,7 @@ Rectangle {
         id: textContainer
         anchors.left: artworkBackground.right
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: parent.spacing / 2
+        anchors.leftMargin: parent.spacing
         width: parent.width - artworkBackground.width - parent.spacing * 2.5
         height: implicitHeight
 
