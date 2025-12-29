@@ -3,17 +3,26 @@ import QtQuick
 Rectangle {
     id: container
 
-    property int spacing: 8
     required property string artworkSource
     required property string name
     required property string description
+    property color defaultColor: "#303030"
+    property color hoverColor: Qt.lighter(defaultColor, 1.2)
+    property color pressedColor: Qt.lighter(defaultColor, 1.5)
+    property color nameTextColor: "#ffffff"
+    property color descriptionTextColor: "#9a9a9a"
     property int nameTextSize: 18
     property int descriptionTextSize: 10
-    property color originalColor: color
-    property color hoverColor: Qt.lighter(originalColor, 1.2)
-    property color pressedColor: Qt.lighter(originalColor, 1.5)
+    property var nameTextStyle: Font.Bold
+    property var descriptionTextStyle: Font.Normal
+    property int spacing: 8
+    
     signal clicked()
     signal doubleClicked()
+
+    Component.onCompleted: {
+        color = defaultColor
+    }
 
     FontLoader {
         id: interFont
@@ -24,12 +33,11 @@ Rectangle {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: parent.clicked()
-        onDoubleClicked: parent.doubleClicked()
+        onClicked: container.clicked()
+        onDoubleClicked: container.doubleClicked()
         onEntered: {
             if(!pressed) {
 
-                container.originalColor = container.color;
                 container.color = container.hoverColor;
                 
             }
@@ -37,7 +45,7 @@ Rectangle {
         onExited: {
             if(!pressed) {
 
-                container.color = container.originalColor
+                container.color = container.defaultColor
 
             }
         }
@@ -51,7 +59,7 @@ Rectangle {
             
             } else {
 
-                container.color = container.originalColor
+                container.color = container.defaultColor
 
             }
         }
@@ -61,10 +69,10 @@ Rectangle {
         id: artworkBackground
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: parent.spacing
+        anchors.leftMargin: container.spacing
         width: height
-        height: parent.height - parent.spacing * 2
-        radius: parent.radius
+        height: parent.height - container.spacing * 2
+        radius: container.radius
         source: container.artworkSource
     }
 
@@ -72,8 +80,8 @@ Rectangle {
         id: textContainer
         anchors.left: artworkBackground.right
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: parent.spacing
-        width: parent.width - artworkBackground.width - parent.spacing * 2.5
+        anchors.leftMargin: container.spacing
+        width: parent.width - artworkBackground.width - container.spacing * 2.5
         height: implicitHeight
 
         Text {
@@ -83,8 +91,8 @@ Rectangle {
             text: container.name
             font.family: interFont.name
             font.pointSize: container.nameTextSize
-            font.weight: Font.Bold
-            color: "#ffffff"
+            font.weight: container.nameTextStyle
+            color: container.nameTextColor
             verticalAlignment: Text.AlignVCenter
             clip: true
             elide: Text.ElideRight
@@ -97,8 +105,8 @@ Rectangle {
             text: container.description
             font.family: interFont.name
             font.pointSize: container.descriptionTextSize
-            font.weight: Font.Normal
-            color: "#9a9a9a"
+            font.weight: container.descriptionTextStyle
+            color: container.descriptionTextColor
             verticalAlignment: Text.AlignTop
             clip: true
             elide: Text.ElideRight

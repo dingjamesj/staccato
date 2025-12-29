@@ -31,6 +31,7 @@ qt_add_qml_module(staccato
         src/ui/homePanel.js
         src/ui/ArtworkTextButton.qml
         src/ui/RoundedImage.qml
+        src/ui/RoundButton.qml
     RESOURCES
         src/ui/resources/piggo58.jpg
         src/ui/resources/placeholder.jpg

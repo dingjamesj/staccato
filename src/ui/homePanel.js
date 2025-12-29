@@ -19,14 +19,39 @@ function startup(staccatoInterface, pinnedItemsPanel) {
 
 }
 
+function incrementPinnedItemsZoomLevel(pinnedItemsContainer) {
+
+    pinnedItemsZoomLevel = (pinnedItemsZoomLevel + 1) % 3;
+    updateItemsZoomLevel(pinnedItemsContainer, pinnedItemsZoomLevel);
+
+}
+
+function incrementPlaylistsZoomLevel(playlistsContainer) {
+
+    playlistsZoomLevel = (playlistsZoomLevel + 1) % 3;
+    updateItemsZoomLevel(playlistsContainer, playlistsZoomLevel);
+
+}
+
+function getPinnedItemsZoomLevel() {
+
+    return pinnedItemsZoomLevel;
+
+}
+
+function getPlaylistsZoomLevel() {
+
+    return playlistsZoomLevel;
+
+}
+
 function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContainer) {
 
     let pinnedItems = staccatoInterface.getPinnedItems();
     pinnedItemsPanel.visible = true;
-    while(pinnedItemsContainer.children.length > 0) {
+    for(let i = pinnedItemsContainer.children.length - 1; i >= 0; i--) {
 
-        console.log(pinnedItemsContainer.children);
-        pinnedItemsContainer.children[0].destroy();
+        pinnedItemsContainer.children[i].destroy();
 
     }
 
@@ -96,19 +121,60 @@ function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContain
 
         }
 
-        component.createObject(pinnedItemsContainer, {
+        let object = component.createObject(pinnedItemsContainer, {
             width: buttonWidth,
             height: buttonWidth / 3,
             radius: 10,
             spacing: buttonWidth / 40,
-            color: "#303030",
+            defaultColor: "#303030",
             artworkSource: artworkSource,
             name: pinnedItems[i][1],
             description: description,
             nameTextSize: nameTextSize,
-            descriptionTextSize: descriptionTextSize
+            descriptionTextSize: descriptionTextSize,
         });
         
     }
+
+}
+
+function updateItemsZoomLevel(itemsContainer, zoomLevel) {
+
+    console.log(zoomLevel);
+
+    let buttonWidth = 0;
+    let nameTextSize = 0;
+    let descriptionTextSize = 0;
+    switch(zoomLevel) {
+    
+    case 0:
+        //List view
+        return;
+    case 1:
+        buttonWidth = (itemsContainer.width - itemsContainer.spacing - itemsContainer.spacing) / 3;
+        nameTextSize = 12;
+        descriptionTextSize = 8;
+        break;
+    case 2:
+        buttonWidth = (itemsContainer.width - itemsContainer.spacing) / 2;
+        nameTextSize = 16;
+        descriptionTextSize = 10;
+        break;
+    default:
+        buttonWidth = (itemsContainer.width - itemsContainer.spacing - itemsContainer.spacing) / 3;
+        nameTextSize = 12;
+        descriptionTextSize = 8;
+        break;
+    
+    }
+
+    for(let i = 0; i < itemsContainer.children.length; i++) {
+
+        itemsContainer.children[i].width = buttonWidth;
+        itemsContainer.children[i].height = buttonWidth / 3;
+        itemsContainer.children[i].spacing = buttonWidth / 40;
+
+    }
+    console.log("");
 
 }

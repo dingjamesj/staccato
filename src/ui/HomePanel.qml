@@ -53,38 +53,30 @@ Column {
             }
 
             //Zoom button
-            Button {
+            RoundButton {
                 id: pinnedItemsZoomButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: 35
                 height: 35
-                padding: 3
-                anchors.verticalCenter: parent.verticalCenter
-                background: Rectangle {
-                    width: parent.width
-                    height: parent.height
-                    radius: 8
-                    color: "#434343"
+                radius: 7
+                spacing: 5
+                defaultColor: "#404040"
+                imageSource: "qrc:/staccato/src/ui/resources/list.svg"
+                onClicked: {
+                    Logic.incrementPinnedItemsZoomLevel(pinnedItemsContainer);
                 }
-                icon.color: "#ffffff"
-                icon.source: "qrc:/staccato/src/ui/resources/list.svg"
             }
 
             //Sort mode button
-            Button {
+            RoundButton {
                 id: pinnedItemsSortModeButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: 35
                 height: 35
-                padding: 3
-                anchors.verticalCenter: parent.verticalCenter
-                background: Rectangle {
-                    width: parent.width
-                    height: parent.height
-                    radius: 8
-                    color: "#434343"
-                }
-                icon.color: "#ffffff"
-                icon.source: "qrc:/staccato/src/ui/resources/list.svg"
-                onClicked: Logic.loadPinnedItems(StaccatoInterface, pinnedItemsPanel, pinnedItemsContainer)
+                radius: 7
+                spacing: 5
+                defaultColor: "#404040"
+                imageSource: "qrc:/staccato/src/ui/resources/list.svg"
             }
         }
 
@@ -110,39 +102,6 @@ Column {
                 onWidthChanged: {
                     Logic.loadPinnedItems(StaccatoInterface, pinnedItemsPanel, pinnedItemsContainer);
                 }
-
-                /*
-                ArtworkTextButton {
-                    id: testingItemButtonPanel
-                    width: (parent.width - parent.spacing - parent.spacing) / 3
-                    height: width / 2
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "file:///D:/Programming/C++/staccato/playlists/images/id1.png"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel5
-                    width: (parent.width - parent.spacing - parent.spacing) / 3
-                    height: width / 2
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                ArtworkTextButton {
-                    id: testingItemButtonPanel4
-                    width: (parent.width - parent.spacing - parent.spacing) / 3
-                    height: width / 2
-                    radius: 10
-                    color: "#303030"
-                    artworkSource: "image://audioFile/D:/Programming/C++/staccato/tracks/ffMfBDkmlz8.m4a"
-                    name: "STARGAZING"
-                    description: "43 songs"
-                }
-                */
             }
         }
     }
