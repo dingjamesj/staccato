@@ -5,14 +5,15 @@ import "homePanel.js" as Logic
 
 Column {
     id: container
-    spacing: (height - pinnedItemsPanel.height - playlistsPanel.height - downloaderPanel.height - topPadding - bottomPadding) / 2
+    // spacing: (height - pinnedItemsPanel.height - playlistsPanel.height - downloaderPanel.height - topPadding - bottomPadding) / 2
+    spacing: (height - pinnedItemsPanel.height - playlistsPanel.height - topPadding - bottomPadding) / 2
     leftPadding: 5
     rightPadding: 10
     topPadding: height * 0.048
     bottomPadding: 25
 
     Component.onCompleted: {
-        Logic.startup(StaccatoInterface, pinnedItemsPanel);
+        Logic.startup(StaccatoInterface);
     }
 
     FontLoader {
@@ -83,9 +84,9 @@ Column {
         ScrollView {
             id: pinnedItemsScrollView
             width: parent.width
-            height: parent.height - pinnedItemsHeader.height - parent.topPadding - parent.bottomPadding - spacing
-            anchors.left: parent.left
-            anchors.right: parent.right
+            height: parent.height - pinnedItemsHeader.height - parent.topPadding - parent.bottomPadding - parent.spacing
+            contentWidth: width
+            contentHeight: height
             clip: true
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOn
@@ -112,17 +113,23 @@ Column {
 
     Column {
         id: playlistsPanel
+        width: parent.width - parent.leftPadding - parent.rightPadding
+        height: parent.height * 0.33
+        spacing: 10
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 10
 
         Row {
             id: playlistsHeader
-            width: container.width - container.leftPadding - container.rightPadding
-            height: 30
+            width: parent.width
+            height: implicitHeight
             spacing: 9
             
             Text {
                 id: playlistsHeaderText
-                width: playlistsHeader.width - playlistsHeader.spacing - playlistsZoomButton.width
-                height: 45
+                width: playlistsHeader.width - playlistsZoomButton.width - playlistsHeader.spacing
                 text: "Your Playlists"
                 font.family: interFont.name
                 font.pointSize: 24
@@ -131,26 +138,48 @@ Column {
                 color: "#ffffff"
             }
 
-            //Zoom button
-            Button {
+            RoundButton {
                 id: playlistsZoomButton
+                anchors.verticalCenter: parent.verticalCenter
                 width: 35
                 height: 35
-                padding: 3
-                anchors.verticalCenter: parent.verticalCenter
-                background: Rectangle {
-                    width: parent.width
-                    height: parent.height
-                    radius: 8
-                    color: "#434343"
+                radius: 7
+                spacing: 5
+                defaultColor: "#404040"
+                imageSource: "qrc:/staccato/src/ui/resources/list.svg"
+                onClicked: {
+                    Logic.incrementPlaylistsZoomLevel(playlistsContainer);
                 }
-                icon.color: "#ffffff"
-                icon.source: "qrc:/staccato/src/ui/resources/list.svg"
+            }
+        }
+
+        ScrollView {
+            id: playlistsScrollView
+            width: parent.width
+            height: parent.height - playlistsHeader.height - parent.topPadding - parent.bottomPadding - parent.spacing
+            contentWidth: width
+            contentHeight: height
+            clip: true
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            Component.onCompleted: {
+                contentItem.boundsBehavior = Flickable.StopAtBounds;
+            }
+
+            Flow {
+                id: playlistsContainer
+                width: parent.width
+                spacing: 8
+                flow: Flow.LeftToRight
+
+                onWidthChanged: {
+                    Logic.loadPlaylists(StaccatoInterface, playlistsPanel, playlistsContainer);
+                }
             }
         }
     }
 
-    Column {
-        id: downloaderPanel
-    }
+    // Column {
+    //     id: downloaderPanel
+    // }
 }

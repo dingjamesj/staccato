@@ -2,7 +2,7 @@ var pinnedItemsZoomLevel = -1;
 var playlistsZoomLevel = -1;
 var pinnedItemsSortMode = "";
 
-function startup(staccatoInterface, pinnedItemsPanel) {
+function startup(staccatoInterface) {
 
     console.log("HOME PANEL STARTUP");
 
@@ -10,12 +10,6 @@ function startup(staccatoInterface, pinnedItemsPanel) {
     pinnedItemsZoomLevel = staccatoInterface.getPinnedItemsZoomLevel();
     playlistsZoomLevel = staccatoInterface.getPlaylistsZoomLevel();
     pinnedItemsSortMode = staccatoInterface.getPinnedItemsSortMode();
-
-    if(staccatoInterface.getPinnedItems().length <= 0) {
-
-        pinnedItemsPanel.visible = false;
-
-    }
 
 }
 
@@ -48,6 +42,13 @@ function getPlaylistsZoomLevel() {
 function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContainer) {
 
     let pinnedItems = staccatoInterface.getPinnedItems();
+    if(pinnedItems.length <= 0) {
+
+        pinnedItems.visible = false;
+        return;
+
+    }
+
     pinnedItemsPanel.visible = true;
     for(let i = pinnedItemsContainer.children.length - 1; i >= 0; i--) {
 
@@ -100,7 +101,7 @@ function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContain
             defaultColor: "#303030",
             artworkSource: artworkSource,
             name: pinnedItems[i][1],
-            description: description,
+            description: description
         });
         
     }
@@ -109,9 +110,60 @@ function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContain
 
 }
 
-function updateItemsZoomLevel(itemsContainer, zoomLevel) {
+function loadPlaylists(staccatoInterface, playlistsPanel, playlistsContainer) {
 
-    console.log(zoomLevel);
+    let playlists = staccatoInterface.getBasicPlaylistsInfo();
+    if(playlists.length <= 0) {
+
+        playlistsPanel.visible = false;
+        return;
+
+    }
+
+    playlistsPanel.visible = true;
+    for(let i = playlistsContainer.children.length - 1; i >= 0; i--) {
+
+        playlistsContainer.children[i].destroy();
+
+    }
+
+    let component = Qt.createComponent("ArtworkTextButton.qml");
+
+    let artworkSource = "";
+    let description = "";
+    for(let i = 0; i < playlists.length; i++) {
+
+        artworkSource = staccatoInterface.getPlaylistImagePath(playlists[i][0]);
+        if(artworkSource.substring(0, 5) !== "qrc:/") { //The image path will be in QRC if it's the placeholder image
+
+            artworkSource = "file:///" + artworkSource;
+
+        }
+
+        if(playlists[i][3] === 1) {
+
+            description = "1 track";
+
+        } else {
+
+            description = playlists[i][3] + " tracks";
+
+        }
+
+        let object = component.createObject(playlistsContainer, {
+            defaultColor: "#303030",
+            artworkSource: artworkSource,
+            name: playlists[i][1],
+            description: description
+        });
+        
+    }
+
+    updateItemsZoomLevel(playlistsContainer, playlistsZoomLevel);
+
+}
+
+function updateItemsZoomLevel(itemsContainer, zoomLevel) {
 
     let buttonWidth = 0;
     let buttonHeight = 0;

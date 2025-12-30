@@ -246,7 +246,7 @@ namespace staccato {
         //=====================================================================================
         
         /// @brief This is when you want to know what playlists are saved in staccato (you don't want complete information including tracklist for each of them)
-        /// @return A vector of tuples that contain each playlist's ID, name, size, and online connection
+        /// @return A vector of tuples that contain each playlist's ID, name, online connection, and size
         static std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> get_basic_playlist_info_from_files();
 
         /// @brief Gets complete information about a singular playlist (including the tracklist)
