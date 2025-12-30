@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
         QCoreApplication::instance(),
         &QCoreApplication::aboutToQuit,
         []() {
+            AppManager::serialize_settings();
             Py_FinalizeEx();
         }
     );

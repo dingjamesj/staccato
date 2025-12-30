@@ -101,7 +101,7 @@ Column {
                 flow: Flow.LeftToRight
 
                 onWidthChanged: {
-                    Logic.loadPinnedItems(StaccatoInterface, pinnedItemsPanel, pinnedItemsContainer);
+                    Logic.loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer);
                 }
             }
         }
@@ -173,7 +173,7 @@ Column {
                 flow: Flow.LeftToRight
 
                 onWidthChanged: {
-                    Logic.loadPlaylists(StaccatoInterface, playlistsPanel, playlistsContainer);
+                    Logic.loadPlaylists(playlistsPanel, playlistsContainer);
                 }
             }
         }

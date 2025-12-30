@@ -248,7 +248,7 @@ namespace staccato {
         /// @param sort_mode 
         static void set_pinned_items_sort_mode(const std::string& sort_mode);
 
-        /// @brief Serializes the `pinned_items` property to the file system (specifically the settings file)
+        /// @brief Serializes the settings to settings.config
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_settings();
 

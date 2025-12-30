@@ -1,15 +1,18 @@
 var pinnedItemsZoomLevel = -1;
 var playlistsZoomLevel = -1;
 var pinnedItemsSortMode = "";
+var staccatoInterface;
 
-function startup(staccatoInterface) {
+function startup(interface) {
 
     console.log("HOME PANEL STARTUP");
 
     //Set the zoom levels and sort modes
-    pinnedItemsZoomLevel = staccatoInterface.getPinnedItemsZoomLevel();
-    playlistsZoomLevel = staccatoInterface.getPlaylistsZoomLevel();
-    pinnedItemsSortMode = staccatoInterface.getPinnedItemsSortMode();
+    pinnedItemsZoomLevel = interface.getPinnedItemsZoomLevel();
+    playlistsZoomLevel = interface.getPlaylistsZoomLevel();
+    pinnedItemsSortMode = interface.getPinnedItemsSortMode();
+
+    staccatoInterface = interface;
 
 }
 
@@ -17,6 +20,7 @@ function incrementPinnedItemsZoomLevel(pinnedItemsContainer) {
 
     pinnedItemsZoomLevel = (pinnedItemsZoomLevel + 1) % 3;
     updateItemsZoomLevel(pinnedItemsContainer, pinnedItemsZoomLevel);
+    staccatoInterface.setPinnedItemsZoomLevel(pinnedItemsZoomLevel);
 
 }
 
@@ -24,6 +28,7 @@ function incrementPlaylistsZoomLevel(playlistsContainer) {
 
     playlistsZoomLevel = (playlistsZoomLevel + 1) % 3;
     updateItemsZoomLevel(playlistsContainer, playlistsZoomLevel);
+    staccatoInterface.setPlaylistsZoomLevel(playlistsZoomLevel);
 
 }
 
@@ -39,7 +44,7 @@ function getPlaylistsZoomLevel() {
 
 }
 
-function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContainer) {
+function loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer) {
 
     let pinnedItems = staccatoInterface.getPinnedItems();
     if(pinnedItems.length <= 0) {
@@ -110,7 +115,7 @@ function loadPinnedItems(staccatoInterface, pinnedItemsPanel, pinnedItemsContain
 
 }
 
-function loadPlaylists(staccatoInterface, playlistsPanel, playlistsContainer) {
+function loadPlaylists(playlistsPanel, playlistsContainer) {
 
     let playlists = staccatoInterface.getBasicPlaylistsInfo();
     if(playlists.length <= 0) {

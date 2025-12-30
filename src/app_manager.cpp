@@ -477,6 +477,7 @@ void AppManager::read_settings_zoom_levels(std::ifstream& input, std::string& te
 
             try {
 
+                std::cout << "text: " << text << std::endl;
                 pinned_items_zoom_level = std::stoi(text);
 
             } catch (const std::exception&) {}
