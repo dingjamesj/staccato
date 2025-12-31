@@ -32,17 +32,15 @@ function incrementPlaylistsZoomLevel(playlistsContainer) {
 
 }
 
-function cyclePinnedItemsSortMode(pinnedItemsPanel, pinnedItemsContainer) {
+function setPinnedItemsSortMode(sortMode, pinnedItemsPanel, pinnedItemsContainer) {
 
-    if(pinnedItemsSortMode === "ALPHA") {
+    if(pinnedItemsSortMode === sortMode) {
 
-        pinnedItemsSortMode = "CUSTOM";
-
-    } else {
-
-        pinnedItemsSortMode = "ALPHA";
+        return;
 
     }
+
+    pinnedItemsSortMode = sortMode;
 
     loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer);
     staccatoInterface.setPinnedItemsSortMode(pinnedItemsSortMode);
