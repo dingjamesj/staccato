@@ -32,6 +32,23 @@ function incrementPlaylistsZoomLevel(playlistsContainer) {
 
 }
 
+function cyclePinnedItemsSortMode(pinnedItemsPanel, pinnedItemsContainer) {
+
+    if(pinnedItemsSortMode === "ALPHA") {
+
+        pinnedItemsSortMode = "CUSTOM";
+
+    } else {
+
+        pinnedItemsSortMode = "ALPHA";
+
+    }
+
+    loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer);
+    staccatoInterface.setPinnedItemsSortMode(pinnedItemsSortMode);
+
+}
+
 function getPinnedItemsZoomLevel() {
 
     return pinnedItemsZoomLevel;
@@ -44,9 +61,15 @@ function getPlaylistsZoomLevel() {
 
 }
 
+function getPinnedItemsSortMode() {
+
+    return pinnedItemsSortMode;
+
+}
+
 function loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer) {
 
-    let pinnedItems = staccatoInterface.getPinnedItems();
+    let pinnedItems = staccatoInterface.getPinnedItems(pinnedItemsSortMode);
     if(pinnedItems.length <= 0) {
 
         pinnedItems.visible = false;

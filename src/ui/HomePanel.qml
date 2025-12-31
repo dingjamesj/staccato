@@ -5,7 +5,6 @@ import "homePanel.js" as Logic
 
 Column {
     id: container
-    // spacing: (height - pinnedItemsPanel.height - playlistsPanel.height - downloaderPanel.height - topPadding - bottomPadding) / 2
     spacing: (height - pinnedItemsPanel.height - playlistsPanel.height - topPadding - bottomPadding) / 2
     leftPadding: 5
     rightPadding: 10
@@ -53,21 +52,6 @@ Column {
                 color: "#ffffff"
             }
 
-            //Zoom button
-            RoundButton {
-                id: pinnedItemsZoomButton
-                anchors.verticalCenter: parent.verticalCenter
-                width: 35
-                height: 35
-                radius: 7
-                spacing: 5
-                defaultColor: "#404040"
-                imageSource: "qrc:/staccato/src/ui/resources/list.svg"
-                onClicked: {
-                    Logic.incrementPinnedItemsZoomLevel(pinnedItemsContainer);
-                }
-            }
-
             //Sort mode button
             RoundButton {
                 id: pinnedItemsSortModeButton
@@ -78,6 +62,24 @@ Column {
                 spacing: 5
                 defaultColor: "#404040"
                 imageSource: "qrc:/staccato/src/ui/resources/list.svg"
+                onClicked: {
+                    Logic.cyclePinnedItemsSortMode(pinnedItemsPanel, pinnedItemsContainer);
+                }
+            }
+
+            //Zoom button
+            RoundButton {
+                id: pinnedItemsZoomButton
+                anchors.verticalCenter: parent.verticalCenter
+                width: 35
+                height: 35
+                radius: 7
+                spacing: 6
+                defaultColor: "#404040"
+                imageSource: "qrc:/staccato/src/ui/resources/zoom.svg"
+                onClicked: {
+                    Logic.incrementPinnedItemsZoomLevel(pinnedItemsContainer);
+                }
             }
         }
 
@@ -97,7 +99,7 @@ Column {
             Flow {
                 id: pinnedItemsContainer
                 width: parent.width
-                spacing: 8
+                spacing: 7
                 flow: Flow.LeftToRight
 
                 onWidthChanged: {
@@ -138,15 +140,16 @@ Column {
                 color: "#ffffff"
             }
 
+            //Zoom button
             RoundButton {
                 id: playlistsZoomButton
                 anchors.verticalCenter: parent.verticalCenter
                 width: 35
                 height: 35
                 radius: 7
-                spacing: 5
+                spacing: 6
                 defaultColor: "#404040"
-                imageSource: "qrc:/staccato/src/ui/resources/list.svg"
+                imageSource: "qrc:/staccato/src/ui/resources/zoom.svg"
                 onClicked: {
                     Logic.incrementPlaylistsZoomLevel(playlistsContainer);
                 }
@@ -169,7 +172,7 @@ Column {
             Flow {
                 id: playlistsContainer
                 width: parent.width
-                spacing: 8
+                spacing: 7
                 flow: Flow.LeftToRight
 
                 onWidthChanged: {

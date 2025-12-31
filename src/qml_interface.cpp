@@ -5,13 +5,149 @@
 
 using namespace staccato;
 
+void StaccatoInterface::sort_pinned_items_alphabetically(QList<QVariantList>& qt_pinned_items, qsizetype begin, qsizetype end) {
+
+    if(end - begin <= 1) {
+
+        return;
+
+    }
+
+    qsizetype mid = (begin + end) / 2;
+
+    sort_pinned_items_alphabetically(qt_pinned_items, begin, mid);
+    sort_pinned_items_alphabetically(qt_pinned_items, mid, end);
+
+    //Merge:
+
+    QList<QVariantList> list_left {};
+    QList<QVariantList> list_right {};
+
+    for(qsizetype i {0}; i < mid - begin; i++) {
+
+        list_left.append(qt_pinned_items[i + begin]);
+
+    }
+
+    for(qsizetype i {0}; i < end - mid; i++) {
+
+        list_right.append(qt_pinned_items[i + mid]);
+
+    }
+
+    qsizetype l {0}, r {0}, i {begin};
+    while(l < list_left.size() && r < list_right.size()) {
+
+        int compare = QString::compare(list_left[l][1].value<QString>(), list_right[r][1].value<QString>(), Qt::CaseInsensitive);
+        if(compare < 0) {
+
+            qt_pinned_items[i] = list_left[l];
+            l++;
+
+        } else {
+
+            qt_pinned_items[i] = list_right[r];
+            r++;
+
+        }
+        
+        i++;
+
+    }
+
+    while(l < list_left.size()) {
+
+        qt_pinned_items[i] = list_left[l];
+        l++;
+        i++;
+
+    }
+
+    while(r < list_right.size()) {
+
+        qt_pinned_items[i] = list_right[r];
+        r++;
+        i++;
+
+    }
+
+}
+
+void StaccatoInterface::sort_playlists_alphabetically(QList<QStringList>& qt_playlists, qsizetype begin, qsizetype end) {
+
+    if(end - begin <= 1) {
+
+        return;
+
+    }
+
+    qsizetype mid = (begin + end) / 2;
+
+    sort_playlists_alphabetically(qt_playlists, begin, mid);
+    sort_playlists_alphabetically(qt_playlists, mid, end);
+
+    //Merge:
+
+    QList<QStringList> list_left {};
+    QList<QStringList> list_right {};
+
+    for(qsizetype i {0}; i < mid - begin; i++) {
+
+        list_left.append(qt_playlists[i + begin]);
+
+    }
+
+    for(qsizetype i {0}; i < end - mid; i++) {
+
+        list_right.append(qt_playlists[i + mid]);
+
+    }
+
+    qsizetype l {0}, r {0}, i {begin};
+    while(l < list_left.size() && r < list_right.size()) {
+
+        int compare = QString::compare(list_left[l][1], list_right[r][1], Qt::CaseInsensitive);
+        if(compare < 0) {
+
+            qt_playlists[i] = list_left[l];
+            l++;
+
+        } else {
+
+            qt_playlists[i] = list_right[r];
+            r++;
+
+        }
+        
+        i++;
+
+    }
+
+    while(l < list_left.size()) {
+
+        qt_playlists[i] = list_left[l];
+        l++;
+        i++;
+
+    }
+
+    while(r < list_right.size()) {
+
+        qt_playlists[i] = list_right[r];
+        r++;
+        i++;
+
+    }
+
+}
+
 void StaccatoInterface::readSettings() {
 
     AppManager::read_settings();
 
 }
 
-QList<QVariantList> StaccatoInterface::getPinnedItems() {
+QList<QVariantList> StaccatoInterface::getPinnedItems(QString sortMode) {
     
     std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = AppManager::get_pinned_items();
 
@@ -34,6 +170,12 @@ QList<QVariantList> StaccatoInterface::getPinnedItems() {
 
     }
 
+    if(sortMode == "ALPHA") {
+
+        sort_pinned_items_alphabetically(qt_pinned_items, 0, qt_pinned_items.size());
+
+    }
+
     return qt_pinned_items;
 
 }
@@ -53,6 +195,8 @@ QList<QStringList> StaccatoInterface::getBasicPlaylistsInfo() {
         });
 
     }
+
+    sort_playlists_alphabetically(qt_playlists, 0, qt_playlists.size());
 
     return qt_playlists;
 

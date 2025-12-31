@@ -12,13 +12,20 @@ namespace staccato {
         QML_ELEMENT
         QML_SINGLETON
 
+        private:
+        
+        //Helper functions
+
+        void sort_pinned_items_alphabetically(QList<QVariantList>& qt_pinned_items, qsizetype begin, qsizetype end);
+        void sort_playlists_alphabetically(QList<QStringList>& qt_playlists, qsizetype begin, qsizetype end);
+
         public:
 
         Q_INVOKABLE
         void readSettings();
 
         Q_INVOKABLE
-        QList<QVariantList> getPinnedItems();
+        QList<QVariantList> getPinnedItems(QString sortMode);
 
         Q_INVOKABLE
         QList<QStringList> getBasicPlaylistsInfo();
