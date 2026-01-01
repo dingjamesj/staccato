@@ -348,14 +348,18 @@ Column {
                     }
 
                     RoundButton {
-                        id: resetTrackInfoButton
+                        id: loadTrackInfoButton
                         width: 145
                         height: 30
                         radius: 6
-                        text: "Reset Track Info"
+                        text: "Load Track Info"
                         defaultColor: "#434343"
                         textSize: 12
                         textStyle: Font.Bold
+                        
+                        onClicked: {
+                            Logic.loadTrackInfo(urlTextField.text, loadTrackInfoButton, addTracksTitleField, addTracksArtistsContainer, addTracksAlbumField, addTracksArtwork);
+                        }
                     }
                 }
             }

@@ -147,7 +147,7 @@ void StaccatoInterface::readSettings() {
 
 }
 
-QList<QVariantList> StaccatoInterface::getPinnedItems(QString sortMode) {
+QList<QVariantList> StaccatoInterface::getPinnedItems(const QString& sortMode) {
     
     std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = AppManager::get_pinned_items();
 
@@ -311,5 +311,34 @@ void StaccatoInterface::setPlaylistsZoomLevel(int zoomLevel) {
 void StaccatoInterface::setPinnedItemsSortMode(const QString& sortMode) {
 
     AppManager::set_pinned_items_sort_mode(sortMode.toStdString());
+
+}
+
+QList<QVariant> StaccatoInterface::getLocalTrackInfo(const QString& path) {
+
+    Track track = TrackManager::get_local_track_info(path.toStdString());
+    QStringList artists {};
+    for(std::string artist: track.artists()) {
+
+        artists.append(QString::fromStdString(artist));
+
+    }
+
+    return {QVariant(QString::fromStdString(track.title())), artists, QVariant(QString::fromStdString(track.album()))};
+
+}
+
+QList<QVariant> StaccatoInterface::getOnlineTrackInfo(const QString& url) {
+
+    std::pair<Track, std::string> track_artwork_pair = TrackManager::get_online_track_info(url.toStdString());
+    Track& track = track_artwork_pair.first;
+    QStringList artists {};
+    for(std::string artist: track.artists()) {
+
+        artists.append(QString::fromStdString(artist));
+
+    }
+    
+    return {QVariant(QString::fromStdString(track.title())), artists, QVariant(QString::fromStdString(track.album())), QVariant(QString::fromStdString(track_artwork_pair.second))};
 
 }

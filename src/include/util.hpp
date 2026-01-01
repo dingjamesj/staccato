@@ -1,6 +1,15 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+// =========================================================================================
+// 
+//                SET TO TRUE DURING DEVELOPMENT, SET TO FALSE WHEN DEPLOYED.             
+//   USED TO ADJUST FOR THE DIFFERENCE BETWEEN DEVELOPMENT AND DEPLOYED PROJECT STRUCTURE.
+
+#define DEVELOPMENT_BUILD true
+
+// =========================================================================================
+
 #include <string>
 #include <format>
 #include <filesystem>

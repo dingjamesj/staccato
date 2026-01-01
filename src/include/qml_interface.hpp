@@ -25,7 +25,7 @@ namespace staccato {
         void readSettings();
 
         Q_INVOKABLE
-        QList<QVariantList> getPinnedItems(QString sortMode);
+        QList<QVariantList> getPinnedItems(const QString& sortMode);
 
         Q_INVOKABLE
         QList<QStringList> getBasicPlaylistsInfo();
@@ -62,6 +62,12 @@ namespace staccato {
 
         Q_INVOKABLE
         void setPinnedItemsSortMode(const QString& sortMode);
+
+        Q_INVOKABLE
+        QList<QVariant> getLocalTrackInfo(const QString& path);
+
+        Q_INVOKABLE
+        QList<QVariant> getOnlineTrackInfo(const QString& url);
 
     };
 

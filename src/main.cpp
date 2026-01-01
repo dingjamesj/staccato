@@ -57,15 +57,7 @@ int main(int argc, char* argv[]) {
 
     /*
 
-    std::cout << TrackManager::get_local_track_info("C:\\Users\\James\\Music\\rargb\\4th Dimension KIDS SEE GHOSTS Louis Prima  6Hj5tucYv1Q.mp3").string();
-
-    const char* raw_image_data = TrackManager::get_track_artwork_raw("C:\\Users\\James\\Music\\rargb\\4th Dimension KIDS SEE GHOSTS Louis Prima  6Hj5tucYv1Q.mp3");
-    std::cout << "size: " << sizeof(raw_image_data) << std::endl;
-    for(std::size_t i {0}; i < sizeof(raw_image_data); i++) {
-
-        std::cout << raw_image_data[i] << std::endl;
-
-    }
+    std::cout << TrackManager::get_local_track_info("D:\\ss5msvokUkY.mp3").string();
 
     return 0;
 

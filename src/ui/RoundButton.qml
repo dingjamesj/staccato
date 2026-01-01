@@ -8,7 +8,9 @@ Rectangle {
     property color defaultColor: "#404040"
     property color hoverColor: Qt.lighter(defaultColor, 1.2)
     property color pressedColor: Qt.lighter(defaultColor, 1.5)
+    property color disabledColor: Qt.darker(defaultColor, 1.5)
     property color textColor: "#ffffff"
+    property color disabledTextColor: Qt.darker(textColor, 1.5);
     property int textSize: 18
     property var textStyle: Font.Normal
     property int spacing: 8
@@ -26,6 +28,21 @@ Rectangle {
         }
     }
 
+    onEnabledChanged: {
+        mouseArea.enabled = enabled;
+        if(enabled === false) {
+
+            color = disabledColor;
+            buttonText.color = disabledTextColor;
+
+        } else {
+
+            color = defaultColor;
+            buttonText.color = textColor;
+
+        }
+    }
+
     FontLoader {
         id: interFont
         source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
@@ -37,6 +54,13 @@ Rectangle {
         hoverEnabled: true
         onClicked: container.clicked()
         onEntered: {
+            if(!enabled) {
+
+                container.color = container.disabledColor;
+                buttonText.color = container.disabledTextColor;
+                return;
+
+            }
             if(!pressed) {
 
                 container.color = container.hoverColor;
@@ -44,6 +68,13 @@ Rectangle {
             }
         }
         onExited: {
+            if(!enabled) {
+
+                container.color = container.disabledColor;
+                buttonText.color = container.disabledTextColor;
+                return;
+
+            }
             if(!pressed) {
 
                 container.color = container.defaultColor
@@ -51,9 +82,23 @@ Rectangle {
             }
         }
         onPressed: {
+            if(!enabled) {
+
+                container.color = container.disabledColor;
+                buttonText.color = container.disabledTextColor;
+                return;
+
+            }
             container.color = container.pressedColor
         }
         onReleased: {
+            if(!enabled) {
+
+                container.color = container.disabledColor;
+                buttonText.color = container.disabledTextColor;
+                return;
+
+            }
             if(containsMouse) {
 
                 container.color = container.hoverColor
