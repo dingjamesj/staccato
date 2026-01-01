@@ -76,7 +76,7 @@ Rectangle {
         font.pointSize: container.textSize
         font.weight: container.textStyle
         clip: true
-        text: text
+        text: container.text
         color: container.textColor
     }
 

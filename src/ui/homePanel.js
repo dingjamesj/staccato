@@ -240,3 +240,20 @@ function updateItemsZoomLevel(itemsContainer, zoomLevel) {
     }
 
 }
+
+function addArtistTextField(artistsContainer) {
+
+    let component = Qt.createComponent("HomePanelArtistsTextField.qml");
+    component.createObject(artistsContainer);
+
+}
+
+function removeArtistTextField(artistsContainer) {
+
+    if(artistsContainer.children.length > 1) {
+
+        artistsContainer.children[artistsContainer.children.length - 1].destroy();
+
+    }
+
+}

@@ -32,6 +32,7 @@ qt_add_qml_module(staccato
         src/ui/ArtworkTextButton.qml
         src/ui/RoundedImage.qml
         src/ui/RoundButton.qml
+        src/ui/HomePanelArtistsTextField.qml
     RESOURCES
         src/ui/resources/piggo58.jpg
         src/ui/resources/placeholder.jpg
@@ -47,6 +48,7 @@ qt_add_qml_module(staccato
         src/ui/resources/grid.svg
         src/ui/resources/plus.svg
         src/ui/resources/zoom.svg
+        src/ui/resources/minus.svg
         src/ui/resources/chevrondown.svg
     SOURCES
         src/qml_interface.cpp
