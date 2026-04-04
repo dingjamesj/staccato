@@ -16,8 +16,8 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
-#include <taglib/fileref.h>
-#include <taglib/attachedpictureframe.h>
+#include <fileref.h>
+#include <attachedpictureframe.h>
 #include <tfile.h>
 #include <mp4file.h>
 #include <mpegfile.h>

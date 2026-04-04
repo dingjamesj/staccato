@@ -209,7 +209,7 @@ QVariantList StaccatoInterface::readLastSessionData() {
 
     if(AppManager::read_last_session_data(main_queue_playlist_id, main_position, added_position)) {
 
-        return {QVariant(QString::fromStdString(main_queue_playlist_id)), QVariant(main_position), QVariant(added_position)};
+        return {QVariant(QString::fromStdString(main_queue_playlist_id)), QVariant((uint) main_position), QVariant((uint) added_position)};
 
     }
 
