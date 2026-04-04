@@ -993,7 +993,18 @@ std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> Tr
 
     std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> info {};
 
-    for(std::filesystem::directory_entry file: std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY)) {
+    std::filesystem::directory_iterator directory_iter;
+    try {
+
+        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY);
+
+    } catch(const std::exception& e) {
+
+        return {};
+
+    }
+
+    for(std::filesystem::directory_entry file: directory_iter) {
 
         //We only want the .sply files
         if(file.path().extension().string() != std::string{PLAYLIST_FILE_EXTENSION}) {
