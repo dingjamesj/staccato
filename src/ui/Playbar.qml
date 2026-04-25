@@ -1,6 +1,9 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
+pragma ComponentBehavior: Bound
+
+//This component has a play/pause bar and a progress slider
 Rectangle {
     id: container
     topLeftRadius: width / 7
@@ -13,11 +16,11 @@ Rectangle {
     }
 
     //=========================================
-    //               CONTROL BAR               
+    //             PLAY PAUSE BAR              
     //=========================================
 
     Rectangle {
-        id: controlsPanel
+        id: playPauseBar
         anchors.top: parent.top
         anchors.topMargin: parent.width * 0.08
         anchors.horizontalCenter: parent.horizontalCenter

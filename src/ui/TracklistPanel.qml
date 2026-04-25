@@ -1,5 +1,7 @@
 import QtQuick
 
+pragma ComponentBehavior: Bound
+
 Column {
     id: container
     spacing: 18

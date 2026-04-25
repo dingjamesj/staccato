@@ -1,5 +1,7 @@
 import QtQuick
 
+pragma ComponentBehavior: Bound
+
 Rectangle {
     id: container
 

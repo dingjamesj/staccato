@@ -1,14 +1,12 @@
 #ifndef APP_MANAGER_HPP
 #define APP_MANAGER_HPP
 
-// =========================================================================================
-// 
-//                SET TO TRUE DURING DEVELOPMENT, SET TO FALSE WHEN DEPLOYED.             
-//   USED TO ADJUST FOR THE DIFFERENCE BETWEEN DEVELOPMENT AND DEPLOYED PROJECT STRUCTURE.
+//=======================================================================================
+// Main job of AppManager is to organize the application's settings and persistent data.
+//=======================================================================================
 
+//Used to adjust for the difference between development and deployed project structure
 #define DEVELOPMENT_BUILD true
-
-// =========================================================================================
 
 #include <string>
 #include <iostream>

@@ -4,6 +4,11 @@
 #include <QObject>
 #include <QtQml>
 
+//=====================================================================================================================================
+// Since Qt requires their own Qt objects such as QList and QString, we need an "interface" that converts STL objects into Qt objects.
+// This is that interface.
+//=====================================================================================================================================
+
 namespace staccato {
 
     class StaccatoInterface: public QObject {

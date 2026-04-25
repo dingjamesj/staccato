@@ -1,16 +1,16 @@
 import QtQuick
 import QtQuick.Controls
 
+pragma ComponentBehavior: Bound
+
 TextField {
     id: container
-    width: 70
+    width: 200
     height: 25
     color: "#d4d4d4"
     font.family: interFont.name
     font.pointSize: 10
     padding: 5
-    placeholderText: "Artist"
-    placeholderTextColor: '#7f7f7f'
 
     background: Rectangle {
         radius: 6

@@ -1,14 +1,12 @@
 #ifndef TRACK_MANAGER_HPP
 #define TRACK_MANAGER_HPP
 
-// =========================================================================================
-// 
-//                SET TO TRUE DURING DEVELOPMENT, SET TO FALSE WHEN DEPLOYED.             
-//   USED TO ADJUST FOR THE DIFFERENCE BETWEEN DEVELOPMENT AND DEPLOYED PROJECT STRUCTURE.
+//===========================================================
+// Main job of TrackManager is the organize the audio files.
+//===========================================================
 
+//Used to adjust for the difference between development and deployed project structure
 #define DEVELOPMENT_BUILD true
-
-// =========================================================================================
 
 #include <string>
 #include <unordered_map>

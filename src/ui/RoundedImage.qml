@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Effects
 
+pragma ComponentBehavior: Bound
+
 Rectangle {
     id: container
     color: "#2b2b2b"

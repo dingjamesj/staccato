@@ -1,5 +1,7 @@
 import QtQuick
 
+pragma ComponentBehavior: Bound
+
 Rectangle {
     id: container
 
@@ -120,7 +122,7 @@ Rectangle {
         font.family: interFont.name
         font.pointSize: container.textSize
         font.weight: container.textStyle
-        clip: true
+        clip: false
         text: container.text
         color: container.textColor
     }

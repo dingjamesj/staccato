@@ -3,6 +3,8 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import "main.js" as Logic
 
+pragma ComponentBehavior: Bound
+
 ApplicationWindow {
     width: 1350
     height: 810
@@ -25,52 +27,40 @@ ApplicationWindow {
         columnSpacing: 0
         anchors.fill: parent
 
-        CurrentlyPlayingPanel {
-            id: currentlyPlayingPanel
+        //The left panel (with the queue and playbar, essentially the controls for the media player)
+        ControlPanel {
+            id: queuePanel
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.row: 0
             Layout.column: 0
-            Layout.preferredWidth: 380
-            Layout.preferredHeight: parent.height * 0.82
+            Layout.preferredWidth: parent.width * 0.25
         }
 
-        Item {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Layout.row: 1
-            Layout.column: 0
-            Layout.preferredWidth: 380
-            Layout.preferredHeight: parent.height * 0.18
-
-            ControlBarPanel {
-                id: controlBarPanel
-                anchors.centerIn: parent
-                width: parent.width * 75 / 85
-                height: parent.height
-            }
-        }
-
+        //The center panel that either shows the home menu or a playlist's tracklist
         StackView {
             id: mainPanel
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.column: 1
-            Layout.rowSpan: 2
-            Layout.preferredWidth: parent.width - 380 - 290
+            Layout.preferredWidth: parent.width * 0.5
 
+            //The center panel shows the home panel on startup
             initialItem: HomePanel {
                 anchors.fill: parent
             }
         }
 
-        QueuePanel {
-            id: queuePanel
+        //The right panel
+        StackView {
+            id: currentlyPlayingAndLibraryPanel
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.column: 2
-            Layout.rowSpan: 2
-            Layout.preferredWidth: 290
+            Layout.preferredWidth: parent.width * 0.25
+
+            initialItem: Rectangle {
+                anchors.fill: parent
+            }
         }
     }
 }

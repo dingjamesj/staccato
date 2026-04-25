@@ -1,9 +1,14 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import QtQuick.Layouts
 import staccato
 import "homePanel.js" as Logic
 
 pragma ComponentBehavior: Bound
+
+//===============================================
+// Shows the track importer and recent playlists 
+//===============================================
 
 Column {
     id: container
@@ -22,256 +27,9 @@ Column {
         source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
     }
 
-    //=========================================
-    //           PINNED ITEMS PANEL           
-    //=========================================
-    
+    //Track importer
     Column {
-        id: pinnedItemsPanel
-        width: parent.width - parent.leftPadding - parent.rightPadding
-        height: (parent.height - parent.topPadding - parent.bottomPadding - addTracksPanel.height - parent.spacing * 2) * 0.4
-        spacing: 10
-        leftPadding: 0
-        rightPadding: 0
-        topPadding: 0
-        bottomPadding: 10
-
-        //Header containing the text "Pinned" and view buttons
-        Row {
-            id: pinnedItemsHeader
-            width: parent.width
-            height: implicitHeight
-            spacing: 9
-
-            Text {
-                id: pinnedItemsHeaderText
-                width: pinnedItemsHeader.width - pinnedItemsZoomButton.width - pinnedItemsSortModeComboBox.width - parent.spacing * 2
-                text: "Pinned"
-                font.family: interFont.name
-                font.pointSize: 24
-                font.weight: Font.DemiBold
-                wrapMode: Text.NoWrap
-                color: "#ffffff"
-            }
-
-            ComboBox {
-                id: pinnedItemsSortModeComboBox
-                anchors.verticalCenter: parent.verticalCenter
-                width: 150
-                height: 30
-                hoverEnabled: true
-                model: ["Custom Order", "Alphabetical"]
-
-                Component.onCompleted: {
-                    let sortMode = Logic.getPinnedItemsSortMode();
-                    if(sortMode === "CUSTOM") {
-
-                        currentIndex = 0;
-
-                    } else if(sortMode === "ALPHA") {
-
-                        currentIndex = 1;
-
-                    }
-                }
-
-                onActivated: {
-                    if(currentIndex === 0) {
-
-                        Logic.setPinnedItemsSortMode("CUSTOM", pinnedItemsPanel, pinnedItemsContainer);
-
-                    } else if(currentIndex === 1) {
-
-                        Logic.setPinnedItemsSortMode("ALPHA", pinnedItemsPanel, pinnedItemsContainer);
-                        
-                    }
-                }
-
-                contentItem: Text {
-                    text: pinnedItemsSortModeComboBox.displayText
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    font.family: interFont.name
-                    font.pointSize: 11
-                    font.weight: Font.DemiBold
-                    color: "#ffffff"
-                }
-                indicator: Image {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: parent.height - 5
-                    source: "qrc:/staccato/src/ui/resources/chevrondown.svg"
-                    fillMode: Image.PreserveAspectFit
-                }
-                background: Rectangle {
-                    anchors.fill: pinnedItemsSortModeComboBox
-                    radius: 6
-                    color: pinnedItemsSortModeComboBox.pressed ? "#7f7f7f" : (pinnedItemsSortModeComboBox.hovered ? "#4d4d4d" : "#404040")
-                }
-                popup: Popup {
-                    y: pinnedItemsSortModeComboBox.height - 1
-                    width: pinnedItemsSortModeComboBox.width - 30
-                    implicitHeight: popupListView.implicitHeight
-                    padding: 0
-                    background: Rectangle {
-                        anchors.fill: parent
-                        radius: 6
-                        color: "#404040"
-                    }
-                    contentItem: ListView {
-                        id: popupListView
-                        clip: true
-                        implicitHeight: contentHeight
-                        model: pinnedItemsSortModeComboBox.delegateModel
-
-                        currentIndex: pinnedItemsSortModeComboBox.highlightedIndex
-                        Keys.onEscapePressed: pinnedItemsSortModeComboBox.popup.close()
-
-                        delegate: ItemDelegate {
-                            id: delegate
-                            width: popupListView.width
-                            height: 30
-                            required property string modelData
-                            property bool isHighlighted: ListView.isCurrentItem
-
-                            contentItem: Text {
-                                text: delegate.modelData
-                                font.family: interFont.name
-                                font.pointSize: 11
-                                font.weight: Font.DemiBold
-                                color: "#ffffff"
-                                verticalAlignment: Text.AlignVCenter
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-                            
-                            background: Rectangle {
-                                radius: 6
-                                color: delegate.isHighlighted ? "#4d4d4d" : "#404040"
-                            }
-                        }
-                    }
-                }
-            }
-
-            //Zoom button
-            RoundButton {
-                id: pinnedItemsZoomButton
-                anchors.verticalCenter: parent.verticalCenter
-                width: 30
-                height: 30
-                radius: 6
-                spacing: 6
-                defaultColor: "#404040"
-                imageSource: "qrc:/staccato/src/ui/resources/zoom.svg"
-
-                onClicked: {
-                    Logic.incrementPinnedItemsZoomLevel(pinnedItemsContainer);
-                }
-            }
-        }
-
-        ScrollView {
-            id: pinnedItemsScrollView
-            width: parent.width
-            height: parent.height - pinnedItemsHeader.height - parent.topPadding - parent.bottomPadding - parent.spacing
-            contentWidth: width
-            clip: true
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-            ScrollBar.vertical.policy: ScrollBar.AsNeeded
-
-            Component.onCompleted: {
-                contentItem.boundsBehavior = Flickable.StopAtBounds;
-            }
-
-            Flow {
-                id: pinnedItemsContainer
-                width: parent.width
-                spacing: 7
-                flow: Flow.LeftToRight
-
-                onWidthChanged: {
-                    Logic.loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer);
-                }
-            }
-        }
-    }
-
-    //=========================================
-    //             PLAYLISTS PANEL             
-    //=========================================
-
-    Column {
-        id: playlistsPanel
-        width: parent.width - parent.leftPadding - parent.rightPadding
-        height: (parent.height - parent.topPadding - parent.bottomPadding - addTracksPanel.height - parent.spacing * 2) * 0.6
-        spacing: 10
-        leftPadding: 0
-        rightPadding: 0
-        topPadding: 0
-        bottomPadding: 10
-
-        Row {
-            id: playlistsHeader
-            width: parent.width
-            height: implicitHeight
-            spacing: 9
-            
-            Text {
-                id: playlistsHeaderText
-                width: playlistsHeader.width - playlistsZoomButton.width - playlistsHeader.spacing
-                text: "Your Playlists"
-                font.family: interFont.name
-                font.pointSize: 24
-                font.weight: Font.DemiBold
-                wrapMode: Text.NoWrap
-                color: "#ffffff"
-            }
-
-            //Zoom button
-            RoundButton {
-                id: playlistsZoomButton
-                anchors.verticalCenter: parent.verticalCenter
-                width: 30
-                height: 30
-                radius: 6
-                spacing: 6
-                defaultColor: "#404040"
-                imageSource: "qrc:/staccato/src/ui/resources/zoom.svg"
-
-                onClicked: {
-                    Logic.incrementPlaylistsZoomLevel(playlistsContainer);
-                }
-            }
-        }
-
-        ScrollView {
-            id: playlistsScrollView
-            width: parent.width
-            height: parent.height - playlistsHeader.height - parent.topPadding - parent.bottomPadding - parent.spacing
-            contentWidth: width
-            clip: true
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-            ScrollBar.vertical.policy: ScrollBar.AsNeeded
-
-            Component.onCompleted: {
-                contentItem.boundsBehavior = Flickable.StopAtBounds;
-            }
-
-            Flow {
-                id: playlistsContainer
-                width: parent.width
-                spacing: 7
-                flow: Flow.LeftToRight
-
-                onWidthChanged: {
-                    Logic.loadPlaylists(playlistsPanel, playlistsContainer);
-                }
-            }
-        }
-    }
-
-    Column {
-        id: addTracksPanel
+        id: trackImporter
         width: parent.width - parent.leftPadding - parent.rightPadding
         height: implicitHeight
         spacing: 12
@@ -280,10 +38,11 @@ Column {
         topPadding: 0
         bottomPadding: 0
         
+        //Title text
         Text {
             id: addTracksText
             height: 39
-            text: "Import New Tracks"
+            text: "Add New Tracks"
             font.family: interFont.name
             font.pointSize: 24
             font.weight: Font.DemiBold
@@ -291,204 +50,265 @@ Column {
             color: "#ffffff"
         }
 
+        //URL textbox title text
+        Text {
+            id: urlTitleText
+            width: parent.width
+            height: 20
+            text: "Location"
+            font.family: interFont.name
+            font.pointSize: 13
+            font.weight: Font.DemiBold
+            wrapMode: Text.NoWrap
+            color: "#ffffff"
+        }
+
+        //URL input text box & download button
         Row {
-            id: addTracksContainer
+            id: urlInputPanel
             width: parent.width
             height: implicitHeight
             spacing: 8
 
-            Column {
-                id: urlContainer
-                width: 270
-                height: implicitHeight
-                spacing: 8
+            //Text field to input the URL / file path
+            TextField {
+                id: urlTextField
+                width: 240
+                height: 25
+                color: "#d4d4d4"
+                font.family: interFont.name
+                font.pointSize: 9
+                padding: 5
+                placeholderText: "Paste here a web URL or a file path to import audio from"
+                placeholderTextColor: '#7f7f7f'
 
-                Text {
-                    id: urlText
-                    width: parent.width
-                    height: 20
-                    text: "URL/File Path"
-                    font.family: interFont.name
-                    font.pointSize: 13
-                    font.weight: Font.DemiBold
-                    wrapMode: Text.NoWrap
-                    color: "#ffffff"
-                }
-
-                TextField {
-                    id: urlTextField
-                    width: parent.width
-                    height: 25
-                    color: "#d4d4d4"
-                    font.family: interFont.name
-                    font.pointSize: 10
-                    padding: 5
-
-                    background: Rectangle {
-                        radius: 6
-                        color: "#303030"
-                    }
-                }
-
-                Row {
-                    id: addTracksButtonPanel
-                    width: parent.width
-                    height: 30
-                    spacing: 8
-
-                    RoundButton {
-                        id: downloadButton
-                        width: 100
-                        height: 30
-                        radius: 6
-                        text: "Download"
-                        defaultColor: "#80005d"
-                        textSize: 12
-                        textStyle: Font.Bold
-                    }
-
-                    RoundButton {
-                        id: loadTrackInfoButton
-                        width: 145
-                        height: 30
-                        radius: 6
-                        text: "Load Track Info"
-                        defaultColor: "#434343"
-                        textSize: 12
-                        textStyle: Font.Bold
-                        
-                        onClicked: {
-                            Logic.loadTrackInfo(urlTextField.text, loadTrackInfoButton, addTracksTitleField, addTracksArtistsContainer, addTracksAlbumField, addTracksArtwork);
-                        }
-                    }
+                background: Rectangle {
+                    radius: 6
+                    color: "#303030"
                 }
             }
 
-            Item {
-                id: emptySpacingItem1
-                width: 10
-                height: 2
-            }
-
-            RoundedImage {
-                id: addTracksArtwork
-                width: height
-                height: parent.height
+            RoundButton {
+                id: downloadButton
+                width: 80
+                height: 25
                 radius: 6
-                source: ""
+                text: "Download"
+                defaultColor: "#80005d"
+                textSize: 10
+                textStyle: Font.Bold
+                enabled: false
             }
 
-            Column {
-                id: addTracksInfoContainer
-                width: 270
-                height: implicitHeight
-                spacing: 6
-
-                TextField {
-                    id: addTracksTitleField
-                    width: parent.width
-                    height: 25
-                    color: "#d4d4d4"
-                    font.family: interFont.name
-                    font.pointSize: 10
-                    padding: 5
-                    placeholderText: "Title"
-                    placeholderTextColor: '#7f7f7f'
-
-                    background: Rectangle {
-                        radius: 6
-                        color: "#303030"
-                    }
-                }
-
-                Row {
-                    id: addTracksArtistsPanel
-                    width: parent.width
-                    height: 25
-                    spacing: 6
-
-                    ScrollView {
-                        id: addTracksArtistsScrollView
-                        width: parent.width - addArtistButton.width - removeArtistButton.width - parent.spacing * 2
-                        height: parent.height
-                        contentHeight: height
-                        clip: true
-                        ScrollBar.horizontal.policy: ScrollBar.AsNeeded
-                        ScrollBar.vertical.policy: ScrollBar.AlwaysOff
-                        
-                        Component.onCompleted: {
-                            contentItem.boundsBehavior = Flickable.StopAtBounds;
-                        }
-
-                        Row {
-                            id: addTracksArtistsContainer
-                            width: addTracksArtistsScrollView.width
-                            height: addTracksArtistsScrollView.height
-                            spacing: 6
-
-                            TextField {
-                                id: defaultAddTracksArtistField
-                                width: 70
-                                height: 25
-                                color: "#d4d4d4"
-                                font.family: interFont.name
-                                font.pointSize: 10
-                                padding: 5
-                                placeholderText: "Artist"
-                                placeholderTextColor: '#7f7f7f'
-
-                                background: Rectangle {
-                                    radius: 6
-                                    color: "#303030"
-                                }
-                            }
-                        }
-                    }
-
-                    RoundButton {
-                        id: addArtistButton
-                        width: height
-                        height: parent.height
-                        radius: 6
-                        spacing: 3
-                        defaultColor: "#434343"
-                        imageSource: "qrc:/staccato/src/ui/resources/plus.svg"
-                        onClicked: {
-                            Logic.addArtistTextField(addTracksArtistsContainer);
-                        }
-                    }
-
-                    RoundButton {
-                        id: removeArtistButton
-                        width: height
-                        height: parent.height
-                        radius: 6
-                        spacing: 3
-                        defaultColor: "#434343"
-                        imageSource: "qrc:/staccato/src/ui/resources/minus.svg"
-                        onClicked: {
-                            Logic.removeArtistTextField(addTracksArtistsContainer);
-                        }
-                    }
-                }
-
-                TextField {
-                    id: addTracksAlbumField
-                    width: parent.width
-                    height: 25
-                    color: "#d4d4d4"
-                    font.family: interFont.name
-                    font.pointSize: 10
-                    padding: 5
-                    placeholderText: "Album"
-                    placeholderTextColor: '#7f7f7f'
-
-                    background: Rectangle {
-                        radius: 6
-                        color: "#303030"
-                    }
+            RoundButton {
+                id: loadPreviewButton
+                width: 105
+                height: 25
+                radius: 6
+                text: "Load Preview"
+                defaultColor: "#434343"
+                textSize: 10
+                textStyle: Font.Bold
+                enabled: false
+                
+                onClicked: {
+                    Logic.loadTrackInfo(urlTextField.text, loadPreviewButton, previewTitleField, artistsTextFieldRow, previewAlbumField, previewArtwork);
                 }
             }
         }
+
+        //Track preview title text
+        Text {
+            id: previewTitleText
+            width: parent.width
+            height: 20
+            text: "Preview"
+            font.family: interFont.name
+            font.pointSize: 13
+            font.weight: Font.DemiBold
+            wrapMode: Text.NoWrap
+            color: "#ffffff"
+        }
+
+        //Track preview contents
+        GridLayout {
+            id: previewContainer
+            rows: 3
+            columns: 3
+            rowSpacing: 6
+            columnSpacing: 8
+            width: parent.width * 0.8
+            height: implicitHeight
+
+            //Cover art
+            RoundedImage {
+                id: previewArtwork
+                radius: 6
+                source: ""
+
+                Layout.fillHeight: true
+                Layout.row: 0
+                Layout.column: 0
+                Layout.rowSpan: 3
+                Layout.preferredWidth: 25 * 3 + parent.rowSpacing * 2
+            }
+
+            //Text that says "Title: "
+            Text {
+                id: titleContainerTitleText
+                text: "Title: "
+                font.family: interFont.name
+                font.pointSize: 10
+                font.weight: Font.DemiBold
+                wrapMode: Text.NoWrap
+                color: "#ffffff"
+
+                Layout.row: 0
+                Layout.column: 1
+            }
+
+            //Text field for the title
+            TextField {
+                id: previewTitleField
+                color: "#d4d4d4"
+                font.family: interFont.name
+                font.pointSize: 10
+
+                background: Rectangle {
+                    radius: 6
+                    color: "#303030"
+                }
+
+                Layout.row: 0
+                Layout.column: 2
+                Layout.preferredHeight: 25
+                Layout.fillWidth: true;
+            }
+
+            //Text that says "Artists: "
+            Text {
+                id: artistsContainerTitleText
+                text: "Artists: "
+                font.family: interFont.name
+                font.pointSize: 10
+                font.weight: Font.DemiBold
+                wrapMode: Text.NoWrap
+                color: "#ffffff"
+
+                Layout.row: 1
+                Layout.column: 1
+            }
+
+            //List of artists for the preview
+            Row {
+                id: previewArtistsContainer
+                spacing: 6
+
+                Layout.row: 1
+                Layout.column: 2
+                Layout.preferredHeight: 25
+                Layout.fillWidth: true;
+
+                ScrollView {
+                    id: previewArtistsScrollView
+                    width: parent.width - addArtistButton.width - removeArtistButton.width - parent.spacing * 2
+                    height: parent.height
+                    contentHeight: height
+                    clip: true
+                    ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                    ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+                    
+                    Component.onCompleted: {
+                        contentItem.boundsBehavior = Flickable.StopAtBounds;
+                    }
+
+                    Row {
+                        id: artistsTextFieldRow
+                        width: previewArtistsScrollView.width
+                        height: previewArtistsScrollView.height
+                        spacing: 6
+
+                        TextField {
+                            id: defaultAddTracksArtistField
+                            width: 200
+                            height: 25
+                            color: "#d4d4d4"
+                            font.family: interFont.name
+                            font.pointSize: 10
+                            padding: 5
+
+                            background: Rectangle {
+                                radius: 6
+                                color: "#303030"
+                            }
+                        }
+                    }
+                }
+
+                //Button to add a text field
+                RoundButton {
+                    id: addArtistButton
+                    width: height
+                    height: parent.height
+                    radius: 6
+                    spacing: 3
+                    defaultColor: "#434343"
+                    imageSource: "qrc:/staccato/src/ui/resources/plus.svg"
+                    onClicked: {
+                        Logic.addArtistTextField(artistsTextFieldRow);
+                    }
+                }
+
+                //Button to remove the last text field
+                RoundButton {
+                    id: removeArtistButton
+                    width: height
+                    height: parent.height
+                    radius: 6
+                    spacing: 3
+                    defaultColor: "#434343"
+                    imageSource: "qrc:/staccato/src/ui/resources/minus.svg"
+                    onClicked: {
+                        Logic.removeArtistTextField(artistsTextFieldRow);
+                    }
+                }
+            }
+
+            //Text that just says "Album: "
+            Text {
+                id: albumContainerTitleText
+                text: "Album: "
+                font.family: interFont.name
+                font.pointSize: 10
+                font.weight: Font.DemiBold
+                wrapMode: Text.NoWrap
+                color: "#ffffff"
+
+                Layout.row: 2
+                Layout.column: 1
+            }
+
+            //Text field for the preview album name
+            TextField {
+                id: previewAlbumField
+                color: "#d4d4d4"
+                font.family: interFont.name
+                font.pointSize: 10
+                padding: 5
+
+                background: Rectangle {
+                    radius: 6
+                    color: "#303030"
+                }
+
+                Layout.row: 2
+                Layout.column: 2
+                Layout.preferredHeight: 25
+                Layout.fillWidth: true;
+            }
+        }
     }
+
+    //Recent playlists
+
 }

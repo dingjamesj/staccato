@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
+pragma ComponentBehavior: Bound
+
 Column {
     id: container
     spacing: 25
