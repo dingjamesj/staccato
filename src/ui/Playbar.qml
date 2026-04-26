@@ -10,11 +10,6 @@ Rectangle {
     topRightRadius: width / 7
     color: "#93006b"
 
-    FontLoader {
-        id: interFont
-        source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
-    }
-
     //=========================================
     //             PLAY PAUSE BAR              
     //=========================================
@@ -132,7 +127,7 @@ Rectangle {
                 width: 20
                 text: "24:00:00"
                 horizontalAlignment: Text.AlignLeft
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 9
                 font.weight: Font.Medium
                 color: "#ffffff"
@@ -144,7 +139,7 @@ Rectangle {
                 width: 20
                 text: "-24:00:00"
                 horizontalAlignment: Text.AlignRight
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 9
                 font.weight: Font.Medium
                 color: "#ffffff"

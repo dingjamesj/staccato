@@ -31,7 +31,7 @@ Column {
             id: pinnedItemsHeaderText
             width: pinnedItemsHeader.width - pinnedItemsZoomButton.width - pinnedItemsSortModeComboBox.width - parent.spacing * 2
             text: "Pinned"
-            font.family: interFont.name
+            font.family: Style.mainFontFamily
             font.pointSize: 24
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
@@ -75,7 +75,7 @@ Column {
                 text: pinnedItemsSortModeComboBox.displayText
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 11
                 font.weight: Font.DemiBold
                 color: "#ffffff"
@@ -120,7 +120,7 @@ Column {
 
                         contentItem: Text {
                             text: delegate.modelData
-                            font.family: interFont.name
+                            font.family: Style.mainFontFamily
                             font.pointSize: 11
                             font.weight: Font.DemiBold
                             color: "#ffffff"
@@ -206,7 +206,7 @@ Column {
             id: playlistsHeaderText
             width: playlistsHeader.width - playlistsZoomButton.width - playlistsHeader.spacing
             text: "Your Playlists"
-            font.family: interFont.name
+            font.family: Style.mainFontFamily
             font.pointSize: 24
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap

@@ -1,7 +1,11 @@
 function addArtistTextField(artistsContainer) {
 
-    let component = Qt.createComponent("HomePanelArtistsTextField.qml");
-    component.createObject(artistsContainer);
+    let component = Qt.createComponent("RoundTextField.qml");
+    component.createObject(artistsContainer, {
+        width: 200,
+        height: 25,
+        "font.pointSize": 10
+    });
 
 }
 
@@ -49,7 +53,7 @@ function loadTrackInfo(url, loadTrackInfoButton, titleField, artistsContainer, a
 
     }
 
-    let component = Qt.createComponent("HomePanelArtistsTextField.qml");
+    let component = Qt.createComponent("RoundTextField.qml");
     for(let i = 0; i < track[1].length; i++) {
 
         component.createObject(artistsContainer, {

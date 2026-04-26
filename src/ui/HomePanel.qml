@@ -22,11 +22,6 @@ Column {
         Logic.startup(StaccatoInterface);
     }
 
-    FontLoader {
-        id: interFont
-        source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
-    }
-
     //Track importer
     Column {
         id: trackImporter
@@ -43,7 +38,7 @@ Column {
             id: addTracksText
             height: 39
             text: "Add New Tracks"
-            font.family: interFont.name
+            font.family: Style.mainFontFamily
             font.pointSize: 24
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
@@ -56,7 +51,7 @@ Column {
             width: parent.width
             height: 20
             text: "Location"
-            font.family: interFont.name
+            font.family: Style.mainFontFamily
             font.pointSize: 13
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
@@ -71,21 +66,12 @@ Column {
             spacing: 8
 
             //Text field to input the URL / file path
-            TextField {
+            RoundTextField {
                 id: urlTextField
                 width: 240
                 height: 25
-                color: "#d4d4d4"
-                font.family: interFont.name
                 font.pointSize: 9
-                padding: 5
                 placeholderText: "Paste here a web URL or a file path to import audio from"
-                placeholderTextColor: '#7f7f7f'
-
-                background: Rectangle {
-                    radius: 6
-                    color: "#303030"
-                }
             }
 
             RoundButton {
@@ -123,7 +109,7 @@ Column {
             width: parent.width
             height: 20
             text: "Preview"
-            font.family: interFont.name
+            font.family: Style.mainFontFamily
             font.pointSize: 13
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
@@ -141,7 +127,7 @@ Column {
             height: implicitHeight
 
             //Cover art
-            RoundedImage {
+            RoundImage {
                 id: previewArtwork
                 radius: 6
                 source: ""
@@ -157,7 +143,7 @@ Column {
             Text {
                 id: titleContainerTitleText
                 text: "Title: "
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 10
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
@@ -168,17 +154,9 @@ Column {
             }
 
             //Text field for the title
-            TextField {
+            RoundTextField {
                 id: previewTitleField
-                color: "#d4d4d4"
-                font.family: interFont.name
-                font.pointSize: 10
                 enabled: false
-
-                background: Rectangle {
-                    radius: 6
-                    color: "#303030"
-                }
 
                 Layout.row: 0
                 Layout.column: 2
@@ -190,7 +168,7 @@ Column {
             Text {
                 id: artistsContainerTitleText
                 text: "Artists: "
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 10
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
@@ -229,20 +207,11 @@ Column {
                         height: previewArtistsScrollView.height
                         spacing: 6
 
-                        TextField {
+                        RoundTextField {
                             id: defaultAddTracksArtistField
                             width: 200
                             height: 25
-                            color: "#d4d4d4"
-                            font.family: interFont.name
-                            font.pointSize: 10
-                            padding: 5
                             enabled: false
-
-                            background: Rectangle {
-                                radius: 6
-                                color: "#303030"
-                            }
                         }
                     }
                 }
@@ -274,7 +243,7 @@ Column {
                     onClicked: {
                         Logic.removeArtistTextField(artistsTextFieldRow);
                     }
-                    enabled: true
+                    enabled: false
                 }
             }
 
@@ -282,7 +251,7 @@ Column {
             Text {
                 id: albumContainerTitleText
                 text: "Album: "
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 10
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
@@ -293,18 +262,9 @@ Column {
             }
 
             //Text field for the preview album name
-            TextField {
+            RoundTextField {
                 id: previewAlbumField
-                color: "#d4d4d4"
-                font.family: interFont.name
-                font.pointSize: 10
-                padding: 5
                 enabled: false
-
-                background: Rectangle {
-                    radius: 6
-                    color: "#303030"
-                }
 
                 Layout.row: 2
                 Layout.column: 2

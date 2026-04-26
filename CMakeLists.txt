@@ -29,6 +29,9 @@ target_include_directories(staccatoapp PRIVATE
 
 # Add Qt files
 qt_policy(SET QTP0004 NEW)
+set_source_files_properties(
+    src/ui/Style.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE
+)
 qt_add_qml_module(staccatoapp
     URI staccato
     VERSION 0.1
@@ -42,10 +45,11 @@ qt_add_qml_module(staccatoapp
         src/ui/HomePanel.qml
         src/ui/homePanel.js
         src/ui/ArtworkTextButton.qml
-        src/ui/RoundedImage.qml
+        src/ui/RoundImage.qml
         src/ui/RoundButton.qml
-        src/ui/HomePanelArtistsTextField.qml
+        src/ui/RoundTextField.qml
         src/ui/LibraryPanel.qml
+        src/ui/Style.qml
     RESOURCES
         src/ui/resources/piggo58.jpg
         src/ui/resources/placeholder.jpg

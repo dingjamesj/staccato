@@ -26,11 +26,6 @@ Rectangle {
         color = defaultColor
     }
 
-    FontLoader {
-        id: interFont
-        source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
-    }
-
     MouseArea {
         id: mouseArea
         anchors.fill: parent
@@ -91,7 +86,7 @@ Rectangle {
             width: parent.width
             height: implicitHeight
             text: container.name
-            font.family: interFont.name
+            font.family: Style.mainFontFamily
             font.pointSize: container.nameTextSize
             font.weight: container.nameTextStyle
             color: container.nameTextColor
@@ -105,7 +100,7 @@ Rectangle {
             width: parent.width
             height: implicitHeight
             text: container.description
-            font.family: interFont.name
+            font.family: Style.mainFontFamily
             font.pointSize: container.descriptionTextSize
             font.weight: container.descriptionTextStyle
             color: container.descriptionTextColor

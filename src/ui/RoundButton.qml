@@ -4,8 +4,6 @@ import QtQuick.Effects
 pragma ComponentBehavior: Bound
 
 Rectangle {
-    id: container
-
     property string text: ""
     property url imageSource: ""
     
@@ -27,12 +25,8 @@ Rectangle {
     signal clicked()
     signal doubleClicked()
 
+    id: container
     color: enabled ? (mouseArea.pressed ? pressedColor : (mouseArea.containsMouse ? hoverColor : defaultColor)) : disabledColor
-
-    FontLoader {
-        id: interFont
-        source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
-    }
 
     MouseArea {
         id: mouseArea
@@ -48,7 +42,7 @@ Rectangle {
         anchors.margins: container.spacing
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        font.family: interFont.name
+        font.family: Style.mainFontFamily
         font.pointSize: container.textSize
         font.weight: container.textStyle
         clip: false

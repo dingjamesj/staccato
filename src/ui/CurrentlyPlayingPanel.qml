@@ -11,16 +11,6 @@ Column {
     topPadding: height * 0.048 / 0.82
     bottomPadding: 12
 
-    FontLoader {
-        id: interFont
-        source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
-    }
-
-    FontLoader {
-        id: interItalicFont
-        source: "qrc:/staccato/src/ui/resources/Inter-Italic-VariableFont_opsz,wght.ttf"
-    }
-
     //=========================================
     //                COVER ART                
     //=========================================
@@ -66,7 +56,7 @@ Column {
                     width: container.width - container.leftPadding - container.rightPadding
                     text: "Track Title"
                     horizontalAlignment: TextEdit.AlignHCenter
-                    font.family: interFont.name
+                    font.family: Style.mainFontFamily
                     font.pointSize: 30
                     font.bold: true
                     wrapMode: TextEdit.NoWrap
@@ -90,7 +80,7 @@ Column {
                     width: container.width - container.leftPadding - container.rightPadding
                     text: "Track Artists"
                     horizontalAlignment: TextEdit.AlignHCenter
-                    font.family: interFont.name
+                    font.family: Style.mainFontFamily
                     font.pointSize: 15
                     wrapMode: TextEdit.NoWrap
                     readOnly: true
@@ -113,7 +103,7 @@ Column {
                     width: container.width - container.leftPadding - container.rightPadding
                     text: "Track Album"
                     horizontalAlignment: TextEdit.AlignHCenter
-                    font.family: interFont.name
+                    font.family: Style.mainFontFamily
                     font.italic: true
                     font.pointSize: 15
                     wrapMode: TextEdit.NoWrap
@@ -169,7 +159,7 @@ Column {
                     text: "M4A"
                     horizontalAlignment: TextEdit.AlignHCenter
                     verticalAlignment: TextEdit.AlignVCenter
-                    font.family: interFont.name
+                    font.family: Style.mainFontFamily
                     font.pointSize: 13
                     font.weight: Font.ExtraBold
                     wrapMode: TextEdit.NoWrap
@@ -184,7 +174,7 @@ Column {
                 width: implicitWidth
                 text: "124 kbps"
                 horizontalAlignment: TextEdit.AlignHCenter
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 13
                 font.bold: true
                 wrapMode: TextEdit.NoWrap
@@ -198,7 +188,7 @@ Column {
                 width: implicitWidth
                 text: "44.1 kHz"
                 horizontalAlignment: TextEdit.AlignHCenter
-                font.family: interFont.name
+                font.family: Style.mainFontFamily
                 font.pointSize: 13
                 font.bold: true
                 wrapMode: TextEdit.NoWrap
