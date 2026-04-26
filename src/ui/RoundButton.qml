@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 
 pragma ComponentBehavior: Bound
 
@@ -7,43 +8,26 @@ Rectangle {
 
     property string text: ""
     property url imageSource: ""
+    
     property color defaultColor: "#404040"
     property color hoverColor: Qt.lighter(defaultColor, 1.2)
     property color pressedColor: Qt.lighter(defaultColor, 1.5)
     property color disabledColor: Qt.darker(defaultColor, 1.5)
+    
     property color textColor: "#ffffff"
-    property color disabledTextColor: Qt.darker(textColor, 1.5);
+    property color disabledTextColor: Qt.darker(textColor, 1.5)
+    
+    property color imageColor: "#ffffff"
+    property color disabledImageColor: Qt.darker(imageColor, 1.5)
+
     property int textSize: 18
     property var textStyle: Font.Normal
     property int spacing: 8
-    property bool enableDoubleClick: false
 
     signal clicked()
     signal doubleClicked()
 
-    Component.onCompleted: {
-        color = defaultColor
-        if(enableDoubleClick) {
-
-            mouseArea.doubleClicked.connect(container.doubleClicked);
-
-        }
-    }
-
-    onEnabledChanged: {
-        mouseArea.enabled = enabled;
-        if(enabled === false) {
-
-            color = disabledColor;
-            buttonText.color = disabledTextColor;
-
-        } else {
-
-            color = defaultColor;
-            buttonText.color = textColor;
-
-        }
-    }
+    color: enabled ? (mouseArea.pressed ? pressedColor : (mouseArea.containsMouse ? hoverColor : defaultColor)) : disabledColor
 
     FontLoader {
         id: interFont
@@ -55,62 +39,7 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: container.clicked()
-        onEntered: {
-            if(!enabled) {
-
-                container.color = container.disabledColor;
-                buttonText.color = container.disabledTextColor;
-                return;
-
-            }
-            if(!pressed) {
-
-                container.color = container.hoverColor;
-                
-            }
-        }
-        onExited: {
-            if(!enabled) {
-
-                container.color = container.disabledColor;
-                buttonText.color = container.disabledTextColor;
-                return;
-
-            }
-            if(!pressed) {
-
-                container.color = container.defaultColor
-
-            }
-        }
-        onPressed: {
-            if(!enabled) {
-
-                container.color = container.disabledColor;
-                buttonText.color = container.disabledTextColor;
-                return;
-
-            }
-            container.color = container.pressedColor
-        }
-        onReleased: {
-            if(!enabled) {
-
-                container.color = container.disabledColor;
-                buttonText.color = container.disabledTextColor;
-                return;
-
-            }
-            if(containsMouse) {
-
-                container.color = container.hoverColor
-            
-            } else {
-
-                container.color = container.defaultColor
-
-            }
-        }
+        enabled: container.enabled
     }
 
     Text {
@@ -124,13 +53,23 @@ Rectangle {
         font.weight: container.textStyle
         clip: false
         text: container.text
-        color: container.textColor
+        color: container.enabled ? container.textColor : container.disabledTextColor
     }
 
     Image {
-        id: buttonImage
+        id: img
         anchors.fill: parent
         anchors.margins: container.spacing
         source: container.imageSource
+        visible: false
+    }
+
+    MultiEffect {
+        id: buttonImage
+        source: img
+        anchors.fill: img
+        colorization: 1.0
+        colorizationColor: container.enabled ? container.imageColor : container.disabledImageColor
+        autoPaddingEnabled: true
     }
 }

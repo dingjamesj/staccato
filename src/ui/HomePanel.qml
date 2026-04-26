@@ -173,6 +173,7 @@ Column {
                 color: "#d4d4d4"
                 font.family: interFont.name
                 font.pointSize: 10
+                enabled: false
 
                 background: Rectangle {
                     radius: 6
@@ -236,6 +237,7 @@ Column {
                             font.family: interFont.name
                             font.pointSize: 10
                             padding: 5
+                            enabled: false
 
                             background: Rectangle {
                                 radius: 6
@@ -257,6 +259,7 @@ Column {
                     onClicked: {
                         Logic.addArtistTextField(artistsTextFieldRow);
                     }
+                    enabled: false
                 }
 
                 //Button to remove the last text field
@@ -271,6 +274,7 @@ Column {
                     onClicked: {
                         Logic.removeArtistTextField(artistsTextFieldRow);
                     }
+                    enabled: true
                 }
             }
 
@@ -295,6 +299,7 @@ Column {
                 font.family: interFont.name
                 font.pointSize: 10
                 padding: 5
+                enabled: false
 
                 background: Rectangle {
                     radius: 6
