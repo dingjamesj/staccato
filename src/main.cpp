@@ -23,8 +23,6 @@ int main(int argc, char* argv[]) {
 
     }
     
-    // /*
-
     QGuiApplication app (argc, argv);
     QQmlApplicationEngine engine;
 
@@ -52,15 +50,5 @@ int main(int argc, char* argv[]) {
     engine.loadFromModule("staccato", "Main");
 
     return app.exec(); 
-    
-    // */
-
-    /*
-
-    std::cout << TrackManager::get_local_track_info("D:\\ss5msvokUkY.mp3").string();
-
-    return 0;
-
-    */
 
 }

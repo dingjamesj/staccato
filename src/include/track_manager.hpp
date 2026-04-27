@@ -27,6 +27,7 @@
 #include <vector>
 #include <bit>
 #include <QPixmap>
+#include <nlohmann/json.hpp>
 
 /* Examples of .stkl and .sply file structures:
 
@@ -121,6 +122,12 @@ namespace staccato {
         static bool write_file_metadata(const std::string& path, const Track& track);
 
         public:
+
+        //================
+        //     DEBUG
+        //================
+
+        static void debug_track_dict_init();
 
         //=====================================================================================
         //                               READING EXTERNAL TRACKS                               
@@ -301,18 +308,25 @@ namespace staccato {
         //                                      CONSTANTS                                      
         //=====================================================================================
 
+        static constexpr std::size_t FILENAME_COLLISIONS_TOLERANCE {100000}; //The max number of attempts to find a unique filename
+        //Key names in the track dictionary JSON file
+        static constexpr std::string_view TRACK_DICTIONARY_JSON_KEY {"dict"};
+        static constexpr std::string_view TRACK_OBJ_JSON_KEY {"track"};
+        static constexpr std::string_view TITLE_JSON_KEY {"title"};
+        static constexpr std::string_view ARTISTS_JSON_KEY {"artists"};
+        static constexpr std::string_view ALBUM_JSON_KEY {"album"};
+        static constexpr std::string_view FILEPATH_JSON_KEY {"path"};
+
         #if(DEVELOPMENT_BUILD)
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"..\\playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"..\\tracks"};
-        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view TRACK_DICTIONARY_PATH {"..\\tracks\\trackdict.stkl"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"..\\tracks\\trackdict.json"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"../playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"../tracks"};
-        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view TRACK_DICTIONARY_PATH {"../tracks/trackdict.stkl"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"../tracks/trackdict.json"};
         #endif
 
         #else
@@ -320,13 +334,11 @@ namespace staccato {
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
-        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\trackdict.stkl"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks\\trackdict.json"};
         #else
         static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
         static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
-        static constexpr std::string_view PLAYLIST_FILE_EXTENSION {".sply"};
-        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.stkl"};
+        static constexpr std::string_view TRACK_DICTIONARY_PATH {"tracks/trackdict.json"};
         #endif
 
         #endif

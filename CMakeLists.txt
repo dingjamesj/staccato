@@ -15,6 +15,7 @@ find_package(ICU REQUIRED COMPONENTS uc i18n)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 find_package(TagLib REQUIRED)
 find_path(TaglibIncludeFolder tag.h REQUIRED PATH_SUFFIXES taglib)
+find_package(nlohmann_json 3.12.0 REQUIRED)
 
 # Create the executable
 qt_standard_project_setup(REQUIRES 6.8)
@@ -79,6 +80,7 @@ target_link_libraries(staccatoapp PRIVATE
     TagLib::TagLib
     ICU::uc ICU::i18n
     Python3::Python
+    nlohmann_json::nlohmann_json
 )
 
 include(GNUInstallDirs)
