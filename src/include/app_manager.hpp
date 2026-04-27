@@ -15,40 +15,6 @@
 
 /*
 
-queue.dat file format:
-
-File version
-\0
-Main queue's playlist ID
-\0
-Main queue position
-Added queue position
-Main queue title 1     <-- Beginning of main queue tracklist
-\0
-Main queue artist 1
-\0
-Main queue artist 2
-\0
-\0                     <-- Again, note that double null chars signify the end of the artists list
-Main queue album
-\0
-Main queue track title 2
-\0
-Main queue artist 2
-\0
-\0
-Main queue album 2
-\0
-\0                   <-- End of main queue tracklist signified by double null chars
-Added queue title 1  <-- Beginning of added queue tracklist
-\0
-Added queue artist 1
-\0
-\0
-Added queue album 1
-\0
-...
-
 settings.config file format: (note that this is a text file, as opposed to a binary file)
 
 [SORT]
@@ -144,7 +110,7 @@ namespace staccato {
 
         /// @brief Used for reading the queue from the last staccato session's saved data, so that the user can continue where they left off. Should be ran once at the beginning of the program.
         /// @return A tuple of the saved main queue's playlist ID, main queue position, and added queue position.
-        static bool read_last_session_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position);
+        static bool read_persistent_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position);
 
         /// @brief Used to get the main queue
         /// @return A const ref to the main queue Track vector
@@ -192,7 +158,7 @@ namespace staccato {
         /// @param main_position
         /// @param added_position
         /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position);
+        static bool serialize_persistent_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position);
 
         /// @brief Reads the settings (updates the `pinned_items` property). Should only be called at the beginning of the program since settings are stored as static variables at runtime.
         static void read_settings();
@@ -272,32 +238,36 @@ namespace staccato {
         //                                      CONSTANTS                                      
         //=====================================================================================
 
-        /// @brief The header that appears on all .sply files and on the .stkl file. Should be in the format: "staccato[version number]"
-        static constexpr std::string_view FILE_HEADER {"staccato1"};
-        
         static constexpr std::string_view PLACEHOLDER_ART_PATH {":/staccato/src/ui/resources/placeholder.jpg"};
+
+        //Key names for the persistent data JSON
+        static constexpr std::string_view MAIN_QUEUE_JSON_KEY {"mainQueue"};
+        static constexpr std::string_view MAIN_QUEUE_POSITION_JSON_KEY {"mainQueuePosition"};
+        static constexpr std::string_view MAIN_QUEUE_PLAYLIST_ID_JSON_KEY {"mainQueuePlaylistID"};
+        static constexpr std::string_view ADDED_QUEUE_JSON_KEY {"addedQueue"};
+        static constexpr std::string_view ADDED_QUEUE_POSITION_JSON_KEY {"addedQueuePosition"};
 
         #if(DEVELOPMENT_BUILD)
 
         #if defined(_WIN32) || defined(_WIN64)
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"..\\lastsession.dat"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.json"};
+        static constexpr std::string_view PERSISTENT_DATA_PATH {"..\\persistent.json"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"..\\playlists\\images"};
         #else
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"../lastsession.dat"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.json"};
+        static constexpr std::string_view PERSISTENT_DATA_PATH {"../persistent.json"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"../playlists/images"};
         #endif
 
         #else
 
         #if defined(_WIN32) || defined(_WIN64)
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"lastsession.dat"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.json"};
+        static constexpr std::string_view PERSISTENT_DATA_PATH {"persistent.json"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
         #else
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.config"};
-        static constexpr std::string_view QUEUE_STORAGE_PATH {"lastsession.dat"};
+        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.json"};
+        static constexpr std::string_view PERSISTENT_DATA_PATH {"persistent.json"};
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
         #endif
 

@@ -12,73 +12,71 @@ int AppManager::pinned_items_zoom_level {1};
 int AppManager::playlists_zoom_level {1};
 std::string AppManager::pinned_items_sort_mode {"CUSTOM"};
 
-bool AppManager::serialize_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
+bool AppManager::serialize_persistent_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
 
-    std::ofstream output (std::string(QUEUE_STORAGE_PATH), std::ios::binary);
+    //To represent the queue, we want to store the main queue, the added queue, the main queue's playlist ID,
+    //the position in the main queue, and the position in the added queue.
+
+    std::ofstream output (std::string{PERSISTENT_DATA_PATH});
     if(!output.is_open()) {
 
         return false;
 
     }
 
-    output.write(std::string(FILE_HEADER).c_str(), FILE_HEADER.size());
-    output.put('\0');
-    output.write(main_queue_playlist_id.c_str(), main_queue_playlist_id.size());
-    output.put('\0');
-    output.write(reinterpret_cast<const char*>(&main_position), sizeof(std::uint64_t));
-    output.write(reinterpret_cast<const char*>(&added_position), sizeof(std::uint64_t));
+    nlohmann::json root {};
+
+    root[MAIN_QUEUE_JSON_KEY] = nlohmann::json::array();
+    std::size_t i {0};
     for(const Track& track: main_queue) {
 
-        output.write(track.title().c_str(), track.title().size());
-        output.put('\0');
+        root[MAIN_QUEUE_JSON_KEY].push_back(nlohmann::json::object());
+        nlohmann::json& track_json = root[MAIN_QUEUE_JSON_KEY][i];
+        track_json[TrackManager::TITLE_JSON_KEY] = track.title();
+        track_json[TrackManager::ALBUM_JSON_KEY] = track.album();
+        track_json[TrackManager::ARTISTS_JSON_KEY] = nlohmann::json::array();
         for(const std::string& artist: track.artists()) {
 
-            output.write(artist.c_str(), artist.size());
-            output.put('\0');
+            track_json[TrackManager::ARTISTS_JSON_KEY].push_back(artist);
 
         }
-        output.put('\0');
-        output.write(track.album().c_str(), track.album().size());
-        output.put('\0');
 
-        if(output.fail()) {
-
-            return false;
-
-        }
+        i++;
 
     }
-    output.put('\0');
+
+    root[ADDED_QUEUE_JSON_KEY] = nlohmann::json::array();
+    i = 0;
     for(const Track& track: added_queue) {
 
-        output.write(track.title().c_str(), track.title().size());
-        output.put('\0');
+        root[ADDED_QUEUE_JSON_KEY].push_back(nlohmann::json::object());
+        nlohmann::json& track_json = root[ADDED_QUEUE_JSON_KEY][i];
+        track_json[TrackManager::TITLE_JSON_KEY] = track.title();
+        track_json[TrackManager::ALBUM_JSON_KEY] = track.album();
+        track_json[TrackManager::ARTISTS_JSON_KEY] = nlohmann::json::array();
         for(const std::string& artist: track.artists()) {
 
-            output.write(artist.c_str(), artist.size());
-            output.put('\0');
+            track_json[TrackManager::ARTISTS_JSON_KEY].push_back(artist);
 
         }
-        output.put('\0');
-        output.write(track.album().c_str(), track.album().size());
-        output.put('\0');
 
-        if(output.fail()) {
-
-            return false;
-
-        }
+        i++;
 
     }
 
-    output.flush();
+    root[MAIN_QUEUE_POSITION_JSON_KEY] = main_position;
+    root[ADDED_QUEUE_POSITION_JSON_KEY] = added_position;
+    root[MAIN_QUEUE_PLAYLIST_ID_JSON_KEY] = main_queue_playlist_id;
+
+    //Serialize
+    output << std::setw(4) << root << std::endl;
+
     if(output.fail()) {
 
         return false;
 
     }
 
-    output.close();
     return true;
 
 }
@@ -155,163 +153,135 @@ bool AppManager::serialize_settings() {
 
 }
 
-bool AppManager::read_last_session_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position) {
+bool AppManager::read_persistent_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position) {
 
-    std::ifstream input (std::string{QUEUE_STORAGE_PATH}, std::ios::binary);
+    //Unlike some other JSON read functions, this one returns absolutely nothing if an error in the JSON formatting is detected.
+    //i.e. if there's a missing JSON field anywhere in the file, then all of the data is ignored and no persistent data is read.
+    //This design choice was made because the persistent data JSON should never be modified manually, so any errors in formatting 
+    //would have came from the program. Bugs in the program should not be ignored.
+
+    main_queue.clear();
+    main_position = 0;
+    main_queue_playlist_id.clear();
+    added_queue.clear();
+    added_position = 0;
+
+    std::ifstream input (std::string{PERSISTENT_DATA_PATH});
     if(!input.is_open()) {
 
         return false;
 
     }
 
-    std::string header = ifstream_read_file_header(input);
-    if(header != std::string(FILE_HEADER)) {
+    const nlohmann::json& root = nlohmann::json::parse(input);
+    if(
+        !root.contains(MAIN_QUEUE_JSON_KEY) || !root.contains(MAIN_QUEUE_POSITION_JSON_KEY) || !root.contains(MAIN_QUEUE_PLAYLIST_ID_JSON_KEY) ||
+        !root.contains(ADDED_QUEUE_JSON_KEY) || !root.contains(ADDED_QUEUE_POSITION_JSON_KEY)
+    ) {
 
         return false;
 
     }
 
-    main_queue.clear();
-    added_queue.clear();
+    //Read the main queue's tracklist
+    const nlohmann::json& main_queue_json = root[MAIN_QUEUE_JSON_KEY];
+    for(nlohmann::json::const_iterator iter = main_queue_json.begin(); iter != main_queue_json.end(); iter++) {
 
-    std::uint16_t total_count {0};
-    main_queue_playlist_id.clear();
-    main_position = added_position = 0;
+        if(!(*iter).contains(TrackManager::TITLE_JSON_KEY) || !(*iter).contains(TrackManager::ARTISTS_JSON_KEY) || !(*iter).contains(TrackManager::ALBUM_JSON_KEY)) {
 
-    char c = '\0';
-    while(total_count < 65500) {
-
-        c = input.get();
-        total_count++;
-        
-        if(input.fail()) {
-
-            //Input should not fail AND input should not be EOF at this point of the reading
+            main_queue.clear();
             return false;
 
         }
 
-        main_queue_playlist_id.push_back(c);
+        const nlohmann::json& title_json = (*iter)[TrackManager::TITLE_JSON_KEY];
+        const nlohmann::json& artists_json = (*iter)[TrackManager::ARTISTS_JSON_KEY];
+        const nlohmann::json& album_json = (*iter)[TrackManager::ALBUM_JSON_KEY];
 
-        if(c == '\0') {
+        //Ensure that the values are of the correct types
+        if(!title_json.is_string() || !artists_json.is_array() || !album_json.is_string()) {
 
-            break;
-
-        }
-
-    }
-
-    bool uint64_input_failed {false};
-    main_position = read_next_uint64(input, uint64_input_failed);
-    if(uint64_input_failed) {
-
-        return false;
-
-    }
-    added_position = read_next_uint64(input, uint64_input_failed);
-    if(uint64_input_failed) {
-
-        return false;
-
-    }
-
-    bool is_on_added_queue {false};
-    std::uint8_t count {0};
-    std::string title {""}, curr_artist {""}, album {""};
-    std::vector<std::string> artists {};
-    while(total_count < 65500) {
-
-        c = input.get();
-        total_count++;
-
-        if(input.fail()) {
-
-            if(input.eof()) {
-
-                break;
-
-            }
-
+            main_queue.clear();
             return false;
 
         }
 
-        if(count != 1) {
+        std::vector<std::string> artists {};
+        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); artists_iter++) {
 
-            if(c == '\0') {
+            //Ensure that only strings exist inside the artists array
+            if(!(*artists_iter).is_string()) {
 
-                count++;
-
-                //Remember, double null chars separate the main queue's last album and the added queue's first title.
-                //If we encounter a null char when the title is empty, that means no title was read, and hence the
-                //previous char was a null char-- forming double null chars.
-                if(title.size() == 0) {
-
-                    is_on_added_queue = true;
-                    count--;
-
-                }
-
-            } else {
-
-                switch(count) {
-
-                case 0:
-                    title.push_back(c);
-                    break;
-                case 2:
-                    album.push_back(c);
-                default:
-                    break;
-
-                }
+                main_queue.clear();
+                return false;
 
             }
 
-            if(count > 2) {
-
-                count = 0;
-                if(is_on_added_queue) {
-
-                    added_queue.push_back(Track(title, artists, album));
-
-                } else {
-
-                    main_queue.push_back(Track(title, artists, album));
-
-                }
-
-                title = curr_artist = album = "";
-                artists.clear();
-
-            }
-
-        } else {
-
-            if(c == '\0' && curr_artist.empty()) {
-
-                count++;
-
-            } else if(c == '\0') {
-
-                artists.push_back(curr_artist);
-                curr_artist = "";
-
-            } else {
-
-                curr_artist.push_back(c);
-
-            }
+            artists.push_back((*artists_iter).get<std::string>());
 
         }
 
+        main_queue.push_back(Track(
+            title_json.get<std::string>(),
+            artists,
+            album_json.get<std::string>()
+        ));
+
     }
 
-    if(count != 0) {
+    //Read the added queue's tracklist
+    const nlohmann::json& added_queue_json = root[ADDED_QUEUE_JSON_KEY];
+    for(nlohmann::json::const_iterator iter = added_queue_json.begin(); iter != added_queue_json.end(); iter++) {
 
-        return false;
+        if(!(*iter).contains(TrackManager::TITLE_JSON_KEY) || !(*iter).contains(TrackManager::ARTISTS_JSON_KEY) || !(*iter).contains(TrackManager::ALBUM_JSON_KEY)) {
+
+            main_queue.clear();
+            added_queue.clear();
+            return false;
+
+        }
+
+        const nlohmann::json& title_json = (*iter)[TrackManager::TITLE_JSON_KEY];
+        const nlohmann::json& artists_json = (*iter)[TrackManager::ARTISTS_JSON_KEY];
+        const nlohmann::json& album_json = (*iter)[TrackManager::ALBUM_JSON_KEY];
+
+        //Ensure that the values are of the correct types
+        if(!title_json.is_string() || !artists_json.is_array() || !album_json.is_string()) {
+
+            main_queue.clear();
+            added_queue.clear();
+            return false;
+
+        }
+
+        std::vector<std::string> artists {};
+        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); artists_iter++) {
+
+            //Ensure that only strings exist inside the artists array
+            if(!(*artists_iter).is_string()) {
+
+                main_queue.clear();
+                added_queue.clear();
+                return false;
+
+            }
+
+            artists.push_back((*artists_iter).get<std::string>());
+
+        }
+
+        added_queue.push_back(Track(
+            title_json.get<std::string>(),
+            artists,
+            album_json.get<std::string>()
+        ));
 
     }
+
+    //Read everything else
+    main_position = root[MAIN_QUEUE_POSITION_JSON_KEY];
+    main_queue_playlist_id = root[MAIN_QUEUE_PLAYLIST_ID_JSON_KEY];
+    added_position = root[ADDED_QUEUE_POSITION_JSON_KEY];
 
     return true;
 

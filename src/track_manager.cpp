@@ -247,6 +247,12 @@ std::string TrackManager::get_musicbrainz_artwork_url(const std::string& title, 
 
 bool TrackManager::online_playlist_is_accessible(const std::string& url) {
 
+    if(url.empty()) {
+
+        return false;
+
+    }
+
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
@@ -798,7 +804,7 @@ bool TrackManager::read_track_dict() {
     const nlohmann::json root = nlohmann::json::parse(input);
     if(!root.contains(TRACK_DICTIONARY_JSON_KEY)) {
 
-        return true; //No data avaialble, but read was successful
+        return false;
 
     }
 
@@ -875,21 +881,28 @@ bool TrackManager::serialize_track_dict() {
     for(const std::pair<const staccato::Track, std::string>& item: track_dict) {
 
         root[TRACK_DICTIONARY_JSON_KEY].push_back(nlohmann::json::object());
-        root[TRACK_DICTIONARY_JSON_KEY][i][TRACK_OBJ_JSON_KEY][TITLE_JSON_KEY] = item.first.title();
-        root[TRACK_DICTIONARY_JSON_KEY][i][TRACK_OBJ_JSON_KEY][ARTISTS_JSON_KEY] = nlohmann::json::array();
+        nlohmann::json& track_json = root[TRACK_DICTIONARY_JSON_KEY][i];
+        track_json[TRACK_OBJ_JSON_KEY][TITLE_JSON_KEY] = item.first.title();
+        track_json[TRACK_OBJ_JSON_KEY][ARTISTS_JSON_KEY] = nlohmann::json::array();
         for(const std::string& artist: item.first.artists()) {
 
-            root[TRACK_DICTIONARY_JSON_KEY][i][TRACK_OBJ_JSON_KEY][ARTISTS_JSON_KEY].push_back(artist);
+            track_json[TRACK_OBJ_JSON_KEY][ARTISTS_JSON_KEY].push_back(artist);
 
         }
-        root[TRACK_DICTIONARY_JSON_KEY][i][TRACK_OBJ_JSON_KEY][ALBUM_JSON_KEY] = item.first.album();
-        root[TRACK_DICTIONARY_JSON_KEY][i][FILEPATH_JSON_KEY] = item.second;
+        track_json[TRACK_OBJ_JSON_KEY][ALBUM_JSON_KEY] = item.first.album();
+        track_json[FILEPATH_JSON_KEY] = item.second;
         i++;
 
     }
 
     //Serialize
     output << std::setw(4) << root << std::endl;
+
+    if(output.fail()) {
+
+        return false;
+
+    }
 
     return true;
 
@@ -1108,13 +1121,14 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
     for(const Track& track: playlist.tracklist()) {
 
         root[PLAYLIST_TRACKLIST_JSON_KEY].push_back(nlohmann::json::object());
-        root[PLAYLIST_TRACKLIST_JSON_KEY][i][TITLE_JSON_KEY] = track.title();
-        root[PLAYLIST_TRACKLIST_JSON_KEY][i][ARTISTS_JSON_KEY] = nlohmann::json::array();
-        root[PLAYLIST_TRACKLIST_JSON_KEY][i][ALBUM_JSON_KEY] = track.album();
+        nlohmann::json& track_json = root[PLAYLIST_TRACKLIST_JSON_KEY][i];
+        track_json[TITLE_JSON_KEY] = track.title();
+        track_json[ARTISTS_JSON_KEY] = nlohmann::json::array();
+        track_json[ALBUM_JSON_KEY] = track.album();
 
         for(const std::string& artist: track.artists()) {
 
-            root[PLAYLIST_TRACKLIST_JSON_KEY][i][ARTISTS_JSON_KEY].push_back(artist);
+            track_json[ARTISTS_JSON_KEY].push_back(artist);
 
         }
 
@@ -1122,7 +1136,14 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
     }
 
+    //Serialize
     output << std::setw(4) << root << std::endl;
+
+    if(output.fail()) {
+
+        return false;
+
+    }
 
     return true;
 
