@@ -1,9 +1,9 @@
 #ifndef TRACK_MANAGER_HPP
 #define TRACK_MANAGER_HPP
 
-//===========================================================
-// Main job of TrackManager is the organize the audio files.
-//===========================================================
+//=======================================================
+// Main job of TrackManager is the organize audio files.
+//=======================================================
 
 //Used to adjust for the difference between development and deployed project structure
 #define DEVELOPMENT_BUILD true
@@ -29,51 +29,24 @@
 #include <QPixmap>
 #include <nlohmann/json.hpp>
 
-/* Examples of .stkl and .sply file structures:
-
-NOTE: new lines are only there for visual purposes---they don't exist in the actual binary files.
-      (the actual binary files are just series of chars)
-
-.sply file format:
-
-File header
-\0
-Playlist name
-\0
-Online connection
-\0
-Playlist size (as a uint64_t, which has a fixed number of bytes, so no need for a null char to end it)
-Title 1
-\0
-Artist 1
-\0
-\0      <-- Again, note that two null chars separate the artists list and the album since one null char separates each artist.
-Album 1
-\0
-Title 2
-\0
-...
-
-*/
-
-
 
 /* Familiarize yourself with some terminology:
-
-Internal tracks  -- Audio files that staccato has a record of (specifically in the .stkl "track dictionary" file).
-
-External tracks  -- Audio files that staccato has NOT recorded (is not in the "track dictionary"). These can be
-                    tracks on the local computer system (a "local" track) or a track from an online streaming
-                    service that isn't downloaded (an "online" track).
-
-Local playlists  -- A playlist from staccato. Has an associated .sply file and can be expressed as a Playlist object.
-
-Online playlists -- A playlist from an online streaming service. Only exists online and can only be expressed as a 
-                    set of tracks (std::unordered_multiset<Track>)
 
 Track dictionary -- The core part of staccato's file tracking system. It maps Tracks (so a title, artist, and album)
                     to file paths, and it is serialized as the .stkl file found in the "tracks" directory. In this
                     documentation, it might also be referred to as "the track dict" or "the .stkl file."
+
+Internal tracks  -- Audio files that staccato has recorded inside the track dictionary.
+
+External tracks  -- Audio files that staccato has not recorded inside the track dictionary. These can be
+                    tracks on the local computer system (a "local" track) or a track from an online streaming
+                    service that isn't downloaded (an "online" track).
+
+Local playlists  -- A playlist made by the user in staccato. Each has an associated JSON file with the filename being the playlist ID,
+                    and can be expressed as a Playlist object.
+
+Online playlists -- A playlist from an online streaming service (not made by the user in staccato) and is expressed as a 
+                    vector of Track objects.
 
 */
 
