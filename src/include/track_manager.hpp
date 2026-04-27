@@ -34,25 +34,6 @@
 NOTE: new lines are only there for visual purposes---they don't exist in the actual binary files.
       (the actual binary files are just series of chars)
 
-.stkl file format:
-
-File header
-\0
-Title 1
-\0
-Artist 1
-\0
-Artist 2
-\0
-\0      <-- Note that two null chars separate the artists list and the album since one null char separates each artist.
-Album 1
-\0
-Path 1
-\0
-Title 2
-\0
-...
-
 .sply file format:
 
 File header
@@ -122,12 +103,6 @@ namespace staccato {
         static bool write_file_metadata(const std::string& path, const Track& track);
 
         public:
-
-        //================
-        //     DEBUG
-        //================
-
-        static void debug_track_dict_init();
 
         //=====================================================================================
         //                               READING EXTERNAL TRACKS                               
@@ -257,8 +232,8 @@ namespace staccato {
         /// @brief Gets complete information about a singular playlist (including the tracklist)
         /// @param id (A playlist's ID is actually just the .sply filename's stem)
         /// @return A Playlist object containing complete information about the playlist
-        static Playlist get_playlist(const std::string& id);
-
+        static Playlist get_playlist(const std::string& id, bool& error_flag);
+        
         /// @brief Reads through each track in the tracklist and finds the track's associated file's audio length
         /// @param playlist 
         /// @return The total duration in seconds of the playlist
@@ -309,13 +284,19 @@ namespace staccato {
         //=====================================================================================
 
         static constexpr std::size_t FILENAME_COLLISIONS_TOLERANCE {100000}; //The max number of attempts to find a unique filename
-        //Key names in the track dictionary JSON file
-        static constexpr std::string_view TRACK_DICTIONARY_JSON_KEY {"dict"};
-        static constexpr std::string_view TRACK_OBJ_JSON_KEY {"track"};
+        //Key names for JSON representation of Track objects
         static constexpr std::string_view TITLE_JSON_KEY {"title"};
         static constexpr std::string_view ARTISTS_JSON_KEY {"artists"};
         static constexpr std::string_view ALBUM_JSON_KEY {"album"};
+        //Key names in the track dictionary JSON file
+        static constexpr std::string_view TRACK_DICTIONARY_JSON_KEY {"dict"};
+        static constexpr std::string_view TRACK_OBJ_JSON_KEY {"track"};
         static constexpr std::string_view FILEPATH_JSON_KEY {"path"};
+        //Key names in playlist JSON files
+        static constexpr std::string_view PLAYLIST_NAME_JSON_KEY {"name"};
+        static constexpr std::string_view PLAYLIST_CONNECTION_JSON_KEY {"connection"};
+        static constexpr std::string_view PLAYLIST_SIZE_JSON_KEY {"size"};
+        static constexpr std::string_view PLAYLIST_TRACKLIST_JSON_KEY {"tracklist"};
 
         #if(DEVELOPMENT_BUILD)
 

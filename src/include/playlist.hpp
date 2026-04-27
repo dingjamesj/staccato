@@ -45,10 +45,9 @@ namespace staccato {
         //        ONLINE CONNECTIONS        
         //==================================
 
-        /// @brief Only sets the online connection if the URL leads to an accessible online playlist
+        /// @brief Sets the online connection (as a URL) regardless of the connection's validity
         /// @param url 
-        /// @return `true` if the connection is set (i.e. if the URL leads to an accessible online playlist), `false` otherwise
-        bool set_online_connection(const std::string& url);
+        void set_online_connection(const std::string& url);
 
         /// @brief Removes the online connection
         void remove_online_connection();
