@@ -117,6 +117,12 @@ namespace staccato {
         /// @return The absolute path of the playlist image
         static std::string get_playlist_image_path(const std::string& playlist_id);
 
+        /// @brief Used to set the cover image of a playlist, given the image location and playlist's ID
+        /// @param image_path 
+        /// @param playlist_id 
+        /// @return `true` if successful, `false` otherwise
+        static bool set_playlist_image(const std::string& image_absolute_path, const std::string& playlist_id);
+
         //=====================================================================================
         //                                      DEBUGGING                                      
         //=====================================================================================

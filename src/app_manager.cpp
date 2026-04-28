@@ -422,42 +422,44 @@ void AppManager::read_settings() {
 
 std::string AppManager::get_playlist_image_path(const std::string& playlist_id) {
 
-    std::filesystem::path jpg_path = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".jpg");
+    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY);
+
+    std::filesystem::path jpg_path = playlist_images_directory / (playlist_id + ".jpg");
     if(std::ifstream(jpg_path).good()) {
 
         return jpg_path.string();
 
     }
 
-    std::filesystem::path png_path = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".png");
+    std::filesystem::path png_path = playlist_images_directory / (playlist_id + ".png");
     if(std::ifstream(png_path).good()) {
 
         return png_path.string();
 
     }
 
-    std::filesystem::path jpeg_path = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".jpeg");
+    std::filesystem::path jpeg_path = playlist_images_directory / (playlist_id + ".jpeg");
     if(std::ifstream(jpeg_path).good()) {
 
         return jpeg_path.string();
 
     }
 
-    std::filesystem::path jpg_path_caps = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".JPG");
+    std::filesystem::path jpg_path_caps = playlist_images_directory / (playlist_id + ".JPG");
     if(std::ifstream(jpg_path_caps).good()) {
 
         return jpg_path_caps.string();
 
     }
 
-    std::filesystem::path png_path_caps = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".PNG");
+    std::filesystem::path png_path_caps = playlist_images_directory / (playlist_id + ".PNG");
     if(std::ifstream(png_path_caps).good()) {
 
         return png_path_caps.string();
 
     }
 
-    std::filesystem::path jpeg_path_caps = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY) / (playlist_id + ".JPEG");
+    std::filesystem::path jpeg_path_caps = playlist_images_directory / (playlist_id + ".JPEG");
     if(std::ifstream(jpeg_path_caps).good()) {
 
         return jpeg_path_caps.string();
@@ -465,6 +467,46 @@ std::string AppManager::get_playlist_image_path(const std::string& playlist_id) 
     }
 
     return "qrc" + std::string(PLACEHOLDER_ART_PATH);
+
+}
+
+bool AppManager::set_playlist_image(const std::string& image_path_str, const std::string& playlist_id) {
+
+    //Copies the image specified at `image_path` to the playlist image directory and renames the copied image file to be the playlist ID
+
+    //Ensure that the specified image is valid
+    std::filesystem::path image_path (image_path_str);
+    if(!std::ifstream(image_path).good()) {
+
+        return false;
+
+    }
+
+    std::string image_extension = image_path.extension().string();
+    std::transform(image_extension.begin(), image_extension.end(), image_extension.begin(), [](unsigned char c) {
+        return std::tolower(c);
+    });
+
+    if(image_extension != ".jpg" && image_extension != ".png" && image_extension != ".jpeg") {
+
+        return false;
+
+    }
+
+    //Ensure that the playlist images folder exists
+    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY);
+    std::filesystem::create_directories(playlist_images_directory);
+
+    //Delete the current image, which might have a different file extension from the new image we're about to copy.
+    std::string old_image_path = get_playlist_image_path(playlist_id);
+    if(!old_image_path.contains(std::string(PLACEHOLDER_ART_PATH))) {
+
+        std::filesystem::remove(playlist_images_directory / old_image_path);
+
+    }
+
+    //Copy the image
+    return std::filesystem::copy_file(image_path, playlist_images_directory / (playlist_id + image_extension));
 
 }
 

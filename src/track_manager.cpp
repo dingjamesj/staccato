@@ -794,7 +794,8 @@ bool TrackManager::read_track_dict() {
 
     track_dict.clear();
 
-    std::ifstream input (std::string{TRACK_DICTIONARY_PATH});
+    std::filesystem::path track_dict_path = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIRECTORY) / std::filesystem::path(TRACK_DICTIONARY_FILENAME);
+    std::ifstream input (track_dict_path);
     if(!input.is_open()) {
 
         return false;
@@ -866,14 +867,18 @@ bool TrackManager::read_track_dict() {
 
 bool TrackManager::serialize_track_dict() {
 
-    //We first create the JSON C++ object, and then serialize it with an std::ostream
-    std::ofstream output (std::string{TRACK_DICTIONARY_PATH});
+    //Since std::ofstream can't create files in nonexistent folders, we first need to ensure that the track folder exists
+    std::filesystem::path track_files_directory = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIRECTORY);
+    std::filesystem::create_directories(track_files_directory);
+
+    std::ofstream output (track_files_directory / std::filesystem::path(TRACK_DICTIONARY_FILENAME));
     if(!output.is_open()) {
 
         return false;
 
     }
 
+    //Create the JSON object
     nlohmann::json root {};
     root[TRACK_DICTIONARY_JSON_KEY] = nlohmann::json::array();
 
@@ -895,7 +900,7 @@ bool TrackManager::serialize_track_dict() {
 
     }
 
-    //Serialize
+    //Serialize the JSON object
     output << std::setw(4) << root << std::endl;
 
     if(output.fail()) {
@@ -1102,8 +1107,11 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
 
 bool TrackManager::serialize_playlist(const std::string& id, const Playlist& playlist) {
 
-    std::filesystem::path playlist_files_directory_path = PLAYLIST_FILES_DIRECTORY / std::filesystem::path(id + ".json");
-    std::cout << "  " << playlist_files_directory_path << std::endl;
+    //Since std::ofstream can't create files in nonexistent folders, we first need to ensure that the playlists folder exists
+    std::filesystem::path playlist_files_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIRECTORY);
+    std::filesystem::create_directories(playlist_files_directory);
+
+    std::filesystem::path playlist_files_directory_path = playlist_files_directory / std::filesystem::path(id + ".json");
     std::ofstream output (playlist_files_directory_path);
     if(!output.is_open()) {
 
@@ -1111,6 +1119,7 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
     }
 
+    //Create the JSON object
     nlohmann::json root {};
     root[PLAYLIST_NAME_JSON_KEY] = playlist.name();
     root[PLAYLIST_CONNECTION_JSON_KEY] = playlist.online_connection();
@@ -1136,7 +1145,7 @@ bool TrackManager::serialize_playlist(const std::string& id, const Playlist& pla
 
     }
 
-    //Serialize
+    //Serialize the JSON object
     output << std::setw(4) << root << std::endl;
 
     if(output.fail()) {
