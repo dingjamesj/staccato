@@ -227,6 +227,12 @@ bool Playlist::is_empty() const {
 
 }
 
+bool Playlist::operator==(const Playlist& other) const {
+
+    return true;
+
+}
+
 std::ostream& operator<<(std::ostream& os, const Playlist& playlist) {
 
     os << playlist.string();

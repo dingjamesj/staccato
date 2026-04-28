@@ -3,11 +3,13 @@
 #include "track_manager.hpp"
 #include "app_manager.hpp"
 #include "playlist_tree.hpp"
+#include "playlist.hpp"
 
 using namespace staccato;
 
 std::vector<Track> AppManager::main_queue {};
 std::vector<Track> AppManager::added_queue {};
+std::vector<std::variant<Track, Playlist>> AppManager::recents {};
 
 std::unordered_map<std::string, std::variant<std::string, int, double, std::vector<std::string>>> AppManager::settings;
 PlaylistTree AppManager::playlistTree {};
@@ -278,6 +280,12 @@ const std::vector<Track>& AppManager::get_added_queue() {
 
 }
 
+const std::vector<std::variant<Track, Playlist>>& AppManager::get_recents() {
+
+    return recents;
+
+}
+
 void AppManager::set_main_queue(const std::vector<Track>& tracklist) {
 
     main_queue.clear();
@@ -370,6 +378,55 @@ bool AppManager::move_added_queue_track(std::size_t original_index, std::size_t 
     }
 
     return true;
+
+}
+
+void AppManager::add_recently_played_item(std::variant<Track, Playlist> item) {
+
+    //If the item is already in the recents, remove it (will re-add it later)
+    if(Track* item_track = std::get_if<Track>(&item)) {
+
+        for(std::size_t i {0}; i < recents.size(); i++) {
+
+            Track* recents_track = std::get_if<Track>(&recents[i]);
+            if(recents_track != nullptr && *item_track == *recents_track) {
+
+                recents.erase(recents.begin() + i);
+                break;
+
+            }
+
+        }
+
+    } else if(Playlist* item_playlist = std::get_if<Playlist>(&item)) {
+
+        for(std::size_t i {0}; i < recents.size(); i++) {
+
+            Playlist* recents_playlist = std::get_if<Playlist>(&recents[i]);
+            if(recents_playlist != nullptr && *item_playlist == *recents_playlist) {
+
+                recents.erase(recents.begin() + i);
+                break;
+
+            }
+
+        }
+
+    } else {
+
+        return; //The value inside `item` is neither a Track nor a Playlist
+
+    }
+
+    //Remove the least recent element if the array is at capacity
+    if(recents.size() >= RECENTS_CAPACITY) {
+
+        recents.erase(recents.begin());
+
+    }
+
+    //Add the item to the back
+    recents.push_back(item);
 
 }
 

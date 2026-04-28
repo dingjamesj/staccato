@@ -14,12 +14,14 @@ namespace staccato {
     /// @brief A container for basic information about a track: its title, artists, and album (or "release group" e.g. EP, single release, etc.)
     struct Track {
 
-    private:
+        private:
+
         std::string title_;
         std::vector<std::string> artists_;
         std::string album_;
 
-    public:
+        public:
+        
         /// @return The track title
         const std::string& title() const;
         /// @return The track's artists
@@ -53,6 +55,10 @@ namespace staccato {
         /// @param other 
         /// @return `true` if the other Track's title, artists, and album are equal to this Track's, `false` otherwise
         bool operator==(const Track& other) const;
+
+        /// @param other 
+        /// @return `true` if the other Track's title, artists, and album are equal to this Track's, `false` otherwise
+        bool operator==(Track&& other) const;
 
     };
 

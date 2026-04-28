@@ -17,7 +17,8 @@ namespace staccato {
     /// @brief Contains a name, an online connection URL, and a tracklist. Note that playlists also have IDs associated with them, but this is simply stored in the .sply file names.
     class Playlist {
 
-    private:
+        private:
+
         std::string name_;
         std::vector<Track> tracklist_;
         std::string online_connection_;
@@ -26,7 +27,7 @@ namespace staccato {
         //Helper functions
         static urltype get_url_type(const std::string& url);
 
-    public:
+        public:
 
         /// @brief Creates a Playlist object
         /// @param name 
@@ -110,6 +111,10 @@ namespace staccato {
         
         /// @return A string representation of this Playlist object
         std::string string() const;
+
+        bool operator==(const Playlist& other) const;
+
+        bool operator==(Playlist&& other) const;
 
     };
 

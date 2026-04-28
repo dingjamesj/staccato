@@ -33,6 +33,7 @@ Main/added queue -- When a user hits "play" on a playlist, the playlist's trackl
 namespace staccato {
 
     struct Track;
+    class Playlist;
     class PlaylistTree;
 
     class AppManager {
@@ -44,6 +45,9 @@ namespace staccato {
 
         /// @brief The tracklist composed of tracks that the user manually added using the "add to queue" feature
         static std::vector<Track> added_queue;
+
+        /// @brief Recently played Playlists & singular Tracks. Index 0 contains the LEAST recent.
+        static std::vector<std::variant<Track, Playlist>> recents;
 
         /// @brief Maps setting names to their values. Values can be strings, ints, or doubles (signed).
         static std::unordered_map<std::string, std::variant<std::string, int, double, std::vector<std::string>>> settings;
@@ -64,6 +68,10 @@ namespace staccato {
         /// @brief Used to get the added queue
         /// @return A const ref to the added queue Track vector
         static const std::vector<Track>& get_added_queue();
+
+        /// @brief Used to get the recently played items. Index 0 contains the LEAST recent and the last index contains the MOST recent.
+        /// @return A const ref to the `recents` vector
+        static const std::vector<std::variant<Track, Playlist>>& get_recents();
 
         /// @brief Used to set the main queue
         /// @param tracklist 
@@ -97,6 +105,10 @@ namespace staccato {
         /// @param new_index 
         /// @return `false` if either index is out of bounds, `true` otherwise
         static bool move_added_queue_track(std::size_t original_index, std::size_t new_index);
+
+        /// @brief Adds a Playlist or Track to the recently played list, popping the oldest item if the list is at capacity.
+        /// @param item 
+        static void add_recently_played_item(std::variant<Track, Playlist> item);
 
         /// @brief Used to save the track queue to the hard drive, so that when the user opens staccato later, they can continue where they left off. Should be ran once at the end of the program.
         /// @param main_queue_playlist_id 
@@ -138,6 +150,8 @@ namespace staccato {
         //=====================================================================================
 
         static constexpr std::string_view PLACEHOLDER_ART_PATH {":/staccato/src/ui/resources/placeholder.jpg"};
+
+        static constexpr std::size_t RECENTS_CAPACITY {5};
 
         //Key names for the persistent data JSON
         static constexpr std::string_view MAIN_QUEUE_JSON_KEY {"mainQueue"};
