@@ -16,42 +16,6 @@
 #include <variant>
 #include <nlohmann/json.hpp>
 
-/*
-
-settings.config file format: (note that this is a text file, as opposed to a binary file)
-
-[SORT]
-PINNED: CUSTOM  <-- options are CUSTOM and ALPHA
-
-[ZOOM]
-PINNED
-1                   <-- Ranges from 0 to 2
-PLAYLISTS
-1                   <-- Again ranges from 0 to 2
-
-[PINNED]
-"playlist" or "track"     <-- Depending on if this pinned item is a playlist or a track
-Playlist ID
-Playlist name
-Playlist size
-Online connection
-
-"playlist" or "track"
-Playlist ID
-Playlist name
-Playlist size             <-- Note that this pinned playlist has no online connection 
- 
-"playlist" or "track"
-Track title
-Track album
-Track artist 1
-Track artist 2
-
-"playlist" or "track"
-...
-
-*/
-
 /* Familiarize yourself with some terminology:
 
 Main/added queue -- When a user hits "play" on a playlist, the playlist's tracklist is put into the "main queue."
@@ -82,7 +46,7 @@ namespace staccato {
         static std::vector<Track> added_queue;
 
         /// @brief Maps setting names to their values. Values can be strings, ints, or doubles (signed).
-        static std::unordered_map<std::string, std::variant<std::string, int, double>> settings;
+        static std::unordered_map<std::string, std::variant<std::string, int, double, std::vector<std::string>>> settings;
 
         /// @brief Stores the hierarchical structure of user-created playlists
         static PlaylistTree playlistTree;

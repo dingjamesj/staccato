@@ -9,7 +9,7 @@ using namespace staccato;
 std::vector<Track> AppManager::main_queue {};
 std::vector<Track> AppManager::added_queue {};
 
-std::unordered_map<std::string, std::variant<std::string, int, double>> AppManager::settings;
+std::unordered_map<std::string, std::variant<std::string, int, double, std::vector<std::string>>> AppManager::settings;
 PlaylistTree AppManager::playlistTree {};
 
 bool AppManager::serialize_persistent_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
@@ -91,20 +91,30 @@ bool AppManager::serialize_settings() {
     }
 
     nlohmann::json root {};
-    for(const std::pair<std::string, std::variant<std::string, int, double>>& pair: settings) {
+    for(const std::pair<std::string, std::variant<std::string, int, double, std::vector<std::string>>>& pair: settings) {
 
-        if(auto val = std::get_if<std::string>(&pair.second)) {
-
-            root[pair.first] = *val;
-
-        } else if(auto val = std::get_if<int>(&pair.second)) {
+        if(const std::string* val = std::get_if<std::string>(&pair.second)) {
 
             root[pair.first] = *val;
 
-        } else if(auto val = std::get_if<double>(&pair.second)) {
+        } else if(const int* val = std::get_if<int>(&pair.second)) {
 
             root[pair.first] = *val;
 
+        } else if(const double* val = std::get_if<double>(&pair.second)) {
+
+            root[pair.first] = *val;
+
+        } else if(const std::vector<std::string>* val = std::get_if<std::vector<std::string>>(&pair.second)) {
+
+            root[pair.first] = nlohmann::json::array();
+
+            for(const std::string& str: *val) {
+
+                root[pair.first].push_back(str);
+
+            }
+            
         }
 
     }
@@ -388,6 +398,21 @@ void AppManager::read_settings() {
         } else if(item.value().type() == nlohmann::json::value_t::number_float) {
 
             settings.insert({item.key(), item.value().get<double>()});
+
+        } else if(item.value().type() == nlohmann::json::value_t::array) {
+
+            std::vector<std::string>&& array {};
+            for(nlohmann::json::const_iterator iter = item.value().begin(); iter != item.value().end(); iter++) {
+
+                if((*iter).is_string()) {
+
+                    array.push_back((*iter).get<std::string>());
+
+                }
+
+            }
+
+            settings.insert({item.key(), array});
 
         }
 
