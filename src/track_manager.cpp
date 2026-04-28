@@ -293,14 +293,14 @@ bool TrackManager::online_playlist_is_accessible(const std::string& url) {
 
 }
 
-std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::string& url) {
+std::vector<Track> TrackManager::get_online_tracklist(const std::string& url) {
 
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
     if(py_module == nullptr) {
 
-        return std::unordered_multiset<Track> {};
+        return std::vector<Track> {};
 
     }
 
@@ -309,7 +309,7 @@ std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::str
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        return std::unordered_multiset<Track> {};
+        return std::vector<Track> {};
 
     }
 
@@ -325,11 +325,11 @@ std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::str
     if(py_return == nullptr || !PyList_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        return std::unordered_multiset<Track> {};
+        return std::vector<Track> {};
 
     }
 
-    std::unordered_multiset<Track> connected_tracklist {};
+    std::vector<Track> connected_tracklist {};
     Py_ssize_t size = PyList_Size(py_return);
     for(Py_ssize_t i {0}; i < size; i++) {
 
@@ -337,7 +337,7 @@ std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::str
         if(!PyDict_Check(py_item)) {
 
             Py_DECREF(py_return);
-            return std::unordered_multiset<Track> {};
+            return std::vector<Track> {};
 
         }
 
@@ -345,7 +345,7 @@ std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::str
         if(py_artists_list == nullptr) {
 
             Py_DECREF(py_return);
-            return std::unordered_multiset<Track> {};
+            return std::vector<Track> {};
 
         }
 
@@ -356,7 +356,7 @@ std::unordered_multiset<Track> TrackManager::get_online_tracklist(const std::str
 
         }
 
-        connected_tracklist.insert(Track(
+        connected_tracklist.push_back(Track(
             PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "title")),
             artists,
             PyUnicode_AsUTF8(PyDict_GetItemString(py_item, "album"))
@@ -778,9 +778,8 @@ bool TrackManager::delete_track_artwork(const Track& track) {
 int TrackManager::get_playlist_duration(const Playlist& playlist) {
 
     int total_duration = 0;
-    const std::unordered_multiset<Track>& tracklist = playlist.tracklist();
-    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist.cbegin();
-    for(; iter != tracklist.end(); iter++) {
+    const std::vector<Track>& tracklist = playlist.tracklist();
+    for(std::vector<Track>::const_iterator iter = tracklist.begin(); iter != tracklist.end(); iter++) {
 
         total_duration += TrackManager::get_track_duration(*iter);
 
@@ -1033,7 +1032,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
     const nlohmann::json root = nlohmann::json::parse(input);
 
     std::string name, connection;
-    std::unordered_multiset<Track> tracklist {};
+    std::vector<Track> tracklist {};
 
     if(root.contains(PLAYLIST_NAME_JSON_KEY) && root[PLAYLIST_NAME_JSON_KEY].is_string()) {
 
@@ -1093,7 +1092,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
 
         }
 
-        tracklist.insert(Track(
+        tracklist.push_back(Track(
             title_json.get<std::string>(),
             artists,
             album_json.get<std::string>()

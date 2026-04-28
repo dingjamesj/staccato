@@ -228,7 +228,7 @@ namespace staccato {
         /// @brief *(Calls python function "fetcher.get_playlist")*
         /// @param url 
         /// @return The online playlist's tracklist as an unordered multiset of Track objects, an empty unordered multiset if accessing the playlist was unsuccessful
-        static std::unordered_multiset<Track> get_online_tracklist(const std::string& url);
+        static std::vector<Track> get_online_tracklist(const std::string& url);
 
         //=====================================================================================
         //                             TRACK DICTIONARY MANAGEMENT                             

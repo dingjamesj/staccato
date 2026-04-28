@@ -33,7 +33,7 @@ urltype Playlist::get_url_type(const std::string& url) {
 
 Playlist::Playlist(
     const std::string& name, 
-    const std::unordered_multiset<Track>& tracklist, 
+    const std::vector<Track>& tracklist, 
     const std::string& online_connection
 ): 
     name_ {name},
@@ -65,7 +65,7 @@ std::string Playlist::online_connection() const {
 
 }
 
-const std::unordered_multiset<Track>& Playlist::tracklist() const {
+const std::vector<Track>& Playlist::tracklist() const {
 
     return tracklist_;
 
@@ -110,25 +110,26 @@ std::vector<Track> Playlist::get_sorted_tracklist(sortmode sort_mode, bool is_as
 
 void Playlist::add_track(const Track& track) {
 
-    tracklist_.insert(track);
+    tracklist_.push_back(track);
+
+}
+
+void Playlist::add_track(const Track& track, std::size_t index) {
+
+    tracklist_.insert(tracklist_.begin() + index, track);
 
 }
 
 void Playlist::add_tracks_from_online_connection() {
 
-    std::unordered_multiset<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection_);
-    std::unordered_multiset<Track>::iterator iter = online_tracklist.begin();
-    while(iter != online_tracklist.end()) {
+    std::vector<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection_);
+    for(std::size_t i {0}; i < online_tracklist.size(); i++) {
 
-        if(tracklist_.contains(*iter)) {
+        if(!std::ranges::contains(tracklist_, online_tracklist[i])) {
 
-            iter++;
-            continue;
+            tracklist_.push_back(online_tracklist[i]);
 
         }
-
-        tracklist_.insert(*iter);
-        iter++;
 
     }
 
@@ -146,23 +147,33 @@ void Playlist::set_name(std::string name) {
 
 }
 
-bool Playlist::remove_track(const Track& track) {
+bool Playlist::remove_track(std::size_t index) {
 
-    std::unordered_multiset<staccato::Track>::iterator iter = tracklist_.find(track);
-    if(iter == tracklist_.end()) {
+    if(index < 0 || index >= tracklist_.size()) {
 
         return false;
 
     }
 
-    tracklist_.erase(iter);
+    tracklist_.erase(tracklist_.begin() + index);
+
     return true;
 
 }
 
 bool Playlist::contains_track(const Track& track) const {
 
-    return tracklist_.contains(track);
+    for(std::size_t i {0}; i < tracklist_.size(); i++) {
+
+        if(tracklist_[i] == track) {
+
+            return true;
+
+        }
+
+    }
+
+    return false;
 
 }
 
@@ -188,10 +199,9 @@ std::string Playlist::string() const {
 
     str += std::format("Num. tracks: {}\n", tracklist_.size());
 
-    std::unordered_multiset<staccato::Track>::const_iterator iter = tracklist_.begin();
-    for(; iter != tracklist_.end(); iter++) {
+    for(std::size_t i {0}; i < tracklist_.size(); i++) {
 
-        str += (*iter).string();
+        str += tracklist_[i].string();
 
     }
 

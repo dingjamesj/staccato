@@ -3,10 +3,10 @@
 
 #include <string>
 #include <vector>
-#include <unordered_set>
 #include <filesystem>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 
 namespace staccato {
 
@@ -19,7 +19,7 @@ namespace staccato {
 
     private:
         std::string name_;
-        std::unordered_multiset<Track> tracklist_;
+        std::vector<Track> tracklist_;
         std::string online_connection_;
         std::int64_t last_played_time_;
         
@@ -34,7 +34,7 @@ namespace staccato {
         /// @param online_connection 
         Playlist(
             const std::string& name, 
-            const std::unordered_multiset<Track>& tracklist, 
+            const std::vector<Track>& tracklist, 
             const std::string& online_connection
         );
 
@@ -60,7 +60,7 @@ namespace staccato {
         //==================================
 
         /// @return A const ref to the tracklist as an unordered_multiset
-        const std::unordered_multiset<Track>& tracklist() const;
+        const std::vector<Track>& tracklist() const;
 
         /// @brief Takes the tracklist and sorts it based on an attribute. Note that some attributes require usage of TrackManager.
         /// @param sort_mode The attribute to sort the tracklist with (e.g. track title, duration, bitrate)
@@ -72,10 +72,15 @@ namespace staccato {
         /// @param track 
         void add_track(const Track& track);
 
-        /// @brief Removes a track from the tracklist
+        /// @brief Adds a track to the tracklist at the index
         /// @param track 
-        /// @return `true` if successfully removed, `false` otherwise (e.g. `false` if the track wasn't in the tracklist)
-        bool remove_track(const Track& track);
+        /// @param index 
+        void add_track(const Track& track, std::size_t index);
+
+        /// @brief Removes a track from the tracklist
+        /// @param index
+        /// @return `true` if `index` is in range
+        bool remove_track(std::size_t index);
 
         /// @param track 
         /// @return `true` if the track is in the tracklist, `false` otherwise
