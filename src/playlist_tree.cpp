@@ -1,0 +1,215 @@
+#include "playlist_tree.hpp"
+
+using namespace staccato;
+
+PlaylistTree::PlaylistTree() {}
+
+std::vector<std::any>* PlaylistTree::find_folder(const std::vector<std::string>& folder_hierarchy) {
+
+    std::vector<std::any>& folder = root;
+    for(const std::string& folder_name: folder_hierarchy) {
+
+        bool found = false;
+        for(const std::any& item: folder) {
+
+            //Each item can be a std::pair<std::string, std::vector<std::any>> (representing folders) or a std::string (representing playlist IDs) 
+            if(item.type() != typeid(std::pair<std::string, std::vector<std::any>>)) {
+
+                continue;
+
+            }
+
+            const std::pair<std::string, std::vector<std::any>>& child_folder = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(item);
+            if(child_folder.first == folder_name) {
+
+                folder = child_folder.second;
+                found = true;
+                break;
+
+            }
+
+        }
+
+        if(!found) {
+
+            return nullptr;
+
+        }
+
+    }
+
+    return &folder;
+
+}
+
+std::vector<std::string> PlaylistTree::get_folder_playlists_recursive(const std::vector<std::any>& folder) const {
+
+    std::vector<std::string> id_list {};
+    //The stack stores playlist folders-- more specifically, pairs of the folder itself and its iterator.
+    std::stack<std::pair<const std::vector<std::any>&, std::vector<std::any>::const_iterator>> todo;
+    todo.push({folder, folder.begin()});
+    while(!todo.empty()) {
+
+        const std::vector<std::any>& folder = todo.top().first;
+        std::vector<std::any>::const_iterator& iter = todo.top().second;
+
+        //We're done iterating the current folder:
+        if(iter == folder.end()) {
+
+            todo.pop();
+            continue;
+
+        }
+        
+        if((*iter).type() == typeid(std::string)) {
+
+            id_list.push_back(std::any_cast<const std::string&>(*iter));
+            iter++;
+
+        } else if((*iter).type() == typeid(std::pair<std::string, std::vector<std::any>>)) {
+
+            const std::vector<std::any>& child_folder = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(*iter).second;
+            todo.push({child_folder, child_folder.begin()});
+
+        } else {
+
+            return {}; //Error encountered due to invalid type
+
+        }
+
+    }
+
+    return id_list;
+
+}
+
+bool PlaylistTree::add_playlist(std::string id, const std::vector<std::string>& folder_hierarchy) {
+
+    std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
+    if(folder_ptr == nullptr) {
+
+        return false;
+
+    }
+
+    (*folder_ptr).push_back(id);
+
+    return true;
+
+}
+
+bool PlaylistTree::add_folder(std::string name, const std::vector<std::string>& folder_hierarchy) {
+
+    std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
+    if(folder_ptr == nullptr) {
+
+        return false;
+
+    }
+
+    (*folder_ptr).push_back(std::pair<std::string, std::vector<std::any>>(name, {}));
+
+    return true;
+
+}
+
+bool PlaylistTree::remove_playlist(std::string id, const std::vector<std::string>& folder_hierarchy) {
+
+    std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
+    if(folder_ptr == nullptr) {
+
+        return false;
+
+    }
+
+    std::vector<std::any>& folder = *folder_ptr;
+    for(std::size_t i {0}; i < folder.size(); i++) {
+
+        if(folder[i].type() == typeid(std::string) && std::any_cast<const std::string&>(folder[i]) == id) {
+
+            folder.erase(folder.begin() + i);
+            return true;
+
+        }
+
+    }
+
+    return false;
+
+}
+
+std::vector<std::string> PlaylistTree::remove_folder(std::string name, const std::vector<std::string>& folder_hierarchy) {
+
+    std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
+    if(folder_ptr == nullptr) {
+
+        return {};
+
+    }
+
+    std::vector<std::any>& folder = *folder_ptr;
+    for(std::size_t i {0}; i < folder.size(); i++) {
+
+        if(folder[i].type() == typeid(std::pair<std::string, std::vector<std::any>>) && std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(folder[i]).first == name) {
+
+            folder.erase(folder.begin() + i);
+            return get_folder_playlists_recursive(folder);
+
+        }
+
+    }
+
+    return {};
+
+}
+
+std::string PlaylistTree::string() const {
+
+    std::string str {""};
+    int num_indents {0};
+    int indent_width {4};
+    //The stack stores playlist folders-- more specifically, pairs of the folder itself and its iterator.
+    std::stack<std::pair<const std::vector<std::any>&, std::vector<std::any>::const_iterator>> todo;
+    todo.push({root, root.begin()});
+    while(!todo.empty()) {
+
+        const std::vector<std::any>& folder = todo.top().first;
+        std::vector<std::any>::const_iterator& iter = todo.top().second;
+
+        //We're done iterating the current folder:
+        if(iter == folder.end()) {
+
+            todo.pop();
+            num_indents--;
+            continue;
+
+        }
+        
+        if((*iter).type() == typeid(std::string)) {
+
+            for(int i = 0; i < num_indents * indent_width; i++) {
+
+                str += ' ';
+
+            }
+
+            str += std::any_cast<const std::string&>(*iter) + "\n";
+            iter++;
+
+        } else if((*iter).type() == typeid(std::pair<std::string, std::vector<std::any>>)) {
+
+            const std::vector<std::any>& child_folder = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(*iter).second;
+            todo.push({child_folder, child_folder.begin()});
+            num_indents++;
+
+        } else {
+
+            return {}; //Error encountered due to invalid type
+
+        }
+
+    }
+
+    return str;
+
+}

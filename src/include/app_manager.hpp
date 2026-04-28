@@ -66,6 +66,7 @@ Main/added queue -- When a user hits "play" on a playlist, the playlist's trackl
 namespace staccato {
 
     struct Track;
+    class PlaylistTree;
 
     class AppManager {
 
@@ -77,34 +78,11 @@ namespace staccato {
         /// @brief The tracklist composed of tracks that the user manually added using the "add to queue" feature
         static std::vector<Track> added_queue;
 
-        /// @brief A vector of tuples-- each tuple represents an item. Each tuple begins with a bool, has one string, a string vector, and another string. If the bool is true, then the tuple represents a Track, otherwise a Playlist. If it represents a Playlist, the other parts of the tuple represent the name, simple properties, ID, and its artwork's absolute file path. If it represents a Track, the other parts represent the title, artists, album, and its audio file's absolute path. This property acts like a buffer so every change to the pinned items doesn't require a write to the hard drive.
-        static std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items;
+        /// @brief Maps setting names to their values. Values can be strings, ints, or doubles (signed).
+        static std::unordered_map<std::string, std::variant<std::string, int, double>> settings;
 
-        /// @brief The zoom level of the pinned items UI
-        static int pinned_items_zoom_level;
-
-        /// @brief The zoom level of the playlists UI
-        static int playlists_zoom_level;
-
-        /// @brief The sort mode of the pinned items UI
-        static std::string pinned_items_sort_mode;
-
-        //Helper functions
-
-        /// @brief Reads the sort mode settings for the UI (i.e. custom order, alphabetical, by title, by artist, etc.)
-        /// @param input 
-        /// @param text 
-        static void read_settings_sort_modes(std::ifstream& input, std::string& text);
-
-        /// @brief Reads the zoom settings for the UI (e.g. how big the playlist tiles are for the playlist selection menu)
-        /// @param input 
-        /// @param text 
-        static void read_settings_zoom_levels(std::ifstream& input, std::string& text);
-
-        /// @brief Reads the pinned items
-        /// @param input 
-        /// @param text 
-        static void read_settings_pinned_items(std::ifstream& input, std::string& text);
+        /// @brief Stores the hierarchical structure of user-created playlists
+        static PlaylistTree playlistTree;
 
         public:
 
