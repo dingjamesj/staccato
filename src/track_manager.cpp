@@ -1049,7 +1049,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
     if(!root.contains(PLAYLIST_TRACKLIST_JSON_KEY) || !root[PLAYLIST_TRACKLIST_JSON_KEY].is_array()) {
 
         error_flag = true;
-        return Playlist(name, {}, connection); //If no tracklist exists, early return to reduce code indentation
+        return Playlist(id, name, {}, connection); //If no tracklist exists, early return to reduce code indentation
 
     }
 
@@ -1100,7 +1100,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
 
     }
 
-    return Playlist(name, tracklist, connection);
+    return Playlist(id, name, tracklist, connection);
 
 }
 

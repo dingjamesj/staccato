@@ -5,8 +5,8 @@
 #include <vector>
 #include <filesystem>
 #include <iostream>
-#include <chrono>
-#include <algorithm>
+#include <random>
+#include <unordered_set>
 
 namespace staccato {
 
@@ -14,15 +14,15 @@ namespace staccato {
     enum class urltype;
     enum class sortmode;
 
-    /// @brief Contains a name, an online connection URL, and a tracklist. Note that playlists also have IDs associated with them, but this is simply stored in the .sply file names.
+    /// @brief Contains an ID, a name, an online connection URL, and a tracklist.
     class Playlist {
 
         private:
 
+        std::string id_;
         std::string name_;
         std::vector<Track> tracklist_;
         std::string online_connection_;
-        std::int64_t last_played_time_;
         
         //Helper functions
         static urltype get_url_type(const std::string& url);
@@ -30,10 +30,12 @@ namespace staccato {
         public:
 
         /// @brief Creates a Playlist object
+        /// @param id
         /// @param name 
         /// @param tracklist 
         /// @param online_connection 
         Playlist(
+            const std::string& id,
             const std::string& name, 
             const std::vector<Track>& tracklist, 
             const std::string& online_connection
@@ -96,14 +98,13 @@ namespace staccato {
         //               MISC               
         //==================================
 
+        const std::string& id() const;
+
+        void set_id(std::string id);
+
         const std::string& name() const;
 
         void set_name(std::string name);
-
-        int64_t last_played_time() const;
-
-        /// @brief Sets the last played time of this playlist to the current time
-        void set_last_played_time_to_now();
 
         /// @brief Used to see if an error was encountered (empty Playlist objects should signify that an error occurred)
         /// @return `true` if this Playlist object is empty, `false` otherwise
@@ -115,6 +116,8 @@ namespace staccato {
         bool operator==(const Playlist& other) const;
 
         bool operator==(Playlist&& other) const;
+
+        static std::string create_random_id(std::size_t id_length);
 
     };
 

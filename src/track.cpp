@@ -216,6 +216,12 @@ bool Track::operator==(const Track& other) const {
 
 }
 
+bool Track::operator==(Track&& other) const {
+
+    return title_ == other.title_ && artists_ == other.artists_ && album_ == other.album_;
+
+}
+
 std::ostream& operator<<(std::ostream& os, const Track& track) {
 
     os << track.string();

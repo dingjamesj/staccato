@@ -32,20 +32,18 @@ urltype Playlist::get_url_type(const std::string& url) {
 //===========================
 
 Playlist::Playlist(
+    const std::string& id,
     const std::string& name, 
     const std::vector<Track>& tracklist, 
     const std::string& online_connection
 ): 
+    id_ {id},
     name_ {name},
     tracklist_ {tracklist},
-    last_played_time_ {0}
-{
+    online_connection_ {online_connection}
+{}
 
-    set_online_connection(online_connection);
-
-}
-
-Playlist::Playlist(): name_ {""}, tracklist_ {}, online_connection_ {""}, last_played_time_ {0} {}
+Playlist::Playlist(): name_ {""}, tracklist_ {}, online_connection_ {""} {}
 
 void Playlist::set_online_connection(const std::string& url) {
 
@@ -122,16 +120,35 @@ void Playlist::add_track(const Track& track, std::size_t index) {
 
 void Playlist::add_tracks_from_online_connection() {
 
+    std::unordered_set<Track> tracklist_set {};
+    for(std::size_t i {0}; i < tracklist_.size(); i++) {
+
+        tracklist_set.insert(tracklist_[i]);
+
+    }
+
     std::vector<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection_);
     for(std::size_t i {0}; i < online_tracklist.size(); i++) {
 
-        if(!std::ranges::contains(tracklist_, online_tracklist[i])) {
+        if(!tracklist_set.contains(online_tracklist[i])) {
 
             tracklist_.push_back(online_tracklist[i]);
 
         }
 
     }
+
+}
+
+const std::string& Playlist::id() const {
+
+    return id_;
+
+}
+
+void Playlist::set_id(std::string id) {
+
+    id_ = id;
 
 }
 
@@ -185,7 +202,7 @@ std::string Playlist::string() const {
 
     }
 
-    std::string str = name_ + "\n";
+    std::string str = id_ + "\n" + name_ + "\n";
 
     if(!online_connection_.empty()) {
 
@@ -209,27 +226,57 @@ std::string Playlist::string() const {
 
 }
 
-int64_t Playlist::last_played_time() const {
-
-    return last_played_time_;
-
-}
-
-void Playlist::set_last_played_time_to_now() {
-
-    last_played_time_ = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-}
-
 bool Playlist::is_empty() const {
 
-    return name_ == "" && tracklist_.size() == 0 && online_connection_ == "" && last_played_time_ == 0;
+    return id_.empty() && name_.empty() && tracklist_.size() == 0 && online_connection_.empty();
 
 }
 
 bool Playlist::operator==(const Playlist& other) const {
 
-    return true;
+    return id_ == other.id_;
+
+}
+
+bool Playlist::operator==(Playlist&& other) const {
+
+    return id_ == other.id_;
+
+}
+
+std::string Playlist::create_random_id(std::size_t id_length) {
+
+    std::random_device rand;
+    std::mt19937 generator (rand());
+    std::uniform_int_distribution<std::mt19937::result_type> distr (0, 61);
+
+    std::string id {""};
+    for(std::size_t i {0}; i < id_length; i++) {
+
+        //If the random number is:
+        // - Between 0 and 25, then we will add 65 to convert the number into an uppercase ASCII letter
+        // - Between 26 and 51, then we will add 71 to convert the number into a lowercase ASCII letter
+        // - Between 52 and 61, then we will subtract 4 to convert the number into a ASCII numerical digit
+        int num = distr(generator);
+        if(num < 26) {
+
+            num += 65;
+            
+        } else if(num < 52) {
+
+            num += 71;
+
+        } else {
+
+            num -= 4;
+
+        }
+
+        id += (char) num;
+
+    }
+
+    return id;
 
 }
 
