@@ -5,6 +5,7 @@
 #include "audio_file_image_provider.hpp"
 #include "track.hpp"
 #include "playlist.hpp"
+#include "playlist_tree.hpp"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -54,36 +55,14 @@ int main(int argc, char* argv[]) {
 
     */
 
-    Playlist playlist1 ("playlist1", {Track("tack1", {"asd", "a"}, "asdiojads"), Track("", {}, ""), Track("asoid", {}, "")}, "a");
-    Playlist playlist2 ("playlist2", {Track("tack1", {"asd", "a"}, "asdiojads"), Track("", {}, ""), Track("asoid", {}, "")}, "");
-
-    std::cout << playlist1.string() << std::endl;
-    std::cout << playlist2.string() << std::endl;
-
-    std::cout << (TrackManager::serialize_playlist("playlist1id", playlist1) ? "serialization of playlist 1 successfull" : "serialization of playlist 1 failure") << std::endl;
-    std::cout << (TrackManager::serialize_playlist("playlist2id", playlist2) ? "serialization of playlist 2 successfull" : "serialization of playlist 2 failure") << std::endl;
-
-    bool error_flag;
-    Playlist copyPlaylist1 = TrackManager::get_playlist("playlist1id", error_flag);
-    if(error_flag) {
-
-        std::cout << "error in reading playlist 1" << std::endl;
-
-    } else {
-
-        std::cout << copyPlaylist1.string() << std::endl;
-
-    }
-
-    Playlist copyPlaylist2 = TrackManager::get_playlist("playlist2id", error_flag);
-    if(error_flag) {
-
-        std::cout << "error in reading playlist 2" << std::endl;
-
-    } else {
-
-        std::cout << copyPlaylist2.string() << std::endl;
-
-    }
+    PlaylistTree tree;
+    std::cout << tree.string() << std::endl;
+    std::cout << (tree.add_playlist("1", {}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("2", {}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_folder("folder", {}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("3", {"folder"}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("4", {"folder"}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("5", {}) ? "true" : "false") << std::endl;
+    std::cout << tree.string() << std::endl;
     
 }

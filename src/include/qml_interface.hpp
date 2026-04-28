@@ -30,13 +30,10 @@ namespace staccato {
         void readSettings();
 
         Q_INVOKABLE
-        QList<QVariantList> getPinnedItems(const QString& sortMode);
-
-        Q_INVOKABLE
         QList<QStringList> getBasicPlaylistsInfo();
 
         Q_INVOKABLE
-        QVariantList readLastSessionData();
+        QVariantList readPersistentData();
 
         Q_INVOKABLE
         QList<QVariantList> getMainQueue();
@@ -49,24 +46,6 @@ namespace staccato {
 
         Q_INVOKABLE
         QString getPlaylistImagePath(const QString& id);
-
-        Q_INVOKABLE
-        int getPinnedItemsZoomLevel();
-
-        Q_INVOKABLE
-        int getPlaylistsZoomLevel();
-
-        Q_INVOKABLE
-        QString getPinnedItemsSortMode();
-
-        Q_INVOKABLE
-        void setPinnedItemsZoomLevel(int zoomLevel);
-
-        Q_INVOKABLE
-        void setPlaylistsZoomLevel(int zoomLevel);
-
-        Q_INVOKABLE
-        void setPinnedItemsSortMode(const QString& sortMode);
 
         Q_INVOKABLE
         QList<QVariant> getLocalTrackInfo(const QString& path);

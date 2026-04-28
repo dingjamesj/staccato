@@ -1,4 +1,5 @@
 #include "playlist_tree.hpp"
+// #include <iostream>
 
 using namespace staccato;
 
@@ -6,11 +7,11 @@ PlaylistTree::PlaylistTree() {}
 
 std::vector<std::any>* PlaylistTree::find_folder(const std::vector<std::string>& folder_hierarchy) {
 
-    std::vector<std::any>& folder = root;
+    std::vector<std::any>* folder = &root;
     for(const std::string& folder_name: folder_hierarchy) {
 
         bool found = false;
-        for(const std::any& item: folder) {
+        for(std::any& item: *folder) {
 
             //Each item can be a std::pair<std::string, std::vector<std::any>> (representing folders) or a std::string (representing playlist IDs) 
             if(item.type() != typeid(std::pair<std::string, std::vector<std::any>>)) {
@@ -19,10 +20,10 @@ std::vector<std::any>* PlaylistTree::find_folder(const std::vector<std::string>&
 
             }
 
-            const std::pair<std::string, std::vector<std::any>>& child_folder = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(item);
+            std::pair<std::string, std::vector<std::any>>& child_folder = std::any_cast<std::pair<std::string, std::vector<std::any>>&>(item);
             if(child_folder.first == folder_name) {
 
-                folder = child_folder.second;
+                folder = &child_folder.second;
                 found = true;
                 break;
 
@@ -38,7 +39,7 @@ std::vector<std::any>* PlaylistTree::find_folder(const std::vector<std::string>&
 
     }
 
-    return &folder;
+    return folder;
 
 }
 
@@ -64,7 +65,6 @@ std::vector<std::string> PlaylistTree::get_folder_playlists_recursive(const std:
         if((*iter).type() == typeid(std::string)) {
 
             id_list.push_back(std::any_cast<const std::string&>(*iter));
-            iter++;
 
         } else if((*iter).type() == typeid(std::pair<std::string, std::vector<std::any>>)) {
 
@@ -76,6 +76,8 @@ std::vector<std::string> PlaylistTree::get_folder_playlists_recursive(const std:
             return {}; //Error encountered due to invalid type
 
         }
+
+        iter++;
 
     }
 
@@ -107,7 +109,7 @@ bool PlaylistTree::add_folder(std::string name, const std::vector<std::string>& 
 
     }
 
-    (*folder_ptr).push_back(std::pair<std::string, std::vector<std::any>>(name, {}));
+    (*folder_ptr).push_back(std::pair<std::string, std::vector<std::any>>(name, std::vector<std::any>()));
 
     return true;
 
@@ -185,28 +187,31 @@ std::string PlaylistTree::string() const {
 
         }
         
+        for(int i = 0; i < num_indents * indent_width; i++) {
+
+            str += ' ';
+
+        }
+
         if((*iter).type() == typeid(std::string)) {
 
-            for(int i = 0; i < num_indents * indent_width; i++) {
-
-                str += ' ';
-
-            }
-
-            str += std::any_cast<const std::string&>(*iter) + "\n";
-            iter++;
+            str += "\"" + std::any_cast<const std::string&>(*iter) + "\"\n";
 
         } else if((*iter).type() == typeid(std::pair<std::string, std::vector<std::any>>)) {
 
-            const std::vector<std::any>& child_folder = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(*iter).second;
-            todo.push({child_folder, child_folder.begin()});
+            const std::pair<std::string, std::vector<std::any>>& child_folder = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(*iter);
+            str += child_folder.first + ": \n";
+            todo.push({child_folder.second, child_folder.second.begin()});
             num_indents++;
 
         } else {
 
-            return {}; //Error encountered due to invalid type
+            str += "error in type\n";
+            return str; //Error encountered due to invalid type
 
         }
+
+        iter++;
 
     }
 

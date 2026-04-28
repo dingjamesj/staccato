@@ -147,39 +147,6 @@ void StaccatoInterface::readSettings() {
 
 }
 
-QList<QVariantList> StaccatoInterface::getPinnedItems(const QString& sortMode) {
-    
-    std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> pinned_items = AppManager::get_pinned_items();
-
-    QList<QVariantList> qt_pinned_items {};
-    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: pinned_items) {
-
-        QStringList properties {};
-        for(const std::string& property: std::get<2>(item)) {
-
-            properties.push_back(QString::fromStdString(property));
-
-        }
-        
-        qt_pinned_items.push_back({
-            QVariant(std::get<0>(item)),
-            QVariant(QString::fromStdString(std::get<1>(item))),
-            QVariant(properties),
-            QVariant(QString::fromStdString(std::get<3>(item)))
-        });
-
-    }
-
-    if(sortMode == "ALPHA") {
-
-        sort_pinned_items_alphabetically(qt_pinned_items, 0, qt_pinned_items.size());
-
-    }
-
-    return qt_pinned_items;
-
-}
-
 QList<QStringList> StaccatoInterface::getBasicPlaylistsInfo() {
 
     std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> playlists = TrackManager::get_basic_playlist_info_from_files();
@@ -202,12 +169,12 @@ QList<QStringList> StaccatoInterface::getBasicPlaylistsInfo() {
 
 }
 
-QVariantList StaccatoInterface::readLastSessionData() {
+QVariantList StaccatoInterface::readPersistentData() {
 
     std::string main_queue_playlist_id {""};
     std::uint64_t main_position {0}, added_position {0};
 
-    if(AppManager::read_last_session_data(main_queue_playlist_id, main_position, added_position)) {
+    if(AppManager::read_persistent_data(main_queue_playlist_id, main_position, added_position)) {
 
         return {QVariant(QString::fromStdString(main_queue_playlist_id)), QVariant((uint) main_position), QVariant((uint) added_position)};
 
@@ -275,42 +242,6 @@ QString StaccatoInterface::getTrackFilePath(const QString& title, const QStringL
 QString StaccatoInterface::getPlaylistImagePath(const QString& id) {
 
     return QString::fromStdString(AppManager::get_playlist_image_path(id.toStdString()));
-
-}
-
-int StaccatoInterface::getPinnedItemsZoomLevel() {
-
-    return AppManager::get_pinned_items_zoom_level();
-
-}
-
-int StaccatoInterface::getPlaylistsZoomLevel() {
-
-    return AppManager::get_playlists_zoom_level();
-
-}
-
-QString StaccatoInterface::getPinnedItemsSortMode() {
-
-    return QString::fromStdString(AppManager::get_pinned_items_sort_mode());
-
-}
-
-void StaccatoInterface::setPinnedItemsZoomLevel(int zoomLevel) {
-
-    AppManager::set_pinned_items_zoom_level(zoomLevel);
-
-}
-
-void StaccatoInterface::setPlaylistsZoomLevel(int zoomLevel) {
-
-    AppManager::set_playlists_zoom_level(zoomLevel);
-
-}
-
-void StaccatoInterface::setPinnedItemsSortMode(const QString& sortMode) {
-
-    AppManager::set_pinned_items_sort_mode(sortMode.toStdString());
 
 }
 

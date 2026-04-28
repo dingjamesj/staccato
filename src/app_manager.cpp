@@ -2,15 +2,15 @@
 #include "util.hpp"
 #include "track_manager.hpp"
 #include "app_manager.hpp"
+#include "playlist_tree.hpp"
 
 using namespace staccato;
 
 std::vector<Track> AppManager::main_queue {};
 std::vector<Track> AppManager::added_queue {};
-std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>> AppManager::pinned_items {};
-int AppManager::pinned_items_zoom_level {1};
-int AppManager::playlists_zoom_level {1};
-std::string AppManager::pinned_items_sort_mode {"CUSTOM"};
+
+std::unordered_map<std::string, std::variant<std::string, int, double>> AppManager::settings;
+PlaylistTree AppManager::playlistTree {};
 
 bool AppManager::serialize_persistent_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
 
@@ -90,65 +90,34 @@ bool AppManager::serialize_settings() {
 
     }
 
-    output << "[SORT]\n";
-    output << "PINNED\n";
-    output << pinned_items_sort_mode << "\n";
-    output << "\n";
+    nlohmann::json root {};
+    for(const std::pair<std::string, std::variant<std::string, int, double>>& pair: settings) {
 
-    output << "[ZOOM]\n";
-    output << "PINNED\n";
-    output << pinned_items_zoom_level << "\n";
-    output << "PLAYLISTS\n";
-    output << playlists_zoom_level << "\n";
-    output << "\n";
+        if(auto val = std::get_if<std::string>(&pair.second)) {
 
-    output << "[PINNED]\n";
-    for(std::tuple<bool, std::string, std::vector<std::string>, std::string> item: pinned_items) {
+            root[pair.first] = *val;
 
-        if(std::get<0>(item)) {
+        } else if(auto val = std::get_if<int>(&pair.second)) {
 
-            output << "track\n";
-            output << std::get<1>(item) + "\n";
-            output << std::get<3>(item) + "\n";
+            root[pair.first] = *val;
 
-        } else {
+        } else if(auto val = std::get_if<double>(&pair.second)) {
 
-            output << "playlist\n";
-            output << std::get<3>(item) + "\n";
-            output << std::get<1>(item) + "\n";
-
-        }
-
-        for(const std::string& str: std::get<2>(item)) {
-
-            if(str.empty()) {
-
-                continue;
-
-            }
-            
-            output << str + "\n";
-
-        }
-
-        output << "\n";
-
-        if(output.fail()) {
-
-            return false;
+            root[pair.first] = *val;
 
         }
 
     }
 
-    output.flush();
+    //Serialize
+    output << std::setw(4) << root << std::endl;
+
     if(output.fail()) {
 
         return false;
 
     }
 
-    output.close();
     return true;
 
 }
@@ -396,6 +365,8 @@ bool AppManager::move_added_queue_track(std::size_t original_index, std::size_t 
 
 void AppManager::read_settings() {
 
+    settings.clear();
+
     std::ifstream input {std::string(STACCATO_SETTINGS_PATH)};
     if(!input.is_open()) {
 
@@ -403,280 +374,24 @@ void AppManager::read_settings() {
 
     }
 
-    std::string text {};
+    const nlohmann::json root = nlohmann::json::parse(input);
+    for(auto& item: root.items()) {
 
-    while(std::getline(input, text)) {
+        if(item.value().type() == nlohmann::json::value_t::string) {
 
-        if(text == "[SORT]") {
+            settings.insert({item.key(), item.value().get<std::string>()});
 
-            read_settings_sort_modes(input, text);
+        } else if(item.value().type() == nlohmann::json::value_t::number_integer || item.value().type() == nlohmann::json::value_t::number_unsigned) {
 
-        } else if(text == "[ZOOM]") {
+            settings.insert({item.key(), item.value().get<int>()});
 
-            read_settings_zoom_levels(input, text);
+        } else if(item.value().type() == nlohmann::json::value_t::number_float) {
 
-        } else if(text == "[PINNED]") {
-
-            read_settings_pinned_items(input, text);
-
-        }
-
-    }
-
-}
-
-void AppManager::read_settings_sort_modes(std::ifstream& input, std::string& text) {
-
-    while(std::getline(input, text) && !text.empty()) {
-
-        if(text == "PINNED" && std::getline(input, text)) {
-
-            pinned_items_sort_mode = text;
+            settings.insert({item.key(), item.value().get<double>()});
 
         }
 
     }
-
-}
-
-void AppManager::read_settings_zoom_levels(std::ifstream& input, std::string& text) {
-
-    while(std::getline(input, text) && !text.empty()) {
-
-        if(text == "PINNED" && std::getline(input, text)) {
-
-            try {
-
-                pinned_items_zoom_level = std::stoi(text);
-
-            } catch (const std::exception&) {}
-
-        }
-
-        if(text == "PLAYLISTS" && std::getline(input, text)) {
-
-            try {
-
-                playlists_zoom_level = std::stoi(text);
-
-            } catch (const std::exception&) {}
-
-        }
-
-    }
-
-}
-
-void AppManager::read_settings_pinned_items(std::ifstream& input, std::string& text) {
-
-    pinned_items.clear();
-    bool is_track {0};
-    std::string property_1 {}; //Either the playlist name or the track title
-    std::vector<std::string> property_2 {}; //Either the playlist size & online connection or the track artists
-    std::string property_3 {}; //Either the playlist ID or the track album
-
-    std::size_t i {0};
-    while(true) {
-
-        if(!std::getline(input, text) || text.empty() || text[0] == '[') {
-
-            break;
-
-        }
-
-        switch(i) {
-
-        case 0:
-            if(text == "playlist") {
-
-                is_track = false;
-
-            } else {
-
-                is_track = true;
-
-            }
-            break;
-        case 1:
-            if(is_track) {
-
-                property_1 = text;
-
-            } else {
-
-                property_3 = text;
-
-            }
-            break;
-        case 2:
-            if(is_track) {
-
-                property_3 = text;
-
-            } else {
-
-                property_1 = text;
-
-            }
-            break;
-        case 3:
-            property_2.clear();
-            property_2.push_back(text);
-            while(std::getline(input, text)) {
-
-                if(text == "") {
-
-                    break;
-
-                }
-
-                property_2.push_back(text);
-
-            }
-
-            //When reading a pinned playlist that has no online connection, property_2 will have length 1 and only contain the playlist size.
-            //However, for playlists without an online connection, property_2 should still have length 2, and have an empty string for the online connection.
-            if(!is_track && property_2.size() == 1) {
-
-                property_2.push_back("");
-
-            }
-
-            pinned_items.push_back({is_track, property_1, property_2, property_3});
-            break;
-        default:
-            break;
-
-        }
-
-        i++;
-        i %= 4;
-
-    }
-
-}
-
-const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& AppManager::get_pinned_items() {
-
-    return pinned_items;
-
-}
-
-bool AppManager::add_pinned_playlist(const std::string& id, const std::string& name, std::uint64_t size, const std::string& online_connection) {
-
-    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: pinned_items) {
-
-        if(std::get<0>(item)) {
-
-            continue;
-
-        }
-
-        if(std::get<3>(item) == id) {
-
-            return false;
-
-        }
-
-    }
-
-    std::string size_str = std::to_string(size);
-    pinned_items.push_back({false, name, {size_str, online_connection}, id});
-    return true;
-
-}
-
-bool AppManager::add_pinned_track(const Track& track) {
-
-    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string>& item: pinned_items) {
-
-        if(!std::get<0>(item)) {
-
-            continue;
-
-        }
-
-        if(std::get<1>(item) == track.title() && std::get<2>(item) == track.artists() && std::get<3>(item) == track.album()) {
-
-            return false;
-
-        }
-
-    }
-
-    pinned_items.push_back({true, track.title(), track.artists(), track.album()});
-    return true;
-
-}
-
-bool AppManager::remove_pinned_item(std::size_t index) {
-
-    if(index >= pinned_items.size()) {
-
-        return false;
-
-    }
-
-    pinned_items.erase(pinned_items.begin() + index);
-    return true;
-
-}
-
-bool AppManager::move_pinned_item(std::size_t original_index, std::size_t new_index) {
-
-    if(original_index >= pinned_items.size() || new_index >= pinned_items.size() || original_index < 0 || new_index < 0) {
-
-        return false;
-
-    }
-
-    if(original_index > new_index) {
-
-        std::rotate(pinned_items.begin() + new_index, pinned_items.begin() + original_index, pinned_items.begin() + original_index + 1);
-
-    } else if(original_index < new_index) {
-
-        std::rotate(pinned_items.begin() + original_index, pinned_items.begin() + original_index + 1, pinned_items.begin() + new_index + 1);
-
-    }
-
-    return true;
-
-}
-
-int AppManager::get_pinned_items_zoom_level() {
-
-    return pinned_items_zoom_level;
-
-}
-
-int AppManager::get_playlists_zoom_level() {
-
-    return playlists_zoom_level;
-
-}
-
-std::string AppManager::get_pinned_items_sort_mode() {
-
-    return pinned_items_sort_mode;
-
-}
-
-void AppManager::set_pinned_items_zoom_level(int zoom_level) {
-
-    pinned_items_zoom_level = zoom_level;
-
-}
-
-void AppManager::set_playlists_zoom_level(int zoom_level) {
-
-    playlists_zoom_level = zoom_level;
-
-}
-
-void AppManager::set_pinned_items_sort_mode(const std::string& sort_mode) {
-
-    pinned_items_sort_mode = sort_mode;
 
 }
 
@@ -748,20 +463,3 @@ void AppManager::print_added_queue() {
 
 }
 
-void AppManager::print_pinned_items() {
-
-    for(const std::tuple<bool, std::string, std::vector<std::string>, std::string> item: pinned_items) {
-
-        std::cout << (std::get<0>(item) ? "Track" : "Playlist") << std::endl;
-        std::cout << std::get<1>(item) << std::endl;
-        for(const std::string& str: std::get<2>(item)) {
-
-            std::cout << (str.empty() ? "[empty]" : str) << std::endl;
-
-        }
-        std::cout << std::get<3>(item) << std::endl;
-        std::cout << std::endl;
-
-    }
-
-}

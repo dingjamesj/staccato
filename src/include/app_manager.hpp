@@ -12,6 +12,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <unordered_map>
+#include <variant>
+#include <nlohmann/json.hpp>
 
 /*
 
@@ -141,55 +144,6 @@ namespace staccato {
         /// @brief Reads the settings (updates the `pinned_items` property). Should only be called at the beginning of the program since settings are stored as static variables at runtime.
         static void read_settings();
 
-        /// @brief Used to get the pinned items
-        /// @return A const ref of the `pinned_items` field
-        static const std::vector<std::tuple<bool, std::string, std::vector<std::string>, std::string>>& get_pinned_items();
-
-        /// @brief Adds a playlist to the `pinned_items` property (does not serialize to the file system)
-        /// @param id 
-        /// @return `true` if the playlist was not already pinned, `false` otherwise
-        static bool add_pinned_playlist(const std::string& id, const std::string& name, std::uint64_t size, const std::string& online_connection);
-
-        /// @brief Adds a track to the `pinned_items` property (does not serialize to the file system)
-        /// @param track 
-        /// @return `true` if the playlist was not already pinned, `false` otherwise
-        static bool add_pinned_track(const Track& track);
-
-        /// @brief Removes an item from the `pinned_items` property (does not serialize to the file system)
-        /// @param id 
-        /// @return `false` if the index is out of bounds, `true` otherwise
-        static bool remove_pinned_item(std::size_t index);
-
-        /// @brief Moves the pinned item at `original_index` to `new_index`
-        /// @param original_index 
-        /// @param new_index 
-        /// @return `false` if either index is out of bounds, `true` otherwise
-        static bool move_pinned_item(std::size_t original_index, std::size_t new_index);
-
-        /// @brief Used to get the pinned items UI zoom level
-        /// @return The `pinned_items_zoom_level` field
-        static int get_pinned_items_zoom_level();
-        
-        /// @brief Used to get the playlists UI zoom level
-        /// @return The `playlists_zoom_level` field
-        static int get_playlists_zoom_level();
-
-        /// @brief Used to get the pinned items UI sort mode
-        /// @return The `pinned_items_sort_mode` field
-        static std::string get_pinned_items_sort_mode();
-
-        /// @brief Used to set the pinned items UI zoom level
-        /// @param zoom_level 
-        static void set_pinned_items_zoom_level(int zoom_level);
-
-        /// @brief Used to set the playlists UI zoom level
-        /// @param zoom_level
-        static void set_playlists_zoom_level(int zoom_level);
-
-        /// @brief Used to set the pinned items UI sort mode
-        /// @param sort_mode 
-        static void set_pinned_items_sort_mode(const std::string& sort_mode);
-
         /// @brief Serializes the settings to settings.config
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_settings();
@@ -208,9 +162,6 @@ namespace staccato {
 
         /// @brief Prints the added queue tracklist to std::cout in order
         static void print_added_queue();
-
-        /// @brief Prints the pinned items to std::cout in order
-        static void print_pinned_items();
 
         //=====================================================================================
         //                                      CONSTANTS                                      
