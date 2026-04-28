@@ -1,5 +1,4 @@
 #include "playlist_tree.hpp"
-// #include <iostream>
 
 using namespace staccato;
 
@@ -152,10 +151,19 @@ std::vector<std::string> PlaylistTree::remove_folder(std::string name, const std
     std::vector<std::any>& folder = *folder_ptr;
     for(std::size_t i {0}; i < folder.size(); i++) {
 
-        if(folder[i].type() == typeid(std::pair<std::string, std::vector<std::any>>) && std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(folder[i]).first == name) {
+        if(folder[i].type() == typeid(std::pair<std::string, std::vector<std::any>>)) {
 
+            const std::pair<std::string, std::vector<std::any>>& folder_info = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(folder[i]);
+
+            if(folder_info.first != name) {
+
+                continue;
+
+            }
+
+            std::vector<std::string> removed_playlists = get_folder_playlists_recursive(folder_info.second);
             folder.erase(folder.begin() + i);
-            return get_folder_playlists_recursive(folder);
+            return removed_playlists;
 
         }
 
@@ -167,7 +175,7 @@ std::vector<std::string> PlaylistTree::remove_folder(std::string name, const std
 
 std::string PlaylistTree::string() const {
 
-    std::string str {""};
+    std::string str {"[root]:\n"};
     int num_indents {0};
     int indent_width {4};
     //The stack stores playlist folders-- more specifically, pairs of the folder itself and its iterator.
@@ -198,6 +206,12 @@ std::string PlaylistTree::string() const {
             str += "\"" + std::any_cast<const std::string&>(*iter) + "\"\n";
 
         } else if((*iter).type() == typeid(std::pair<std::string, std::vector<std::any>>)) {
+
+            for(int i = 0; i < indent_width; i++) {
+
+                str += ' ';
+
+            }
 
             const std::pair<std::string, std::vector<std::any>>& child_folder = std::any_cast<const std::pair<std::string, std::vector<std::any>>&>(*iter);
             str += child_folder.first + ": \n";

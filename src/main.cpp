@@ -63,6 +63,60 @@ int main(int argc, char* argv[]) {
     std::cout << (tree.add_playlist("3", {"folder"}) ? "true" : "false") << std::endl;
     std::cout << (tree.add_playlist("4", {"folder"}) ? "true" : "false") << std::endl;
     std::cout << (tree.add_playlist("5", {}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_folder("singular folder", {}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_folder("nested folder", {"folder"}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("6", {"folder", "nested folder"}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("7", {"folder", "nested folder"}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("8", {"nested folder"}) ? "true" : "false") << std::endl;
+    std::cout << (tree.add_playlist("8", {"folder"}) ? "true" : "false") << std::endl;
     std::cout << tree.string() << std::endl;
-    
+
+    std::vector<std::string> deleted_playlists = tree.remove_folder("singlular folder", {});
+    std::cout << '[';
+    if(deleted_playlists.size() > 0) {
+
+        std::cout << deleted_playlists[0];
+
+    }
+    for(std::size_t i {0}; i < deleted_playlists.size(); i++) {
+
+        std::cout << ", " << deleted_playlists[i];
+
+    }
+    std::cout << ']' << std::endl;
+    std::cout << tree.string() << std::endl;
+
+    deleted_playlists = tree.remove_folder("singular folder", {});
+    std::cout << '[';
+    if(deleted_playlists.size() > 0) {
+
+        std::cout << deleted_playlists[0];
+
+    }
+    for(std::size_t i {0}; i < deleted_playlists.size(); i++) {
+
+        std::cout << ", " << deleted_playlists[i];
+
+    }
+    std::cout << ']' << std::endl;
+    std::cout << tree.string() << std::endl;
+
+    std::cout << (tree.remove_playlist("6", {"folder", "nested folder"}) ? "true" : "false") << std::endl;
+    std::cout << tree.string() << std::endl;
+
+    deleted_playlists = tree.remove_folder("folder", {});
+    std::cout << '[';
+    if(deleted_playlists.size() > 0) {
+
+        std::cout << deleted_playlists[0];
+
+    }
+    for(std::size_t i {1}; i < deleted_playlists.size(); i++) {
+
+        std::cout << ", " << deleted_playlists[i];
+
+    }
+    std::cout << ']' << std::endl;
+    std::cout << tree.string() << std::endl;
+
 }
