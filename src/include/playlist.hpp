@@ -17,6 +17,8 @@ namespace staccato {
     /// @brief Contains an ID, a name, an online connection URL, and a tracklist.
     class Playlist {
 
+        friend class TrackManager; //Playlist objects can only be created by the TrackManager class. 
+
         private:
 
         std::string id_;
@@ -24,10 +26,13 @@ namespace staccato {
         std::vector<Track> tracklist_;
         std::string online_connection_;
         
-        //Helper functions
+        // -- Helper functions --
+
         static urltype get_url_type(const std::string& url);
 
-        public:
+        static std::string create_random_id(std::size_t id_length);
+
+        // -- Constructors --
 
         /// @brief Creates a Playlist object
         /// @param id
@@ -43,6 +48,8 @@ namespace staccato {
 
         /// @brief Creates an empty Playlist object. Encountering an empty Playlist object should signify that an error occurred.
         Playlist();
+
+        public:
 
         //==================================
         //        ONLINE CONNECTIONS        
@@ -116,8 +123,6 @@ namespace staccato {
         bool operator==(const Playlist& other) const;
 
         bool operator==(Playlist&& other) const;
-
-        static std::string create_random_id(std::size_t id_length);
 
     };
 

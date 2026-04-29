@@ -3,6 +3,8 @@
 
 //=======================================================================================
 // Main job of AppManager is to organize the application's settings and persistent data.
+// It also controls anything else that is unrelated to data contained within Track and 
+// Playlist objects (i.e. playlist images).
 //=======================================================================================
 
 //Used to adjust for the difference between development and deployed project structure
@@ -51,9 +53,6 @@ namespace staccato {
 
         /// @brief Maps setting names to their values. Values can be strings, ints, or doubles (signed).
         static std::unordered_map<std::string, std::variant<std::string, int, double, std::vector<std::string>>> settings;
-
-        /// @brief Stores the hierarchical structure of user-created playlists
-        static PlaylistTree playlistTree;
 
         public:
 
@@ -127,7 +126,7 @@ namespace staccato {
         /// @brief Used to find the absolute path of the playlist image, since the path could have various file extensions
         /// @param playlist_id 
         /// @return The absolute path of the playlist image
-        static std::string get_playlist_image_path(const std::string& playlist_id);
+        static std::string get_playlist_image_path(const std::string& playlist_id); //NOTE: AppManager controls playlist images because playlist images aren't controlled by the Playlist class
 
         /// @brief Used to set the cover image of a playlist, given the image location and playlist's ID
         /// @param image_path 

@@ -3,10 +3,12 @@
 #include "util.hpp"
 #include "track_manager.hpp"
 #include "app_manager.hpp"
+#include "playlist_tree.hpp"
 
 using namespace staccato;
 
 std::unordered_map<Track, std::string> TrackManager::track_dict {};
+PlaylistTree TrackManager::playlist_tree {};
 
 //====================
 //  HELPER FUNCTIONS
@@ -931,6 +933,18 @@ std::vector<Track> TrackManager::find_missing_tracks() {
 
 std::vector<std::string> TrackManager::find_extraneous_track_files() {
 
+    std::filesystem::directory_iterator directory_iter;
+    try {
+
+        directory_iter = std::filesystem::directory_iterator(TRACK_FILES_DIRECTORY);
+
+    } catch(const std::exception& e) {
+
+        return {};
+
+    }
+
+    //Obtain a set of all audio file paths from staccato, then find all audio files in the track folder that aren't in this set.
     std::unordered_set<std::filesystem::path> paths_in_dict {};
     for(const std::pair<Track, std::string>& pair: track_dict) {
 
@@ -939,11 +953,10 @@ std::vector<std::string> TrackManager::find_extraneous_track_files() {
     }
 
     std::vector<std::string> extraneous_track_files {};
-    for(std::filesystem::directory_entry file: std::filesystem::directory_iterator(TRACK_FILES_DIRECTORY)) {
+    for(const std::filesystem::directory_entry& file: directory_iter) {
 
-        //Ignore directories, non-audio files, and corrupted audio files
-
-        if(file.is_directory() || !path_is_readable_track_file(file.path().string())) {
+        //Ignore everything except for valid audio files
+        if(!path_is_readable_track_file(file.path().string())) {
 
             continue;
 
@@ -961,9 +974,9 @@ std::vector<std::string> TrackManager::find_extraneous_track_files() {
 
 }
 
-std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> TrackManager::get_basic_playlist_info_from_files() {
+std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> TrackManager::get_basic_playlist_info_from_files() {
 
-    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> info {};
+    std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> info {};
 
     std::filesystem::directory_iterator directory_iter;
     try {
@@ -977,7 +990,7 @@ std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> Tr
     }
 
     //We want to obtain each playlist's id, name, online connection, and size.
-    for(std::filesystem::directory_entry file: directory_iter) {
+    for(const std::filesystem::directory_entry& file: directory_iter) {
 
         //Ignore non-JSON files
         if(file.path().extension().string() != ".json") {
@@ -1013,6 +1026,80 @@ std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> Tr
     }
 
     return info;
+
+}
+
+std::string TrackManager::create_playlist(const std::string& name, const std::vector<std::string>& folder_hierarchy) {
+
+    //Do not allow empty names since that'll create an empty Playlist object, which we use as an error value.
+    if(name.empty()) {
+
+        return "";
+
+    }
+
+    Playlist playlist (Playlist::create_random_id(PLAYLIST_ID_LENGTH), name, {}, "");
+
+    //Add the playlist ID to the playlist tree and create a JSON file for it
+    bool success = playlist_tree.add_playlist(playlist.id(), folder_hierarchy);
+    if(!success) {
+
+        return "";
+
+    }
+
+    success = serialize_playlist(playlist);
+    if(!success) {
+
+        return "";
+
+    }
+
+    return playlist.id();
+
+}
+
+bool TrackManager::remove_playlist(const std::string& id, const std::vector<std::string>& folder_hierarchy) {
+
+    bool found = false; //Found in either the playlists folder or the playlist tree
+
+    //Remove from the playlist tree,
+    //we will remove from the playlist tree no matter what.
+    found = playlist_tree.remove_playlist(id, folder_hierarchy);
+
+    //Remove its JSON file:
+    //First check if the playlist folder exists
+    std::filesystem::directory_iterator directory_iter;
+    try {
+
+        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY);
+
+    } catch(const std::exception& e) {
+
+        return found;
+
+    }
+
+    for(const std::filesystem::directory_entry& file: directory_iter) {
+
+        //Ignore directories and non-json files
+        if(file.path().extension() != ".json") {
+
+            continue;
+
+        }
+
+        if(file.path().stem().string() == id) {
+
+            std::filesystem::remove(file);
+            found = true;
+            break;
+
+        }
+
+    }
+
+    return found;
 
 }
 
@@ -1053,7 +1140,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
 
     }
 
-    //Read the tracklist from the JSON object, and be strict about the format (e.g. ensure that every object has ALL three fields: title, artists, and album)
+    //Read the tracklist from the JSON object, and be loose about the format (i.e. it's ok if we're missing some fields, just mark the error flag as true)
     const nlohmann::json& tracklist_json = root[PLAYLIST_TRACKLIST_JSON_KEY];
     for(nlohmann::json::const_iterator iter = tracklist_json.begin(); iter != tracklist_json.end(); iter++) {
 
@@ -1104,13 +1191,13 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
 
 }
 
-bool TrackManager::serialize_playlist(const std::string& id, const Playlist& playlist) {
+bool TrackManager::serialize_playlist(const Playlist& playlist) {
 
     //Since std::ofstream can't create files in nonexistent folders, we first need to ensure that the playlists folder exists
     std::filesystem::path playlist_files_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIRECTORY);
     std::filesystem::create_directories(playlist_files_directory);
 
-    std::filesystem::path playlist_files_directory_path = playlist_files_directory / std::filesystem::path(id + ".json");
+    std::filesystem::path playlist_files_directory_path = playlist_files_directory / std::filesystem::path(playlist.id() + ".json");
     std::ofstream output (playlist_files_directory_path);
     if(!output.is_open()) {
 
@@ -1185,14 +1272,14 @@ void TrackManager::print_track_dict() {
 
 void TrackManager::print_basic_playlists_info() {
 
-    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> playlists_info = get_basic_playlist_info_from_files();
+    std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> playlists_info = get_basic_playlist_info_from_files();
     if(playlists_info.size() == 0) {
 
         std::cout << "[no playlists available]" << std::endl;
 
     } else {
 
-        for(std::tuple<std::string, std::string, std::string, std::uint64_t> info: playlists_info) {
+        for(std::tuple<std::string, std::string, std::string, unsigned int> info: playlists_info) {
 
             std::cout << std::get<0>(info) << " " << std::get<1>(info) << " " << std::get<2>(info) << " " << std::get<3>(info) << std::endl;
 

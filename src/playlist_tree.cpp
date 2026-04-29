@@ -84,7 +84,7 @@ std::vector<std::string> PlaylistTree::get_folder_playlists_recursive(const std:
 
 }
 
-bool PlaylistTree::add_playlist(std::string id, const std::vector<std::string>& folder_hierarchy) {
+bool PlaylistTree::add_playlist(const std::string& id, const std::vector<std::string>& folder_hierarchy) {
 
     std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
     if(folder_ptr == nullptr) {
@@ -99,7 +99,7 @@ bool PlaylistTree::add_playlist(std::string id, const std::vector<std::string>& 
 
 }
 
-bool PlaylistTree::add_folder(std::string name, const std::vector<std::string>& folder_hierarchy) {
+bool PlaylistTree::add_folder(const std::string& name, const std::vector<std::string>& folder_hierarchy) {
 
     std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
     if(folder_ptr == nullptr) {
@@ -114,7 +114,7 @@ bool PlaylistTree::add_folder(std::string name, const std::vector<std::string>& 
 
 }
 
-bool PlaylistTree::remove_playlist(std::string id, const std::vector<std::string>& folder_hierarchy) {
+bool PlaylistTree::remove_playlist(const std::string& id, const std::vector<std::string>& folder_hierarchy) {
 
     std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
     if(folder_ptr == nullptr) {
@@ -139,7 +139,7 @@ bool PlaylistTree::remove_playlist(std::string id, const std::vector<std::string
 
 }
 
-std::vector<std::string> PlaylistTree::remove_folder(std::string name, const std::vector<std::string>& folder_hierarchy) {
+std::vector<std::string> PlaylistTree::remove_folder(const std::string& name, const std::vector<std::string>& folder_hierarchy) {
 
     std::vector<std::any>* folder_ptr = find_folder(folder_hierarchy);
     if(folder_ptr == nullptr) {

@@ -2,7 +2,6 @@
 #include "util.hpp"
 #include "track_manager.hpp"
 #include "app_manager.hpp"
-#include "playlist_tree.hpp"
 #include "playlist.hpp"
 
 using namespace staccato;
@@ -12,7 +11,6 @@ std::vector<Track> AppManager::added_queue {};
 std::vector<std::variant<Track, Playlist>> AppManager::recents {};
 
 std::unordered_map<std::string, std::variant<std::string, int, double, std::vector<std::string>>> AppManager::settings;
-PlaylistTree AppManager::playlistTree {};
 
 bool AppManager::serialize_persistent_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
 

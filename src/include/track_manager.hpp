@@ -1,9 +1,10 @@
 #ifndef TRACK_MANAGER_HPP
 #define TRACK_MANAGER_HPP
 
-//=======================================================
+//========================================================
 // Main job of TrackManager is the organize audio files.
-//=======================================================
+// Controls data contained in Track and Playlist objects.
+//========================================================
 
 //Used to adjust for the difference between development and deployed project structure
 #define DEVELOPMENT_BUILD true
@@ -32,9 +33,11 @@
 
 /* Familiarize yourself with some terminology:
 
-Track dictionary -- The core part of staccato's file tracking system. It maps Tracks (so a title, artist, and album)
-                    to file paths, and it is serialized as the .stkl file found in the "tracks" directory. In this
-                    documentation, it might also be referred to as "the track dict" or "the .stkl file."
+Track dictionary -- The core part of staccato's audio file tracking system. It maps Tracks (title, artist, album)
+                    to file paths, and it is serialized as a JSON file found in the "tracks" directory.
+
+Playlist tree    -- The tree that organizes user-created playlists in an ordered folder hierarchy. It only stores
+                    playlist IDs, not actual Playlist objects.
 
 Internal tracks  -- Audio files that staccato has recorded inside the track dictionary.
 
@@ -54,6 +57,7 @@ namespace staccato {
 
     struct Track;
     class Playlist;
+    class PlaylistTree;
     enum class audiotype;
     
     class TrackManager {
@@ -62,6 +66,9 @@ namespace staccato {
 
         /// @brief The unordered map that maps all Tracks to a file path as a std::string
         static std::unordered_map<Track, std::string> track_dict;
+
+        /// @brief Stores the hierarchical structure of user-created playlists
+        static PlaylistTree playlist_tree;
 
         //Helper functions
 
@@ -200,11 +207,21 @@ namespace staccato {
         
         /// @brief This is when you want to know what playlists are saved in staccato (you don't want complete information including tracklist for each of them)
         /// @return A vector of tuples that contain each playlist's ID, name, online connection, and size
-        static std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> get_basic_playlist_info_from_files();
+        static std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> get_basic_playlist_info_from_files();
 
-        /// @brief Gets complete information about a singular playlist (including the tracklist)
-        /// @param id (A playlist's ID is actually just the .sply filename's stem)
-        /// @return A Playlist object containing complete information about the playlist
+        /// @brief Adds a playlist to staccato (i.e. adds it to the PlaylistTree and creates an empty JSON file for it)
+        /// @param name 
+        /// @return The ID of the created playlist
+        static std::string create_playlist(const std::string& name, const std::vector<std::string>& folder_hierarchy);
+
+        /// @brief Removes a playlist from staccato (i.e. removes it from the PlaylistTree if found and deletes its JSON file if exists)
+        /// @param id 
+        /// @return `true` if the playlist was found in the tree and removed or if the playlist's JSON was deleted, `false` otherwise
+        static bool remove_playlist(const std::string& id, const std::vector<std::string>& folder_hierarchy);
+
+        /// @brief Used to get complete info on a Playlist given an ID
+        /// @param id
+        /// @return A reference to the `Playlist` object containing complete information about the playlist
         static Playlist get_playlist(const std::string& id, bool& error_flag);
         
         /// @brief Reads through each track in the tracklist and finds the track's associated file's audio length
@@ -216,7 +233,7 @@ namespace staccato {
         /// @param id (What the .sply filename's stem will be)
         /// @param playlist
         /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_playlist(const std::string& id, const Playlist& playlist);
+        static bool serialize_playlist(const Playlist& playlist);
         
         //------------------------------- REQUIRES THE INTERNET -------------------------------
 
@@ -257,6 +274,8 @@ namespace staccato {
         //=====================================================================================
 
         static constexpr std::size_t FILENAME_COLLISIONS_TOLERANCE {100000}; //The max number of attempts to find a unique filename
+        static constexpr std::size_t PLAYLIST_ID_LENGTH {10};
+
         //Key names for JSON representation of Track objects
         static constexpr std::string_view TITLE_JSON_KEY {"title"};
         static constexpr std::string_view ARTISTS_JSON_KEY {"artists"};
@@ -272,6 +291,7 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_TRACKLIST_JSON_KEY {"tracklist"};
 
         static constexpr std::string_view TRACK_DICTIONARY_FILENAME {"trackdict.json"};
+        static constexpr std::string_view PLAYLIST_TREE_FILENAME {"playlistfolders.json"};
 
         #if(DEVELOPMENT_BUILD)
 

@@ -35,24 +35,26 @@ namespace staccato {
         /// @brief Used to add a playlist to a folder specified by `folder_hierarchy` (or to the root if `folder_hierarchy` is empty)
         /// @param id 
         /// @param folder_hierarchy List of folders in hierarchical order (top to bottom)
-        /// @return `true` if the folder exists, `false` otherwise
-        bool add_playlist(std::string id, const std::vector<std::string>& folder_hierarchy);
+        /// @return `true` if the folder hierarchy exists, `false` otherwise
+        bool add_playlist(const std::string& id, const std::vector<std::string>& folder_hierarchy);
 
         /// @brief Used to add an empty folder to a parent folder specified by `folder_hierarchy` (or to the root if `folder_hierarchy` is empty)
         /// @param name 
         /// @param folder_hierarchy List of folders in hierarchical order (top to bottom)
-        bool add_folder(std::string name, const std::vector<std::string>& folder_hierarchy);
+        /// @return `true` if the folder hierarchy exists, `false` otherwise
+        bool add_folder(const std::string& name, const std::vector<std::string>& folder_hierarchy);
 
         /// @brief Used to remove a playlist from a folder specified by `folder_hierarchy` (or from the root if `folder_hierarchy` is empty)
         /// @param id 
         /// @param folder_hierarchy List of folders in hierarchical order (top to bottom)
-        bool remove_playlist(std::string id, const std::vector<std::string>& folder_hierarchy);
+        /// @return `true` if the playlist was found, `false` otherwise
+        bool remove_playlist(const std::string& id, const std::vector<std::string>& folder_hierarchy);
 
         /// @brief Used to recursively remove a folder from a parent folder specified by `folder_hierarchy` (or from the root if `folder_hierarchy` is empty)
         /// @param name 
         /// @param folder_hierarchy
-        /// @return The playlists included in the removed folder
-        std::vector<std::string> remove_folder(std::string name, const std::vector<std::string>& folder_hierarchy);
+        /// @return The playlists included in the removed folder, empty list if the folder wasn't found
+        std::vector<std::string> remove_folder(const std::string& name, const std::vector<std::string>& folder_hierarchy);
 
         /// @return A string representation of this tree object
         std::string string() const;
