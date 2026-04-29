@@ -10,36 +10,40 @@ pragma ComponentBehavior: Bound
 // Shows the track importer and recent playlists 
 //===============================================
 
-Column {
+GridLayout {
+    property int h1TextSize: 24
+    property int h2TextSize: 13
+    property int normalTextSize: 10
+
     id: container
-    spacing: 8
-    leftPadding: 5
-    rightPadding: 10
-    topPadding: height * 0.048
-    bottomPadding: 25
+    rows: 2
+    columns: 1
+    rowSpacing: 30
+    columnSpacing: 0
 
     Component.onCompleted: {
-        Logic.startup(StaccatoInterface);
+        // Logic.startup(StaccatoInterface);
     }
 
     //Track importer
     Column {
+        property int componentHeight: 25
+
         id: trackImporter
-        width: parent.width - parent.leftPadding - parent.rightPadding
-        height: implicitHeight
         spacing: 12
-        leftPadding: 0
-        rightPadding: 0
-        topPadding: 0
-        bottomPadding: 0
+
+        Layout.row: 0
+        Layout.column: 0
+        Layout.fillWidth: true
+        Layout.fillHeight: false
         
         //Title text
         Text {
             id: addTracksText
-            height: 39
+            height: implicitHeight
             text: "Add New Tracks"
             font.family: Style.mainFontFamily
-            font.pointSize: 24
+            font.pointSize: container.h1TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: "#ffffff"
@@ -49,10 +53,10 @@ Column {
         Text {
             id: urlTitleText
             width: parent.width
-            height: 20
+            height: implicitHeight
             text: "Location"
             font.family: Style.mainFontFamily
-            font.pointSize: 13
+            font.pointSize: container.h2TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: "#ffffff"
@@ -69,19 +73,19 @@ Column {
             RoundTextField {
                 id: urlTextField
                 width: 240
-                height: 25
-                font.pointSize: 9
+                height: trackImporter.componentHeight
+                font.pointSize: container.normalTextSize - 1
                 placeholderText: "Paste here a web URL or a file path to import audio from"
             }
 
             RoundButton {
                 id: downloadButton
                 width: 80
-                height: 25
+                height: trackImporter.componentHeight
                 radius: 6
                 text: "Download"
                 defaultColor: "#80005d"
-                textSize: 10
+                textSize: container.normalTextSize
                 textStyle: Font.Bold
                 enabled: false
             }
@@ -89,11 +93,11 @@ Column {
             RoundButton {
                 id: loadPreviewButton
                 width: 105
-                height: 25
+                height: trackImporter.componentHeight
                 radius: 6
                 text: "Load Preview"
                 defaultColor: "#434343"
-                textSize: 10
+                textSize: container.normalTextSize
                 textStyle: Font.Bold
                 enabled: false
                 
@@ -107,10 +111,10 @@ Column {
         Text {
             id: previewTitleText
             width: parent.width
-            height: 20
+            height: implicitHeight
             text: "Preview"
             font.family: Style.mainFontFamily
-            font.pointSize: 13
+            font.pointSize: container.h2TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: "#ffffff"
@@ -136,7 +140,7 @@ Column {
                 Layout.row: 0
                 Layout.column: 0
                 Layout.rowSpan: 3
-                Layout.preferredWidth: 25 * 3 + parent.rowSpacing * 2
+                Layout.preferredWidth: trackImporter.componentHeight * 3 + parent.rowSpacing * 2
             }
 
             //Text that says "Title: "
@@ -144,7 +148,7 @@ Column {
                 id: titleContainerTitleText
                 text: "Title: "
                 font.family: Style.mainFontFamily
-                font.pointSize: 10
+                font.pointSize: container.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
                 color: "#ffffff"
@@ -160,7 +164,7 @@ Column {
 
                 Layout.row: 0
                 Layout.column: 2
-                Layout.preferredHeight: 25
+                Layout.preferredHeight: trackImporter.componentHeight
                 Layout.fillWidth: true;
             }
 
@@ -169,7 +173,7 @@ Column {
                 id: artistsContainerTitleText
                 text: "Artists: "
                 font.family: Style.mainFontFamily
-                font.pointSize: 10
+                font.pointSize: container.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
                 color: "#ffffff"
@@ -185,7 +189,7 @@ Column {
 
                 Layout.row: 1
                 Layout.column: 2
-                Layout.preferredHeight: 25
+                Layout.preferredHeight: trackImporter.componentHeight
                 Layout.fillWidth: true;
 
                 ScrollView {
@@ -210,7 +214,7 @@ Column {
                         RoundTextField {
                             id: defaultAddTracksArtistField
                             width: 200
-                            height: 25
+                            height: trackImporter.componentHeight
                             enabled: false
                         }
                     }
@@ -252,7 +256,7 @@ Column {
                 id: albumContainerTitleText
                 text: "Album: "
                 font.family: Style.mainFontFamily
-                font.pointSize: 10
+                font.pointSize: container.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
                 color: "#ffffff"
@@ -268,12 +272,53 @@ Column {
 
                 Layout.row: 2
                 Layout.column: 2
-                Layout.preferredHeight: 25
+                Layout.preferredHeight: trackImporter.componentHeight
                 Layout.fillWidth: true;
             }
         }
     }
 
     //Recent playlists
+    Column {
+        id: recents
+        spacing: 12
+
+        Layout.row: 1
+        Layout.column: 0
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        Text {
+            id: recentsText
+            height: implicitHeight
+            text: "Recents"
+            font.family: Style.mainFontFamily
+            font.pointSize: container.h1TextSize
+            font.weight: Font.DemiBold
+            wrapMode: Text.NoWrap
+            color: "#ffffff"
+        }
+
+        // Rectangle {
+        //     id: recentsContainer
+        //     width: parent.width
+        //     height: parent.height - recentsText.height
+        //     color: "#ff0000"
+        // }
+
+    }
+
+    Button {
+        Layout.preferredHeight: 6
+        font.pointSize: 6
+        onClicked: {
+
+            console.log(urlTextField.height);
+
+        }
+        background: Rectangle {
+            color: "#ff0000"
+        }
+    }
 
 }

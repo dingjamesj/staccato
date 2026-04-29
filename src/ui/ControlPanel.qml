@@ -7,5 +7,5 @@ pragma ComponentBehavior: Bound
 //====================================
 
 Rectangle {
-    color: "#00ff00"
+    color: "#ffffff"
 }
