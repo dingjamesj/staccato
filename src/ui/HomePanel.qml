@@ -19,6 +19,7 @@ GridLayout {
     property alias previewAlbumText: previewAlbumField.text
     property alias recentlyPlayedContainer: recentsContainer
 
+    property bool previewIsLoading: false
     property bool previewIsLoaded: false
 
     id: container
@@ -27,7 +28,7 @@ GridLayout {
     rowSpacing: 0
 
     Component.onCompleted: {
-        // Logic.startup(StaccatoInterface);
+        Logic.startup(StaccatoInterface);
     }
 
     Item {
@@ -96,7 +97,6 @@ GridLayout {
             }
 
             RoundButton {
-                id: downloadButton
                 radius: Style.buttonRadius
                 text: "Download"
                 defaultColor: Style.purple
@@ -107,17 +107,16 @@ GridLayout {
             }
 
             RoundButton {
-                id: loadPreviewButton
                 radius: Style.buttonRadius
                 text: "Load Preview"
                 defaultColor: Style.gray
-                enabled: urlTextField.text.length > 0
+                enabled: previewIsLoading ? false : (urlTextField.text.length > 0)
                 
                 Layout.preferredWidth: 105
                 Layout.fillHeight: true
 
                 onClicked: {
-                    Logic.loadTrackInfo(urlTextField.text, loadPreviewButton, previewTitleField, artistsTextFieldRow, previewAlbumField, previewArtwork);
+                    Logic.loadTrackInfo(container);
                 }
             }
 

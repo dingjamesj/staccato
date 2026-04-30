@@ -1,3 +1,11 @@
+var cpp;
+
+function startup(_cpp) {
+
+    cpp = _cpp;
+    
+}
+
 function addArtistTextField(container) {
 
     let component = Qt.createComponent("RoundTextField.qml");
@@ -21,19 +29,28 @@ function removeArtistTextField(container) {
 
 }
 
-function loadTrackInfo(url, loadTrackInfoButton, titleField, artistsContainer, albumField, artworkRoundedImage) {
+function loadTrackInfo(container) {
 
-    loadTrackInfoButton.enabled = false;
+    let url = container.importURLText;
+    let loadingFlag = container.previewIsLoading;
+    let loadCompletionFlag = container.previewIsLoaded;
+    let title = container.previewTitleText;
+    let artistsContainer = container.previewArtistsContainer;
+    let album = container.previewAlbumText;
+    let artworkSource = container.previewArtworkSource;
+
+    loadingFlag = true;
+    loadCompletionFlag = false;
     let track;
     if(url.charAt(1) === ":") {
 
         //Local filesystem track
-        track = staccatoInterface.getLocalTrackInfo(url);
+        track = cpp.getLocalTrackInfo(url);
 
     } else {
 
         //Online track
-        track = staccatoInterface.getOnlineTrackInfo(url);
+        track = cpp.getOnlineTrackInfo(url);
 
     }
 
@@ -45,8 +62,7 @@ function loadTrackInfo(url, loadTrackInfoButton, titleField, artistsContainer, a
 
     }
 
-    //Set the title
-    titleField.text = track[0];
+    title = track[0];
 
     //Set the artists
     for(let i = artistsContainer.children.length - 1; i >= 0; i--) {
@@ -59,23 +75,26 @@ function loadTrackInfo(url, loadTrackInfoButton, titleField, artistsContainer, a
     for(let i = 0; i < track[1].length; i++) {
 
         component.createObject(artistsContainer, {
+            "Layout.preferredWidth": 1,
+            "Layout.fillWidth": true,
+            "Layout.fillHeight": true,
+            enabled: "container.previewIsLoaded",
             text: track[1][i]
         });
 
     }
 
-    //Set the album
-    albumField.text = track[2];
+    album = track[2];
 
     //Set the artwork
-
     if(track.length >= 4) {
 
         //An online track would have returned an extra artwork URL link
-        artworkRoundedImage.source = track[3];
+        artworkSource = track[3];
 
     } else {
 
+        //Local audio file
         let file_path = "";
         for(let i = 0; i < url.length; i++) {
 
@@ -90,10 +109,11 @@ function loadTrackInfo(url, loadTrackInfoButton, titleField, artistsContainer, a
             }
 
         }
-        artworkRoundedImage.source = "image://audiofile/" + file_path;
+        artworkSource = "image://audiofile/" + file_path;
 
     }
 
-    loadTrackInfoButton.enabled = true;
+    loadingFlag = false;
+    loadCompletionFlag = true;
 
 }
