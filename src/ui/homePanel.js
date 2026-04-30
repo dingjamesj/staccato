@@ -1,16 +1,18 @@
-function addArtistTextField(artistsContainer) {
+function addArtistTextField(container) {
 
     let component = Qt.createComponent("RoundTextField.qml");
-    component.createObject(artistsContainer, {
-        width: 200,
-        height: 25,
-        "font.pointSize": 10
+    component.createObject(container.previewArtistsContainer, {
+        "Layout.preferredWidth": 1,
+        "Layout.fillWidth": true,
+        "Layout.fillHeight": true,
+        enabled: "container.previewIsLoaded"
     });
 
 }
 
-function removeArtistTextField(artistsContainer) {
+function removeArtistTextField(container) {
 
+    let artistsContainer = container.previewArtistsContainer;
     if(artistsContainer.children.length > 0) {
 
         artistsContainer.children[artistsContainer.children.length - 1].destroy();

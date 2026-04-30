@@ -18,7 +18,6 @@ TextField {
     id: container
     color: enabled ? textColor : disabledTextColor
     placeholderTextColor: enabled ? defaultPlaceholderTextColor : disabledPlaceholderTextColor
-    
     font.family: Style.mainFontFamily
     font.pointSize: 10
     padding: 5

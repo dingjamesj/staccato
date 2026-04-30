@@ -19,36 +19,50 @@ GridLayout {
     property alias previewAlbumText: previewAlbumField.text
     property alias recentlyPlayedContainer: recentsContainer
 
+    property bool previewIsLoaded: false
+
     id: container
-    rows: 2
+    rows: 8
     columns: 1
-    rowSpacing: Style.bigSpacing
+    rowSpacing: 0
 
     Component.onCompleted: {
         // Logic.startup(StaccatoInterface);
     }
 
+    Item {
+        Layout.row: 0
+        Layout.preferredHeight: Style.medSpacing
+    }
+
+    //Title text
+    Text {
+        id: trackImporterTitle
+        text: "Add New Tracks"
+        font.family: Style.mainFontFamily
+        font.pointSize: Style.h1TextSize
+        font.weight: Font.DemiBold
+        wrapMode: Text.NoWrap
+        color: Style.white
+
+        Layout.row: 1
+        Layout.fillWidth: true
+        Layout.preferredHeight: implicitHeight
+    }
+
+    Item {
+        Layout.row: 2
+        Layout.preferredHeight: Style.medSpacing
+    }
+
     //Track importer
     Column {
         id: trackImporter
-        spacing: Style.medSpacing
+        spacing: Style.smallSpacing
 
-        Layout.row: 0
-        Layout.column: 0
+        Layout.row: 3
         Layout.fillWidth: true
         Layout.fillHeight: false
-        
-        //Title text
-        Text {
-            id: addTracksText
-            height: implicitHeight
-            text: "Add New Tracks"
-            font.family: Style.mainFontFamily
-            font.pointSize: Style.h1TextSize
-            font.weight: Font.DemiBold
-            wrapMode: Text.NoWrap
-            color: Style.white
-        }
 
         //URL textbox title text
         Text {
@@ -64,7 +78,7 @@ GridLayout {
         }
 
         //URL input text box & download button
-        Row {
+        RowLayout {
             id: urlInputPanel
             width: parent.width
             height: implicitHeight
@@ -73,31 +87,35 @@ GridLayout {
             //Text field to input the URL / file path
             RoundTextField {
                 id: urlTextField
-                width: 240
-                height: Style.buttonSize
                 font.pointSize: Style.normalTextSize - 1
-                placeholderText: "Paste here a web URL or a file path to import audio from"
+                placeholderText: "Paste a web URL or a file path"
+
+                Layout.preferredWidth: 3
+                Layout.fillWidth: true
+                Layout.fillHeight: true
             }
 
             RoundButton {
                 id: downloadButton
-                width: 80
-                height: Style.buttonSize
                 radius: Style.buttonRadius
                 text: "Download"
                 defaultColor: Style.purple
                 enabled: urlTextField.text.length > 0
+
+                Layout.preferredWidth: 80
+                Layout.fillHeight: true
             }
 
             RoundButton {
                 id: loadPreviewButton
-                width: 105
-                height: Style.buttonSize
                 radius: Style.buttonRadius
                 text: "Load Preview"
                 defaultColor: Style.gray
                 enabled: urlTextField.text.length > 0
                 
+                Layout.preferredWidth: 105
+                Layout.fillHeight: true
+
                 onClicked: {
                     Logic.loadTrackInfo(urlTextField.text, loadPreviewButton, previewTitleField, artistsTextFieldRow, previewAlbumField, previewArtwork);
                 }
@@ -105,8 +123,6 @@ GridLayout {
 
             Text {
                 id: statusText
-                width: 175
-                height: Style.buttonSize
                 text: ""
                 font.family: Style.mainFontFamily
                 font.pointSize: Style.normalTextSize
@@ -114,12 +130,15 @@ GridLayout {
                 wrapMode: Text.NoWrap
                 color: Style.red
                 verticalAlignment: Text.AlignVCenter
+
+                Layout.preferredWidth: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
             }
         }
 
         //Track preview title text
         Text {
-            id: previewTitleText
             width: parent.width
             height: implicitHeight
             text: "Preview"
@@ -132,7 +151,6 @@ GridLayout {
 
         //Track preview contents
         GridLayout {
-            id: previewContainer
             rows: 3
             columns: 3
             rowSpacing: Style.smallSpacing
@@ -155,7 +173,6 @@ GridLayout {
 
             //Text that says "Title: "
             Text {
-                id: titleContainerTitleText
                 text: "Title: "
                 font.family: Style.mainFontFamily
                 font.pointSize: Style.normalTextSize
@@ -170,7 +187,7 @@ GridLayout {
             //Text field for the title
             RoundTextField {
                 id: previewTitleField
-                enabled: false
+                enabled: container.previewIsLoaded
 
                 Layout.row: 0
                 Layout.column: 2
@@ -180,7 +197,6 @@ GridLayout {
 
             //Text that says "Artists: "
             Text {
-                id: artistsContainerTitleText
                 text: "Artists: "
                 font.family: Style.mainFontFamily
                 font.pointSize: Style.normalTextSize
@@ -193,8 +209,7 @@ GridLayout {
             }
 
             //List of artists for the preview
-            Row {
-                id: previewArtistsContainer
+            RowLayout {
                 spacing: Style.tinySpacing
 
                 Layout.row: 1
@@ -204,64 +219,67 @@ GridLayout {
 
                 ScrollView {
                     id: previewArtistsScrollView
-                    width: parent.width - addArtistButton.width - removeArtistButton.width - parent.spacing * 2
-                    height: parent.height
                     contentHeight: height
                     clip: true
+
                     ScrollBar.horizontal.policy: ScrollBar.AsNeeded
                     ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     
                     Component.onCompleted: {
                         contentItem.boundsBehavior = Flickable.StopAtBounds;
                     }
 
-                    Row {
+                    RowLayout {
                         id: artistsTextFieldRow
                         width: previewArtistsScrollView.width
                         height: previewArtistsScrollView.height
                         spacing: Style.tinySpacing
 
                         RoundTextField {
-                            id: defaultAddTracksArtistField
-                            width: 200
-                            height: Style.buttonSize
-                            enabled: false
+                            id: initialArtistPreviewField
+                            enabled: container.previewIsLoaded
+
+                            Layout.preferredWidth: 1
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                         }
                     }
                 }
 
                 //Button to add a text field
                 RoundButton {
-                    id: addArtistButton
-                    width: height
-                    height: parent.height
                     radius: Style.buttonRadius
                     defaultColor: Style.gray
                     imageSource: "qrc:/staccato/src/ui/resources/plus.svg"
                     onClicked: {
-                        Logic.addArtistTextField(artistsTextFieldRow);
+                        Logic.addArtistTextField(container);
                     }
-                    enabled: false
+                    enabled: container.previewIsLoaded
+                 
+                    Layout.preferredWidth: height
+                    Layout.fillHeight: true
                 }
 
                 //Button to remove the last text field
                 RoundButton {
-                    id: removeArtistButton
-                    width: height
-                    height: parent.height
                     radius: Style.buttonRadius
                     defaultColor: Style.gray
                     imageSource: "qrc:/staccato/src/ui/resources/minus.svg"
                     onClicked: {
-                        Logic.removeArtistTextField(artistsTextFieldRow);
+                        Logic.removeArtistTextField(container);
                     }
-                    enabled: false
+                    enabled: container.previewIsLoaded ? (container.previewArtistsContainer.children.length > 0 ? true : false) : false
+
+                    Layout.preferredWidth: height
+                    Layout.fillHeight: true
                 }
             }
 
             //Text that just says "Album: "
             Text {
-                id: albumContainerTitleText
                 text: "Album: "
                 font.family: Style.mainFontFamily
                 font.pointSize: Style.normalTextSize
@@ -276,7 +294,7 @@ GridLayout {
             //Text field for the preview album name
             RoundTextField {
                 id: previewAlbumField
-                enabled: false
+                enabled: container.previewIsLoaded
 
                 Layout.row: 2
                 Layout.column: 2
@@ -286,34 +304,40 @@ GridLayout {
         }
     }
 
-    //Recent playlists
-    Column {
-        id: recents
-        spacing: Style.medSpacing
+    Item {
+        Layout.row: 4
+        Layout.preferredHeight: Style.bigSpacing
+    }
 
-        Layout.row: 1
-        Layout.column: 0
+    Text {
+        text: "Recents"
+        font.family: Style.mainFontFamily
+        font.pointSize: Style.h1TextSize
+        font.weight: Font.DemiBold
+        wrapMode: Text.NoWrap
+        color: Style.white
+
+        Layout.row: 5
+        Layout.fillWidth: true
+        Layout.preferredHeight: implicitHeight
+    }
+
+    Item {
+        Layout.row: 6
+        Layout.preferredHeight: Style.medSpacing
+    }
+
+    //Recent playlists
+    Rectangle {
+        color: Style.background
+
+        Layout.row: 7
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        Text {
-            id: recentsText
-            height: implicitHeight
-            text: "Recents"
-            font.family: Style.mainFontFamily
-            font.pointSize: Style.h1TextSize
-            font.weight: Font.DemiBold
-            wrapMode: Text.NoWrap
-            color: Style.white
-        }
-
-        Rectangle {
+        Column {
             id: recentsContainer
-            width: parent.width
-            height: parent.height - recentsText.height
-            color: Style.background
         }
-
     }
 
     Button {
@@ -327,6 +351,7 @@ GridLayout {
         background: Rectangle {
             color: Style.red
         }
+        text: "HomePanel DEBUG"
     }
 
 }

@@ -28,7 +28,7 @@ Item {
     //Sizing & spacing
     readonly property int tinySpacing: 6
     readonly property int smallSpacing: 8
-    readonly property int medSpacing: 20
+    readonly property int medSpacing: 17
     readonly property int bigSpacing: 45
     readonly property int buttonSize: 25
     readonly property int buttonRadius: 6
