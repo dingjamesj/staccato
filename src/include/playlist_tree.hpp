@@ -146,7 +146,8 @@ namespace staccato {
         /// @return The playlists included in the removed folder, empty list if the folder wasn't found
         std::vector<std::string> remove_folder(const std::string& name, const std::vector<std::string>& folder_hierarchy);
 
-        const std::vector<std::any>& root() const;
+        /// @brief Clears the tree
+        void clear();
 
         /// @return A string representation of this tree object
         std::string string() const;

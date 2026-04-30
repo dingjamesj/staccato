@@ -30,6 +30,7 @@
 #include <QPixmap>
 #include <any>
 #include <nlohmann/json_fwd.hpp>
+#include <stack>
 
 
 /* Familiarize yourself with some terminology:
@@ -82,6 +83,11 @@ namespace staccato {
         /// @param track 
         /// @return `true` if the write was successful, `false` otherwise
         static bool write_file_metadata(const std::string& path, const Track& track);
+
+        /// @brief Used when reading the playlist tree. 
+        ///        In the case of a JSON read error, we will just add all the playlists from the playlist directory to the root of the tree.
+        /// @param id_set 
+        static void populate_tree_unorganized();
 
         public:
 
@@ -260,7 +266,8 @@ namespace staccato {
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_track_dict();
 
-        /// @brief Used to read the stored playlist tree, should be run once at the beginning of the program
+        /// @brief Used to read the stored playlist tree, should be run once at the beginning of the program. 
+        ///        Also adds any playlists to the tree that were found in the playlists folder but not originally in the tree.
         /// @return `true` if the read was successful, `false` otherwise
         static bool read_playlist_tree();
 
@@ -290,16 +297,19 @@ namespace staccato {
         static constexpr std::string_view ARTISTS_JSON_KEY {"artists"};
         static constexpr std::string_view ALBUM_JSON_KEY {"album"};
         //Key names in the track dictionary JSON file
-        static constexpr std::string_view TRACK_DICTIONARY_JSON_KEY {"dict"};
-        static constexpr std::string_view TRACK_OBJ_JSON_KEY {"track"};
-        static constexpr std::string_view FILEPATH_JSON_KEY {"path"};
+        static constexpr std::string_view TRACK_DICT_JSON_KEY {"dict"};
+        static constexpr std::string_view TRACK_TRACK_DICT_JSON_KEY {"track"};
+        static constexpr std::string_view FILEPATH_TRACK_DICT_JSON_KEY {"path"};
         //Key names in playlist JSON files
-        static constexpr std::string_view PLAYLIST_NAME_JSON_KEY {"name"};
-        static constexpr std::string_view PLAYLIST_CONNECTION_JSON_KEY {"connection"};
-        static constexpr std::string_view PLAYLIST_SIZE_JSON_KEY {"size"};
-        static constexpr std::string_view PLAYLIST_TRACKLIST_JSON_KEY {"tracklist"};
+        static constexpr std::string_view NAME_PLAYLIST_JSON_KEY {"name"};
+        static constexpr std::string_view CONNECTION_PLAYLIST_JSON_KEY {"connection"};
+        static constexpr std::string_view SIZE_PLAYLIST_JSON_KEY {"size"};
+        static constexpr std::string_view TRACKLIST_PLAYLIST_JSON_KEY {"tracklist"};
+        //Key names in the playlist tree JSON file
+        static constexpr std::string_view CONTENTS_PLAYLIST_TREE_JSON_KEY {"contents"};
+        static constexpr std::string_view FOLDER_NAME_PLAYLIST_TREE_JSON_KEY {"name"};
 
-        static constexpr std::string_view TRACK_DICTIONARY_FILENAME {"trackdict.json"};
+        static constexpr std::string_view TRACK_DICT_FILENAME {"trackdict.json"};
         static constexpr std::string_view PLAYLIST_TREE_FILENAME {"playlisttree.json"};
 
         #if(DEVELOPMENT_BUILD)

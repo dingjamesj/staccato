@@ -506,9 +506,9 @@ std::vector<std::string> PlaylistTree::remove_folder(const std::string& name, co
 
 }
 
-const std::vector<std::any>& PlaylistTree::root() const {
+void PlaylistTree::clear() {
 
-    return root_;
+    root_.clear();
 
 }
 

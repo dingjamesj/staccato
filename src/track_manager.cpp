@@ -62,6 +62,34 @@ bool TrackManager::write_file_metadata(const std::string& path, const Track& tra
 
 }
 
+void TrackManager::populate_tree_unorganized() {
+
+    playlist_tree.clear();
+
+    std::filesystem::directory_iterator directory_iter;
+    try {
+
+        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY);
+
+    } catch(const std::exception& e) {
+
+        return;
+
+    }
+
+    for(const std::filesystem::directory_entry& file: directory_iter) {
+
+        const std::filesystem::path& path = file.path();
+        if(path.extension().string() == ".json") {
+
+            playlist_tree.add_playlist(path.stem().string(), {});
+            
+        }        
+
+    }
+
+}
+
 //===========================
 //  PUBLIC ACCESS FUNCTIONS
 //===========================
@@ -782,7 +810,7 @@ int TrackManager::get_playlist_duration(const Playlist& playlist) {
 
     int total_duration = 0;
     const std::vector<Track>& tracklist = playlist.tracklist();
-    for(std::vector<Track>::const_iterator iter = tracklist.begin(); iter != tracklist.end(); iter++) {
+    for(std::vector<Track>::const_iterator iter = tracklist.begin(); iter != tracklist.end(); ++iter) {
 
         total_duration += TrackManager::get_track_duration(*iter);
 
@@ -796,7 +824,7 @@ bool TrackManager::read_track_dict() {
 
     track_dict.clear();
 
-    std::filesystem::path track_dict_path = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIRECTORY) / std::filesystem::path(TRACK_DICTIONARY_FILENAME);
+    std::filesystem::path track_dict_path = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIRECTORY) / std::filesystem::path(TRACK_DICT_FILENAME);
     std::ifstream input (track_dict_path);
     if(!input.is_open()) {
 
@@ -805,7 +833,7 @@ bool TrackManager::read_track_dict() {
     }
 
     const nlohmann::json root = nlohmann::json::parse(input);
-    if(!root.contains(TRACK_DICTIONARY_JSON_KEY)) {
+    if(!root.contains(TRACK_DICT_JSON_KEY)) {
 
         return false;
 
@@ -813,20 +841,20 @@ bool TrackManager::read_track_dict() {
 
     //Adds each Track-filepath pair from the JSON file to the track dict
     bool no_errors = true;
-    for(nlohmann::json::const_iterator iter = root[TRACK_DICTIONARY_JSON_KEY].begin(); iter != root[TRACK_DICTIONARY_JSON_KEY].end(); iter++) {
+    for(nlohmann::json::const_iterator iter = root[TRACK_DICT_JSON_KEY].begin(); iter != root[TRACK_DICT_JSON_KEY].end(); ++iter) {
 
         //Ensure that the JSON object contains ALL required keys
-        if(!(*iter).contains(TRACK_OBJ_JSON_KEY) || !(*iter).contains(FILEPATH_JSON_KEY) || !(*iter)[TRACK_OBJ_JSON_KEY].contains(TITLE_JSON_KEY) || !(*iter)[TRACK_OBJ_JSON_KEY].contains(ARTISTS_JSON_KEY) || !(*iter)[TRACK_OBJ_JSON_KEY].contains(ALBUM_JSON_KEY)) {
+        if(!(*iter).contains(TRACK_TRACK_DICT_JSON_KEY) || !(*iter).contains(FILEPATH_TRACK_DICT_JSON_KEY) || !(*iter)[TRACK_TRACK_DICT_JSON_KEY].contains(TITLE_JSON_KEY) || !(*iter)[TRACK_TRACK_DICT_JSON_KEY].contains(ARTISTS_JSON_KEY) || !(*iter)[TRACK_TRACK_DICT_JSON_KEY].contains(ALBUM_JSON_KEY)) {
 
             no_errors = false;
             continue;
 
         }
 
-        const nlohmann::json& title_json = (*iter)[TRACK_OBJ_JSON_KEY][TITLE_JSON_KEY];
-        const nlohmann::json& artists_json = (*iter)[TRACK_OBJ_JSON_KEY][ARTISTS_JSON_KEY];
-        const nlohmann::json& album_json = (*iter)[TRACK_OBJ_JSON_KEY][ALBUM_JSON_KEY];
-        const nlohmann::json& path_json = (*iter)[FILEPATH_JSON_KEY];
+        const nlohmann::json& title_json = (*iter)[TRACK_TRACK_DICT_JSON_KEY][TITLE_JSON_KEY];
+        const nlohmann::json& artists_json = (*iter)[TRACK_TRACK_DICT_JSON_KEY][ARTISTS_JSON_KEY];
+        const nlohmann::json& album_json = (*iter)[TRACK_TRACK_DICT_JSON_KEY][ALBUM_JSON_KEY];
+        const nlohmann::json& path_json = (*iter)[FILEPATH_TRACK_DICT_JSON_KEY];
 
         //Ensure that every value is of the correct type
         if(!title_json.is_string() || !artists_json.is_array() || !album_json.is_string() || !path_json.is_string()) {
@@ -837,7 +865,7 @@ bool TrackManager::read_track_dict() {
         }
 
         std::vector<std::string> artists {};
-        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); artists_iter++) {
+        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); ++artists_iter) {
 
             //Ensure that only strings exist inside the artists array
             if(!(*artists_iter).is_string()) {
@@ -873,7 +901,7 @@ bool TrackManager::serialize_track_dict() {
     std::filesystem::path track_files_directory = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIRECTORY);
     std::filesystem::create_directories(track_files_directory);
 
-    std::ofstream output (track_files_directory / std::filesystem::path(TRACK_DICTIONARY_FILENAME));
+    std::ofstream output (track_files_directory / std::filesystem::path(TRACK_DICT_FILENAME));
     if(!output.is_open()) {
 
         return false;
@@ -882,22 +910,22 @@ bool TrackManager::serialize_track_dict() {
 
     //Create the JSON object
     nlohmann::json root {};
-    root[TRACK_DICTIONARY_JSON_KEY] = nlohmann::json::array();
+    root[TRACK_DICT_JSON_KEY] = nlohmann::json::array();
 
     std::size_t i {0};
     for(const std::pair<const staccato::Track, std::string>& item: track_dict) {
 
-        root[TRACK_DICTIONARY_JSON_KEY].push_back(nlohmann::json::object());
-        nlohmann::json& track_json = root[TRACK_DICTIONARY_JSON_KEY][i];
-        track_json[TRACK_OBJ_JSON_KEY][TITLE_JSON_KEY] = item.first.title();
-        track_json[TRACK_OBJ_JSON_KEY][ARTISTS_JSON_KEY] = nlohmann::json::array();
+        root[TRACK_DICT_JSON_KEY].push_back(nlohmann::json::object());
+        nlohmann::json& track_json = root[TRACK_DICT_JSON_KEY][i];
+        track_json[TRACK_TRACK_DICT_JSON_KEY][TITLE_JSON_KEY] = item.first.title();
+        track_json[TRACK_TRACK_DICT_JSON_KEY][ARTISTS_JSON_KEY] = nlohmann::json::array();
         for(const std::string& artist: item.first.artists()) {
 
-            track_json[TRACK_OBJ_JSON_KEY][ARTISTS_JSON_KEY].push_back(artist);
+            track_json[TRACK_TRACK_DICT_JSON_KEY][ARTISTS_JSON_KEY].push_back(artist);
 
         }
-        track_json[TRACK_OBJ_JSON_KEY][ALBUM_JSON_KEY] = item.first.album();
-        track_json[FILEPATH_JSON_KEY] = item.second;
+        track_json[TRACK_TRACK_DICT_JSON_KEY][ALBUM_JSON_KEY] = item.first.album();
+        track_json[FILEPATH_TRACK_DICT_JSON_KEY] = item.second;
         i++;
 
     }
@@ -1010,16 +1038,16 @@ std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> Tra
         //We strictly require each JSON object to have ALL the required keys (playlist name, connection, and size)
         const nlohmann::json root = nlohmann::json::parse(input);
         if(
-            root.contains(PLAYLIST_NAME_JSON_KEY) && root[PLAYLIST_CONNECTION_JSON_KEY].is_string() &&
-            root.contains(PLAYLIST_CONNECTION_JSON_KEY) && root[PLAYLIST_CONNECTION_JSON_KEY].is_string() &&
-            root.contains(PLAYLIST_SIZE_JSON_KEY) && root[PLAYLIST_SIZE_JSON_KEY].is_number_unsigned()
+            root.contains(NAME_PLAYLIST_JSON_KEY) && root[CONNECTION_PLAYLIST_JSON_KEY].is_string() &&
+            root.contains(CONNECTION_PLAYLIST_JSON_KEY) && root[CONNECTION_PLAYLIST_JSON_KEY].is_string() &&
+            root.contains(SIZE_PLAYLIST_JSON_KEY) && root[SIZE_PLAYLIST_JSON_KEY].is_number_unsigned()
         ) {
 
             info.push_back({
                 file.path().stem().string(), 
-                root[PLAYLIST_NAME_JSON_KEY].get<std::string>(), 
-                root[PLAYLIST_CONNECTION_JSON_KEY].get<std::string>(), 
-                root[PLAYLIST_SIZE_JSON_KEY]
+                root[NAME_PLAYLIST_JSON_KEY].get<std::string>(), 
+                root[CONNECTION_PLAYLIST_JSON_KEY].get<std::string>(), 
+                root[SIZE_PLAYLIST_JSON_KEY]
             });
 
         }
@@ -1122,19 +1150,19 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
     std::string name, connection;
     std::vector<Track> tracklist {};
 
-    if(root.contains(PLAYLIST_NAME_JSON_KEY) && root[PLAYLIST_NAME_JSON_KEY].is_string()) {
+    if(root.contains(NAME_PLAYLIST_JSON_KEY) && root[NAME_PLAYLIST_JSON_KEY].is_string()) {
 
-        name = root[PLAYLIST_NAME_JSON_KEY].get<std::string>();
-
-    }
-
-    if(root.contains(PLAYLIST_CONNECTION_JSON_KEY) && root[PLAYLIST_CONNECTION_JSON_KEY].is_string()) {
-
-        connection = root[PLAYLIST_CONNECTION_JSON_KEY].get<std::string>();
+        name = root[NAME_PLAYLIST_JSON_KEY].get<std::string>();
 
     }
 
-    if(!root.contains(PLAYLIST_TRACKLIST_JSON_KEY) || !root[PLAYLIST_TRACKLIST_JSON_KEY].is_array()) {
+    if(root.contains(CONNECTION_PLAYLIST_JSON_KEY) && root[CONNECTION_PLAYLIST_JSON_KEY].is_string()) {
+
+        connection = root[CONNECTION_PLAYLIST_JSON_KEY].get<std::string>();
+
+    }
+
+    if(!root.contains(TRACKLIST_PLAYLIST_JSON_KEY) || !root[TRACKLIST_PLAYLIST_JSON_KEY].is_array()) {
 
         error_flag = true;
         return Playlist(id, name, {}, connection); //If no tracklist exists, early return to reduce code indentation
@@ -1142,8 +1170,8 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
     }
 
     //Read the tracklist from the JSON object, and be loose about the format (i.e. it's ok if we're missing some fields, just mark the error flag as true)
-    const nlohmann::json& tracklist_json = root[PLAYLIST_TRACKLIST_JSON_KEY];
-    for(nlohmann::json::const_iterator iter = tracklist_json.begin(); iter != tracklist_json.end(); iter++) {
+    const nlohmann::json& tracklist_json = root[TRACKLIST_PLAYLIST_JSON_KEY];
+    for(nlohmann::json::const_iterator iter = tracklist_json.begin(); iter != tracklist_json.end(); ++iter) {
 
         if(!(*iter).contains(TITLE_JSON_KEY) || !(*iter).contains(ARTISTS_JSON_KEY) || !(*iter).contains(ALBUM_JSON_KEY)) {
 
@@ -1165,7 +1193,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
         }
 
         std::vector<std::string> artists {};
-        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); artists_iter++) {
+        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); ++artists_iter) {
 
             //Ensure that only strings exist inside the artists array
             if(!(*artists_iter).is_string()) {
@@ -1208,16 +1236,16 @@ bool TrackManager::serialize_playlist(const Playlist& playlist) {
 
     //Create the JSON object
     nlohmann::json root {};
-    root[PLAYLIST_NAME_JSON_KEY] = playlist.name();
-    root[PLAYLIST_CONNECTION_JSON_KEY] = playlist.online_connection();
-    root[PLAYLIST_SIZE_JSON_KEY] = playlist.tracklist().size();
-    root[PLAYLIST_TRACKLIST_JSON_KEY] = nlohmann::json::array();
+    root[NAME_PLAYLIST_JSON_KEY] = playlist.name();
+    root[CONNECTION_PLAYLIST_JSON_KEY] = playlist.online_connection();
+    root[SIZE_PLAYLIST_JSON_KEY] = playlist.tracklist().size();
+    root[TRACKLIST_PLAYLIST_JSON_KEY] = nlohmann::json::array();
     
     std::size_t i {0};
     for(const Track& track: playlist.tracklist()) {
 
-        root[PLAYLIST_TRACKLIST_JSON_KEY].push_back(nlohmann::json::object());
-        nlohmann::json& track_json = root[PLAYLIST_TRACKLIST_JSON_KEY][i];
+        root[TRACKLIST_PLAYLIST_JSON_KEY].push_back(nlohmann::json::object());
+        nlohmann::json& track_json = root[TRACKLIST_PLAYLIST_JSON_KEY][i];
         track_json[TITLE_JSON_KEY] = track.title();
         track_json[ARTISTS_JSON_KEY] = nlohmann::json::array();
         track_json[ALBUM_JSON_KEY] = track.album();
@@ -1247,7 +1275,110 @@ bool TrackManager::serialize_playlist(const Playlist& playlist) {
 
 bool TrackManager::read_playlist_tree() {
 
-    return false; //unfinished
+    playlist_tree.clear();
+
+    std::filesystem::path playlists_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIRECTORY);
+    std::filesystem::path playlist_tree_path = playlists_directory / std::filesystem::path(PLAYLIST_TREE_FILENAME);
+    std::ifstream input (playlist_tree_path);
+    if(!input.is_open()) {
+
+        return false;
+
+    }
+
+    //First obtain every playlist in the playlists folder
+    std::filesystem::directory_iterator directory_iter;
+    try {
+
+        directory_iter = std::filesystem::directory_iterator(playlists_directory);
+
+    } catch(const std::exception& e) {
+
+        return false;
+
+    }
+
+    std::unordered_set<std::string> id_set {};
+    for(const std::filesystem::directory_entry& file: directory_iter) {
+
+        const std::filesystem::path& path = file.path();
+        if(path.extension().string() == ".json") {
+
+            id_set.insert(path.stem().string());
+
+        }
+
+    }
+
+    //Now iter. through the playlist tree JSON
+
+    const nlohmann::json root = nlohmann::json::parse(input);
+    if(!root.contains(CONTENTS_PLAYLIST_TREE_JSON_KEY)) {
+
+        populate_tree_unorganized();
+        return false;
+
+    }
+
+    //We will read the playlist tree JSON strictly (i.e. any error in the JSON structure renders the entire tree gone)
+    std::vector<std::string> folder_hierarchy {};
+    std::stack<std::pair<const nlohmann::json&, nlohmann::json::const_iterator>> stack_json;
+    stack_json.push({root, root[CONTENTS_PLAYLIST_TREE_JSON_KEY].begin()});
+    while(!stack_json.empty()) {
+
+        nlohmann::json::const_iterator& iter = stack_json.top().second;
+        if(iter == stack_json.top().first.end()) {
+
+            stack_json.pop();
+            folder_hierarchy.pop_back();
+            continue;
+
+        }
+
+        if((*iter).is_string()) { //Iter. is at a playlist ID
+
+            std::string id = (*iter).get<std::string>();
+            if(id_set.contains(id)) { //Check that the playlist exists in the Playlists folder
+
+                playlist_tree.add_playlist(id, folder_hierarchy);
+                id_set.erase(id);
+
+            }
+
+        } else if((*iter).is_object()) { //Iter. is at a folder
+
+            const nlohmann::json& child_name_json = (*iter)[FOLDER_NAME_PLAYLIST_TREE_JSON_KEY];
+            const nlohmann::json& child_contents_json = (*iter)[CONTENTS_PLAYLIST_TREE_JSON_KEY];
+
+            if(!child_name_json.is_string() || !child_contents_json.is_array()) {
+
+                populate_tree_unorganized();
+                return false;
+
+            }
+
+            std::string child_name = child_name_json.get<std::string>();
+            playlist_tree.add_folder(child_name, folder_hierarchy);
+            folder_hierarchy.push_back(child_name);
+            stack_json.push({child_contents_json, child_contents_json.begin()});
+
+        } else {
+
+            populate_tree_unorganized();
+            return false;
+
+        }
+
+    }
+
+    //Append any playlists left in id_set to the tree (these ones weren't found in the tree JSON)
+    for(const std::string& id: id_set) {
+
+        playlist_tree.add_playlist(id, {});
+
+    }
+
+    return true;
 
 }
 
@@ -1266,7 +1397,36 @@ bool TrackManager::serialize_playlist_tree() {
     }
 
     //Loop through the tree
-    nlohmann::json root = nlohmann::json::array();
+    nlohmann::json root;
+    root[CONTENTS_PLAYLIST_TREE_JSON_KEY] = nlohmann::json::array();
+    std::stack<nlohmann::json*> stack_json;
+    stack_json.push(&root[CONTENTS_PLAYLIST_TREE_JSON_KEY]);
+    for(PlaylistTree::ConstIterator iter = playlist_tree.cbegin(); iter != playlist_tree.cend() && !stack_json.empty(); ++iter) {
+
+        //nullptr signifies that we reached the end of a subfolder
+        if(iter.operator->() == nullptr) {
+
+            stack_json.pop();
+            continue;
+
+        }
+
+        nlohmann::json& folder_contents_json = *stack_json.top();
+        if(iter.is_folder_start()) { //Add a child folder to this folder's contents array
+
+            nlohmann::json&& folder_json = nlohmann::json::object();
+            folder_json[FOLDER_NAME_PLAYLIST_TREE_JSON_KEY] = *iter;
+            folder_json[CONTENTS_PLAYLIST_TREE_JSON_KEY] = nlohmann::json::array();
+            stack_json.push(&folder_json[CONTENTS_PLAYLIST_TREE_JSON_KEY]);
+            folder_contents_json.push_back(folder_json);
+
+        } else {
+
+            folder_contents_json.push_back(*iter);
+
+        }
+
+    }
 
     //Serialize the JSON object
     output << std::setw(4) << root << std::endl;

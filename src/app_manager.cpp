@@ -165,7 +165,7 @@ bool AppManager::read_persistent_data(std::string& main_queue_playlist_id, unsig
 
     //Read the main queue's tracklist
     const nlohmann::json& main_queue_json = root[MAIN_QUEUE_JSON_KEY];
-    for(nlohmann::json::const_iterator iter = main_queue_json.begin(); iter != main_queue_json.end(); iter++) {
+    for(nlohmann::json::const_iterator iter = main_queue_json.begin(); iter != main_queue_json.end(); ++iter) {
 
         if(!(*iter).contains(TrackManager::TITLE_JSON_KEY) || !(*iter).contains(TrackManager::ARTISTS_JSON_KEY) || !(*iter).contains(TrackManager::ALBUM_JSON_KEY)) {
 
@@ -187,7 +187,7 @@ bool AppManager::read_persistent_data(std::string& main_queue_playlist_id, unsig
         }
 
         std::vector<std::string> artists {};
-        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); artists_iter++) {
+        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); ++artists_iter) {
 
             //Ensure that only strings exist inside the artists array
             if(!(*artists_iter).is_string()) {
@@ -211,7 +211,7 @@ bool AppManager::read_persistent_data(std::string& main_queue_playlist_id, unsig
 
     //Read the added queue's tracklist
     const nlohmann::json& added_queue_json = root[ADDED_QUEUE_JSON_KEY];
-    for(nlohmann::json::const_iterator iter = added_queue_json.begin(); iter != added_queue_json.end(); iter++) {
+    for(nlohmann::json::const_iterator iter = added_queue_json.begin(); iter != added_queue_json.end(); ++iter) {
 
         if(!(*iter).contains(TrackManager::TITLE_JSON_KEY) || !(*iter).contains(TrackManager::ARTISTS_JSON_KEY) || !(*iter).contains(TrackManager::ALBUM_JSON_KEY)) {
 
@@ -235,7 +235,7 @@ bool AppManager::read_persistent_data(std::string& main_queue_playlist_id, unsig
         }
 
         std::vector<std::string> artists {};
-        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); artists_iter++) {
+        for(nlohmann::json::const_iterator artists_iter = artists_json.begin(); artists_iter != artists_json.end(); ++artists_iter) {
 
             //Ensure that only strings exist inside the artists array
             if(!(*artists_iter).is_string()) {
@@ -458,7 +458,7 @@ void AppManager::read_settings() {
         } else if(item.value().type() == nlohmann::json::value_t::array) {
 
             std::vector<std::string>&& array {};
-            for(nlohmann::json::const_iterator iter = item.value().begin(); iter != item.value().end(); iter++) {
+            for(nlohmann::json::const_iterator iter = item.value().begin(); iter != item.value().end(); ++iter) {
 
                 if((*iter).is_string()) {
 
