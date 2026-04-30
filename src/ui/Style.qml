@@ -22,8 +22,19 @@ Item {
     readonly property color pink: "#ffb9ff"
     readonly property color red: "#cc3333"
 
-    //Misc
+    //Misc colors
     readonly property color m4aColor: "#d04ea5"
+
+    //Sizing & spacing
+    readonly property int tinySpacing: 6
+    readonly property int smallSpacing: 8
+    readonly property int medSpacing: 20
+    readonly property int bigSpacing: 45
+    readonly property int buttonSize: 25
+    readonly property int buttonRadius: 6
+    readonly property int h1TextSize: 24
+    property int h2TextSize: 13
+    property int normalTextSize: 10
 
     FontLoader {
         id: interFont

@@ -19,15 +19,10 @@ GridLayout {
     property alias previewAlbumText: previewAlbumField.text
     property alias recentlyPlayedContainer: recentsContainer
 
-    property int h1TextSize: 24
-    property int h2TextSize: 13
-    property int normalTextSize: 10
-
     id: container
     rows: 2
     columns: 1
-    rowSpacing: 30
-    columnSpacing: 0
+    rowSpacing: Style.bigSpacing
 
     Component.onCompleted: {
         // Logic.startup(StaccatoInterface);
@@ -35,10 +30,8 @@ GridLayout {
 
     //Track importer
     Column {
-        property int componentHeight: 25
-
         id: trackImporter
-        spacing: 12
+        spacing: Style.medSpacing
 
         Layout.row: 0
         Layout.column: 0
@@ -51,7 +44,7 @@ GridLayout {
             height: implicitHeight
             text: "Add New Tracks"
             font.family: Style.mainFontFamily
-            font.pointSize: container.h1TextSize
+            font.pointSize: Style.h1TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: Style.white
@@ -64,7 +57,7 @@ GridLayout {
             height: implicitHeight
             text: "Location"
             font.family: Style.mainFontFamily
-            font.pointSize: container.h2TextSize
+            font.pointSize: Style.h2TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: Style.white
@@ -75,38 +68,34 @@ GridLayout {
             id: urlInputPanel
             width: parent.width
             height: implicitHeight
-            spacing: 8
+            spacing: Style.smallSpacing
 
             //Text field to input the URL / file path
             RoundTextField {
                 id: urlTextField
                 width: 240
-                height: trackImporter.componentHeight
-                font.pointSize: container.normalTextSize - 1
+                height: Style.buttonSize
+                font.pointSize: Style.normalTextSize - 1
                 placeholderText: "Paste here a web URL or a file path to import audio from"
             }
 
             RoundButton {
                 id: downloadButton
                 width: 80
-                height: trackImporter.componentHeight
-                radius: 6
+                height: Style.buttonSize
+                radius: Style.buttonRadius
                 text: "Download"
                 defaultColor: Style.purple
-                textSize: container.normalTextSize
-                textStyle: Font.Bold
                 enabled: urlTextField.text.length > 0
             }
 
             RoundButton {
                 id: loadPreviewButton
                 width: 105
-                height: trackImporter.componentHeight
-                radius: 6
+                height: Style.buttonSize
+                radius: Style.buttonRadius
                 text: "Load Preview"
                 defaultColor: Style.gray
-                textSize: container.normalTextSize
-                textStyle: Font.Bold
                 enabled: urlTextField.text.length > 0
                 
                 onClicked: {
@@ -117,10 +106,10 @@ GridLayout {
             Text {
                 id: statusText
                 width: 175
-                height: trackImporter.componentHeight
+                height: Style.buttonSize
                 text: ""
                 font.family: Style.mainFontFamily
-                font.pointSize: container.normalTextSize
+                font.pointSize: Style.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
                 color: Style.red
@@ -135,7 +124,7 @@ GridLayout {
             height: implicitHeight
             text: "Preview"
             font.family: Style.mainFontFamily
-            font.pointSize: container.h2TextSize
+            font.pointSize: Style.h2TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: Style.white
@@ -146,22 +135,22 @@ GridLayout {
             id: previewContainer
             rows: 3
             columns: 3
-            rowSpacing: 6
-            columnSpacing: 8
+            rowSpacing: Style.smallSpacing
+            columnSpacing: Style.smallSpacing
             width: parent.width * 0.8
             height: implicitHeight
 
             //Cover art
             RoundImage {
                 id: previewArtwork
-                radius: 6
+                radius: Style.buttonRadius
                 source: ""
 
                 Layout.fillHeight: true
                 Layout.row: 0
                 Layout.column: 0
                 Layout.rowSpan: 3
-                Layout.preferredWidth: trackImporter.componentHeight * 3 + parent.rowSpacing * 2
+                Layout.preferredWidth: Style.buttonSize * 3 + parent.rowSpacing * 2
             }
 
             //Text that says "Title: "
@@ -169,7 +158,7 @@ GridLayout {
                 id: titleContainerTitleText
                 text: "Title: "
                 font.family: Style.mainFontFamily
-                font.pointSize: container.normalTextSize
+                font.pointSize: Style.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
                 color: Style.white
@@ -185,7 +174,7 @@ GridLayout {
 
                 Layout.row: 0
                 Layout.column: 2
-                Layout.preferredHeight: trackImporter.componentHeight
+                Layout.preferredHeight: Style.buttonSize
                 Layout.fillWidth: true;
             }
 
@@ -194,7 +183,7 @@ GridLayout {
                 id: artistsContainerTitleText
                 text: "Artists: "
                 font.family: Style.mainFontFamily
-                font.pointSize: container.normalTextSize
+                font.pointSize: Style.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
                 color: Style.white
@@ -206,11 +195,11 @@ GridLayout {
             //List of artists for the preview
             Row {
                 id: previewArtistsContainer
-                spacing: 6
+                spacing: Style.tinySpacing
 
                 Layout.row: 1
                 Layout.column: 2
-                Layout.preferredHeight: trackImporter.componentHeight
+                Layout.preferredHeight: Style.buttonSize
                 Layout.fillWidth: true;
 
                 ScrollView {
@@ -230,12 +219,12 @@ GridLayout {
                         id: artistsTextFieldRow
                         width: previewArtistsScrollView.width
                         height: previewArtistsScrollView.height
-                        spacing: 6
+                        spacing: Style.tinySpacing
 
                         RoundTextField {
                             id: defaultAddTracksArtistField
                             width: 200
-                            height: trackImporter.componentHeight
+                            height: Style.buttonSize
                             enabled: false
                         }
                     }
@@ -246,8 +235,7 @@ GridLayout {
                     id: addArtistButton
                     width: height
                     height: parent.height
-                    radius: 6
-                    spacing: 3
+                    radius: Style.buttonRadius
                     defaultColor: Style.gray
                     imageSource: "qrc:/staccato/src/ui/resources/plus.svg"
                     onClicked: {
@@ -261,8 +249,7 @@ GridLayout {
                     id: removeArtistButton
                     width: height
                     height: parent.height
-                    radius: 6
-                    spacing: 3
+                    radius: Style.buttonRadius
                     defaultColor: Style.gray
                     imageSource: "qrc:/staccato/src/ui/resources/minus.svg"
                     onClicked: {
@@ -277,7 +264,7 @@ GridLayout {
                 id: albumContainerTitleText
                 text: "Album: "
                 font.family: Style.mainFontFamily
-                font.pointSize: container.normalTextSize
+                font.pointSize: Style.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
                 color: Style.white
@@ -293,7 +280,7 @@ GridLayout {
 
                 Layout.row: 2
                 Layout.column: 2
-                Layout.preferredHeight: trackImporter.componentHeight
+                Layout.preferredHeight: Style.buttonSize
                 Layout.fillWidth: true;
             }
         }
@@ -302,7 +289,7 @@ GridLayout {
     //Recent playlists
     Column {
         id: recents
-        spacing: 12
+        spacing: Style.medSpacing
 
         Layout.row: 1
         Layout.column: 0
@@ -314,7 +301,7 @@ GridLayout {
             height: implicitHeight
             text: "Recents"
             font.family: Style.mainFontFamily
-            font.pointSize: container.h1TextSize
+            font.pointSize: Style.h1TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: Style.white

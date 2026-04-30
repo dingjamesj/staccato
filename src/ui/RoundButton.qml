@@ -17,9 +17,8 @@ Rectangle {
     
     property double disabledColorTintStrength: 0.5
 
-    property int textSize: 18
-    property var textStyle: Font.Normal
-    property int spacing: 8
+    property int textSize: Style.normalTextSize
+    property var textStyle: Font.Bold
 
     signal clicked()
     signal doubleClicked()
@@ -38,7 +37,7 @@ Rectangle {
     Text {
         id: buttonText
         anchors.fill: parent
-        anchors.margins: container.spacing
+        anchors.margins: Style.smallSpacing
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.family: Style.mainFontFamily
@@ -52,7 +51,6 @@ Rectangle {
     Image {
         id: img
         anchors.fill: parent
-        anchors.margins: container.spacing
         source: container.imageSource
         visible: false
     }
