@@ -4,6 +4,7 @@
 #include "track_manager.hpp"
 #include "app_manager.hpp"
 #include "playlist_tree.hpp"
+#include <nlohmann/json.hpp>
 
 using namespace staccato;
 
@@ -1230,6 +1231,42 @@ bool TrackManager::serialize_playlist(const Playlist& playlist) {
         i++;
 
     }
+
+    //Serialize the JSON object
+    output << std::setw(4) << root << std::endl;
+
+    if(output.fail()) {
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+bool TrackManager::read_playlist_tree() {
+
+    return false; //unfinished
+
+}
+
+bool TrackManager::serialize_playlist_tree() {
+
+    //Since std::ofstream can't create files in nonexistent folders, we first need to ensure that the playlists folder exists
+    std::filesystem::path playlist_files_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIRECTORY);
+    std::filesystem::create_directories(playlist_files_directory);
+
+    std::filesystem::path playlist_files_directory_path = playlist_files_directory / std::filesystem::path(PLAYLIST_TREE_FILENAME);
+    std::ofstream output (playlist_files_directory_path);
+    if(!output.is_open()) {
+
+        return false;
+
+    }
+
+    //Loop through the tree
+    nlohmann::json root = nlohmann::json::array();
 
     //Serialize the JSON object
     output << std::setw(4) << root << std::endl;

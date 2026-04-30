@@ -149,10 +149,10 @@ void StaccatoInterface::readSettings() {
 
 QList<QStringList> StaccatoInterface::getBasicPlaylistsInfo() {
 
-    std::vector<std::tuple<std::string, std::string, std::string, std::uint64_t>> playlists = TrackManager::get_basic_playlist_info_from_files();
+    std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> playlists = TrackManager::get_basic_playlist_info_from_files();
 
     QList<QStringList> qt_playlists {};
-    for(std::tuple<std::string, std::string, std::string, std::uint64_t> playlist: playlists) {
+    for(std::tuple<std::string, std::string, std::string, unsigned int> playlist: playlists) {
 
         qt_playlists.push_back({
             QString::fromStdString(std::get<0>(playlist)), 
@@ -172,7 +172,7 @@ QList<QStringList> StaccatoInterface::getBasicPlaylistsInfo() {
 QVariantList StaccatoInterface::readPersistentData() {
 
     std::string main_queue_playlist_id {""};
-    std::uint64_t main_position {0}, added_position {0};
+    unsigned int main_position {0}, added_position {0};
 
     if(AppManager::read_persistent_data(main_queue_playlist_id, main_position, added_position)) {
 

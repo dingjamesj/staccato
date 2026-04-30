@@ -28,7 +28,8 @@
 #include <vector>
 #include <bit>
 #include <QPixmap>
-#include <nlohmann/json.hpp>
+#include <any>
+#include <nlohmann/json_fwd.hpp>
 
 
 /* Familiarize yourself with some terminology:
@@ -229,8 +230,8 @@ namespace staccato {
         /// @return The total duration in seconds of the playlist
         static int get_playlist_duration(const Playlist& playlist);
 
-        /// @brief Writes the playlist to its .sply file (creating one if needed)
-        /// @param id (What the .sply filename's stem will be)
+        /// @brief Writes the playlist to its JSON file (creating one if needed)
+        /// @param id
         /// @param playlist
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_playlist(const Playlist& playlist);
@@ -248,16 +249,24 @@ namespace staccato {
         static std::vector<Track> get_online_tracklist(const std::string& url);
 
         //=====================================================================================
-        //                             TRACK DICTIONARY MANAGEMENT                             
+        //                     TRACK DICTIONARY & PLAYLIST TREE MANAGEMENT                     
         //=====================================================================================
 
-        /// @brief Reads the .stkl file and loads its information to the static field `track_dict` (declaration found somewhere else in this header file)
+        /// @brief Reads the track dict file and loads its information to the static field `track_dict`
         /// @return `true` if the read was successful, `false` otherwise
         static bool read_track_dict();
 
-        /// @brief Writes the track dict from the static field `track_dict` to the .stkl file (declaration of `track_dict` found somewhere else in this header file)
+        /// @brief Writes the track dict to its file
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_track_dict();
+
+        /// @brief Used to read the stored playlist tree, should be run once at the beginning of the program
+        /// @return `true` if the read was successful, `false` otherwise
+        static bool read_playlist_tree();
+
+        /// @brief Writes the playlist tree to its JSON file
+        /// @return `true` if the serialization was successful, `false` otherwise
+        static bool serialize_playlist_tree();
 
         //=====================================================================================
         //                                      DEBUGGING                                      
@@ -291,7 +300,7 @@ namespace staccato {
         static constexpr std::string_view PLAYLIST_TRACKLIST_JSON_KEY {"tracklist"};
 
         static constexpr std::string_view TRACK_DICTIONARY_FILENAME {"trackdict.json"};
-        static constexpr std::string_view PLAYLIST_TREE_FILENAME {"playlistfolders.json"};
+        static constexpr std::string_view PLAYLIST_TREE_FILENAME {"playlisttree.json"};
 
         #if(DEVELOPMENT_BUILD)
 

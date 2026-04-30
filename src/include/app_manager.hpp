@@ -16,7 +16,7 @@
 #include <vector>
 #include <unordered_map>
 #include <variant>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 /* Familiarize yourself with some terminology:
 
@@ -58,7 +58,7 @@ namespace staccato {
 
         /// @brief Used for reading the queue from the last staccato session's saved data, so that the user can continue where they left off. Should be ran once at the beginning of the program.
         /// @return A tuple of the saved main queue's playlist ID, main queue position, and added queue position.
-        static bool read_persistent_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position);
+        static bool read_persistent_data(std::string& main_queue_playlist_id, unsigned int& main_position, unsigned int& added_position);
 
         /// @brief Used to get the main queue
         /// @return A const ref to the main queue Track vector
@@ -114,7 +114,7 @@ namespace staccato {
         /// @param main_position
         /// @param added_position
         /// @return `true` if the serialization was successful, `false` otherwise
-        static bool serialize_persistent_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position);
+        static bool serialize_persistent_session_data(const std::string& main_queue_playlist_id, unsigned int main_position, unsigned int added_position);
 
         /// @brief Reads the settings (updates the `pinned_items` property). Should only be called at the beginning of the program since settings are stored as static variables at runtime.
         static void read_settings();

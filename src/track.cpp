@@ -222,7 +222,7 @@ bool Track::operator==(Track&& other) const {
 
 }
 
-std::ostream& operator<<(std::ostream& os, const Track& track) {
+std::ostream& staccato::operator<<(std::ostream& os, const Track& track) {
 
     os << track.string();
     return os;

@@ -3,6 +3,7 @@
 #include "track_manager.hpp"
 #include "app_manager.hpp"
 #include "playlist.hpp"
+#include <nlohmann/json.hpp>
 
 using namespace staccato;
 
@@ -12,7 +13,7 @@ std::vector<std::variant<Track, Playlist>> AppManager::recents {};
 
 std::unordered_map<std::string, std::variant<std::string, int, double, std::vector<std::string>>> AppManager::settings;
 
-bool AppManager::serialize_persistent_session_data(const std::string& main_queue_playlist_id, std::uint64_t main_position, std::uint64_t added_position) {
+bool AppManager::serialize_persistent_session_data(const std::string& main_queue_playlist_id, unsigned int main_position, unsigned int added_position) {
 
     //To represent the queue, we want to store the main queue, the added queue, the main queue's playlist ID,
     //the position in the main queue, and the position in the added queue.
@@ -132,7 +133,7 @@ bool AppManager::serialize_settings() {
 
 }
 
-bool AppManager::read_persistent_data(std::string& main_queue_playlist_id, std::uint64_t& main_position, std::uint64_t& added_position) {
+bool AppManager::read_persistent_data(std::string& main_queue_playlist_id, unsigned int& main_position, unsigned int& added_position) {
 
     //Unlike some other JSON read functions, this one returns absolutely nothing if an error in the JSON formatting is detected.
     //i.e. if there's a missing JSON field anywhere in the file, then all of the data is ignored and no persistent data is read.

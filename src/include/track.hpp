@@ -60,12 +60,12 @@ namespace staccato {
         /// @return `true` if the other Track's title, artists, and album are equal to this Track's, `false` otherwise
         bool operator==(Track&& other) const;
 
+        //For debugging
+        friend std::ostream& operator<<(std::ostream& os, const Track& track);
+
     };
 
 }
-
-//For debugging purposes
-std::ostream& operator<<(std::ostream& os, const staccato::Track& track);
 
 //To make hash-using collections work
 template<> struct std::hash<staccato::Track> {
