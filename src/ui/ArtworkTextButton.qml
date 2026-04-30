@@ -2,17 +2,18 @@ import QtQuick
 
 pragma ComponentBehavior: Bound
 
+//Button that contains a picture and text.
 Rectangle {
     id: container
 
     required property string artworkSource
     required property string name
     required property string description
-    property color defaultColor: "#303030"
+    property color defaultColor: Style.lightBackground
     property color hoverColor: Qt.lighter(defaultColor, 1.2)
     property color pressedColor: Qt.lighter(defaultColor, 1.5)
-    property color nameTextColor: "#ffffff"
-    property color descriptionTextColor: "#9a9a9a"
+    property color nameTextColor: Style.white
+    property color descriptionTextColor: Style.darkWhite
     property int nameTextSize: 18
     property int descriptionTextSize: 10
     property var nameTextStyle: Font.Bold

@@ -7,16 +7,15 @@ Rectangle {
     property string text: ""
     property url imageSource: ""
     
-    property color defaultColor: "#404040"
+    property color defaultColor: Style.gray
     property color hoverColor: Qt.lighter(defaultColor, 1.2)
     property color pressedColor: Qt.lighter(defaultColor, 1.5)
     property color disabledColor: Qt.darker(defaultColor, 1.5)
     
-    property color textColor: "#ffffff"
+    property color textColor: Style.white
     property color disabledTextColor: Qt.darker(textColor, 1.5)
     
-    property color imageColor: "#ffffff"
-    property color disabledImageColor: Qt.darker(imageColor, 1.5)
+    property double disabledColorTintStrength: 0.5
 
     property int textSize: 18
     property var textStyle: Font.Normal
@@ -62,8 +61,8 @@ Rectangle {
         id: buttonImage
         source: img
         anchors.fill: img
-        colorization: 1.0
-        colorizationColor: container.enabled ? container.imageColor : container.disabledImageColor
+        colorization: container.enabled ? 0 : container.disabledColorTintStrength
+        colorizationColor: '#000000'
         autoPaddingEnabled: true
     }
 }

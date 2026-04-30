@@ -61,7 +61,7 @@ Column {
                     font.bold: true
                     wrapMode: TextEdit.NoWrap
                     readOnly: true
-                    color: "#ffffff"
+                    color: Style.white
                 }
             }
 
@@ -84,7 +84,7 @@ Column {
                     font.pointSize: 15
                     wrapMode: TextEdit.NoWrap
                     readOnly: true
-                    color: "#9a9a9a"
+                    color: Style.darkWhite
                 }
             }
 
@@ -108,7 +108,7 @@ Column {
                     font.pointSize: 15
                     wrapMode: TextEdit.NoWrap
                     readOnly: true
-                    color: "#9a9a9a"
+                    color: Style.darkWhite
                 }
             }
         }
@@ -150,7 +150,7 @@ Column {
                 width: 67
                 height: 36
                 radius: height / 2
-                color: "#d04ea5"
+                color: Style.m4aColor
 
                 TextEdit {
                     id: fileTypeText
@@ -164,7 +164,7 @@ Column {
                     font.weight: Font.ExtraBold
                     wrapMode: TextEdit.NoWrap
                     readOnly: true
-                    color: "#ffffff"
+                    color: Style.white
                 }
             }
 
@@ -179,7 +179,7 @@ Column {
                 font.bold: true
                 wrapMode: TextEdit.NoWrap
                 readOnly: true
-                color: "#ffffff"
+                color: Style.white
             }
 
             TextEdit {
@@ -193,7 +193,7 @@ Column {
                 font.bold: true
                 wrapMode: TextEdit.NoWrap
                 readOnly: true
-                color: "#ffffff"
+                color: Style.white
             }
         }
     }

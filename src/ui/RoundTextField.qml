@@ -4,13 +4,13 @@ import QtQuick.Controls
 pragma ComponentBehavior: Bound
 
 TextField {
-    property color textColor: "#d4d4d4"
+    property color textColor: Style.offWhite
     property color disabledTextColor: Qt.darker(textColor, 1.5)
 
-    property color defaultPlaceholderTextColor: "#7f7f7f"
+    property color defaultPlaceholderTextColor: Style.darkWhite
     property color disabledPlaceholderTextColor: Qt.darker(placeholderTextColor, 1.5)
 
-    property color defaultColor: "#303030"
+    property color defaultColor: Style.lightBackground
     property color disabledColor: Qt.darker(defaultColor, 1.3)
 
     property int backgroundRadius: 6

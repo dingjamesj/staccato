@@ -5,7 +5,7 @@ pragma ComponentBehavior: Bound
 
 Rectangle {
     id: container
-    color: "#2b2b2b"
+    color: Style.lightBackground
     required property string source
 
     Image {

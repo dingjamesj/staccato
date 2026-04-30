@@ -11,6 +11,14 @@ pragma ComponentBehavior: Bound
 //===============================================
 
 GridLayout {
+    property alias importStatusText: statusText.text
+    property alias importURLText: urlTextField.text
+    property alias previewArtworkSource: previewArtwork.source
+    property alias previewTitleText: previewTitleField.text
+    property alias previewArtistsContainer: artistsTextFieldRow
+    property alias previewAlbumText: previewAlbumField.text
+    property alias recentlyPlayedContainer: recentsContainer
+
     property int h1TextSize: 24
     property int h2TextSize: 13
     property int normalTextSize: 10
@@ -46,7 +54,7 @@ GridLayout {
             font.pointSize: container.h1TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
-            color: "#ffffff"
+            color: Style.white
         }
 
         //URL textbox title text
@@ -59,7 +67,7 @@ GridLayout {
             font.pointSize: container.h2TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
-            color: "#ffffff"
+            color: Style.white
         }
 
         //URL input text box & download button
@@ -84,10 +92,10 @@ GridLayout {
                 height: trackImporter.componentHeight
                 radius: 6
                 text: "Download"
-                defaultColor: "#80005d"
+                defaultColor: Style.purple
                 textSize: container.normalTextSize
                 textStyle: Font.Bold
-                enabled: false
+                enabled: urlTextField.text.length > 0
             }
 
             RoundButton {
@@ -96,14 +104,27 @@ GridLayout {
                 height: trackImporter.componentHeight
                 radius: 6
                 text: "Load Preview"
-                defaultColor: "#434343"
+                defaultColor: Style.gray
                 textSize: container.normalTextSize
                 textStyle: Font.Bold
-                enabled: false
+                enabled: urlTextField.text.length > 0
                 
                 onClicked: {
                     Logic.loadTrackInfo(urlTextField.text, loadPreviewButton, previewTitleField, artistsTextFieldRow, previewAlbumField, previewArtwork);
                 }
+            }
+
+            Text {
+                id: statusText
+                width: 175
+                height: trackImporter.componentHeight
+                text: ""
+                font.family: Style.mainFontFamily
+                font.pointSize: container.normalTextSize
+                font.weight: Font.DemiBold
+                wrapMode: Text.NoWrap
+                color: Style.red
+                verticalAlignment: Text.AlignVCenter
             }
         }
 
@@ -117,7 +138,7 @@ GridLayout {
             font.pointSize: container.h2TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
-            color: "#ffffff"
+            color: Style.white
         }
 
         //Track preview contents
@@ -151,7 +172,7 @@ GridLayout {
                 font.pointSize: container.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
-                color: "#ffffff"
+                color: Style.white
 
                 Layout.row: 0
                 Layout.column: 1
@@ -176,7 +197,7 @@ GridLayout {
                 font.pointSize: container.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
-                color: "#ffffff"
+                color: Style.white
 
                 Layout.row: 1
                 Layout.column: 1
@@ -227,7 +248,7 @@ GridLayout {
                     height: parent.height
                     radius: 6
                     spacing: 3
-                    defaultColor: "#434343"
+                    defaultColor: Style.gray
                     imageSource: "qrc:/staccato/src/ui/resources/plus.svg"
                     onClicked: {
                         Logic.addArtistTextField(artistsTextFieldRow);
@@ -242,7 +263,7 @@ GridLayout {
                     height: parent.height
                     radius: 6
                     spacing: 3
-                    defaultColor: "#434343"
+                    defaultColor: Style.gray
                     imageSource: "qrc:/staccato/src/ui/resources/minus.svg"
                     onClicked: {
                         Logic.removeArtistTextField(artistsTextFieldRow);
@@ -259,7 +280,7 @@ GridLayout {
                 font.pointSize: container.normalTextSize
                 font.weight: Font.DemiBold
                 wrapMode: Text.NoWrap
-                color: "#ffffff"
+                color: Style.white
 
                 Layout.row: 2
                 Layout.column: 1
@@ -296,15 +317,15 @@ GridLayout {
             font.pointSize: container.h1TextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
-            color: "#ffffff"
+            color: Style.white
         }
 
-        // Rectangle {
-        //     id: recentsContainer
-        //     width: parent.width
-        //     height: parent.height - recentsText.height
-        //     color: "#ff0000"
-        // }
+        Rectangle {
+            id: recentsContainer
+            width: parent.width
+            height: parent.height - recentsText.height
+            color: Style.background
+        }
 
     }
 
@@ -317,7 +338,7 @@ GridLayout {
 
         }
         background: Rectangle {
-            color: "#ff0000"
+            color: Style.red
         }
     }
 
