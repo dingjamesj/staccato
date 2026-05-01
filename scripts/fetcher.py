@@ -38,7 +38,7 @@ def change_api_settings(client_id: str, client_secret: str, market: str):
         print(e)
 
 
-# Exposed to C++
+# Used in C++ code
 def get_playlist(url: str) -> list[dict]:
     url_type: str = get_url_type(url)
     if url_type == "spotify":
@@ -88,7 +88,7 @@ def get_youtube_playlist(url: str) -> list[dict]:
         return tracklist
 
 
-# Exposed to C++
+# Used in C++ code
 def can_access_playlist(url: str) -> bool:
     url_type: str = get_url_type(url)
     if url_type == "spotify":
@@ -118,7 +118,7 @@ def can_access_youtube_playlist(url: str) -> bool:
         return info is not None and "entries" in info and "description" in info and info["channel"] is not None
 
 
-# Exposed to C++
+# Used in C++ code
 def get_track(url: str) -> dict:
     url_type: str = get_url_type(url)
     if url_type == "spotify":
@@ -176,7 +176,7 @@ def get_youtube_track(url: str) -> dict:
         return {}
 
 
-# Exposed to C++
+# Used in C++ code
 def get_artwork_url_from_musicbrainz(album: str = "", lead_artist: str = "", title: str = "") -> str:
     try:
         musicbrainzngs.set_useragent(app="staccato", version="development")
@@ -247,7 +247,7 @@ def get_artwork_url_from_musicbrainz(album: str = "", lead_artist: str = "", tit
         return ""
 
 
-# Exposed to C++
+# Used in C++ code
 def find_best_youtube_url(title: str, artists: list[str]) -> str:
     try: 
         artists_str: str = ""

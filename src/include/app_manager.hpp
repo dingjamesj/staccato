@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <variant>
 #include <nlohmann/json_fwd.hpp>
+#include <Python.h>
 
 /* Familiarize yourself with some terminology:
 
@@ -135,6 +136,17 @@ namespace staccato {
         static bool set_playlist_image(const std::string& image_absolute_path, const std::string& playlist_id);
 
         //=====================================================================================
+        //                                       PYTHON                                        
+        //=====================================================================================
+
+        /// @brief Initializes python, to be called once at program start
+        static bool init_python();
+        
+        /// @brief *(Calls python function "downloader.update_libraries")* Updates python libraries (e.g. pip, yt-dlp)
+        /// @return The status of the update (failure, success, already up to date) as a string, empty string if a python error occurred
+        static std::string update_python_libraries();
+
+        //=====================================================================================
         //                                      DEBUGGING                                      
         //=====================================================================================
 
@@ -159,31 +171,31 @@ namespace staccato {
         static constexpr std::string_view ADDED_QUEUE_JSON_KEY {"addedQueue"};
         static constexpr std::string_view ADDED_QUEUE_POSITION_JSON_KEY {"addedQueuePosition"};
 
+        //Directory paths
         #if(DEVELOPMENT_BUILD)
 
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.json"};
         static constexpr std::string_view PERSISTENT_DATA_PATH {"..\\persistent.json"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"..\\playlists\\images"};
+        static constexpr std::string_view PYTHON_SCRIPTS_DIRECTORY {"..\\scripts"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.json"};
         static constexpr std::string_view PERSISTENT_DATA_PATH {"../persistent.json"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"../playlists/images"};
+        static constexpr std::string_view PYTHON_SCRIPTS_DIRECTORY {"../scripts"};
         #endif
 
         #else
 
-        #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.json"};
         static constexpr std::string_view PERSISTENT_DATA_PATH {"persistent.json"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists\\images"};
-        #else
-        static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.json"};
-        static constexpr std::string_view PERSISTENT_DATA_PATH {"persistent.json"};
-        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"playlists/images"};
+        static constexpr std::string_view PYTHON_SCRIPTS_DIRECTORY {"scripts"};
+        
         #endif
 
-        #endif
+        static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"images"};
+        static constexpr std::string_view PYTHON_VENV_DIRECTORY {".venv"};
+        static constexpr std::string_view PYTHON_SCRIPT_NAME {"main.py"};
+        static constexpr std::string_view PYTHON_DOWNLOAD_FUNC_NAME {"download_track"};
 
     };
     

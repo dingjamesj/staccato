@@ -1,9 +1,5 @@
 from yt_dlp import YoutubeDL
 
-from subprocess import CompletedProcess
-import subprocess
-import sys
-
 import os
 
 import base64
@@ -23,7 +19,7 @@ import imageio_ffmpeg
 
 import imghdr
 
-# Exposed to C++
+# Used in C++ code
 def download_youtube_track(url: str, artwork_url: str, location: str, force_mp3: bool = False, force_opus: bool = False) -> str:
     """Returns the downloaded path if the download was successful, empty string otherwise. 
     Downloads an M4A (with AAC codec) by default, but options are included for MP3 and WEBM (with Opus codec)"""
@@ -193,27 +189,6 @@ def set_track_artwork_ogg(track_path: str, artwork_url: str) -> bool:
         print("False")
         return False
     return True
-
-
-# Exposed to C++
-def update_libraries() -> str:
-    """Returns a string representation of the update status (failure, success, already up to date)"""
-    pip_install_result: CompletedProcess[str] = subprocess.run(
-        [sys.executable, "-m", "pip", "install", "--upgrade", "pip"], 
-        capture_output=True, 
-        text=True
-    )
-    yt_dlp_install_result: CompletedProcess[str] = subprocess.run(
-        [sys.executable, "-m", "pip", "install", "--upgrade", "yt-dlp"], 
-        capture_output=True, 
-        text=True
-    )
-    
-    if pip_install_result.returncode != 0 or yt_dlp_install_result.returncode != 0:
-        return "UPDATE FAILED"
-    if ("already satisfied" in pip_install_result.stdout) and ("already satisfied" in yt_dlp_install_result.stdout):
-        return "ALREADY UP TO DATE"
-    return "UPDATED SUCCESSFULLY"
 
 
 def extract_youtube_id_from_url(url: str) -> str:

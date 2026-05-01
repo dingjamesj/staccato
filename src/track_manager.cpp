@@ -114,8 +114,9 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
 }
 
-std::pair<Track, std::string> TrackManager::get_online_track_info(const std::string& url) {
+std::tuple<Track, std::string, std::string> TrackManager::get_online_track_full_info(const std::string& url, const Track& track, const std::vector<std::string>& args) {
 
+    /*
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
@@ -175,156 +176,11 @@ std::pair<Track, std::string> TrackManager::get_online_track_info(const std::str
     );
     Py_DECREF(py_return);
     return {track, PyUnicode_AsUTF8(py_artwork_url)};
+    */
 
 }
 
-std::string TrackManager::get_best_youtube_url(const Track& track) {
-
-    //Find the best YouTube URL and then download
-
-    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
-    PyObject* py_module = PyImport_Import(py_fetcher);
-    Py_DECREF(py_fetcher);
-    if(py_module == nullptr) {
-
-        return "";
-
-    }
-
-    PyObject* py_func = PyObject_GetAttrString(py_module, "find_best_youtube_url");
-    Py_DECREF(py_module);
-    if(py_func == nullptr || !PyCallable_Check(py_func)) {
-
-        Py_XDECREF(py_func);
-        return "";
-
-    }
-
-    PyObject* py_param_title = PyUnicode_FromString(track.title().c_str());
-    const std::vector<std::string>& track_artists = track.artists();
-    PyObject* py_param_artists = PyList_New(0);
-    for(std::size_t i {0}; i < track_artists.size(); i++) {
-
-        PyList_Append(py_param_artists, PyUnicode_FromString(track_artists[i].c_str()));
-
-    }
-    
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
-    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_title, py_param_artists, NULL);
-    PyGILState_Release(gstate);
-    
-    Py_DECREF(py_func);
-    Py_DECREF(py_param_title);
-    Py_DECREF(py_param_artists);
-    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
-
-        Py_XDECREF(py_return);
-        return "";
-
-    }
-
-    std::string youtube_url {PyUnicode_AsUTF8(py_return)};
-    Py_DECREF(py_return);
-    return youtube_url;
-
-}
-
-std::string TrackManager::get_musicbrainz_artwork_url(const std::string& title, const std::string& lead_artist, const std::string& album) {
-
-    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
-    PyObject* py_module = PyImport_Import(py_fetcher);
-    Py_DECREF(py_fetcher);
-    if(py_module == nullptr) {
-
-        return "";
-
-    }
-
-    PyObject* py_func = PyObject_GetAttrString(py_module, "get_artwork_url_from_musicbrainz");
-    Py_DECREF(py_module);
-    if(py_func == nullptr || !PyCallable_Check(py_func)) {
-
-        Py_XDECREF(py_func);
-        return "";
-
-    }
-
-    PyObject* py_param_title = PyUnicode_FromString(title.c_str());
-    PyObject* py_param_lead_artist = PyUnicode_FromString(lead_artist.c_str());
-    PyObject* py_param_album = PyUnicode_FromString(album.c_str());
-
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
-    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_album, py_param_lead_artist, py_param_title, NULL);
-    PyGILState_Release(gstate);
-
-    Py_DECREF(py_func);
-    Py_DECREF(py_param_title);
-    Py_DECREF(py_param_lead_artist);
-    Py_DECREF(py_param_album);
-    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
-
-        Py_XDECREF(py_return);
-        return "";
-
-    }
-
-    std::string image_url {PyUnicode_AsUTF8(py_return)};
-    Py_DECREF(py_return);
-    return image_url;
-
-}
-
-bool TrackManager::online_playlist_is_accessible(const std::string& url) {
-
-    if(url.empty()) {
-
-        return false;
-
-    }
-
-    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
-    PyObject* py_module = PyImport_Import(py_fetcher);
-    Py_DECREF(py_fetcher);
-    if(py_module == nullptr) {
-
-        return false;
-
-    }
-
-    PyObject* py_func = PyObject_GetAttrString(py_module, "can_access_playlist");
-    Py_DECREF(py_module);
-    if(py_func == nullptr || !PyCallable_Check(py_func)) {
-
-        Py_XDECREF(py_func);
-        return false;
-
-    }
-
-    PyObject* py_param = PyUnicode_FromString(url.c_str());
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
-    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param, NULL);
-    PyGILState_Release(gstate);
-
-    Py_DECREF(py_func);
-    Py_DECREF(py_param);
-    if(py_return == nullptr || !PyBool_Check(py_return)) {
-
-        Py_XDECREF(py_return);
-        return false;
-
-    }
-
-    bool is_valid_url = PyObject_IsTrue(py_return) == 1;
-    Py_DECREF(py_return);
-
-    return is_valid_url;
-
-}
-
-std::vector<Track> TrackManager::get_online_tracklist(const std::string& url) {
+std::vector<Track> TrackManager::get_online_tracks(const std::string& url) {
 
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
@@ -429,8 +285,9 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     
 }
 
-bool TrackManager::download_track(const Track& track, const std::string& youtube_url, const std::string& artwork_url, bool force_mp3, bool force_opus) {
+bool TrackManager::download_online_track(const std::string& url, const Track& track, const std::vector<std::string>& args) {
 
+    /*
     if(track_dict.contains(track)) {
 
         //(we return true because we only return false if the download was unsuccessful,
@@ -484,6 +341,10 @@ bool TrackManager::download_track(const Track& track, const std::string& youtube
     Py_DECREF(py_return);
     track_dict.insert({track, downloaded_path});
     return write_file_metadata(downloaded_path, track);
+
+    */
+
+    return true;
 
 }
 
@@ -687,11 +548,11 @@ audiotype TrackManager::get_track_file_type(const Track& track) {
 
 }
 
-QPixmap TrackManager::get_track_artwork(const Track& track) {
+TagLib::ByteVector TrackManager::get_track_artwork(const Track& track) {
 
     if(!track_dict.contains(track)) {
 
-        return QPixmap();
+        return {nullptr, 0};
 
     }
 
@@ -699,31 +560,23 @@ QPixmap TrackManager::get_track_artwork(const Track& track) {
 
 }
 
-QPixmap TrackManager::get_track_artwork(const std::string& audio_file_path) {
+TagLib::ByteVector TrackManager::get_track_artwork(const std::string& audio_file_path) {
 
     TagLib::FileRef file_ref(audio_file_path.c_str());
     if(file_ref.isNull()) {
 
-        return QPixmap();
+        return {nullptr, 0};
 
     }
 
     TagLib::List<TagLib::VariantMap> picture_properties = file_ref.complexProperties("PICTURE");
     if(picture_properties.isEmpty() || picture_properties.front().isEmpty() || picture_properties.front().value("data").isEmpty()) {
 
-        return QPixmap();
+        return {nullptr, 0};
 
     }
 
-    TagLib::ByteVector data = picture_properties.front().value("data").toByteVector();
-    QPixmap pixmap;
-    if(!pixmap.loadFromData(QByteArray(data.data(), data.size()))) {
-
-        return QPixmap();
-
-    }
-
-    return pixmap;
+    return picture_properties.front().value("data").toByteVector();
 
 }
 

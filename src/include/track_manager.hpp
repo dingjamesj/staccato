@@ -27,10 +27,10 @@
 #include <flacfile.h>
 #include <vector>
 #include <bit>
-#include <QPixmap>
 #include <any>
 #include <nlohmann/json_fwd.hpp>
 #include <stack>
+#include <Python.h>
 
 
 /* Familiarize yourself with some terminology:
@@ -92,7 +92,7 @@ namespace staccato {
         public:
 
         //=====================================================================================
-        //                               READING EXTERNAL TRACKS                               
+        //                            READING EXTERNAL AUDIO FILES                            
         //=====================================================================================
 
         /// @param path 
@@ -103,25 +103,6 @@ namespace staccato {
         /// @param path 
         /// @return A Track object representing the local track
         static Track get_local_track_info(const std::string& path);
-
-        //------------------------------- REQUIRES THE INTERNET -------------------------------
-
-        /// @brief *(Calls python function "fetcher.get_track")* Gets info about a track from an online source
-        /// @param url 
-        /// @return A Track object representing the online track
-        static std::pair<Track, std::string> get_online_track_info(const std::string& url);
-
-        /// @brief *(Calls python function "fetcher.find_best_youtube_url")* Searches for a YouTube video that matches best with the Track info. 
-        /// @param track 
-        /// @return A YouTube URL
-        static std::string get_best_youtube_url(const Track& track);
-
-        /// @brief *(Calls python function "fetcher.get_artwork_url_from_musicbrainz")* Searches for a release group on musicbrainz that contains the track described by the params, and gets its cover artwork URL
-        /// @param title 
-        /// @param lead_artist 
-        /// @param album 
-        /// @return An online URL to an image resource, an empty string if an image wasn't found
-        static std::string get_musicbrainz_artwork_url(const std::string& title, const std::string& lead_artist, const std::string& album);
 
         //=====================================================================================
         //                               READING INTERNAL TRACKS                               
@@ -151,11 +132,11 @@ namespace staccato {
         /// @brief Short form of `get_track_artwork_raw(get_track_file_path(track))`
         /// @param track 
         /// @return The embedded artwork of the Track object's associated audio file as a vector of bytes (chars)
-        static QPixmap get_track_artwork(const Track& track);
+        static TagLib::ByteVector get_track_artwork(const Track& track);
 
         /// @param audio_file_path 
         /// @return The embedded artwork of the audio file as a vector of bytes (chars)
-        static QPixmap get_track_artwork(const std::string& audio_file_path);
+        static TagLib::ByteVector get_track_artwork(const std::string& audio_file_path);
 
         /// @brief To keep staccato's file tracking in sync, this should be ran in the background when staccato starts
         /// @return A vector of Tracks that are keys in the track dict and whose corresponding audio files are no longer accessible
@@ -197,19 +178,8 @@ namespace staccato {
         /// @return `true` if deleting the artwork was successful, `false` otherwise. NOTE : returns `true` if `track` is not in the track dict (vacuously since deleting the artwork wasn't attempted)
         static bool delete_track_artwork(const Track& track);
 
-        //------------------------------- REQUIRES THE INTERNET -------------------------------
-
-        /// @brief *(Calls python function "downloader.download_youtube_track")* Downloads an audio file from YouTube, puts it into staccato's "track" directory, and adds param `track` and the downloaded file path to the track dict. DOES NOTHING IF `track` ALREADY EXISTS IN THE TRACK DICT.
-        /// @param track The track metadata to put into the track dict and to set the downloaded audio file metadata to
-        /// @param youtube_url YouTube video URL to download from
-        /// @param artwork_url URL to an online image resource
-        /// @param force_mp3 Forces the audio file to be an mp3
-        /// @param force_opus Forces the audio file to be an ogg file with opus codec
-        /// @return `true` if the download was successful, `false` otherwise (e.g. unable to download video, python error). NOTE : returns `true` if `track` is already in the track dict (vacuously since a download wasn't attempted)
-        static bool download_track(const Track& track, const std::string& youtube_url, const std::string& artwork_url, bool force_mp3, bool force_opus);
-
         //=====================================================================================
-        //                        PLAYLISTS MANAGEMENT (LOCAL & ONLINE)                        
+        //                                PLAYLISTS MANAGEMENT                        
         //=====================================================================================
         
         /// @brief This is when you want to know what playlists are saved in staccato (you don't want complete information including tracklist for each of them)
@@ -242,17 +212,31 @@ namespace staccato {
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_playlist(const Playlist& playlist);
         
-        //------------------------------- REQUIRES THE INTERNET -------------------------------
+        //=====================================================================================
+        //                      ONLINE TRACK ACCESS (via. Python scripts)                      
+        //=====================================================================================
 
-        /// @brief *(Calls python function "fetcher.can_access_playlist")*
+        /// @brief Used 
         /// @param url 
-        /// @return `true` if the online playlist is accessible, `false` otherwise
-        static bool online_playlist_is_accessible(const std::string& url);
-        
-        /// @brief *(Calls python function "fetcher.get_playlist")*
-        /// @param url 
-        /// @return The online playlist's tracklist as an unordered multiset of Track objects, an empty unordered multiset if accessing the playlist was unsuccessful
-        static std::vector<Track> get_online_tracklist(const std::string& url);
+        /// @return 
+        static std::vector<Track> get_online_tracks(const std::string& url);
+
+        /// @brief Used to get complete info about a singular track (e.g. including picture data). 
+        ///        Meant to be used sparingly, for example when loading a track preview.
+        /// @param url The track URL
+        /// @param track The track information
+        /// @param args 
+        /// @return A tuple of the track info, audio source URL, and artwork URL
+        static std::tuple<Track, std::string, std::string> get_online_track_full_info(const std::string& url, const Track& track, const std::vector<std::string>& args);
+
+        /// @brief Used to download audio. The audio's filepath is then mapped to the param `track` in the track dictionary.
+        ///        Note that this calls the Python "download track" function and does nothing else.
+        ///        The download Python script may or may not use both the URL and the track info, but are given for flexibility in implementation.
+        /// @param audio_source_url A URL to the audio source (example: a YouTube video; anti-example: a Spotify link)
+        /// @param track Track information
+        /// @param args Extra information, if needed
+        /// @return `false` if the download encountered an unexpected error, `true` otherwise
+        static bool download_online_track(const std::string& audio_source_url, const Track& track, const std::vector<std::string>& args);
 
         //=====================================================================================
         //                     TRACK DICTIONARY & PLAYLIST TREE MANAGEMENT                     

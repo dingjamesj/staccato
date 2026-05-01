@@ -1,7 +1,7 @@
+#include "app_manager.hpp"
 #include "track.hpp"
 #include "util.hpp"
 #include "track_manager.hpp"
-#include "app_manager.hpp"
 #include "playlist.hpp"
 #include <nlohmann/json.hpp>
 
@@ -478,7 +478,7 @@ void AppManager::read_settings() {
 
 std::string AppManager::get_playlist_image_path(const std::string& playlist_id) {
 
-    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY);
+    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / TrackManager::PLAYLIST_FILES_DIRECTORY / PLAYLIST_IMAGES_DIRECTORY;
 
     std::filesystem::path jpg_path = playlist_images_directory / (playlist_id + ".jpg");
     if(std::ifstream(jpg_path).good()) {
@@ -550,7 +550,7 @@ bool AppManager::set_playlist_image(const std::string& image_path_str, const std
     }
 
     //Ensure that the playlist images folder exists
-    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_IMAGES_DIRECTORY);
+    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / TrackManager::PLAYLIST_FILES_DIRECTORY / PLAYLIST_IMAGES_DIRECTORY;
     std::filesystem::create_directories(playlist_images_directory);
 
     //Delete the current image, which might have a different file extension from the new image we're about to copy.
@@ -563,6 +563,68 @@ bool AppManager::set_playlist_image(const std::string& image_path_str, const std
 
     //Copy the image
     return std::filesystem::copy_file(image_path, playlist_images_directory / (playlist_id + image_extension));
+
+}
+
+bool AppManager::init_python() {
+
+    //Get the path to the virtual env.'s Python executable
+    #if defined(_WIN32) || defined(_WIN64)
+    std::filesystem::path venv_path = std::filesystem::current_path() / PYTHON_SCRIPTS_DIRECTORY / PYTHON_VENV_DIRECTORY / "Scripts/python.exe";
+    #else
+    std::filesystem::path venv_path = std::filesystem::current_path() / PYTHON_SCRIPTS_DIRECTORY / PYTHON_VENV_DIRECTORY / "bin/python";
+    #endif
+
+    PyConfig config;
+    PyConfig_InitIsolatedConfig(&config);
+    PyConfig_SetString(&config, &config.executable, venv_path.wstring().c_str());
+    
+    PyStatus status = Py_InitializeFromConfig(&config);
+    PyConfig_Clear(&config);
+
+    //Make the Python interpreter look in the correct directory for Python scripts
+    PyRun_SimpleString(("import sys; sys.path.append('" + std::string(PYTHON_SCRIPTS_DIRECTORY) + "')").c_str());
+
+    return !(bool) PyStatus_Exception(status);
+
+}
+
+std::string AppManager::update_python_libraries() {
+
+    PyObject* py_script = PyUnicode_DecodeFSDefault(PYTHON_SCRIPT_NAME.data());
+    PyObject* py_module = PyImport_Import(py_script);
+    Py_DECREF(py_script);
+    if(py_module == nullptr) {
+
+        return "";
+
+    }
+
+    PyObject* py_func = PyObject_GetAttrString(py_module, "update_libraries");
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return "";
+
+    }
+
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, NULL);
+    PyGILState_Release(gstate);
+
+    Py_DECREF(py_func);
+    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return "";
+
+    }
+
+    std::string update_status {PyUnicode_AsUTF8(py_return)};
+    Py_DECREF(py_return);
+    return update_status;
 
 }
 

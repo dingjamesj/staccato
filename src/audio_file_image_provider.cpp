@@ -1,6 +1,6 @@
-#include "audio_file_image_provider.hpp"
 #include "app_manager.hpp"
 #include "track_manager.hpp"
+#include "audio_file_image_provider.hpp"
 
 using namespace staccato;
 
@@ -8,9 +8,10 @@ AudioFileImageProvider::AudioFileImageProvider(): QQuickImageProvider(QQuickImag
 
 QPixmap AudioFileImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) {
 
-    QPixmap pixmap = TrackManager::get_track_artwork(id.toStdString());
+    TagLib::ByteVector data  = TrackManager::get_track_artwork(id.toStdString());
+    QPixmap pixmap;
 
-    if(pixmap.isNull()) {
+    if(data == nullptr || !pixmap.loadFromData(QByteArray(data.data(), data.size()))) {
 
         pixmap.load(AppManager::PLACEHOLDER_ART_PATH.data());
         if(size != nullptr) {

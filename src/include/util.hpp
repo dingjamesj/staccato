@@ -17,7 +17,6 @@
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
-#include <Python.h>
 
 namespace staccato {
 
@@ -62,14 +61,6 @@ namespace staccato {
     /// @param url 
     /// @return The streaming service that is param `url`
     urltype get_url_type(const std::string& url);
-
-    /// @brief Initializes python, SHOULD ONLY BE CALLED ONCE AT THE BEGINNING OF THE ENTIRE PROGRAM
-    /// @return 
-    bool init_python();
-
-    /// @brief *(Calls python function "downloader.update_libraries")* Updates python libraries (e.g. pip, yt-dlp)
-    /// @return The status of the update (failure, success, already up to date) as a string, empty string if a python error occurred
-    std::string update_python_libraries();
 
 }
 

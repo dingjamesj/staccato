@@ -127,7 +127,7 @@ void Playlist::add_tracks_from_online_connection() {
 
     }
 
-    std::vector<Track> online_tracklist = TrackManager::get_online_tracklist(online_connection_);
+    std::vector<Track> online_tracklist = TrackManager::get_online_tracks(online_connection_);
     for(std::size_t i {0}; i < online_tracklist.size(); i++) {
 
         if(!tracklist_set.contains(online_tracklist[i])) {

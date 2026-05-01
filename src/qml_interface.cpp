@@ -1,5 +1,5 @@
-#include "track_manager.hpp"
 #include "app_manager.hpp"
+#include "track_manager.hpp"
 #include "track.hpp"
 #include "qml_interface.hpp"
 
@@ -261,15 +261,17 @@ QList<QVariant> StaccatoInterface::getLocalTrackInfo(const QString& path) {
 
 QList<QVariant> StaccatoInterface::getOnlineTrackInfo(const QString& url) {
 
-    std::pair<Track, std::string> track_artwork_pair = TrackManager::get_online_track_info(url.toStdString());
-    Track& track = track_artwork_pair.first;
-    QStringList artists {};
-    for(std::string artist: track.artists()) {
+    // std::pair<Track, std::string> track_artwork_pair = TrackManager::get_online_track_info(url.toStdString());
+    // Track& track = track_artwork_pair.first;
+    // QStringList artists {};
+    // for(std::string artist: track.artists()) {
 
-        artists.append(QString::fromStdString(artist));
+    //     artists.append(QString::fromStdString(artist));
 
-    }
+    // }
     
-    return {QVariant(QString::fromStdString(track.title())), artists, QVariant(QString::fromStdString(track.album())), QVariant(QString::fromStdString(track_artwork_pair.second))};
+    // return {QVariant(QString::fromStdString(track.title())), artists, QVariant(QString::fromStdString(track.album())), QVariant(QString::fromStdString(track_artwork_pair.second))};
+
+    return {};
 
 }

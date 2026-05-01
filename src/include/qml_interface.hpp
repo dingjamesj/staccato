@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtQml>
+#include <QPixmap>
 
 //=====================================================================================================================================
 // Since Qt requires their own Qt objects such as QList and QString, we need an "interface" that converts STL objects into Qt objects.

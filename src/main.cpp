@@ -1,6 +1,6 @@
 #include "app_manager.hpp"
-#include "util.hpp"
 #include "track_manager.hpp"
+#include "util.hpp"
 #include "qml_interface.hpp"
 #include "audio_file_image_provider.hpp"
 #include "track.hpp"
@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
     AppManager::read_settings();
 
-    bool init_success = init_python();
+    bool init_success = AppManager::init_python();
     if(!init_success) {
 
         return 2;

@@ -5,6 +5,7 @@
 #include <QPixmap>
 #include <vector>
 #include <string>
+#include <taglib/tbytevector.h>
 
 namespace staccato {
 
