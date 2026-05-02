@@ -29,6 +29,16 @@ Column {
 
     ButtonGroup {
         id: extraParametersButtonGroup
+        exclusive: false
+        onClicked: button => {
+            if(checkedButton === button) {
+
+                checkedButton = null;
+                return;
+
+            }
+            checkedButton = button;
+        }
     }
 
     //URL input text box & download button
@@ -111,13 +121,14 @@ Column {
                     id: extraParametersCheckBox
                     text: "Use advanced settings"
                     spacing: Style.smallSpacing
+                    textColor: Style.darkWhite
                 }
             }
 
             RowLayout {
                 width: parent.width
                 height: extraParametersPanelHeight
-                spacing: Style.smallSpacing
+                spacing: Style.medSpacing
                 visible: extraParametersCheckBox.checked
 
                 ScrollView {
@@ -150,15 +161,25 @@ Column {
                     }
                 }
 
-                Column {
+                ColumnLayout {
+                    Layout.fillWidth: false
                     Layout.fillHeight: true
 
-                    RadioButton {
-                        text: "Force MP3"
+                    Repeater {
+                        model: ["Force MP3", "Force Opus (.ogg)"]
+
+                        RoundRadioButton {
+                            text: modelData
+                            ButtonGroup.group: extraParametersButtonGroup
+                            textColor: Style.darkWhite
+                        }
                     }
-                    RadioButton {
-                        text: "Force Opus (.ogg)"
-                    }
+                }
+
+                //Empty component to shove everything to the left
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 1
                 }
             }
         }        

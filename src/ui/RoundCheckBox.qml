@@ -5,7 +5,7 @@ CheckBox {
     property int boxSize: 13
     property int textSize: Style.normalTextSize
     
-    property color textColor: Style.darkWhite
+    property color textColor: Style.white
     property color disabledTextColor: Qt.darker(textColor, 1.5)
     
     property color defaultColor: Style.gray
@@ -13,10 +13,10 @@ CheckBox {
     property color pressedColor: Qt.lighter(defaultColor, 1.5)
     property color disabledColor: Qt.darker(defaultColor, 1.5)
 
-    property color defaultColor2: Style.purple
-    readonly property color hoverColor2: Qt.lighter(defaultColor2, 1.2)
-    readonly property color pressedColor2: Qt.lighter(defaultColor2, 1.5)
-    readonly property color disabledColor2: Qt.darker(defaultColor2, 1.5)
+    property color checkedColor: Style.purple
+    readonly property color checkedHoverColor: Qt.lighter(checkedColor, 1.2)
+    readonly property color checkedPressedColor: Qt.lighter(checkedColor, 1.5)
+    readonly property color checkedDisabledColor: Qt.darker(checkedColor, 1.5)
 
     id: container
     hoverEnabled: true
@@ -30,11 +30,11 @@ CheckBox {
         color: (
             container.enabled ? (
                 container.pressed ? (
-                    container.checked ? pressedColor2 : pressedColor
+                    container.checked ? checkedPressedColor : pressedColor
                 ) : container.hovered ? (
-                    container.checked ? hoverColor2: hoverColor
-                ) : container.checked ? defaultColor2 : defaultColor
-            ) : container.checked ? disabledColor2 : disabledColor
+                    container.checked ? checkedHoverColor: hoverColor
+                ) : container.checked ? checkedColor : defaultColor
+            ) : container.checked ? checkedDisabledColor : disabledColor
         )
 
         Text {

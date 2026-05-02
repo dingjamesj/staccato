@@ -53,6 +53,7 @@ qt_add_qml_module(staccatoapp
         src/ui/RoundTextField.qml
         src/ui/RoundTabButton.qml
         src/ui/RoundCheckBox.qml
+        src/ui/RoundRadioButton.qml
         src/ui/trackImporter.js
         src/ui/main.js
     RESOURCES

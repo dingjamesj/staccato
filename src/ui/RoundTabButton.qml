@@ -9,6 +9,7 @@ TabButton {
     property color underlineColor: Style.purple
 
     id: container
+    hoverEnabled: true
 
     contentItem: Column {
         spacing: underlineSeparation
@@ -18,7 +19,7 @@ TabButton {
             id: tabButtonText
             anchors.horizontalCenter: parent.horizontalCenter
             width: implicitWidth
-            color: container.checked ? Style.white : Style.darkWhite
+            color: container.checked ? Style.white : (container.hovered ? Qt.lighter(Style.darkWhite, 1.2) : Style.darkWhite)
             text: container.text
             font.family: Style.mainFontFamily
             font.pointSize: Style.normalTextSize
