@@ -84,7 +84,8 @@ Column {
                 Layout.fillHeight: true
 
                 onClicked: {
-                    Logic.loadTrackInfo(container);
+                    // Logic.loadTrackInfo(container);
+                    container.previewIsLoaded = !container.previewIsLoaded;
                 }
             }
 
@@ -120,8 +121,9 @@ Column {
                 RoundCheckBox {
                     id: extraParametersCheckBox
                     text: "Use advanced settings"
-                    spacing: Style.smallSpacing
-                    textColor: Style.darkWhite
+                    spacing: Style.tinySpacing
+                    textColor: Style.offWhite
+                    textSize: Style.smallTextSize
                 }
             }
 
@@ -171,7 +173,7 @@ Column {
                         RoundRadioButton {
                             text: modelData
                             ButtonGroup.group: extraParametersButtonGroup
-                            textColor: Style.darkWhite
+                            textColor: Style.offWhite
                         }
                     }
                 }
@@ -193,6 +195,7 @@ Column {
         columnSpacing: Style.smallSpacing
         width: parent.width
         height: implicitHeight
+        enabled: container.previewIsLoaded
 
         //Track preview title text
         Text {
@@ -216,7 +219,7 @@ Column {
             font.pointSize: Style.normalTextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
-            color: Style.white
+            color: enabled ? Style.white : Qt.darker(Style.white, 1.5)
 
             Layout.row: 1
             Layout.column: 0
@@ -225,7 +228,7 @@ Column {
         //Text field for the title
         RoundTextField {
             id: previewTitleField
-            enabled: container.previewIsLoaded
+            readOnly: !overwriteMetadataCheckbox.checked
 
             Layout.row: 1
             Layout.column: 1
@@ -241,7 +244,7 @@ Column {
             font.pointSize: Style.normalTextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
-            color: Style.white
+            color: enabled ? Style.white : Qt.darker(Style.white, 1.5)
 
             Layout.row: 2
             Layout.column: 0
@@ -280,7 +283,7 @@ Column {
 
                     RoundTextField {
                         id: initialArtistPreviewField
-                        enabled: container.previewIsLoaded
+                        readOnly: !overwriteMetadataCheckbox.checked
 
                         Layout.preferredWidth: 1
                         Layout.fillWidth: true
@@ -297,7 +300,6 @@ Column {
                 onClicked: {
                     Logic.addArtistTextField(container);
                 }
-                enabled: container.previewIsLoaded
                 
                 Layout.preferredWidth: height
                 Layout.fillHeight: true
@@ -325,7 +327,7 @@ Column {
             font.pointSize: Style.normalTextSize
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
-            color: Style.white
+            color: enabled ? Style.white : Qt.darker(Style.white, 1.5)
 
             Layout.row: 3
             Layout.column: 0
@@ -334,7 +336,7 @@ Column {
         //Text field for the preview album name
         RoundTextField {
             id: previewAlbumField
-            enabled: container.previewIsLoaded
+            readOnly: !overwriteMetadataCheckbox.checked
 
             Layout.row: 3
             Layout.column: 1
@@ -358,33 +360,32 @@ Column {
         }
 
         //Overwrite metadata checkbox
-        Row {
-            spacing: Style.smallSpacing
+        RowLayout {
+            spacing: Style.tinySpacing
 
             Layout.row: 4
             Layout.column: 0
             Layout.rowSpan: 1
             Layout.columnSpan: 4
 
-            CheckBox {
+            RoundCheckBox {
+                id: overwriteMetadataCheckbox
                 text: "Overwrite metadata"
-                enabled: container.previewIsLoaded
+                spacing: Style.tinySpacing
+                textColor: Style.offWhite
+                textSize: Style.smallTextSize
+
+                Layout.leftMargin: Style.tinySpacing
+                Layout.alignment: Qt.AlignVCenter
             }
             
-            Rectangle {
-                width: height
-                height: parent.height
-                color: "#0080ff"
+            HelpToolTip {
+                tooltipText: ""
 
-                MouseArea {
-                    id: helpMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
-
-                ToolTip.visible: helpMouseArea.containsMouse
-                ToolTip.text: "testing"
-                ToolTip.delay: 500
+                Layout.leftMargin: width / 2
+                Layout.preferredWidth: 15
+                Layout.preferredHeight: 15
+                Layout.alignment: Qt.AlignVCenter
             }
         }
 

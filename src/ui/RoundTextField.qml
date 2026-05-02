@@ -8,7 +8,7 @@ TextField {
     property color disabledTextColor: Qt.darker(textColor, 1.5)
 
     property color defaultPlaceholderTextColor: Style.darkWhite
-    property color disabledPlaceholderTextColor: Qt.darker(placeholderTextColor, 1.5)
+    property color disabledPlaceholderTextColor: Qt.darker(defaultPlaceholderTextColor, 1.5)
 
     property color defaultColor: Style.lightBackground
     property color disabledColor: Qt.darker(defaultColor, 1.3)
@@ -24,6 +24,6 @@ TextField {
 
     background: Rectangle {
         radius: container.backgroundRadius
-        color: container.enabled ? defaultColor : disabledColor
+        color: !container.readOnly ? (container.enabled ? defaultColor : disabledColor) : "#00000000"
     }
 }

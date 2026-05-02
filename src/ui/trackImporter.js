@@ -13,7 +13,8 @@ function addArtistTextField(container) {
         "Layout.preferredWidth": 1,
         "Layout.fillWidth": true,
         "Layout.fillHeight": true,
-        enabled: "container.previewIsLoaded"
+        enabled: "container.previewIsLoaded",
+        readOnly: "!overwriteMetadataCheckbox.checked"
     });
 
 }

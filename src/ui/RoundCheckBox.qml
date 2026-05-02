@@ -43,7 +43,8 @@ CheckBox {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             color: Style.white
-            anchors.centerIn: parent
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             visible: container.checked
             font.family: Style.mainFontFamily
             font.pointSize: Style.normalTextSize
