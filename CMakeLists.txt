@@ -38,21 +38,23 @@ qt_add_qml_module(staccatoapp
     VERSION 0.1
     QML_FILES
         src/ui/Main.qml
-        src/ui/main.js
         src/ui/TracklistPanel.qml
         src/ui/CurrentlyPlayingPanel.qml
         src/ui/ControlPanel.qml
         src/ui/Playbar.qml
         src/ui/HomePanel.qml
         src/ui/ArtworkTextButton.qml
-        src/ui/RoundImage.qml
-        src/ui/RoundButton.qml
-        src/ui/RoundTextField.qml
         src/ui/LibraryPanel.qml
         src/ui/Style.qml
         src/ui/MetadataImportPanel.qml
         src/ui/URLImportPanel.qml
+        src/ui/RoundImage.qml
+        src/ui/RoundButton.qml
+        src/ui/RoundTextField.qml
+        src/ui/RoundTabButton.qml
+        src/ui/RoundCheckBox.qml
         src/ui/trackImporter.js
+        src/ui/main.js
     RESOURCES
         src/ui/resources/piggo58.jpg
         src/ui/resources/placeholder.jpg

@@ -52,15 +52,24 @@ GridLayout {
 
         TabBar {
             id: trackImportTabBar
+            spacing: Style.tinySpacing
+
             Layout.fillWidth: false
             Layout.fillHeight: false
 
-            TabButton {
-                text: "URL"
+            background: Rectangle {
+                anchors.fill: parent
+                color: "#00000000"
             }
 
-            TabButton {
-                text: "Metadata"
+            Repeater {
+                model: ["URL", "Metadata"]
+
+                RoundTabButton {
+                    required property string modelData
+                    text: modelData
+                    width: implicitWidth
+                }
             }
         }
 

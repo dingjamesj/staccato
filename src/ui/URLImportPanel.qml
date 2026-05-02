@@ -45,7 +45,7 @@ Column {
             //Text field to input the URL / file path
             RoundTextField {
                 id: urlTextField
-                font.pointSize: Style.normalTextSize - 2
+                font.pointSize: Style.smallTextSize
                 placeholderText: "Paste a web URL or a file path"
 
                 Layout.preferredWidth: 3
@@ -94,68 +94,74 @@ Column {
             }
         }
 
-        Row {
+        Column {
             width: parent.width
-            height: implicitHeight
-            spacing: Style.smallSpacing
+            spacing: Style.tinySpacing
 
-            CheckBox {
-                id: extraParametersCheckBox
-            }
+            Row {
+                spacing: 0
 
-            Text {
-                text: "Show advanced settings"
-                font.family: Style.mainFontFamily
-                font.pointSize: Style.normalTextSize
-                color: Style.darkWhite
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
-
-        RowLayout {
-            width: parent.width
-            height: extraParametersPanelHeight
-            spacing: Style.smallSpacing
-            visible: extraParametersCheckBox.checked
-
-            ScrollView {
-                id: extraParametersScrollView
-                contentHeight: height
-                clip: true
-                
-                ScrollBar.vertical.policy: ScrollBar.AsNeeded
-                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.maximumWidth: extraParametersTextAreaMaxWidth
-
-                Component.onCompleted: {
-                    contentItem.boundsBehavior = Flickable.StopAtBounds;
+                Rectangle {
+                    width: Style.tinySpacing
+                    height: 1
+                    color: "#00000000"
                 }
 
-                TextArea {
-                    wrapMode: TextArea.Wrap
-                    selectByMouse: true
+                RoundCheckBox {
+                    id: extraParametersCheckBox
+                    text: "Use advanced settings"
+                    spacing: Style.smallSpacing
+                }
+            }
 
-                    background: Rectangle {
-                        radius: Style.buttonRadius
-                        color: Style.lightBackground
+            RowLayout {
+                width: parent.width
+                height: extraParametersPanelHeight
+                spacing: Style.smallSpacing
+                visible: extraParametersCheckBox.checked
+
+                ScrollView {
+                    id: extraParametersScrollView
+                    contentHeight: height
+                    clip: true
+                    
+                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: extraParametersTextAreaMaxWidth
+
+                    Component.onCompleted: {
+                        contentItem.boundsBehavior = Flickable.StopAtBounds;
+                    }
+
+                    TextArea {
+                        wrapMode: TextArea.Wrap
+                        selectByMouse: true
+                        color: Style.offWhite
+                        font.pointSize: Style.smallTextSize
+                        font.weight: Font.DemiBold
+
+                        background: Rectangle {
+                            radius: Style.buttonRadius
+                            color: Style.lightBackground
+                        }
+                    }
+                }
+
+                Column {
+                    Layout.fillHeight: true
+
+                    RadioButton {
+                        text: "Force MP3"
+                    }
+                    RadioButton {
+                        text: "Force Opus (.ogg)"
                     }
                 }
             }
-
-            Column {
-                Layout.fillHeight: true
-
-                RadioButton {
-                    text: "Force MP3"
-                }
-                RadioButton {
-                    text: "Force Opus (.ogg)"
-                }
-            }
-        }
+        }        
     }
 
     //Track preview contents

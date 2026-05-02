@@ -5,6 +5,7 @@ pragma Singleton
 //Global styling
 Item {
     readonly property string mainFontFamily: interFont.name
+    readonly property double mainFontHeight: interFontMetrics.height
 
     //Background colors
     readonly property color background: "#1e1e1e"
@@ -26,18 +27,25 @@ Item {
     readonly property color m4aColor: "#d04ea5"
 
     //Sizing & spacing
-    readonly property int tinySpacing: 6
+    readonly property int tinySpacing: 4
     readonly property int smallSpacing: 8
     readonly property int medSpacing: 17
     readonly property int bigSpacing: 45
     readonly property int buttonSize: 25
     readonly property int buttonRadius: 6
+    readonly property int smallButtonRadius: 3
     readonly property int h1TextSize: 24
     property int h2TextSize: 13
     property int normalTextSize: 10
+    property int smallTextSize: 8
 
     FontLoader {
         id: interFont
         source: "qrc:/staccato/src/ui/resources/Inter-VariableFont_opsz,wght.ttf"
+    }
+
+    FontMetrics {
+        id: interFontMetrics
+        font: interFont
     }
 }
