@@ -7,7 +7,8 @@ import "trackImporter.js" as Logic
 Column {
     property alias importStatusText: statusText.text
     property alias importURLText: urlTextField.text
-    property alias previewArtworkSource: previewArtwork.source
+    property alias importExtraParamsText: extraParametersTextArea.text
+    property alias previewArtworkSource: previewArtwork.imageSource
     property alias previewTitleText: previewTitleField.text
     property alias previewArtistsContainer: artistsTextFieldRow
     property alias previewAlbumText: previewAlbumField.text
@@ -19,6 +20,9 @@ Column {
     property int urlFieldMaxWidth: 400
     property int extraParametersTextAreaMaxWidth: 400
     property int extraParametersPanelHeight: 100
+
+    property string forceMP3ParamText: "Force MP3"
+    property string forceOpusParamText: "Force Opus (.ogg)"
 
     id: container
     spacing: Style.medSpacing
@@ -34,10 +38,21 @@ Column {
             if(checkedButton === button) {
 
                 checkedButton = null;
+                importExtraParamsText = "";
                 return;
 
             }
+
             checkedButton = button;
+            if(checkedButton.text === forceMP3ParamText) {
+
+                importExtraParamsText = "mp3"
+
+            } else if(checkedButton.text === forceOpusParamText) {
+
+                importExtraParamsText = "opus"
+
+            }
         }
     }
 
@@ -150,15 +165,21 @@ Column {
                     }
 
                     TextArea {
+                        id: extraParametersTextArea
                         wrapMode: TextArea.Wrap
                         selectByMouse: true
                         color: Style.offWhite
+                        font.family: Style.monospaceFamily
                         font.pointSize: Style.smallTextSize
                         font.weight: Font.DemiBold
 
                         background: Rectangle {
                             radius: Style.buttonRadius
                             color: Style.lightBackground
+                        }
+
+                        onTextEdited: {
+                            extraParametersButtonGroup.checkedButton = null;
                         }
                     }
                 }
@@ -168,7 +189,7 @@ Column {
                     Layout.fillHeight: true
 
                     Repeater {
-                        model: ["Force MP3", "Force Opus (.ogg)"]
+                        model: [container.forceMP3ParamText, container.forceOpusParamText]
 
                         RoundRadioButton {
                             text: modelData
@@ -300,6 +321,7 @@ Column {
                 onClicked: {
                     Logic.addArtistTextField(container);
                 }
+                enabled: parent.enabled && overwriteMetadataCheckbox.checked
                 
                 Layout.preferredWidth: height
                 Layout.fillHeight: true
@@ -313,7 +335,7 @@ Column {
                 onClicked: {
                     Logic.removeArtistTextField(container);
                 }
-                enabled: container.previewIsLoaded ? (container.previewArtistsContainer.children.length > 0 ? true : false) : false
+                enabled: (overwriteMetadataCheckbox.checked && parent.enabled && container.previewArtistsContainer.children.length > 0) ? true : false
 
                 Layout.preferredWidth: height
                 Layout.fillHeight: true
@@ -346,10 +368,11 @@ Column {
         }
 
         //Cover art
-        RoundImage {
+        RoundButton {
             id: previewArtwork
             radius: Style.buttonRadius
-            source: ""
+            imageSource: ""
+            clickable: overwriteMetadataCheckbox.checked
 
             Layout.fillHeight: true
             Layout.row: 1
@@ -357,6 +380,10 @@ Column {
             Layout.rowSpan: 3
             Layout.preferredWidth: height
             Layout.leftMargin: Style.smallSpacing
+
+            onClicked: {
+                FilePicker.open(["Image files (*.jpg, *.png, *.jpeg)"]);
+            }
         }
 
         //Overwrite metadata checkbox

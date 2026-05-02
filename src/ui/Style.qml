@@ -6,6 +6,8 @@ pragma Singleton
 Item {
     readonly property string mainFontFamily: interFont.name
     readonly property double mainFontHeight: interFontMetrics.height
+    readonly property string monospaceFamily: cascadiaCodeFont.name
+    readonly property string monospaceHeight: cascadiaCodeFontMetrics.height
 
     //Background colors
     readonly property color background: "#1e1e1e"
@@ -47,5 +49,15 @@ Item {
     FontMetrics {
         id: interFontMetrics
         font: interFont
+    }
+
+    FontLoader {
+        id: cascadiaCodeFont
+        source: "qrc:/staccato/src/ui/resources/CascadiaCode-VariableFont_wght.ttf"
+    }
+
+    FontMetrics {
+        id: cascadiaCodeFontMetrics
+        font: cascadiaCodeFont
     }
 }

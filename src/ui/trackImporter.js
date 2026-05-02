@@ -13,8 +13,9 @@ function addArtistTextField(container) {
         "Layout.preferredWidth": 1,
         "Layout.fillWidth": true,
         "Layout.fillHeight": true,
-        enabled: "container.previewIsLoaded",
-        readOnly: "!overwriteMetadataCheckbox.checked"
+        readOnly: Qt.binding(function() {
+            return !overwriteMetadataCheckbox.checked
+        })
     });
 
 }

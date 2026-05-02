@@ -20,6 +20,8 @@ Rectangle {
     property int textSize: Style.normalTextSize
     property var textStyle: Font.Bold
 
+    property bool clickable: true
+
     signal clicked()
     signal doubleClicked()
 
@@ -31,7 +33,7 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: container.clicked()
-        enabled: container.enabled
+        enabled: container.enabled && container.clickable
     }
 
     Text {
@@ -46,6 +48,7 @@ Rectangle {
         clip: false
         text: container.text
         color: container.enabled ? container.textColor : container.disabledTextColor
+        visible: container.text != ""
     }
 
     Image {
@@ -62,5 +65,6 @@ Rectangle {
         colorization: container.enabled ? 0 : container.disabledColorTintStrength
         colorizationColor: '#000000'
         autoPaddingEnabled: true
+        visible: container.imageSource != ""
     }
 }
