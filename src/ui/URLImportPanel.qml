@@ -10,7 +10,7 @@ Column {
     property alias importExtraParamsText: extraParametersTextArea.text
     property alias previewArtworkSource: previewArtwork.imageSource
     property alias previewTitleText: previewTitleField.text
-    property alias previewArtistsContainer: artistsTextFieldRow
+    property alias artistsContainer: artistsTextFieldRow
     property alias previewAlbumText: previewAlbumField.text
 
     property bool previewIsLoading: false
@@ -77,13 +77,17 @@ Column {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.maximumWidth: container.urlFieldMaxWidth
+
+                onTextEdited: {
+                    previewIsLoaded = false;
+                }
             }
 
             RoundButton {
                 radius: Style.buttonRadius
                 text: "Download"
                 defaultColor: Style.purple
-                enabled: urlTextField.text.length > 0
+                enabled: importURLText.length > 0
 
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
@@ -93,7 +97,7 @@ Column {
                 radius: Style.buttonRadius
                 text: "Load Preview"
                 defaultColor: Style.gray
-                enabled: previewIsLoading ? false : (urlTextField.text.length > 0)
+                enabled: previewIsLoading ? false : (importURLText.length > 0)
                 
                 Layout.preferredWidth: 105
                 Layout.fillHeight: true
@@ -286,7 +290,7 @@ Column {
                 contentHeight: height
                 clip: true
 
-                ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                 ScrollBar.vertical.policy: ScrollBar.AlwaysOff
 
                 Layout.fillWidth: true
@@ -321,7 +325,7 @@ Column {
                 onClicked: {
                     Logic.addArtistTextField(container);
                 }
-                enabled: parent.enabled && overwriteMetadataCheckbox.checked
+                visible: overwriteMetadataCheckbox.checked
                 
                 Layout.preferredWidth: height
                 Layout.fillHeight: true
@@ -335,7 +339,8 @@ Column {
                 onClicked: {
                     Logic.removeArtistTextField(container);
                 }
-                enabled: (overwriteMetadataCheckbox.checked && parent.enabled && container.previewArtistsContainer.children.length > 0) ? true : false
+                visible: overwriteMetadataCheckbox.checked
+                enabled: parent.enabled && container.artistsContainer.children.length > 0
 
                 Layout.preferredWidth: height
                 Layout.fillHeight: true
@@ -407,7 +412,7 @@ Column {
             }
             
             HelpToolTip {
-                tooltipText: ""
+                tooltipText: "Set your own details instead of using automatic info found online."
 
                 Layout.leftMargin: width / 2
                 Layout.preferredWidth: 15

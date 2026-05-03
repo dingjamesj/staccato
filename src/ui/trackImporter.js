@@ -9,7 +9,7 @@ function startup(_cpp) {
 function addArtistTextField(container) {
 
     let component = Qt.createComponent("RoundTextField.qml");
-    component.createObject(container.previewArtistsContainer, {
+    component.createObject(container.artistsContainer, {
         "Layout.preferredWidth": 1,
         "Layout.fillWidth": true,
         "Layout.fillHeight": true,
@@ -20,9 +20,20 @@ function addArtistTextField(container) {
 
 }
 
+function addArtistTextFieldForMetadataImporter(container) {
+
+    let component = Qt.createComponent("RoundTextField.qml");
+    component.createObject(container.artistsContainer, {
+        "Layout.preferredWidth": 1,
+        "Layout.fillWidth": true,
+        "Layout.fillHeight": true
+    });
+
+}
+
 function removeArtistTextField(container) {
 
-    let artistsContainer = container.previewArtistsContainer;
+    let artistsContainer = container.artistsContainer;
     if(artistsContainer.children.length > 0) {
 
         artistsContainer.children[artistsContainer.children.length - 1].destroy();
