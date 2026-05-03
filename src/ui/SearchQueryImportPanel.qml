@@ -14,7 +14,6 @@ Column {
 
     property int searchFieldMaxWidth: 300
     property int searchResultFieldsMaxWidth: 490
-    property int extraParametersTextAreaMaxWidth: 400
     property int extraParametersPanelHeight: 100
 
     property string forceMP3ParamText: "Force MP3"
@@ -25,31 +24,6 @@ Column {
 
     Component.onCompleted: {
         Logic.startup(StaccatoInterface);
-    }
-
-    ButtonGroup {
-        id: extraParametersButtonGroup
-        exclusive: false
-        onClicked: button => {
-            if(checkedButton === button) {
-
-                checkedButton = null;
-                importExtraParamsText = "";
-                return;
-
-            }
-
-            checkedButton = button;
-            if(checkedButton.text === forceMP3ParamText) {
-
-                importExtraParamsText = "mp3"
-
-            } else if(checkedButton.text === forceOpusParamText) {
-
-                importExtraParamsText = "opus"
-
-            }
-        }
     }
 
     RowLayout {
@@ -227,6 +201,20 @@ Column {
                 height: width
                 tooltipText: "Set your own details instead of using automatic info found online."
             }
+
+            RoundCheckBox {
+                id: extraParametersCheckBox
+                text: "Use advanced settings"
+                spacing: Style.tinySpacing
+                textColor: Style.offWhite
+                textSize: Style.smallTextSize
+            }
+        }
+
+        ExtraParametersEditor {
+            id: extraParametersEditor
+            width: parent.width
+            height: extraParametersPanelHeight
         }
     }
 }

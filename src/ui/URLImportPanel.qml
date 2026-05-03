@@ -7,7 +7,7 @@ import "trackImporter.js" as Logic
 Column {
     property alias importStatusText: statusText.text
     property alias importURLText: urlTextField.text
-    property alias importExtraParamsText: extraParametersTextArea.text
+    property alias importExtraParamsText: extraParametersEditor.text
     property alias previewTitleText: previewEditor.titleText
     property alias artistsContainer: previewEditor.artistsContainer
     property alias previewAlbumText: previewEditor.albumText
@@ -18,42 +18,13 @@ Column {
 
     property int previewMetadataFieldsMaxWidth: 490
     property int urlFieldMaxWidth: 400
-    property int extraParametersTextAreaMaxWidth: 400
     property int extraParametersPanelHeight: 100
-
-    property string forceMP3ParamText: "Force MP3"
-    property string forceOpusParamText: "Force Opus (.ogg)"
 
     id: container
     spacing: Style.medSpacing
 
     Component.onCompleted: {
         Logic.startup(StaccatoInterface);
-    }
-
-    ButtonGroup {
-        id: extraParametersButtonGroup
-        exclusive: false
-        onClicked: button => {
-            if(checkedButton === button) {
-
-                checkedButton = null;
-                importExtraParamsText = "";
-                return;
-
-            }
-
-            checkedButton = button;
-            if(checkedButton.text === forceMP3ParamText) {
-
-                importExtraParamsText = "mp3"
-
-            } else if(checkedButton.text === forceOpusParamText) {
-
-                importExtraParamsText = "opus"
-
-            }
-        }
     }
 
     //URL input & extra params.
@@ -136,68 +107,10 @@ Column {
                 textSize: Style.smallTextSize
             }
 
-            RowLayout {
+            ExtraParametersEditor {
+                id: extraParametersEditor
                 width: parent.width
                 height: extraParametersPanelHeight
-                spacing: Style.medSpacing
-                visible: extraParametersCheckBox.checked
-
-                ScrollView {
-                    id: extraParametersScrollView
-                    contentHeight: height
-                    clip: true
-                    
-                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
-                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.maximumWidth: extraParametersTextAreaMaxWidth
-
-                    Component.onCompleted: {
-                        contentItem.boundsBehavior = Flickable.StopAtBounds;
-                    }
-
-                    TextArea {
-                        id: extraParametersTextArea
-                        wrapMode: TextArea.Wrap
-                        selectByMouse: true
-                        color: Style.offWhite
-                        font.family: Style.monospaceFamily
-                        font.pointSize: Style.smallTextSize
-                        font.weight: Font.DemiBold
-
-                        background: Rectangle {
-                            radius: Style.buttonRadius
-                            color: Style.lightBackground
-                        }
-
-                        onTextEdited: {
-                            extraParametersButtonGroup.checkedButton = null;
-                        }
-                    }
-                }
-
-                ColumnLayout {
-                    Layout.fillWidth: false
-                    Layout.fillHeight: true
-
-                    Repeater {
-                        model: [container.forceMP3ParamText, container.forceOpusParamText]
-
-                        RoundRadioButton {
-                            text: modelData
-                            ButtonGroup.group: extraParametersButtonGroup
-                            textColor: Style.offWhite
-                        }
-                    }
-                }
-
-                //Empty component to shove everything to the left
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                }
             }
         }
     }
