@@ -34,6 +34,7 @@ ColumnLayout {
 
         Layout.fillWidth: true
         Layout.fillHeight: true
+        Layout.preferredHeight: 1
         Layout.topMargin: Style.medSpacing
 
         Column {
@@ -61,7 +62,8 @@ ColumnLayout {
         spacing: Style.smallSpacing
 
         Layout.fillWidth: true
-        Layout.fillHeight: false
+        Layout.fillHeight: true
+        Layout.preferredHeight: 1
         Layout.topMargin: Style.medSpacing
         Layout.bottomMargin: Style.medSpacing
 
@@ -88,28 +90,28 @@ ColumnLayout {
             }
         }
 
-        StackLayout {
-            currentIndex: trackImportTabBar.currentIndex
+        ScrollView {
+            clip: true
+            
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            URLImportPanel {}
-            SearchQueryImportPanel {}
-        }
-    }
+            Component.onCompleted: {
+                contentItem.boundsBehavior = Flickable.StopAtBounds;
+            }
 
-    Button {
-        Layout.preferredHeight: 6
-        font.pointSize: 6
-        onClicked: {
+            StackLayout {
+                id: importPanels
+                currentIndex: trackImportTabBar.currentIndex
+                width: parent.width
+                height: currentItem ? currentItem.implicitHeight : 0
 
-            console.log(urlTextField.height);
-
+                URLImportPanel {}
+                SearchQueryImportPanel {}
+            }
         }
-        background: Rectangle {
-            color: Style.red
-        }
-        text: "HomePanel DEBUG"
     }
 }
