@@ -63,7 +63,7 @@ GridLayout {
             }
 
             Repeater {
-                model: ["URL", "Metadata"]
+                model: ["URL", "Search"]
 
                 RoundTabButton {
                     required property string modelData
@@ -80,7 +80,7 @@ GridLayout {
             Layout.fillHeight: true
 
             URLImportPanel {}
-            MetadataImportPanel {}
+            SearchQueryImportPanel {}
         }
     }
 

@@ -10,11 +10,10 @@ GridLayout {
     property alias artworkSource: artwork.imageSource
 
     property bool readOnly: false
-    property int contentMaxWidth: 400
 
     id: container
     rows: 3
-    columns: 4
+    columns: 3
     rowSpacing: Style.smallSpacing
     columnSpacing: Style.smallSpacing
 
@@ -42,7 +41,7 @@ GridLayout {
     //Title
 
     Text {
-        text: "Title: "
+        text: "Title:"
         font.family: Style.mainFontFamily
         font.pointSize: Style.normalTextSize
         font.weight: Font.DemiBold
@@ -61,13 +60,12 @@ GridLayout {
         Layout.column: 1
         Layout.preferredHeight: Style.buttonSize
         Layout.fillWidth: true;
-        Layout.maximumWidth: container.contentMaxWidth
     }
 
     //Artists
 
     Text {
-        text: "Artists: "
+        text: "Artists:"
         font.family: Style.mainFontFamily
         font.pointSize: Style.normalTextSize
         font.weight: Font.DemiBold
@@ -79,13 +77,12 @@ GridLayout {
     }
 
     RowLayout {
-        spacing: Style.tinySpacing
+        spacing: 6
 
         Layout.row: 1
         Layout.column: 1
         Layout.preferredHeight: Style.buttonSize
         Layout.fillWidth: true;
-        Layout.maximumWidth: container.contentMaxWidth
 
         ScrollView {
             id: artistsScrollView
@@ -106,7 +103,7 @@ GridLayout {
                 id: artistsTextFieldRow
                 width: artistsScrollView.width
                 height: artistsScrollView.height
-                spacing: Style.tinySpacing
+                spacing: 6
 
                 RoundTextField {
                     readOnly: container.readOnly
@@ -145,7 +142,7 @@ GridLayout {
     //Album
 
     Text {
-        text: "Album: "
+        text: "Album:"
         font.family: Style.mainFontFamily
         font.pointSize: Style.normalTextSize
         font.weight: Font.DemiBold
@@ -164,7 +161,6 @@ GridLayout {
         Layout.column: 1
         Layout.preferredHeight: Style.buttonSize
         Layout.fillWidth: true;
-        Layout.maximumWidth: container.contentMaxWidth
     }
 
     //Cover art
@@ -174,6 +170,7 @@ GridLayout {
         radius: Style.buttonRadius
         imageSource: ""
         clickable: !container.readOnly
+        disabledColor: Style.background
 
         Layout.fillHeight: true
         Layout.row: 0
@@ -185,14 +182,5 @@ GridLayout {
         onClicked: {
             FilePicker.open(["Image files (*.jpg, *.png, *.jpeg)"]);
         }
-    }
-
-    //Empty component to shove everything to the left
-    
-    Item {
-        Layout.row: 0
-        Layout.column: 3
-        Layout.rowSpan: 3
-        Layout.fillWidth: true
     }
 }

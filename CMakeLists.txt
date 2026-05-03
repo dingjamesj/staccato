@@ -48,7 +48,7 @@ qt_add_qml_module(staccatoapp
         src/ui/ArtworkTextButton.qml
         src/ui/LibraryPanel.qml
         src/ui/Style.qml
-        src/ui/MetadataImportPanel.qml
+        src/ui/SearchQueryImportPanel.qml
         src/ui/URLImportPanel.qml
         src/ui/HelpToolTip.qml
         src/ui/FilePicker.qml

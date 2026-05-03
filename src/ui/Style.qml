@@ -35,9 +35,10 @@ Item {
     readonly property int bigSpacing: 45
     readonly property int buttonSize: 25
     readonly property int buttonRadius: 6
-    readonly property int smallButtonRadius: 3
+    readonly property int smallButtonSize: 15
+    readonly property int smallButtonRadius: 4
     readonly property int h1TextSize: 24
-    property int h2TextSize: 13
+    property int h2TextSize: 16
     property int normalTextSize: 10
     property int smallTextSize: 8
 

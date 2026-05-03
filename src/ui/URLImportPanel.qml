@@ -16,7 +16,7 @@ Column {
     property bool previewIsLoading: false
     property bool previewIsLoaded: false
 
-    property int previewMetadataFieldsMaxWidth: 400
+    property int previewMetadataFieldsMaxWidth: 490
     property int urlFieldMaxWidth: 400
     property int extraParametersTextAreaMaxWidth: 400
     property int extraParametersPanelHeight: 100
@@ -56,7 +56,7 @@ Column {
         }
     }
 
-    //URL input text box & download button
+    //URL input & extra params.
     Column {
         width: parent.width
         height: implicitHeight
@@ -128,22 +128,12 @@ Column {
             width: parent.width
             spacing: Style.tinySpacing
 
-            Row {
-                spacing: 0
-
-                Rectangle {
-                    width: Style.tinySpacing
-                    height: 1
-                    color: "#00000000"
-                }
-
-                RoundCheckBox {
-                    id: extraParametersCheckBox
-                    text: "Use advanced settings"
-                    spacing: Style.tinySpacing
-                    textColor: Style.offWhite
-                    textSize: Style.smallTextSize
-                }
+            RoundCheckBox {
+                id: extraParametersCheckBox
+                text: "Use advanced settings"
+                spacing: Style.tinySpacing
+                textColor: Style.offWhite
+                textSize: Style.smallTextSize
             }
 
             RowLayout {
@@ -209,7 +199,7 @@ Column {
                     Layout.preferredHeight: 1
                 }
             }
-        }        
+        }
     }
 
     //Track preview title text
@@ -226,30 +216,19 @@ Column {
             font.weight: Font.DemiBold
             wrapMode: Text.NoWrap
             color: Style.white
-
-            Layout.row: 0
-            Layout.column: 0
-            Layout.rowSpan: 1
-            Layout.columnSpan: 4
         }
 
         TrackInfoEditor {
             id: previewEditor
-            width: parent.width
-            contentMaxWidth: previewMetadataFieldsMaxWidth
+            anchors.left: parent.left
+            width: Math.min(parent.width, previewMetadataFieldsMaxWidth)
             readOnly: !overwriteMetadataCheckbox.checked
-            enabled: previewIsLoaded
+            enabled: previewIsLoaded || overwriteMetadataCheckbox.checked
         }
 
         //Overwrite metadata checkbox
-        RowLayout {
+        Row {
             spacing: Style.tinySpacing
-            enabled: previewIsLoaded
-
-            Layout.row: 4
-            Layout.column: 0
-            Layout.rowSpan: 1
-            Layout.columnSpan: 4
 
             RoundCheckBox {
                 id: overwriteMetadataCheckbox
@@ -257,18 +236,18 @@ Column {
                 spacing: Style.tinySpacing
                 textColor: Style.offWhite
                 textSize: Style.smallTextSize
-
-                Layout.leftMargin: Style.tinySpacing
-                Layout.alignment: Qt.AlignVCenter
             }
             
-            HelpToolTip {
-                tooltipText: "Set your own details instead of using automatic info found online."
+            Item {
+                width: Style.smallButtonSize / 2 - Style.tinySpacing
+                height: 1
+            }
 
-                Layout.leftMargin: width / 2
-                Layout.preferredWidth: 15
-                Layout.preferredHeight: 15
-                Layout.alignment: Qt.AlignVCenter
+            HelpToolTip {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Style.smallButtonSize
+                height: width
+                tooltipText: "Set your own details instead of using automatic info found online."
             }
         }
     }    
