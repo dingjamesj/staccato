@@ -18,7 +18,7 @@ Column {
 
     property int previewMetadataFieldsMaxWidth: 490
     property int urlFieldMaxWidth: 400
-    property int extraParametersPanelHeight: 100
+    property int extraParametersPanelHeight: 75
 
     id: container
     spacing: Style.medSpacing

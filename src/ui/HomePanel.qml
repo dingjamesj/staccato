@@ -9,17 +9,36 @@ pragma ComponentBehavior: Bound
 // Shows the track importer and recent playlists 
 //===============================================
 
-GridLayout {
+ColumnLayout {
     property alias recentlyPlayedContainer: recentsContainer
 
     id: container
-    rows: 8
-    columns: 1
-    rowSpacing: 0
+    spacing: 0
 
-    Item {
-        Layout.row: 0
-        Layout.preferredHeight: Style.medSpacing
+    Text {
+        text: "Recents"
+        font.family: Style.mainFontFamily
+        font.pointSize: Style.h1TextSize
+        font.weight: Font.DemiBold
+        wrapMode: Text.NoWrap
+        color: Style.white
+
+        Layout.fillWidth: true
+        Layout.preferredHeight: implicitHeight
+        Layout.topMargin: Style.medSpacing
+    }
+
+    //Recent playlists
+    Rectangle {
+        color: Style.background
+
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.topMargin: Style.medSpacing
+
+        Column {
+            id: recentsContainer
+        }
     }
 
     //Title text
@@ -32,23 +51,19 @@ GridLayout {
         wrapMode: Text.NoWrap
         color: Style.white
 
-        Layout.row: 1
         Layout.fillWidth: true
         Layout.preferredHeight: implicitHeight
-    }
-
-    Item {
-        Layout.row: 2
-        Layout.preferredHeight: Style.medSpacing
+        Layout.topMargin: Style.bigSpacing
     }
 
     //Track importer
     ColumnLayout {
         spacing: Style.smallSpacing
 
-        Layout.row: 3
         Layout.fillWidth: true
         Layout.fillHeight: false
+        Layout.topMargin: Style.medSpacing
+        Layout.bottomMargin: Style.medSpacing
 
         TabBar {
             id: trackImportTabBar
@@ -84,42 +99,6 @@ GridLayout {
         }
     }
 
-    Item {
-        Layout.row: 4
-        Layout.preferredHeight: Style.bigSpacing
-    }
-
-    Text {
-        text: "Recents"
-        font.family: Style.mainFontFamily
-        font.pointSize: Style.h1TextSize
-        font.weight: Font.DemiBold
-        wrapMode: Text.NoWrap
-        color: Style.white
-
-        Layout.row: 5
-        Layout.fillWidth: true
-        Layout.preferredHeight: implicitHeight
-    }
-
-    Item {
-        Layout.row: 6
-        Layout.preferredHeight: Style.medSpacing
-    }
-
-    //Recent playlists
-    Rectangle {
-        color: Style.background
-
-        Layout.row: 7
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-
-        Column {
-            id: recentsContainer
-        }
-    }
-
     Button {
         Layout.preferredHeight: 6
         font.pointSize: 6
@@ -133,5 +112,4 @@ GridLayout {
         }
         text: "HomePanel DEBUG"
     }
-
 }

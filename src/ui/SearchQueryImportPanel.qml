@@ -14,7 +14,7 @@ Column {
 
     property int searchFieldMaxWidth: 300
     property int searchResultFieldsMaxWidth: 490
-    property int extraParametersPanelHeight: 100
+    property int extraParametersPanelHeight: 75
 
     property string forceMP3ParamText: "Force MP3"
     property string forceOpusParamText: "Force Opus (.ogg)"
@@ -100,6 +100,7 @@ Column {
         RowLayout {
             anchors.left: parent.left
             width: Math.min(parent.width, searchResultFieldsMaxWidth)
+            height: Style.buttonSize
             spacing: Style.smallSpacing
 
             Text {
@@ -149,6 +150,7 @@ Column {
 
                 Layout.preferredWidth: Style.buttonSize
                 Layout.preferredHeight: width
+                visible: enabled
             }
 
             Text {
@@ -159,6 +161,7 @@ Column {
                 wrapMode: Text.NoWrap
                 color: enabled ? Style.white : Qt.darker(Style.white, 1.5)
                 horizontalAlignment: Text.AlignHCenter
+                visible: enabled
 
                 Layout.minimumWidth: resultsEditor.height - Style.buttonSize * 2 - Style.smallSpacing * 2
             }
@@ -168,6 +171,7 @@ Column {
 
                 Layout.preferredWidth: Style.buttonSize
                 Layout.preferredHeight: width
+                visible: enabled
             }
         }
 
