@@ -6,42 +6,6 @@ function startup(_cpp) {
     
 }
 
-function addArtistTextField(container) {
-
-    let component = Qt.createComponent("RoundTextField.qml");
-    component.createObject(container.artistsContainer, {
-        "Layout.preferredWidth": 1,
-        "Layout.fillWidth": true,
-        "Layout.fillHeight": true,
-        readOnly: Qt.binding(function() {
-            return !overwriteMetadataCheckbox.checked
-        })
-    });
-
-}
-
-function addArtistTextFieldForMetadataImporter(container) {
-
-    let component = Qt.createComponent("RoundTextField.qml");
-    component.createObject(container.artistsContainer, {
-        "Layout.preferredWidth": 1,
-        "Layout.fillWidth": true,
-        "Layout.fillHeight": true
-    });
-
-}
-
-function removeArtistTextField(container) {
-
-    let artistsContainer = container.artistsContainer;
-    if(artistsContainer.children.length > 0) {
-
-        artistsContainer.children[artistsContainer.children.length - 1].destroy();
-
-    }
-
-}
-
 function loadTrackInfo(container) {
 
     let url = container.importURLText;

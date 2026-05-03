@@ -52,6 +52,7 @@ qt_add_qml_module(staccatoapp
         src/ui/URLImportPanel.qml
         src/ui/HelpToolTip.qml
         src/ui/FilePicker.qml
+        src/ui/TrackInfoEditor.qml
         src/ui/RoundImage.qml
         src/ui/RoundButton.qml
         src/ui/RoundTextField.qml
