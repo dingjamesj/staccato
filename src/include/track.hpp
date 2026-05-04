@@ -29,14 +29,26 @@ namespace staccato {
         /// @return The track's "release group" (e.g. album, EP, single release, etc.)
         const std::string& album() const;
 
-        /// @brief Creates a Track object
+        /// @brief Creates a `Track` object
         /// @param title 
         /// @param artists 
         /// @param album 
         Track(const std::string& title, const std::vector<std::string>& artists, const std::string& album);
 
-        /// @brief Creates an empty Track object. Encountering an empty Track object should signify that an error occurred.
+        /// @brief Creates a `Track` object
+        /// @param title 
+        /// @param artists 
+        /// @param album 
+        Track(const std::string& title, std::vector<std::string>&& artists, const std::string& album);
+
+        /// @brief Creates an empty `Track` object. Encountering an empty Track object should signify that an error occurred.
         Track();
+
+        Track(const Track& other) = default;
+        Track(Track&& other) = default;
+        Track& operator=(const Track& other) = default;
+        Track& operator=(Track&& other) = default;
+        ~Track() = default;
 
         /// @brief Used to see if an error was encountered (empty Track objects should signify that an error occurred)
         /// @return `true` if this Track object is empty, `false` otherwise

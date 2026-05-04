@@ -177,25 +177,29 @@ namespace staccato {
         #if defined(_WIN32) || defined(_WIN64)
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"..\\settings.json"};
         static constexpr std::string_view PERSISTENT_DATA_PATH {"..\\persistent.json"};
-        static constexpr std::string_view PYTHON_SCRIPTS_DIRECTORY {"..\\scripts"};
+        static constexpr std::string_view PYTHON_SCRIPTS_DIR {"..\\scripts"};
         #else
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"../settings.json"};
         static constexpr std::string_view PERSISTENT_DATA_PATH {"../persistent.json"};
-        static constexpr std::string_view PYTHON_SCRIPTS_DIRECTORY {"../scripts"};
+        static constexpr std::string_view PYTHON_SCRIPTS_DIR {"../scripts"};
         #endif
 
         #else
 
         static constexpr std::string_view STACCATO_SETTINGS_PATH {"settings.json"};
         static constexpr std::string_view PERSISTENT_DATA_PATH {"persistent.json"};
-        static constexpr std::string_view PYTHON_SCRIPTS_DIRECTORY {"scripts"};
+        static constexpr std::string_view PYTHON_SCRIPTS_DIR {"scripts"};
         
         #endif
 
         static constexpr std::string_view PLAYLIST_IMAGES_DIRECTORY {"images"};
-        static constexpr std::string_view PYTHON_VENV_DIRECTORY {".venv"};
-        static constexpr std::string_view PYTHON_SCRIPT_NAME {"main.py"};
-        static constexpr std::string_view PYTHON_DOWNLOAD_FUNC_NAME {"download_track"};
+
+        static constexpr std::string_view PY_VENV_DIRECTORY {".venv"};
+        static constexpr std::string_view PY_SCRIPT_NAME {"main"};
+        static constexpr std::string_view PY_URL_DOWNLOAD_FUNC_NAME {"download_track_from_url"};
+        static constexpr std::string_view PY_INFO_DOWNLOAD_FUNC_NAME {"download_track_from_info"};
+        static constexpr std::string_view PY_GET_SINGLE_TRACK_FUNC_NAME {"get_online_track_full_info"};
+        static constexpr std::string_view PY_SEARCH_TRACKS_FUNC_NAME {"search_tracks"};
 
     };
     

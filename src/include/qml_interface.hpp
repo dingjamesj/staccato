@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QtQml>
 #include <QPixmap>
+#include <unordered_map>
+#include <vector>
+#include <string>
 
 //=====================================================================================================================================
 // Since Qt requires their own Qt objects such as QList and QString, we need an "interface" that converts STL objects into Qt objects.
@@ -53,6 +56,9 @@ namespace staccato {
 
         Q_INVOKABLE
         QList<QVariant> getOnlineTrackInfo(const QString& url);
+
+        Q_INVOKABLE
+        bool downloadOnlineTrack(const QString& url, const QString& title, const QStringList& artists, const QString& album, const QStringList& args);
 
     };
 

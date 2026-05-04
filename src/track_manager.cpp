@@ -69,7 +69,7 @@ void TrackManager::populate_tree_unorganized() {
     std::filesystem::directory_iterator directory_iter;
     try {
 
-        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY);
+        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIR);
 
     } catch(const std::exception& e) {
 
@@ -116,17 +116,16 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
 std::pair<Track, std::string> TrackManager::get_online_track_full_info(const std::string& url) {
 
-    /*
-    PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
-    PyObject* py_module = PyImport_Import(py_fetcher);
-    Py_DECREF(py_fetcher);
+    PyObject* py_script = PyUnicode_DecodeFSDefault(AppManager::PY_SCRIPT_NAME.data());
+    PyObject* py_module = PyImport_Import(py_script);
+    Py_DECREF(py_script);
     if(py_module == nullptr) {
 
         return {Track(), ""};
 
     }
 
-    PyObject* py_func = PyObject_GetAttrString(py_module, "get_track");
+    PyObject* py_func = PyObject_GetAttrString(py_module, AppManager::PY_GET_SINGLE_TRACK_FUNC_NAME.data());
     Py_DECREF(py_module);
     //Check if the python function was found
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
@@ -152,10 +151,13 @@ std::pair<Track, std::string> TrackManager::get_online_track_full_info(const std
     }
 
     PyObject* py_title = PyDict_GetItemString(py_return, "title");
-    PyObject* py_album = PyDict_GetItemString(py_return, "album");
     PyObject* py_artists_list = PyDict_GetItemString(py_return, "artists");
-    PyObject* py_artwork_url = PyDict_GetItemString(py_return, "artwork_url");
-    if(!py_title || !py_artists_list || !py_album || !py_artwork_url) {
+    PyObject* py_album = PyDict_GetItemString(py_return, "album");
+    PyObject* py_artwork_url = PyDict_GetItemString(py_return, "artwork");
+    if(
+        !py_title || !py_artists_list || !py_album || !py_artwork_url || 
+        !PyList_Check(py_artists_list) || !PyUnicode_Check(py_title) || !PyUnicode_Check(py_album) || !PyUnicode_Check(py_artwork_url)
+    ) {
 
         Py_DECREF(py_return);
         return {Track(), ""};
@@ -176,14 +178,12 @@ std::pair<Track, std::string> TrackManager::get_online_track_full_info(const std
     );
     Py_DECREF(py_return);
     return {track, PyUnicode_AsUTF8(py_artwork_url)};
-    */
-
-    return {};
 
 }
 
 std::vector<Track> TrackManager::get_online_tracks(const std::string& url) {
 
+    /*
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
     PyObject* py_module = PyImport_Import(py_fetcher);
     Py_DECREF(py_fetcher);
@@ -255,7 +255,9 @@ std::vector<Track> TrackManager::get_online_tracks(const std::string& url) {
 
     Py_DECREF(py_return);
     return connected_tracklist;
+    */
 
+    return {};
 }
 
 bool TrackManager::import_local_track(const std::string& path, const Track& track) {
@@ -269,7 +271,7 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     }
 
     std::filesystem::path source_path = path;
-    std::filesystem::path destination_path = TRACK_FILES_DIRECTORY / source_path.filename();
+    std::filesystem::path destination_path = TRACK_FILES_DIR / source_path.filename();
 
     destination_path = get_unique_filename(destination_path);
     std::error_code error;
@@ -287,27 +289,24 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     
 }
 
-bool TrackManager::download_online_track(const std::string& url, const Track& track, const std::vector<std::string>& args) {
+bool TrackManager::download_track_from_url(const std::string& url, const Track& track, const std::vector<std::string>& args) {
 
-    /*
     if(track_dict.contains(track)) {
 
-        //(we return true because we only return false if the download was unsuccessful,
-        // since an download didn't happen, then the download vacuously was successful)
-        return true;
+        return false;
 
     }
 
-    PyObject* py_downloader = PyUnicode_DecodeFSDefault("downloader");
-    PyObject* py_module = PyImport_Import(py_downloader);
-    Py_DECREF(py_downloader);
+    PyObject* py_script = PyUnicode_DecodeFSDefault(AppManager::PY_SCRIPT_NAME.data());
+    PyObject* py_module = PyImport_Import(py_script);
+    Py_DECREF(py_script);
     if(py_module == nullptr) {
 
         return false;
 
     }
 
-    PyObject* py_func = PyObject_GetAttrString(py_module, "download_youtube_track");
+    PyObject* py_func = PyObject_GetAttrString(py_module, AppManager::PY_URL_DOWNLOAD_FUNC_NAME.data());
     Py_DECREF(py_module);
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
@@ -316,22 +315,36 @@ bool TrackManager::download_online_track(const std::string& url, const Track& tr
 
     }
 
-    PyObject* py_param_url = PyUnicode_FromString(youtube_url.c_str());
-    PyObject* py_param_artwork_url = PyUnicode_FromString(artwork_url.c_str());
-    PyObject* py_param_track_files_directory = PyUnicode_FromString(std::string(TRACK_FILES_DIRECTORY).c_str());
-    PyObject* py_param_force_mp3 = PyBool_FromLong(force_mp3);
-    PyObject* py_param_force_opus = PyBool_FromLong(force_opus);
+    PyObject* py_param_url = PyUnicode_FromString(url.c_str());
+    PyObject* py_param_track_files_directory = PyUnicode_FromString(std::string(TRACK_FILES_DIR).c_str());
+    PyObject* py_param_title = PyUnicode_FromString(track.title().c_str());
+    PyObject* py_param_artists = PyList_New(track.artists().size());
+    for(std::size_t i {0}; i < track.artists().size(); i++) {
+
+        PyList_SetItem(py_param_artists, i, PyUnicode_FromString(track.artists()[i].c_str()));
+
+    }
+    PyObject* py_param_album = PyUnicode_FromString(track.album().c_str());
+    PyObject* py_param_args = PyList_New(args.size());
+    for(std::size_t i {0}; i < args.size(); i++) {
+
+        PyList_SetItem(py_param_args, i, PyUnicode_FromString(args[i].c_str()));
+
+    }
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_artwork_url, py_param_track_files_directory, py_param_force_mp3, py_param_force_opus, NULL);
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_track_files_directory, py_param_title, py_param_artists, py_param_album, py_param_args, NULL);
     PyGILState_Release(gstate);
 
     Py_DECREF(py_func);
     Py_DECREF(py_param_url);
-    Py_DECREF(py_param_artwork_url);
     Py_DECREF(py_param_track_files_directory);
-    Py_DECREF(py_param_force_mp3);
-    Py_DECREF(py_param_force_opus);
+    Py_DECREF(py_param_title);
+    Py_DECREF(py_param_title);
+    Py_DECREF(py_param_artists);
+    Py_DECREF(py_param_album);
+    Py_DECREF(py_param_args);
     if(py_return == nullptr || !PyUnicode_Check(py_return)) {
 
         Py_XDECREF(py_return);
@@ -341,12 +354,76 @@ bool TrackManager::download_online_track(const std::string& url, const Track& tr
 
     std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
     Py_DECREF(py_return);
-    track_dict.insert({track, downloaded_path});
+    track_dict[track] = downloaded_path;
     return write_file_metadata(downloaded_path, track);
 
-    */
+}
 
-    return true;
+bool TrackManager::download_track_from_info(const Track& track, const std::vector<std::string>& args) {
+
+    if(track_dict.contains(track)) {
+
+        return false;
+
+    }
+
+    PyObject* py_script = PyUnicode_DecodeFSDefault(AppManager::PY_SCRIPT_NAME.data());
+    PyObject* py_module = PyImport_Import(py_script);
+    Py_DECREF(py_script);
+    if(py_module == nullptr) {
+
+        return false;
+
+    }
+
+    PyObject* py_func = PyObject_GetAttrString(py_module, AppManager::PY_INFO_DOWNLOAD_FUNC_NAME.data());
+    Py_DECREF(py_module);
+    if(py_func == nullptr || !PyCallable_Check(py_func)) {
+
+        Py_XDECREF(py_func);
+        return false;
+
+    }
+
+    PyObject* py_param_track_files_directory = PyUnicode_FromString(std::string(TRACK_FILES_DIR).c_str());
+    PyObject* py_param_title = PyUnicode_FromString(track.title().c_str());
+    PyObject* py_param_artists = PyList_New(track.artists().size());
+    for(std::size_t i {0}; i < track.artists().size(); i++) {
+
+        PyList_SetItem(py_param_artists, i, PyUnicode_FromString(track.artists()[i].c_str()));
+
+    }
+    PyObject* py_param_album = PyUnicode_FromString(track.album().c_str());
+    PyObject* py_param_args = PyList_New(args.size());
+    for(std::size_t i {0}; i < args.size(); i++) {
+
+        PyList_SetItem(py_param_args, i, PyUnicode_FromString(args[i].c_str()));
+
+    }
+
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_track_files_directory, py_param_title, py_param_artists, py_param_album, py_param_args, NULL);
+    PyGILState_Release(gstate);
+
+    Py_DECREF(py_func);
+    Py_DECREF(py_param_track_files_directory);
+    Py_DECREF(py_param_title);
+    Py_DECREF(py_param_title);
+    Py_DECREF(py_param_artists);
+    Py_DECREF(py_param_album);
+    Py_DECREF(py_param_args);
+    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
+
+        Py_XDECREF(py_return);
+        return false;
+
+    }
+
+    std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
+    Py_DECREF(py_return);
+    track_dict[track] = downloaded_path;
+    return write_file_metadata(downloaded_path, track);
 
 }
 
@@ -679,7 +756,7 @@ bool TrackManager::read_track_dict() {
 
     track_dict.clear();
 
-    std::filesystem::path track_dict_path = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIRECTORY) / std::filesystem::path(TRACK_DICT_FILENAME);
+    std::filesystem::path track_dict_path = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIR) / std::filesystem::path(TRACK_DICT_FILENAME);
     std::ifstream input (track_dict_path);
     if(!input.is_open()) {
 
@@ -753,7 +830,7 @@ bool TrackManager::read_track_dict() {
 bool TrackManager::serialize_track_dict() {
 
     //Since std::ofstream can't create files in nonexistent folders, we first need to ensure that the track folder exists
-    std::filesystem::path track_files_directory = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIRECTORY);
+    std::filesystem::path track_files_directory = std::filesystem::current_path() / std::filesystem::path(TRACK_FILES_DIR);
     std::filesystem::create_directories(track_files_directory);
 
     std::ofstream output (track_files_directory / std::filesystem::path(TRACK_DICT_FILENAME));
@@ -820,7 +897,7 @@ std::vector<std::string> TrackManager::find_extraneous_track_files() {
     std::filesystem::directory_iterator directory_iter;
     try {
 
-        directory_iter = std::filesystem::directory_iterator(TRACK_FILES_DIRECTORY);
+        directory_iter = std::filesystem::directory_iterator(TRACK_FILES_DIR);
 
     } catch(const std::exception& e) {
 
@@ -865,7 +942,7 @@ std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> Tra
     std::filesystem::directory_iterator directory_iter;
     try {
 
-        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY);
+        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIR);
 
     } catch(const std::exception& e) {
 
@@ -956,7 +1033,7 @@ bool TrackManager::remove_playlist(const std::string& id, const std::vector<std:
     std::filesystem::directory_iterator directory_iter;
     try {
 
-        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIRECTORY);
+        directory_iter = std::filesystem::directory_iterator(PLAYLIST_FILES_DIR);
 
     } catch(const std::exception& e) {
 
@@ -991,7 +1068,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
 
     error_flag = false;
 
-    std::filesystem::path playlist_files_directory_path = PLAYLIST_FILES_DIRECTORY / std::filesystem::path(id + ".json");
+    std::filesystem::path playlist_files_directory_path = PLAYLIST_FILES_DIR / std::filesystem::path(id + ".json");
     std::ifstream input (playlist_files_directory_path);
     if(!input.is_open()) {
 
@@ -1078,7 +1155,7 @@ Playlist TrackManager::get_playlist(const std::string& id, bool& error_flag) {
 bool TrackManager::serialize_playlist(const Playlist& playlist) {
 
     //Since std::ofstream can't create files in nonexistent folders, we first need to ensure that the playlists folder exists
-    std::filesystem::path playlist_files_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIRECTORY);
+    std::filesystem::path playlist_files_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIR);
     std::filesystem::create_directories(playlist_files_directory);
 
     std::filesystem::path playlist_files_directory_path = playlist_files_directory / std::filesystem::path(playlist.id() + ".json");
@@ -1132,7 +1209,7 @@ bool TrackManager::read_playlist_tree() {
 
     playlist_tree.clear();
 
-    std::filesystem::path playlists_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIRECTORY);
+    std::filesystem::path playlists_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIR);
     std::filesystem::path playlist_tree_path = playlists_directory / std::filesystem::path(PLAYLIST_TREE_FILENAME);
     std::ifstream input (playlist_tree_path);
     if(!input.is_open()) {
@@ -1240,7 +1317,7 @@ bool TrackManager::read_playlist_tree() {
 bool TrackManager::serialize_playlist_tree() {
 
     //Since std::ofstream can't create files in nonexistent folders, we first need to ensure that the playlists folder exists
-    std::filesystem::path playlist_files_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIRECTORY);
+    std::filesystem::path playlist_files_directory = std::filesystem::current_path() / std::filesystem::path(PLAYLIST_FILES_DIR);
     std::filesystem::create_directories(playlist_files_directory);
 
     std::filesystem::path playlist_files_directory_path = playlist_files_directory / std::filesystem::path(PLAYLIST_TREE_FILENAME);

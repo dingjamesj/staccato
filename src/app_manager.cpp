@@ -478,7 +478,7 @@ void AppManager::read_settings() {
 
 std::string AppManager::get_playlist_image_path(const std::string& playlist_id) {
 
-    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / TrackManager::PLAYLIST_FILES_DIRECTORY / PLAYLIST_IMAGES_DIRECTORY;
+    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / TrackManager::PLAYLIST_FILES_DIR / PLAYLIST_IMAGES_DIRECTORY;
 
     std::filesystem::path jpg_path = playlist_images_directory / (playlist_id + ".jpg");
     if(std::ifstream(jpg_path).good()) {
@@ -550,7 +550,7 @@ bool AppManager::set_playlist_image(const std::string& image_path_str, const std
     }
 
     //Ensure that the playlist images folder exists
-    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / TrackManager::PLAYLIST_FILES_DIRECTORY / PLAYLIST_IMAGES_DIRECTORY;
+    std::filesystem::path playlist_images_directory = std::filesystem::current_path() / TrackManager::PLAYLIST_FILES_DIR / PLAYLIST_IMAGES_DIRECTORY;
     std::filesystem::create_directories(playlist_images_directory);
 
     //Delete the current image, which might have a different file extension from the new image we're about to copy.
@@ -570,9 +570,9 @@ bool AppManager::init_python() {
 
     //Get the path to the virtual env.'s Python executable
     #if defined(_WIN32) || defined(_WIN64)
-    std::filesystem::path venv_path = std::filesystem::current_path() / PYTHON_SCRIPTS_DIRECTORY / PYTHON_VENV_DIRECTORY / "Scripts/python.exe";
+    std::filesystem::path venv_path = std::filesystem::current_path() / PYTHON_SCRIPTS_DIR / PY_VENV_DIRECTORY / "Scripts/python.exe";
     #else
-    std::filesystem::path venv_path = std::filesystem::current_path() / PYTHON_SCRIPTS_DIRECTORY / PYTHON_VENV_DIRECTORY / "bin/python";
+    std::filesystem::path venv_path = std::filesystem::current_path() / PYTHON_SCRIPTS_DIR / PY_VENV_DIRECTORY / "bin/python";
     #endif
 
     PyConfig config;
@@ -583,7 +583,7 @@ bool AppManager::init_python() {
     PyConfig_Clear(&config);
 
     //Make the Python interpreter look in the correct directory for Python scripts
-    PyRun_SimpleString(("import sys; sys.path.append('" + std::string(PYTHON_SCRIPTS_DIRECTORY) + "')").c_str());
+    PyRun_SimpleString(("import sys; sys.path.append('" + std::string(PYTHON_SCRIPTS_DIR) + "')").c_str());
 
     return !(bool) PyStatus_Exception(status);
 
@@ -591,7 +591,7 @@ bool AppManager::init_python() {
 
 std::string AppManager::update_python_libraries() {
 
-    PyObject* py_script = PyUnicode_DecodeFSDefault(PYTHON_SCRIPT_NAME.data());
+    PyObject* py_script = PyUnicode_DecodeFSDefault(PY_SCRIPT_NAME.data());
     PyObject* py_module = PyImport_Import(py_script);
     Py_DECREF(py_script);
     if(py_module == nullptr) {

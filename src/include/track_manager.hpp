@@ -224,24 +224,35 @@ namespace staccato {
         /// @brief Used to get complete info about a singular track (e.g. including picture data). 
         ///        Meant to be used sparingly, for example when loading a track preview.
         /// @param url The track URL
-        /// @param track The track information
-        /// @param args 
-        /// @return A tuple of the track info, and artwork URL
+        /// @return A pair of the track info and artwork URL
         static std::pair<Track, std::string> get_online_track_full_info(const std::string& url);
 
-        /// @brief 
+        /// @brief Takes in a search query and returns tracks that match that query.
         /// @param query 
-        /// @return 
-        static std::pair<Track, std::string> search_track_full_info(const std::string& query);
+        /// @param num_results
+        /// @return A vector of track information, stored as pairs of Track objects and any other extra information
+        static std::vector<Track> search_tracks(const std::string& query, std::size_t num_results);
+
+        /// @brief Used to download audio. The audio's filepath is then mapped to the param `track` in the track dictionary.
+        ///        Internally, this calls the Python "download track" function and then maps the filepath to the track dict.
+        ///        It will not download the track if the track already exists in the track dict. To overwrite a track, you must
+        ///        manually delete the track first.
+        ///        The download Python script may or may not use both the URL and the track info, but are given for flexibility in implementation.
+        ///        
+        /// @param url A URL to a streaming service such as Spotify or YouTube
+        /// @param track Track information
+        /// @param args Extra parameters for the Python script (if any)
+        /// @return `false` if the download encountered an unexpected error, `true` otherwise
+        static bool download_track_from_url(const std::string& url, const Track& track, const std::vector<std::string>& args);
 
         /// @brief Used to download audio. The audio's filepath is then mapped to the param `track` in the track dictionary.
         ///        Note that this calls the Python "download track" function and does nothing else.
         ///        The download Python script may or may not use both the URL and the track info, but are given for flexibility in implementation.
         /// @param url A URL to a streaming service such as Spotify or YouTube
         /// @param track Track information
-        /// @param args Extra information, if needed
+        /// @param args Extra parameters for the Python script (if any)
         /// @return `false` if the download encountered an unexpected error, `true` otherwise
-        static bool download_online_track(const std::string& url, const Track& track, const std::vector<std::string>& args);
+        static bool download_track_from_info(const Track& track, const std::vector<std::string>& args);
 
         //=====================================================================================
         //                     TRACK DICTIONARY & PLAYLIST TREE MANAGEMENT                     
@@ -304,17 +315,17 @@ namespace staccato {
         #if(DEVELOPMENT_BUILD)
 
         #if defined(_WIN32) || defined(_WIN64)
-        static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"..\\playlists"};
-        static constexpr std::string_view TRACK_FILES_DIRECTORY {"..\\tracks"};
+        static constexpr std::string_view PLAYLIST_FILES_DIR {"..\\playlists"};
+        static constexpr std::string_view TRACK_FILES_DIR {"..\\tracks"};
         #else
-        static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"../playlists"};
-        static constexpr std::string_view TRACK_FILES_DIRECTORY {"../tracks"};
+        static constexpr std::string_view PLAYLIST_FILES_DIR {"../playlists"};
+        static constexpr std::string_view TRACK_FILES_DIR {"../tracks"};
         #endif
 
         #else
 
-        static constexpr std::string_view PLAYLIST_FILES_DIRECTORY {"playlists"};
-        static constexpr std::string_view TRACK_FILES_DIRECTORY {"tracks"};
+        static constexpr std::string_view PLAYLIST_FILES_DIR {"playlists"};
+        static constexpr std::string_view TRACK_FILES_DIR {"tracks"};
 
         #endif
         

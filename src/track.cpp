@@ -51,6 +51,14 @@ Track::Track(const std::string& title, const std::vector<std::string>& artists, 
 
 }
 
+Track::Track(const std::string& title, std::vector<std::string>&& artists, const std::string& album) {
+
+    title_ = title;
+    artists_ = std::move(artists);
+    album_ = album;
+
+}
+
 Track::Track(): title_ {""}, artists_ {}, album_ {""} {}
 
 bool Track::is_empty() const {

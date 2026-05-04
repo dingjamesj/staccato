@@ -109,7 +109,6 @@ ColumnLayout {
                 id: importPanels
                 currentIndex: trackImportTabBar.currentIndex
                 width: container.importPanelWidth
-                height: currentItem ? currentItem.implicitHeight : 0
 
                 URLImportPanel {}
                 SearchQueryImportPanel {}

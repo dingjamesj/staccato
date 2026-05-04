@@ -282,7 +282,32 @@ QList<QVariant> StaccatoInterface::getOnlineTrackInfo(const QString& url) {
         QString::fromStdString(track.album()), 
         QString::fromStdString(track_info.second)
     };
+}
 
-    return {};
+bool StaccatoInterface::downloadOnlineTrack(const QString& url, const QString& title, const QStringList& artists, const QString& album, const QStringList& args) {
+
+    std::vector<std::string> artistsStd {};
+    for(const QString& str: artists) {
+
+        artistsStd.push_back(str.toStdString());
+
+    }
+
+    std::vector<std::string> argsStd {};
+    for(const QString& str: args) {
+
+        argsStd.push_back(str.toStdString());
+
+    }
+
+    return TrackManager::download_online_track(
+        url.toStdString(),
+        Track(
+            title.toStdString(),
+            artistsStd,
+            album.toStdString()
+        ),
+        argsStd
+    );
 
 }
