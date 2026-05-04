@@ -14,7 +14,7 @@ Rectangle {
     color: enabled ? defaultColor : disabledColor
     radius: width / 2
 
-    ToolTip.visible: enabled && helpMouseArea.containsMouse
+    ToolTip.visible: helpMouseArea.containsMouse
     ToolTip.text: container.tooltipText
     ToolTip.delay: 500
 

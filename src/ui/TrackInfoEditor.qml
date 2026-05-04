@@ -38,6 +38,15 @@ GridLayout {
         }
     }
 
+    function clearArtistFields() {
+        let artistsContainer = container.artistsContainer
+        for(let i = artistsContainer.children.length - 1; i >= 0; i--) {
+
+            artistsContainer.children[i].destroy();
+
+        }
+    }
+
     //Title
 
     Text {

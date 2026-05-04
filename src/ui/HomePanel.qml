@@ -12,6 +12,8 @@ pragma ComponentBehavior: Bound
 ColumnLayout {
     property alias recentlyPlayedContainer: recentsContainer
 
+    property int importPanelWidth: 550
+
     id: container
     spacing: 0
 
@@ -106,7 +108,7 @@ ColumnLayout {
             StackLayout {
                 id: importPanels
                 currentIndex: trackImportTabBar.currentIndex
-                width: parent.width
+                width: container.importPanelWidth
                 height: currentItem ? currentItem.implicitHeight : 0
 
                 URLImportPanel {}

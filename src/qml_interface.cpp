@@ -248,6 +248,12 @@ QString StaccatoInterface::getPlaylistImagePath(const QString& id) {
 QList<QVariant> StaccatoInterface::getLocalTrackInfo(const QString& path) {
 
     Track track = TrackManager::get_local_track_info(path.toStdString());
+    if(track.is_empty()) {
+
+        return {};
+
+    }
+
     QStringList artists {};
     for(std::string artist: track.artists()) {
 
@@ -261,16 +267,21 @@ QList<QVariant> StaccatoInterface::getLocalTrackInfo(const QString& path) {
 
 QList<QVariant> StaccatoInterface::getOnlineTrackInfo(const QString& url) {
 
-    // std::pair<Track, std::string> track_artwork_pair = TrackManager::get_online_track_info(url.toStdString());
-    // Track& track = track_artwork_pair.first;
-    // QStringList artists {};
-    // for(std::string artist: track.artists()) {
+    std::pair<Track, std::string> track_info = TrackManager::get_online_track_full_info(url.toStdString());
+    Track& track = track_info.first;
+    QStringList artists {};
+    for(std::string artist: track.artists()) {
 
-    //     artists.append(QString::fromStdString(artist));
+        artists.append(QString::fromStdString(artist));
 
-    // }
+    }
     
-    // return {QVariant(QString::fromStdString(track.title())), artists, QVariant(QString::fromStdString(track.album())), QVariant(QString::fromStdString(track_artwork_pair.second))};
+    return {QVariant(
+        QString::fromStdString(track.title())), 
+        artists, 
+        QString::fromStdString(track.album()), 
+        QString::fromStdString(track_info.second)
+    };
 
     return {};
 

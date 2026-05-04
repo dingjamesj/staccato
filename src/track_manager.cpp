@@ -114,7 +114,7 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
 }
 
-std::tuple<Track, std::string, std::string> TrackManager::get_online_track_full_info(const std::string& url, const Track& track, const std::vector<std::string>& args) {
+std::pair<Track, std::string> TrackManager::get_online_track_full_info(const std::string& url) {
 
     /*
     PyObject* py_fetcher = PyUnicode_DecodeFSDefault("fetcher");
@@ -177,6 +177,8 @@ std::tuple<Track, std::string, std::string> TrackManager::get_online_track_full_
     Py_DECREF(py_return);
     return {track, PyUnicode_AsUTF8(py_artwork_url)};
     */
+
+    return {};
 
 }
 

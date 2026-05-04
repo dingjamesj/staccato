@@ -8,15 +8,11 @@ Column {
     property alias importStatusText: statusText.text
     property alias importURLText: urlTextField.text
     property alias importExtraParamsText: extraParametersEditor.text
-    property alias previewTitleText: previewEditor.titleText
-    property alias artistsContainer: previewEditor.artistsContainer
-    property alias previewAlbumText: previewEditor.albumText
-    property alias previewArtworkSource: previewEditor.artworkSource
+    property alias previewEditor: previewEditor
 
     property bool previewIsLoading: false
     property bool previewIsLoaded: false
 
-    property int previewMetadataFieldsMaxWidth: 490
     property int urlFieldMaxWidth: 400
     property int extraParametersPanelHeight: 75
 
@@ -73,10 +69,7 @@ Column {
                 Layout.preferredWidth: 105
                 Layout.fillHeight: true
 
-                onClicked: {
-                    // Logic.loadTrackInfo(container);
-                    container.previewIsLoaded = !container.previewIsLoaded;
-                }
+                onClicked: Logic.loadPreview(container)
             }
 
             Text {
@@ -134,7 +127,7 @@ Column {
         TrackInfoEditor {
             id: previewEditor
             anchors.left: parent.left
-            width: Math.min(parent.width, previewMetadataFieldsMaxWidth)
+            width: parent.width
             readOnly: !overwriteMetadataCheckbox.checked
             enabled: previewIsLoaded || overwriteMetadataCheckbox.checked
         }

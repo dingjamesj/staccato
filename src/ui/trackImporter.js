@@ -6,87 +6,61 @@ function startup(_cpp) {
     
 }
 
-function loadTrackInfo(container) {
+function loadPreview(container) {
 
     let url = container.importURLText;
     let loadingFlag = container.previewIsLoading;
     let loadCompletionFlag = container.previewIsLoaded;
-    let title = container.previewTitleText;
-    let artistsContainer = container.previewArtistsContainer;
-    let album = container.previewAlbumText;
-    let artworkSource = container.previewArtworkSource;
+    let previewEditor = container.previewEditor;
 
     loadingFlag = true;
     loadCompletionFlag = false;
-    let track;
-    if(url.charAt(1) === ":") {
+    
+    //We'll first assume that the URI is a track on the local filesystem.
+    //If it isn't, then C++ will return an empty list, and then we'll assume that the URI is an internet link.
 
-        //Local filesystem track
-        track = cpp.getLocalTrackInfo(url);
+    //The C++ API should return the title, artists, and album-- or nothing if the URI isn't a local file.
+    let track = cpp.getLocalTrackInfo(url);
+    if(track.length === 0) {
 
-    } else {
-
-        //Online track
+        //The C++ API should return the title, artists, album, and artwork URL
         track = cpp.getOnlineTrackInfo(url);
 
-    }
+        if(track.length < 4) {
 
-    console.log(track);
+            return;
+            
+        }
 
-    if(track.length < 3) {
+    } else if(track.length < 3) {
 
-        return;
-
-    }
-
-    title = track[0];
-
-    //Set the artists
-    for(let i = artistsContainer.children.length - 1; i >= 0; i--) {
-
-        artistsContainer.children[i].destroy();
+        return; 
 
     }
 
-    let component = Qt.createComponent("RoundTextField.qml");
+    previewEditor.titleText = track[0];
+    previewEditor.albumText = track[2];
+
+    //Display the artists
+    previewEditor.clearArtistFields();
     for(let i = 0; i < track[1].length; i++) {
 
-        component.createObject(artistsContainer, {
-            "Layout.preferredWidth": 1,
-            "Layout.fillWidth": true,
-            "Layout.fillHeight": true,
-            enabled: "container.previewIsLoaded",
-            text: track[1][i]
-        });
+        previewEditor.addArtistField();
+        previewEditor.artistsContainer.children[i].text = track[1][i];
 
     }
 
-    album = track[2];
-
-    //Set the artwork
+    //To display the artwork for...
+    // ... a track on the local filesystem, we just simply set the artwork image source as the audio file path.
+    // ... an online track, we use the artwork URL given by the C++ API.
+    
     if(track.length >= 4) {
 
-        //An online track would have returned an extra artwork URL link
-        artworkSource = track[3];
+        previewEditor.artworkSource = track[3];
 
     } else {
 
-        //Local audio file
-        let file_path = "";
-        for(let i = 0; i < url.length; i++) {
-
-            if(url.charAt(i) === "\\") {
-
-                file_path += "/";
-
-            } else {
-
-                file_path += url.charAt(i);
-
-            }
-
-        }
-        artworkSource = "image://audiofile/" + file_path;
+        previewEditor.artworkSource = "image://audiofile/" + url.replaceAll("\\", "/");
 
     }
 

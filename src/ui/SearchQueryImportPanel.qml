@@ -13,7 +13,6 @@ Column {
     property alias urlTextFieldText: urlTextField.text
 
     property int searchFieldMaxWidth: 300
-    property int searchResultFieldsMaxWidth: 490
     property int extraParametersPanelHeight: 75
 
     property string forceMP3ParamText: "Force MP3"
@@ -93,18 +92,18 @@ Column {
 
         TrackInfoEditor {
             id: resultsEditor
-            width: Math.min(parent.width, searchResultFieldsMaxWidth)
+            width: parent.width
             readOnly: !overwriteMetadataCheckbox.checked
         }
 
         RowLayout {
             anchors.left: parent.left
-            width: Math.min(parent.width, searchResultFieldsMaxWidth)
+            width: parent.width
             height: Style.buttonSize
             spacing: Style.smallSpacing
 
             Text {
-                text: "URL:"
+                text: "Source URL:"
                 font.family: Style.mainFontFamily
                 font.pointSize: Style.normalTextSize
                 font.weight: Font.DemiBold
@@ -123,8 +122,6 @@ Column {
                 wrapMode: Text.NoWrap
                 color: enabled ? Style.white : Qt.darker(Style.white, 1.5)
                 readOnly: true
-
-                // Layout.alignment: Qt.AlignCenter
             }
 
             //Copy URL button

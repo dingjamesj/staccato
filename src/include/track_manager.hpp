@@ -226,17 +226,22 @@ namespace staccato {
         /// @param url The track URL
         /// @param track The track information
         /// @param args 
-        /// @return A tuple of the track info, audio source URL, and artwork URL
-        static std::tuple<Track, std::string, std::string> get_online_track_full_info(const std::string& url, const Track& track, const std::vector<std::string>& args);
+        /// @return A tuple of the track info, and artwork URL
+        static std::pair<Track, std::string> get_online_track_full_info(const std::string& url);
+
+        /// @brief 
+        /// @param query 
+        /// @return 
+        static std::pair<Track, std::string> search_track_full_info(const std::string& query);
 
         /// @brief Used to download audio. The audio's filepath is then mapped to the param `track` in the track dictionary.
         ///        Note that this calls the Python "download track" function and does nothing else.
         ///        The download Python script may or may not use both the URL and the track info, but are given for flexibility in implementation.
-        /// @param audio_source_url A URL to the audio source (example: a YouTube video; anti-example: a Spotify link)
+        /// @param url A URL to a streaming service such as Spotify or YouTube
         /// @param track Track information
         /// @param args Extra information, if needed
         /// @return `false` if the download encountered an unexpected error, `true` otherwise
-        static bool download_online_track(const std::string& audio_source_url, const Track& track, const std::vector<std::string>& args);
+        static bool download_online_track(const std::string& url, const Track& track, const std::vector<std::string>& args);
 
         //=====================================================================================
         //                     TRACK DICTIONARY & PLAYLIST TREE MANAGEMENT                     

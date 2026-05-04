@@ -43,6 +43,7 @@ RowLayout {
     ScrollView {
         id: extraParametersScrollView
         contentHeight: height
+        contentWidth: width
         clip: true
         
         ScrollBar.vertical.policy: ScrollBar.AsNeeded
