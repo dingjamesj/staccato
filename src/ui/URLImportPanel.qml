@@ -5,13 +5,14 @@ import staccato
 import "trackImporter.js" as Logic
 
 Column {
-    property alias importStatusText: statusText.text
-    property alias importURLText: urlTextField.text
-    property alias importExtraParamsText: extraParametersEditor.text
+    property alias statusText: statusText.text
+    property alias urlText: urlTextField.text
+    property alias extraParamsText: extraParametersEditor.text
     property alias previewEditor: previewEditor
 
     property bool previewIsLoading: false
     property bool previewIsLoaded: false
+    property bool isDownloading: false
 
     property int urlFieldMaxWidth: 400
     property int extraParametersPanelHeight: 75
@@ -54,17 +55,19 @@ Column {
                 radius: Style.buttonRadius
                 text: "Download"
                 defaultColor: Style.purple
-                enabled: importURLText.length > 0
+                enabled: urlText.length > 0
 
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
+
+                onClicked: Logic.importTrackFromUrl(container)
             }
 
             RoundButton {
                 radius: Style.buttonRadius
                 text: "Load Preview"
                 defaultColor: Style.gray
-                enabled: previewIsLoading ? false : (importURLText.length > 0)
+                enabled: previewIsLoading ? false : (urlText.length > 0)
                 
                 Layout.preferredWidth: 105
                 Layout.fillHeight: true

@@ -171,13 +171,16 @@ std::pair<Track, std::string> TrackManager::get_online_track_full_info(const std
 
     }
 
-    Track track (
-        PyUnicode_AsUTF8(py_title),
-        artists,
-        PyUnicode_AsUTF8(py_album)
-    );
+    
     Py_DECREF(py_return);
-    return {track, PyUnicode_AsUTF8(py_artwork_url)};
+    return {
+        Track(
+            PyUnicode_AsUTF8(py_title),
+            artists,
+            PyUnicode_AsUTF8(py_album)
+        ), 
+        PyUnicode_AsUTF8(py_artwork_url)
+    };
 
 }
 
@@ -260,7 +263,7 @@ std::vector<Track> TrackManager::get_online_tracks(const std::string& url) {
     return {};
 }
 
-bool TrackManager::import_local_track(const std::string& path, const Track& track) {
+bool TrackManager::import_track_from_filesystem(const std::string& path, const Track& track) {
 
     if(track_dict.contains(track)) {
 
@@ -273,36 +276,33 @@ bool TrackManager::import_local_track(const std::string& path, const Track& trac
     std::filesystem::path source_path = path;
     std::filesystem::path destination_path = TRACK_FILES_DIR / source_path.filename();
 
-    destination_path = get_unique_filename(destination_path);
-    std::error_code error;
-    bool copy_success = std::filesystem::copy_file(source_path, destination_path, std::filesystem::copy_options::skip_existing, error);
+    if(source_path != destination_path) {
 
-    if(!copy_success) {
+        destination_path = get_unique_filename(destination_path);
+        std::error_code error;
+        bool copy_success = std::filesystem::copy_file(source_path, destination_path, std::filesystem::copy_options::skip_existing, error);
 
-        return false;
+        if(!copy_success) {
+
+            return false;
+
+        }
 
     }
 
-    std::string new_track_path = destination_path.string();
-    track_dict.insert({track, new_track_path});
-    return write_file_metadata(new_track_path, track);
+    track_dict.insert({track, destination_path.string()});
+    return write_file_metadata(destination_path.string(), track);
     
 }
 
-bool TrackManager::download_track_from_url(const std::string& url, const Track& track, const std::vector<std::string>& args) {
-
-    if(track_dict.contains(track)) {
-
-        return false;
-
-    }
+std::pair<Track, std::string> TrackManager::download_track_from_url(const std::string& url, const std::vector<std::string>& args) {
 
     PyObject* py_script = PyUnicode_DecodeFSDefault(AppManager::PY_SCRIPT_NAME.data());
     PyObject* py_module = PyImport_Import(py_script);
     Py_DECREF(py_script);
     if(py_module == nullptr) {
 
-        return false;
+        return {Track(), ""};
 
     }
 
@@ -311,20 +311,12 @@ bool TrackManager::download_track_from_url(const std::string& url, const Track& 
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        return false;
+        return {Track(), ""};
 
     }
 
     PyObject* py_param_url = PyUnicode_FromString(url.c_str());
     PyObject* py_param_track_files_directory = PyUnicode_FromString(std::string(TRACK_FILES_DIR).c_str());
-    PyObject* py_param_title = PyUnicode_FromString(track.title().c_str());
-    PyObject* py_param_artists = PyList_New(track.artists().size());
-    for(std::size_t i {0}; i < track.artists().size(); i++) {
-
-        PyList_SetItem(py_param_artists, i, PyUnicode_FromString(track.artists()[i].c_str()));
-
-    }
-    PyObject* py_param_album = PyUnicode_FromString(track.album().c_str());
     PyObject* py_param_args = PyList_New(args.size());
     for(std::size_t i {0}; i < args.size(); i++) {
 
@@ -334,32 +326,55 @@ bool TrackManager::download_track_from_url(const std::string& url, const Track& 
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_track_files_directory, py_param_title, py_param_artists, py_param_album, py_param_args, NULL);
+    PyObject* py_return = PyObject_CallFunctionObjArgs(py_func, py_param_url, py_param_track_files_directory, py_param_args, NULL);
     PyGILState_Release(gstate);
 
     Py_DECREF(py_func);
     Py_DECREF(py_param_url);
     Py_DECREF(py_param_track_files_directory);
-    Py_DECREF(py_param_title);
-    Py_DECREF(py_param_title);
-    Py_DECREF(py_param_artists);
-    Py_DECREF(py_param_album);
     Py_DECREF(py_param_args);
-    if(py_return == nullptr || !PyUnicode_Check(py_return)) {
+    if(py_return == nullptr || !PyDict_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        return false;
+        return {Track(), ""};
 
     }
 
     std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
+    PyObject* py_title = PyDict_GetItemString(py_return, "title");
+    PyObject* py_artists_list = PyDict_GetItemString(py_return, "artists");
+    PyObject* py_album = PyDict_GetItemString(py_return, "album");
+    PyObject* py_filepath = PyDict_GetItemString(py_return, "filepath");
+    if(
+        !py_title || !py_artists_list || !py_album || !py_filepath || 
+        !PyList_Check(py_artists_list) || !PyUnicode_Check(py_title) || !PyUnicode_Check(py_album) || !PyUnicode_Check(py_filepath)
+    ) {
+
+        Py_DECREF(py_return);
+        return {Track(), ""};
+
+    }
+
+    std::vector<std::string> artists {};
+    for(Py_ssize_t i {0}; i < PyList_Size(py_artists_list); i++) {
+
+        artists.push_back(PyUnicode_AsUTF8(PyList_GetItem(py_artists_list, i)));
+
+    }
+    
     Py_DECREF(py_return);
-    track_dict[track] = downloaded_path;
-    return write_file_metadata(downloaded_path, track);
+    return {
+        Track(
+            PyUnicode_AsUTF8(py_title),
+            artists,
+            PyUnicode_AsUTF8(py_album)
+        ),
+        PyUnicode_AsUTF8(py_filepath)
+    };
 
 }
 
-bool TrackManager::download_track_from_info(const Track& track, const std::vector<std::string>& args) {
+bool TrackManager::import_track_from_info(const Track& track, const std::vector<std::string>& args) {
 
     if(track_dict.contains(track)) {
 

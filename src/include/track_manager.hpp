@@ -154,7 +154,7 @@ namespace staccato {
         /// @param path 
         /// @param track 
         /// @return `true` if copying the audio file was successful, `false` otherwise. NOTE : returns `true` if `track` is already a key in the track dict (vacuously since copying the audio file wasn't attempted)
-        static bool import_local_track(const std::string& path, const Track& track);
+        static bool import_track_from_filesystem(const std::string& path, const Track& track);
 
         /// @brief Removes the param `track` from the track dict and deletes its associated audio file
         /// @param track 
@@ -233,17 +233,12 @@ namespace staccato {
         /// @return A vector of track information, stored as pairs of Track objects and any other extra information
         static std::vector<Track> search_tracks(const std::string& query, std::size_t num_results);
 
-        /// @brief Used to download audio. The audio's filepath is then mapped to the param `track` in the track dictionary.
-        ///        Internally, this calls the Python "download track" function and then maps the filepath to the track dict.
-        ///        It will not download the track if the track already exists in the track dict. To overwrite a track, you must
-        ///        manually delete the track first.
-        ///        The download Python script may or may not use both the URL and the track info, but are given for flexibility in implementation.
-        ///        
+        /// @brief Used to download audio. Does NOT add the track to the track dict.
         /// @param url A URL to a streaming service such as Spotify or YouTube
         /// @param track Track information
         /// @param args Extra parameters for the Python script (if any)
-        /// @return `false` if the download encountered an unexpected error, `true` otherwise
-        static bool download_track_from_url(const std::string& url, const Track& track, const std::vector<std::string>& args);
+        /// @return Information on the downloaded track and the downloaded filepath
+        static std::pair<Track, std::string> download_track_from_url(const std::string& url, const std::vector<std::string>& args);
 
         /// @brief Used to download audio. The audio's filepath is then mapped to the param `track` in the track dictionary.
         ///        Note that this calls the Python "download track" function and does nothing else.
@@ -252,7 +247,7 @@ namespace staccato {
         /// @param track Track information
         /// @param args Extra parameters for the Python script (if any)
         /// @return `false` if the download encountered an unexpected error, `true` otherwise
-        static bool download_track_from_info(const Track& track, const std::vector<std::string>& args);
+        static bool import_track_from_info(const Track& track, const std::vector<std::string>& args);
 
         //=====================================================================================
         //                     TRACK DICTIONARY & PLAYLIST TREE MANAGEMENT                     

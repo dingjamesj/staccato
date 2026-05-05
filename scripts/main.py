@@ -19,9 +19,9 @@ import venv
 # 
 # LIST OF REQUIRED FUNCTIONS:
 # 
-# download_track_from_url(download_dir: str, url: str) -> str
-# - Given a URL to a track from a streaming service, downloads audio and returns the downloaded filepath. 
-#   Returns an empty string if an unexpected error occured.
+# download_track_from_url(download_dir: str, url: str) -> dict
+# - Given a URL to a track from a streaming service, downloads audio and returns a dict with the downloaded
+#   filepath and track information. Returns an empty dict if an unexpected error occured.
 # - The implementation of this function does not need to directly download audio from the URL parameter.
 #   That is, the URL parameter serves to identify the track and is not necessarily where the audio file
 #   needs to be sourced from.
@@ -47,7 +47,7 @@ import venv
 #======================================================================================================
 
 # Required by C++
-def download_track_from_url(download_dir: str, url: str, args: list[str]) -> str:
+def download_track_from_url(download_dir: str, url: str, args: list[str]) -> dict:
     return ""
 
 

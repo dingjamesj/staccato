@@ -58,7 +58,7 @@ namespace staccato {
         QList<QVariant> getOnlineTrackInfo(const QString& url);
 
         Q_INVOKABLE
-        bool downloadOnlineTrack(const QString& url, const QString& title, const QStringList& artists, const QString& album, const QStringList& args);
+        QList<QVariant> downloadTrackFromUrl(const QString& url, const QStringList& args);
 
     };
 

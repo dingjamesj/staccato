@@ -276,22 +276,15 @@ QList<QVariant> StaccatoInterface::getOnlineTrackInfo(const QString& url) {
 
     }
     
-    return {QVariant(
-        QString::fromStdString(track.title())), 
+    return {
+        QString::fromStdString(track.title()), 
         artists, 
         QString::fromStdString(track.album()), 
         QString::fromStdString(track_info.second)
     };
 }
 
-bool StaccatoInterface::downloadOnlineTrack(const QString& url, const QString& title, const QStringList& artists, const QString& album, const QStringList& args) {
-
-    std::vector<std::string> artistsStd {};
-    for(const QString& str: artists) {
-
-        artistsStd.push_back(str.toStdString());
-
-    }
+QList<QVariant> StaccatoInterface::downloadTrackFromUrl(const QString& url, const QStringList& args) {
 
     std::vector<std::string> argsStd {};
     for(const QString& str: args) {
@@ -300,14 +293,30 @@ bool StaccatoInterface::downloadOnlineTrack(const QString& url, const QString& t
 
     }
 
-    return TrackManager::download_online_track(
+    std::pair<Track, std::string> download_info = TrackManager::download_track_from_url(
         url.toStdString(),
-        Track(
-            title.toStdString(),
-            artistsStd,
-            album.toStdString()
-        ),
         argsStd
     );
+
+    if(download_info.first.is_empty() && download_info.second.empty()) {
+
+        return {};
+
+    }
+
+    Track& track = download_info.first;
+    QStringList artists {};
+    for(std::string artist: track.artists()) {
+
+        artists.append(QString::fromStdString(artist));
+
+    }
+
+    return {
+        QString::fromStdString(track.title()), 
+        artists, 
+        QString::fromStdString(track.album()), 
+        QString::fromStdString(download_info.second)
+    };
 
 }

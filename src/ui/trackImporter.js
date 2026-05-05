@@ -8,7 +8,7 @@ function startup(_cpp) {
 
 function loadPreview(container) {
 
-    let url = container.importURLText;
+    let url = container.urlText;
     let loadingFlag = container.previewIsLoading;
     let loadCompletionFlag = container.previewIsLoaded;
     let previewEditor = container.previewEditor;
@@ -66,5 +66,26 @@ function loadPreview(container) {
 
     loadingFlag = false;
     loadCompletionFlag = true;
+
+}
+
+function importTrackFromUrl(container) {
+
+    let url = container.urlText;
+    let extraParamsStr = container.extraParamText;
+    let downloadingFlag = container.isDownloading;
+    let previewEditor = container.previewEditor;
+    downloadingFlag = true;
+
+    //Tokenize the extra parameters with newlines as the delimiter
+    let extraParamsList = myString.split(/\r?\n/);
+
+    let downloadInfo = cpp.downloadTrackFromUrl(url, extraParamsList);
+    if(downloadInfo.length === 0) {
+
+        //TODO: Download failed action
+        return;
+
+    }
 
 }
