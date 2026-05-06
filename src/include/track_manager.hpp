@@ -287,6 +287,13 @@ namespace staccato {
         static constexpr std::size_t FILENAME_COLLISIONS_TOLERANCE {100000}; //The max number of attempts to find a unique filename
         static constexpr std::size_t PLAYLIST_ID_LENGTH {10};
 
+        //Key names for dicts returned by Python scripts
+        static constexpr std::string_view PY_TITLE_KEY {"title"};
+        static constexpr std::string_view PY_ARTISTS_KEY {"artists"};
+        static constexpr std::string_view PY_ALBUM_KEY {"album"};
+        static constexpr std::string_view PY_FILEPATH_KEY {"filepath"};
+        static constexpr std::string_view PY_ARTWORK_KEY {"artwork"};
+
         //Key names for JSON representation of Track objects
         static constexpr std::string_view TITLE_JSON_KEY {"title"};
         static constexpr std::string_view ARTISTS_JSON_KEY {"artists"};

@@ -150,10 +150,10 @@ std::pair<Track, std::string> TrackManager::get_online_track_full_info(const std
 
     }
 
-    PyObject* py_title = PyDict_GetItemString(py_return, "title");
-    PyObject* py_artists_list = PyDict_GetItemString(py_return, "artists");
-    PyObject* py_album = PyDict_GetItemString(py_return, "album");
-    PyObject* py_artwork_url = PyDict_GetItemString(py_return, "artwork");
+    PyObject* py_title = PyDict_GetItemString(py_return, TrackManager::PY_TITLE_KEY.data());
+    PyObject* py_artists_list = PyDict_GetItemString(py_return, TrackManager::PY_ARTISTS_KEY.data());
+    PyObject* py_album = PyDict_GetItemString(py_return, TrackManager::PY_ALBUM_KEY.data());
+    PyObject* py_artwork_url = PyDict_GetItemString(py_return, TrackManager::PY_ARTWORK_KEY.data());
     if(
         !py_title || !py_artists_list || !py_album || !py_artwork_url || 
         !PyList_Check(py_artists_list) || !PyUnicode_Check(py_title) || !PyUnicode_Check(py_album) || !PyUnicode_Check(py_artwork_url)
@@ -341,10 +341,10 @@ std::pair<Track, std::string> TrackManager::download_track_from_url(const std::s
     }
 
     std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
-    PyObject* py_title = PyDict_GetItemString(py_return, "title");
-    PyObject* py_artists_list = PyDict_GetItemString(py_return, "artists");
-    PyObject* py_album = PyDict_GetItemString(py_return, "album");
-    PyObject* py_filepath = PyDict_GetItemString(py_return, "filepath");
+    PyObject* py_title = PyDict_GetItemString(py_return, TrackManager::PY_TITLE_KEY.data());
+    PyObject* py_artists_list = PyDict_GetItemString(py_return, TrackManager::PY_ARTISTS_KEY.data());
+    PyObject* py_album = PyDict_GetItemString(py_return, TrackManager::PY_ALBUM_KEY.data());
+    PyObject* py_filepath = PyDict_GetItemString(py_return, TrackManager::PY_FILEPATH_KEY.data());
     if(
         !py_title || !py_artists_list || !py_album || !py_filepath || 
         !PyList_Check(py_artists_list) || !PyUnicode_Check(py_title) || !PyUnicode_Check(py_album) || !PyUnicode_Check(py_filepath)

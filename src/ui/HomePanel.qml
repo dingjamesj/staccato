@@ -117,7 +117,7 @@ ColumnLayout {
     }
 
     Button {
-        onClicked: Dialogs.openMessageDialog("testing", "i have a crestion", "hi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi\nhi", true, true)
+        onClicked: Dialogs.openMessageDialog("title", "header", "content", true, true)
 
         Layout.preferredWidth: 20
         Layout.preferredHeight: 8
