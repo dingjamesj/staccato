@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Window
 import staccato
 
 GridLayout {
@@ -189,7 +190,13 @@ GridLayout {
         Layout.leftMargin: Style.smallSpacing
 
         onClicked: {
-            FilePicker.open(["Image files (*.jpg, *.png, *.jpeg)"]);
+            Dialogs.openFileDialog(
+                "Choose a file", 
+                ["Image files (*.jpg *.png *.jpeg *.JPG *.PNG *.JPEG)"], 
+                (file) => {
+                    console.log("file was picked: " + file);
+                }
+            );
         }
     }
 }

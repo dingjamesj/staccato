@@ -1,11 +1,14 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import "main.js" as Logic
 
 pragma ComponentBehavior: Bound
 
 ApplicationWindow {
+    property alias fileDialog: fileDialog
+
     property int topRowHeight: 35 //Height for the row containing the search bar, settings button, etc.
 
     id: container
@@ -15,7 +18,17 @@ ApplicationWindow {
     title: ""
 
     Component.onCompleted: {
+        Dialogs.mainWindow = container;
         Logic.startup(StaccatoInterface);
+    }
+
+    FileDialog {
+        property var fileChosenAction: function (file) { console.log("file selected: " + file) }
+
+        id: fileDialog
+        title: "Select a File"
+        modality: Qt.ApplicationModal   
+        onAccepted: fileDialog.fileChosenAction(fileDialog.selectedFile)
     }
 
     Rectangle {

@@ -32,7 +32,7 @@ target_include_directories(staccatoapp PRIVATE
 qt_policy(SET QTP0004 NEW)
 set_source_files_properties(
     src/ui/Style.qml
-    src/ui/FilePicker.qml
+    src/ui/Dialogs.qml
     PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 qt_add_qml_module(staccatoapp
@@ -51,7 +51,7 @@ qt_add_qml_module(staccatoapp
         src/ui/SearchQueryImportPanel.qml
         src/ui/URLImportPanel.qml
         src/ui/HelpToolTip.qml
-        src/ui/FilePicker.qml
+        src/ui/Dialogs.qml
         src/ui/TrackInfoEditor.qml
         src/ui/ExtraParametersEditor.qml
         src/ui/RoundImage.qml
