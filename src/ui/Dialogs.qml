@@ -52,7 +52,7 @@ Item {
 
         title: ""
         width: 420
-        height: 240
+        height: 175
         visible: false
         transientParent: mainWindow
         modality: modal ? Qt.ApplicationModal : Qt.NonModal
@@ -106,6 +106,7 @@ Item {
                     color: Style.offWhite
                     font.family: Style.mainFontFamily
                     font.pointSize: Style.normalTextSize
+                    verticalAlignment: Text.AlignVCenter
                     topPadding: 0
                     bottomPadding: 0
                     leftPadding: 0

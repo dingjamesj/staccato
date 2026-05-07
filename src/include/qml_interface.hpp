@@ -60,6 +60,9 @@ namespace staccato {
         Q_INVOKABLE
         QList<QVariant> downloadTrackFromUrl(const QString& url, const QStringList& args);
 
+        Q_INVOKABLE
+        QString getPlaceholderImagePath();
+
     };
 
 }

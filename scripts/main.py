@@ -36,7 +36,7 @@ def download_track_from_url(download_dir: str, url: str, args: list[str]) -> dic
         "filepath": "testing dir download_track_from_url",
         "title": "title",
         "artists": ["artist1", "artist2"],
-        "album": "album"
+        "album": 1
     }
 
 

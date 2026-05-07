@@ -302,7 +302,7 @@ std::pair<Track, std::string> TrackManager::download_track_from_url(const std::s
     Py_DECREF(py_script);
     if(py_module == nullptr) {
 
-        return {Track(), ""};
+        return {Track(), "Could not find the main python script \"" + std::string(AppManager::PY_SCRIPT_NAME) + ".\""};
 
     }
 
@@ -311,7 +311,7 @@ std::pair<Track, std::string> TrackManager::download_track_from_url(const std::s
     if(py_func == nullptr || !PyCallable_Check(py_func)) {
 
         Py_XDECREF(py_func);
-        return {Track(), ""};
+        return {Track(), "Found main python script but could not find the function \"" + std::string(AppManager::PY_URL_DOWNLOAD_FUNC_NAME) + ".\""};
 
     }
 
@@ -336,11 +336,10 @@ std::pair<Track, std::string> TrackManager::download_track_from_url(const std::s
     if(py_return == nullptr || !PyDict_Check(py_return)) {
 
         Py_XDECREF(py_return);
-        return {Track(), ""};
+        return {Track(), "Return value from Python function \"" + std::string(AppManager::PY_URL_DOWNLOAD_FUNC_NAME) + "\" was not a dict."};
 
     }
 
-    std::string downloaded_path {PyUnicode_AsUTF8(py_return)};
     PyObject* py_title = PyDict_GetItemString(py_return, TrackManager::PY_TITLE_KEY.data());
     PyObject* py_artists_list = PyDict_GetItemString(py_return, TrackManager::PY_ARTISTS_KEY.data());
     PyObject* py_album = PyDict_GetItemString(py_return, TrackManager::PY_ALBUM_KEY.data());
@@ -351,7 +350,7 @@ std::pair<Track, std::string> TrackManager::download_track_from_url(const std::s
     ) {
 
         Py_DECREF(py_return);
-        return {Track(), ""};
+        return {Track(), "Return value from Python function \"" + std::string(AppManager::PY_URL_DOWNLOAD_FUNC_NAME) + "\" was a dict but had missing or wrongly-typed values."};
 
     }
 

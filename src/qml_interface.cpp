@@ -298,9 +298,10 @@ QList<QVariant> StaccatoInterface::downloadTrackFromUrl(const QString& url, cons
         argsStd
     );
 
-    if(download_info.first.is_empty() && download_info.second.empty()) {
+    //Returned an error value (empty track w/ error message)
+    if(download_info.first.is_empty()) {
 
-        return {};
+        return {QString::fromStdString(download_info.second)};
 
     }
 
@@ -318,5 +319,11 @@ QList<QVariant> StaccatoInterface::downloadTrackFromUrl(const QString& url, cons
         QString::fromStdString(track.album()), 
         QString::fromStdString(download_info.second)
     };
+
+}
+
+QString StaccatoInterface::getPlaceholderImagePath() {
+
+    return QString::fromStdString("qrc" + std::string(AppManager::PLACEHOLDER_ART_PATH));
 
 }

@@ -18,33 +18,58 @@ GridLayout {
     rowSpacing: Style.smallSpacing
     columnSpacing: Style.smallSpacing
 
-    function addArtistField() {
-        let component = Qt.createComponent("RoundTextField.qml");
-        component.createObject(container.artistsContainer, {
-            "Layout.preferredWidth": 1,
-            "Layout.fillWidth": true,
-            "Layout.fillHeight": true,
-            readOnly: Qt.binding(function() {
-                return container.readOnly
-            })
-        });
+    Component.onCompleted: {
+        addArtistField("");
+    }
+
+    function addArtistField(_artistName) {
+        artistsModel.append({
+            "name": _artistName
+        })
+    }
+
+    function setArtists(_artists) {
+        //Overwrite or add artist fields for every artist name in _artists:
+        let i = 0;
+        for(; i < _artists.length; i++) {
+            if(i < artistsModel.count) {
+                artistsModel.setProperty(i, "name", _artists[i]);
+            } else {
+                container.addArtistField(_artists[i]);
+            }
+        }
+        //Remove any excess artist fields:
+        for(let j = artistsModel.count - 1; j >= i; j--) {
+            artistsModel.remove(j);
+        }
     }
 
     function removeArtistField() {
-        let artistsContainer = container.artistsContainer;
-        if(artistsContainer.children.length > 0) {
-
-            artistsContainer.children[artistsContainer.children.length - 1].destroy();
-
+        if(artistsModel.count > 0) {
+            artistsModel.remove(artistsModel.count - 1);
         }
     }
 
     function clearArtistFields() {
-        let artistsContainer = container.artistsContainer
-        for(let i = artistsContainer.children.length - 1; i >= 0; i--) {
+        artistsModel.clear();
+    }
 
-            artistsContainer.children[i].destroy();
+    ListModel {
+        id: artistsModel
+    }
 
+    Instantiator {
+        model: artistsModel
+        delegate: RoundTextField {
+            readOnly: container.readOnly
+            text: model.name
+
+            Layout.preferredWidth: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        onObjectAdded: (index, object) => {
+            object.parent = container.artistsContainer;
         }
     }
 
@@ -114,14 +139,6 @@ GridLayout {
                 width: artistsScrollView.width
                 height: artistsScrollView.height
                 spacing: 6
-
-                RoundTextField {
-                    readOnly: container.readOnly
-
-                    Layout.preferredWidth: 1
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
             }
         }
 
@@ -129,7 +146,7 @@ GridLayout {
             radius: Style.buttonRadius
             defaultColor: Style.gray
             imageSource: "qrc:/staccato/src/ui/resources/plus.svg"
-            onClicked: addArtistField()
+            onClicked: addArtistField("")
             visible: !container.readOnly
             
             Layout.preferredWidth: height

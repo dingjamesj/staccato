@@ -9,6 +9,7 @@ Column {
     property alias urlText: urlTextField.text
     property alias extraParamsText: extraParametersEditor.text
     property alias previewEditor: previewEditor
+    property alias isOverwritingMetadata: overwriteMetadataCheckbox.checked
 
     property bool previewIsLoading: false
     property bool previewIsLoaded: false

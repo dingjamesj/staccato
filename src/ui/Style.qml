@@ -38,9 +38,12 @@ Item {
     readonly property int smallButtonSize: 15
     readonly property int smallButtonRadius: 4
     readonly property int h1TextSize: 24
-    property int h2TextSize: 16
-    property int normalTextSize: 10
-    property int smallTextSize: 8
+    readonly property int h2TextSize: 16
+    readonly property int normalTextSize: 10
+    readonly property int smallTextSize: 8
+
+    //Misc
+    readonly property string placeholderImageSource: "qrc:/staccato/src/ui/resources/placeholder.jpg"
 
     FontLoader {
         id: interFont

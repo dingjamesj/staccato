@@ -8,13 +8,11 @@ function startup(_cpp) {
 
 function loadPreview(container) {
 
-    let url = container.urlText;
-    let loadingFlag = container.previewIsLoading;
-    let loadCompletionFlag = container.previewIsLoaded;
-    let previewEditor = container.previewEditor;
+    container.previewIsLoading = true;
+    container.previewIsLoaded = false;
 
-    loadingFlag = true;
-    loadCompletionFlag = false;
+    let url = container.urlText;
+    let previewEditor = container.previewEditor;
     
     //We'll first assume that the URI is a track on the local filesystem.
     //If it isn't, then C++ will return an empty list, and then we'll assume that the URI is an internet link.
@@ -23,7 +21,7 @@ function loadPreview(container) {
     let track = cpp.getLocalTrackInfo(url);
     if(track.length === 0) {
 
-        //The C++ API should return the title, artists, album, and artwork URL
+        //The C++ API should return the title, artists, album, and artwork 
         track = cpp.getOnlineTrackInfo(url);
 
         if(track.length < 4) {
@@ -39,16 +37,8 @@ function loadPreview(container) {
     }
 
     previewEditor.titleText = track[0];
+    previewEditor.setArtists(track[1]);
     previewEditor.albumText = track[2];
-
-    //Display the artists
-    previewEditor.clearArtistFields();
-    for(let i = 0; i < track[1].length; i++) {
-
-        previewEditor.addArtistField();
-        previewEditor.artistsContainer.children[i].text = track[1][i];
-
-    }
 
     //To display the artwork for...
     // ... a track on the local filesystem, we just simply set the artwork image source as the audio file path.
@@ -64,28 +54,38 @@ function loadPreview(container) {
 
     }
 
-    loadingFlag = false;
-    loadCompletionFlag = true;
+    container.previewIsLoading = false;
+    container.previewIsLoaded = true;
 
 }
 
 function importTrackFromUrl(container) {
 
+    container.isDownloading = true;
+
     let url = container.urlText;
     let extraParamsStr = container.extraParamText;
-    let downloadingFlag = container.isDownloading;
-    let previewEditor = container.previewEditor;
-    downloadingFlag = true;
+    if(!container.isOverwritingMetadata) {
 
-    //Tokenize the extra parameters with newlines as the delimiter
-    let extraParamsList = myString.split(/\r?\n/);
-
-    let downloadInfo = cpp.downloadTrackFromUrl(url, extraParamsList);
-    if(downloadInfo.length === 0) {
-
-        //TODO: Download failed action
-        return;
+        extraParamsStr = "";
 
     }
+
+    //Tokenize the extra parameters with newlines as the delimiter
+    let extraParamsList = extraParamsStr.split(/\r?\n/);
+
+    let downloadInfo = cpp.downloadTrackFromUrl(url, extraParamsList);
+    if(downloadInfo.length === 1) {
+
+        //TODO: Download failed action
+        Dialogs.openMessageDialog("", "Unexpected download error:", downloadInfo[0], true, false)
+
+    } else {
+
+
+
+    }
+
+    container.isDownloading = false;
 
 }
