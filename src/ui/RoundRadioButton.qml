@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Shapes
 
+pragma ComponentBehavior: Bound
+
 RadioButton {
     property int boxSize: 15
     property int textSize: Style.normalTextSize
@@ -35,20 +37,20 @@ RadioButton {
             strokeColor: (
                 container.enabled ? (
                     container.pressed ? (
-                        container.checked ? pressedColor : backgroundPressedColor
+                        container.checked ? container.pressedColor : container.backgroundPressedColor
                     ) : container.hovered ? (
-                        container.checked ? hoverColor : backgroundHoverColor
-                    ) : container.checked ? defaultColor : backgroundColor
-                ) : container.checked ? disabledColor : backgroundDisabledColor
+                        container.checked ? container.hoverColor : container.backgroundHoverColor
+                    ) : container.checked ? container.defaultColor : container.backgroundColor
+                ) : container.checked ? container.disabledColor : container.backgroundDisabledColor
             )
-            strokeWidth: boxSize * ringWidthProportion / 2
+            strokeWidth: container.boxSize * container.ringWidthProportion / 2
             capStyle: ShapePath.RoundCap // Rounded ends for the ring
 
             PathAngleArc {
-                centerX: boxSize / 2
-                centerY: boxSize / 2
-                radiusX: boxSize * (1.0 - ringWidthProportion) / 2
-                radiusY: boxSize * (1.0 - ringWidthProportion) / 2
+                centerX: container.boxSize / 2
+                centerY: container.boxSize / 2
+                radiusX: container.boxSize * (1.0 - container.ringWidthProportion) / 2
+                radiusY: container.boxSize * (1.0 - container.ringWidthProportion) / 2
                 startAngle: 0
                 sweepAngle: 360 // Change this to 270 for a 3/4 ring
             }
@@ -57,7 +59,7 @@ RadioButton {
 
     contentItem: Text {
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: indicator.right
+        anchors.left: container.indicator.right
         anchors.leftMargin: container.spacing
         text: container.text
         font.family: Style.mainFontFamily

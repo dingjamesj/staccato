@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
+pragma ComponentBehavior: Bound
+
 CheckBox {
     property int boxSize: 13
     property int textSize: Style.normalTextSize
@@ -24,17 +26,17 @@ CheckBox {
     indicator: Rectangle {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        width: boxSize
-        height: boxSize
+        width: container.boxSize
+        height: container.boxSize
         radius: Style.smallButtonRadius
         color: (
             container.enabled ? (
                 container.pressed ? (
-                    container.checked ? checkedPressedColor : pressedColor
+                    container.checked ? container.checkedPressedColor : container.pressedColor
                 ) : container.hovered ? (
-                    container.checked ? checkedHoverColor: hoverColor
-                ) : container.checked ? checkedColor : defaultColor
-            ) : container.checked ? checkedDisabledColor : disabledColor
+                    container.checked ? container.checkedHoverColor: container.hoverColor
+                ) : container.checked ? container.checkedColor : container.defaultColor
+            ) : container.checked ? container.checkedDisabledColor : container.disabledColor
         )
 
         Text {
@@ -54,7 +56,7 @@ CheckBox {
 
     contentItem: Text {
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: indicator.right
+        anchors.left: container.indicator.right
         anchors.leftMargin: container.spacing
         text: container.text
         font.family: Style.mainFontFamily

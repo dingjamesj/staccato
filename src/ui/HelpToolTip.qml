@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
+pragma ComponentBehavior: Bound
+
 Rectangle {
     property string tooltipText: ""
 
@@ -26,7 +28,7 @@ Rectangle {
         font.family: Style.mainFontFamily
         font.weight: Font.Bold
         fontSizeMode: Text.Fit
-        color: container.enabled ? iconColor : disabledIconColor
+        color: container.enabled ? container.iconColor : container.disabledIconColor
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
     }

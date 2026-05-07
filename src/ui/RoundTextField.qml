@@ -24,6 +24,6 @@ TextField {
 
     background: Rectangle {
         radius: container.backgroundRadius
-        color: !container.readOnly ? (container.enabled ? defaultColor : disabledColor) : "#00000000"
+        color: !container.readOnly ? (container.enabled ? container.defaultColor : container.disabledColor) : "#00000000"
     }
 }

@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import staccato
 
+pragma ComponentBehavior: Bound
+
 RowLayout {
     property alias text: textArea.text
 
@@ -21,19 +23,19 @@ RowLayout {
             if(checkedButton === button) {
 
                 checkedButton = null;
-                text = "";
+                container.text = "";
                 return;
 
             }
 
             checkedButton = button;
-            if(checkedButton.text === forceMP3ParamText) {
+            if(checkedButton.text === container.forceMP3ParamText) {
 
-                text = "mp3"
+                container.text = "mp3"
 
-            } else if(checkedButton.text === forceOpusParamText) {
+            } else if(checkedButton.text === container.forceOpusParamText) {
 
-                text = "opus"
+                container.text = "opus"
 
             }
         }
@@ -50,7 +52,7 @@ RowLayout {
 
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.maximumWidth: textAreaMaxWidth
+        Layout.maximumWidth: container.textAreaMaxWidth
 
         Component.onCompleted: {
             contentItem.boundsBehavior = Flickable.StopAtBounds;
@@ -84,7 +86,9 @@ RowLayout {
             model: [container.forceMP3ParamText, container.forceOpusParamText]
 
             RoundRadioButton {
-                text: modelData
+                required property var model
+
+                text: model.data
                 ButtonGroup.group: extraParametersButtonGroup
                 textColor: Style.offWhite
             }

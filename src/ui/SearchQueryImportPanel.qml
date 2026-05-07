@@ -4,6 +4,8 @@ import QtQuick.Layouts
 import staccato
 import "trackImporter.mjs" as Logic
 
+pragma ComponentBehavior: Bound
+
 Column {
     property alias searchQueryText: queryTextField.text
     property alias previewTitleText: resultsEditor.titleText
@@ -42,14 +44,14 @@ Column {
             radius: Style.buttonRadius
             text: "Search"
             defaultColor: Style.purple
-            enabled: searchQueryText.length > 0
+            enabled: container.searchQueryText.length > 0
 
             Layout.preferredWidth: 60
             Layout.fillHeight: true
 
             onClicked: {
                 resultsPanel.enabled = !resultsPanel.enabled;
-                urlTextFieldText = searchQueryText;
+                container.urlTextFieldText = container.searchQueryText;
             }
         }
 
@@ -211,7 +213,7 @@ Column {
         ExtraParametersEditor {
             id: extraParametersEditor
             width: parent.width
-            height: extraParametersPanelHeight
+            height: container.extraParametersPanelHeight
         }
     }
 }

@@ -63,7 +63,7 @@ Rectangle {
         }
     }
 
-    RoundedImage {
+    RoundImage {
         id: artworkBackground
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter

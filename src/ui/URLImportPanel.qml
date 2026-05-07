@@ -4,6 +4,8 @@ import QtQuick.Layouts
 import staccato
 import "trackImporter.mjs" as Logic
 
+pragma ComponentBehavior: Bound
+
 Column {
     property alias statusText: statusText.text
     property alias urlText: urlTextField.text
@@ -45,8 +47,8 @@ Column {
                 Layout.maximumWidth: container.urlFieldMaxWidth
 
                 onTextEdited: {
-                    previewIsLoaded = false;
-                    statusText = "";
+                    container.previewIsLoaded = false;
+                    container.statusText = "";
                 }
             }
 
@@ -54,7 +56,7 @@ Column {
                 radius: Style.buttonRadius
                 text: "Download"
                 defaultColor: Style.purple
-                enabled: urlText.length > 0
+                enabled: container.urlText.length > 0
 
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
@@ -66,7 +68,7 @@ Column {
                 radius: Style.buttonRadius
                 text: "Load Preview"
                 defaultColor: Style.gray
-                enabled: previewIsLoading ? false : (urlText.length > 0)
+                enabled: container.previewIsLoading ? false : (container.urlText.length > 0)
                 
                 Layout.preferredWidth: 105
                 Layout.fillHeight: true
@@ -105,7 +107,7 @@ Column {
             ExtraParametersEditor {
                 id: extraParametersEditor
                 width: parent.width
-                height: extraParametersPanelHeight
+                height: container.extraParametersPanelHeight
                 visible: extraParametersCheckbox.checked
             }
         }
@@ -132,7 +134,7 @@ Column {
             anchors.left: parent.left
             width: parent.width
             readOnly: !overwriteMetadataCheckbox.checked
-            enabled: previewIsLoaded || overwriteMetadataCheckbox.checked
+            enabled: container.previewIsLoaded || overwriteMetadataCheckbox.checked
         }
 
         //Overwrite metadata checkbox

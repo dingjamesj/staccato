@@ -4,6 +4,8 @@ import QtQuick.Controls
 import QtQuick.Window
 import staccato
 
+pragma ComponentBehavior: Bound
+
 GridLayout {
     property alias titleText: titleField.text
     property alias albumText: albumField.text
@@ -71,6 +73,8 @@ GridLayout {
     Instantiator {
         model: artistsModel
         delegate: RoundTextField {
+            required property var model
+
             readOnly: container.readOnly
             text: model.name
 
@@ -156,7 +160,7 @@ GridLayout {
             radius: Style.buttonRadius
             defaultColor: Style.gray
             imageSource: "qrc:/staccato/src/ui/resources/plus.svg"
-            onClicked: addArtistField("")
+            onClicked: container.addArtistField("")
             visible: !container.readOnly
             
             Layout.preferredWidth: height
@@ -167,7 +171,7 @@ GridLayout {
             radius: Style.buttonRadius
             defaultColor: Style.gray
             imageSource: "qrc:/staccato/src/ui/resources/minus.svg"
-            onClicked: removeArtistField()
+            onClicked: container.removeArtistField()
             visible: !container.readOnly
             enabled: parent.enabled && artistsTextFieldRow.children.length > 0
 

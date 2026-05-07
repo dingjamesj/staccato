@@ -15,7 +15,7 @@ Column {
     //                COVER ART                
     //=========================================
 
-    RoundedImage {
+    RoundImage {
         id: artwork
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - container.leftPadding - container.rightPadding

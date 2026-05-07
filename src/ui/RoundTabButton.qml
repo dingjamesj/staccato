@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
+pragma ComponentBehavior: Bound
+
 TabButton {
     property int insets: 3
     property int underlineRectangleHeight: 4
@@ -12,7 +14,7 @@ TabButton {
     hoverEnabled: true
 
     contentItem: Column {
-        spacing: underlineSeparation
+        spacing: container.underlineSeparation
         anchors.verticalCenter: parent.verticalCenter
 
         Text {
@@ -29,16 +31,16 @@ TabButton {
         Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             width: tabButtonText.width + container.underlineExtraWidth * 2
-            height: underlineRectangleHeight
-            color: container.checked ? underlineColor : "#00000000"
+            height: container.underlineRectangleHeight
+            color: container.checked ? container.underlineColor : "#00000000"
         }
     }
 
     background: Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        width: contentItem.width + insets * 2
-        height: contentItem.height + insets * 2
+        width: container.contentItem.width + container.insets * 2
+        height: container.contentItem.height + container.insets * 2
 
         color: '#00000000'
     }

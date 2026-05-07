@@ -86,7 +86,7 @@ Rectangle {
         colorizationColor: '#000000'
         brightness: container.enabled ? (mouseArea.pressed ? container.pressedColorTintStrength : (mouseArea.containsMouse ? container.hoverColorTintStrength : 0)) : 0
         autoPaddingEnabled: true
-        visible: container.imageSource != ""
+        visible: container.imageSource !== ""
         maskEnabled: true
         maskSource: mask
     }
