@@ -28,7 +28,6 @@ Item {
         messageDialog.title = _title;
         messageDialog.modal = _modal;
         messageDialog.includeCancelOption = _includeCancel;
-        
         messageDialog.open();
     }
 
@@ -38,7 +37,17 @@ Item {
         messageDialog.message = _message;
         messageDialog.modal = _modal;
         messageDialog.includeCancelOption = _includeCancel;
+        messageDialog.action = () => {};
+        messageDialog.open();
+    }
 
+    function openActionDialog(_title, _header, _message, _action) {
+        messageDialog.title = _title;
+        messageDialog.header = _header;
+        messageDialog.message = _message;
+        messageDialog.modal = true;
+        messageDialog.includeCancelOption = true;
+        messageDialog.action = _action;
         messageDialog.open();
     }
 
@@ -49,10 +58,11 @@ Item {
         property bool modal: true
         property string message: ""
         property string header: ""
+        property var action: function() {}
 
         title: ""
         width: 420
-        height: 175
+        height: 250
         visible: false
         transientParent: mainWindow
         modality: modal ? Qt.ApplicationModal : Qt.NonModal
@@ -60,7 +70,7 @@ Item {
         flags: Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
 
         function open() {
-            if (mainWindow) {
+            if(mainWindow) {
                 x = mainWindow.x + (mainWindow.width - width) / 2;
                 y = mainWindow.y + (mainWindow.height - height) / 2;
             }
@@ -111,6 +121,7 @@ Item {
                     bottomPadding: 0
                     leftPadding: 0
                     rightPadding: 0
+                    textFormat: TextEdit.MarkdownText
                 }
             }
 
@@ -135,7 +146,10 @@ Item {
                     height: Style.buttonSize
                     text: "OK"
                     defaultColor: Style.purple
-                    onClicked: messageDialog.close()
+                    onClicked: {
+                        messageDialog.action();
+                        messageDialog.close();
+                    }
                 }
             }
         }

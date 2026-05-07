@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import staccato
-import "libraryPanel.js" as Logic
+import "libraryPanel.mjs" as Logic
 
 pragma ComponentBehavior: Bound
 

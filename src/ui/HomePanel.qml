@@ -117,7 +117,18 @@ ColumnLayout {
     }
 
     Button {
-        onClicked: Dialogs.openMessageDialog("title", "header", "content", true, true)
+        onClicked: {
+            // let trackStr = Test.stringifyTrack("title", ["artist"], "album");
+
+            // Dialogs.openActionDialog(
+            //     "", 
+            //     "Confirm track replacement", 
+            //     "The track **" + trackStr + "** already has the following audio file associated with it:\n\n" + "goon\n\nAre you sure you want to replace the existing file?", 
+            //     () => {
+            //         console.log("ok");
+            //     }
+            // );
+        }
 
         Layout.preferredWidth: 20
         Layout.preferredHeight: 8

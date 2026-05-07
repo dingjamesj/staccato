@@ -13,7 +13,6 @@ RowLayout {
 
     id: container
     spacing: Style.medSpacing
-    visible: extraParametersCheckBox.checked
 
     ButtonGroup {
         id: extraParametersButtonGroup

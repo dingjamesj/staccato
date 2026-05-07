@@ -6,7 +6,6 @@ import staccato
 
 GridLayout {
     property alias titleText: titleField.text
-    property alias artistsContainer: artistsTextFieldRow
     property alias albumText: albumField.text
     property alias artworkSource: artwork.imageSource
 
@@ -50,8 +49,19 @@ GridLayout {
         }
     }
 
-    function clearArtistFields() {
+    function clearAll() {
+        container.titleText = "";
         artistsModel.clear();
+        container.albumText = "";
+        container.artworkSource = "";
+    }
+
+    function getArtistsList() {
+        let array = [];
+        for(let i = 0; i < artistsModel.count; i++) {
+            array.push(artistsModel.get(i).name);
+        }
+        return array;
     }
 
     ListModel {
@@ -69,7 +79,7 @@ GridLayout {
             Layout.fillHeight: true
         }
         onObjectAdded: (index, object) => {
-            object.parent = container.artistsContainer;
+            object.parent = artistsTextFieldRow;
         }
     }
 
@@ -159,7 +169,7 @@ GridLayout {
             imageSource: "qrc:/staccato/src/ui/resources/minus.svg"
             onClicked: removeArtistField()
             visible: !container.readOnly
-            enabled: parent.enabled && container.artistsContainer.children.length > 0
+            enabled: parent.enabled && artistsTextFieldRow.children.length > 0
 
             Layout.preferredWidth: height
             Layout.fillHeight: true
@@ -198,6 +208,7 @@ GridLayout {
         imageSource: ""
         clickable: !container.readOnly
         disabledColor: Style.background
+        backupImageSource: StaccatoInterface.getPlaceholderImagePath()
 
         Layout.fillHeight: true
         Layout.row: 0
@@ -211,7 +222,7 @@ GridLayout {
                 "Choose a file", 
                 ["Image files (*.jpg *.png *.jpeg *.JPG *.PNG *.JPEG)"], 
                 (file) => {
-                    console.log("file was picked: " + file);
+                    artwork.imageSource = file;
                 }
             );
         }

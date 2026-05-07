@@ -59,7 +59,8 @@ def get_online_track_full_info(url: str) -> dict:
         "title": "online title",
         "artists": ["artist1", "artist2"],
         "album": "online album",
-        "artwork": "online artwork"
+        "artwork": "asiudh"
+        # "artwork": "https://i.scdn.co/image/ab67616d00001e029c188c494d8bfaf895411890"
     }
 
 # - Returns a list of tracks from the search query.

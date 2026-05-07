@@ -110,6 +110,21 @@ Track TrackManager::get_local_track_info(const std::string& path) {
 
     std::vector<std::string> artists = get_artists_vector_from_str(artist_str);
 
+    if(title.empty()) {
+
+        title = "Unknown Title";
+
+    }
+    if(artists.empty()) {
+
+        artists = {"Unknown Artists"};
+
+    }
+    if(album.empty()) {
+
+        album = "Unknown Album";
+
+    }
     return Track(title, artists, album);
 
 }
@@ -171,7 +186,6 @@ std::pair<Track, std::string> TrackManager::get_online_track_full_info(const std
 
     }
 
-    
     Py_DECREF(py_return);
     return {
         Track(

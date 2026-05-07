@@ -3,7 +3,7 @@ var playlistsZoomLevel = -1;
 var pinnedItemsSortMode = "";
 var staccatoInterface;
 
-function startup(interface) {
+export function startup(interface) {
 
     console.log("HOME PANEL STARTUP");
 
@@ -16,7 +16,7 @@ function startup(interface) {
 
 }
 
-function incrementPinnedItemsZoomLevel(pinnedItemsContainer) {
+export function incrementPinnedItemsZoomLevel(pinnedItemsContainer) {
 
     pinnedItemsZoomLevel = (pinnedItemsZoomLevel + 1) % 3;
     updateItemsZoomLevel(pinnedItemsContainer, pinnedItemsZoomLevel);
@@ -24,7 +24,7 @@ function incrementPinnedItemsZoomLevel(pinnedItemsContainer) {
 
 }
 
-function incrementPlaylistsZoomLevel(playlistsContainer) {
+export function incrementPlaylistsZoomLevel(playlistsContainer) {
 
     playlistsZoomLevel = (playlistsZoomLevel + 1) % 3;
     updateItemsZoomLevel(playlistsContainer, playlistsZoomLevel);
@@ -32,7 +32,7 @@ function incrementPlaylistsZoomLevel(playlistsContainer) {
 
 }
 
-function setPinnedItemsSortMode(sortMode, pinnedItemsPanel, pinnedItemsContainer) {
+export function setPinnedItemsSortMode(sortMode, pinnedItemsPanel, pinnedItemsContainer) {
 
     if(pinnedItemsSortMode === sortMode) {
 
@@ -47,25 +47,25 @@ function setPinnedItemsSortMode(sortMode, pinnedItemsPanel, pinnedItemsContainer
 
 }
 
-function getPinnedItemsZoomLevel() {
+export function getPinnedItemsZoomLevel() {
 
     return pinnedItemsZoomLevel;
 
 }
 
-function getPlaylistsZoomLevel() {
+export function getPlaylistsZoomLevel() {
 
     return playlistsZoomLevel;
 
 }
 
-function getPinnedItemsSortMode() {
+export function getPinnedItemsSortMode() {
 
     return pinnedItemsSortMode;
 
 }
 
-function loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer) {
+export function loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer) {
 
     let pinnedItems = staccatoInterface.getPinnedItems(pinnedItemsSortMode);
     if(pinnedItems.length <= 0) {
@@ -136,7 +136,7 @@ function loadPinnedItems(pinnedItemsPanel, pinnedItemsContainer) {
 
 }
 
-function loadPlaylists(playlistsPanel, playlistsContainer) {
+export function loadPlaylists(playlistsPanel, playlistsContainer) {
 
     let playlists = staccatoInterface.getBasicPlaylistsInfo();
     if(playlists.length <= 0) {
@@ -189,7 +189,7 @@ function loadPlaylists(playlistsPanel, playlistsContainer) {
 
 }
 
-function updateItemsZoomLevel(itemsContainer, zoomLevel) {
+export function updateItemsZoomLevel(itemsContainer, zoomLevel) {
 
     let buttonWidth = 0;
     let buttonHeight = 0;

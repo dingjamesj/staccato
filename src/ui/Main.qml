@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import "main.js" as Logic
+import "main.mjs" as Logic
+import "util.mjs" as Util
 
 pragma ComponentBehavior: Bound
 
@@ -19,7 +20,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         Dialogs.mainWindow = container;
-        Logic.startup(StaccatoInterface);
+        Util.startup(StaccatoInterface, Dialogs);
     }
 
     FileDialog {

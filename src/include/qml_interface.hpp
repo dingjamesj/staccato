@@ -58,6 +58,12 @@ namespace staccato {
         QList<QVariant> getOnlineTrackInfo(const QString& url);
 
         Q_INVOKABLE
+        bool importTrackFromFilesystem(const QString& title, const QStringList& artists, const QString& album, const QString& path);
+
+        Q_INVOKABLE
+        bool deleteTrack(const QString& title, const QStringList& artists, const QString& album);
+
+        Q_INVOKABLE
         QList<QVariant> downloadTrackFromUrl(const QString& url, const QStringList& args);
 
         Q_INVOKABLE

@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import staccato
-import "trackImporter.js" as Logic
+import "trackImporter.mjs" as Logic
 
 Column {
     property alias statusText: statusText.text
@@ -10,6 +10,7 @@ Column {
     property alias extraParamsText: extraParametersEditor.text
     property alias previewEditor: previewEditor
     property alias isOverwritingMetadata: overwriteMetadataCheckbox.checked
+    property alias isUsingExtraParams: extraParametersCheckbox.checked
 
     property bool previewIsLoading: false
     property bool previewIsLoaded: false
@@ -20,10 +21,6 @@ Column {
 
     id: container
     spacing: Style.medSpacing
-
-    Component.onCompleted: {
-        Logic.startup(StaccatoInterface);
-    }
 
     //URL input & extra params.
     Column {
@@ -49,6 +46,7 @@ Column {
 
                 onTextEdited: {
                     previewIsLoaded = false;
+                    statusText = "";
                 }
             }
 
@@ -97,7 +95,7 @@ Column {
             spacing: Style.tinySpacing
 
             RoundCheckBox {
-                id: extraParametersCheckBox
+                id: extraParametersCheckbox
                 text: "Use advanced settings"
                 spacing: Style.tinySpacing
                 textColor: Style.offWhite
@@ -108,6 +106,7 @@ Column {
                 id: extraParametersEditor
                 width: parent.width
                 height: extraParametersPanelHeight
+                visible: extraParametersCheckbox.checked
             }
         }
     }

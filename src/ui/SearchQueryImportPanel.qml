@@ -2,15 +2,15 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import staccato
-import "trackImporter.js" as Logic
+import "trackImporter.mjs" as Logic
 
 Column {
     property alias searchQueryText: queryTextField.text
     property alias previewTitleText: resultsEditor.titleText
-    property alias artistsContainer: resultsEditor.artistsContainer
     property alias previewAlbumText: resultsEditor.albumText
     property alias previewArtworkSource: resultsEditor.artworkSource
     property alias urlTextFieldText: urlTextField.text
+    property alias isUsingExtraParams: extraParametersCheckbox.checked
 
     property int searchFieldMaxWidth: 300
     property int extraParametersPanelHeight: 75
@@ -20,10 +20,6 @@ Column {
 
     id: container
     spacing: Style.medSpacing
-
-    Component.onCompleted: {
-        Logic.startup(StaccatoInterface);
-    }
 
     RowLayout {
         width: parent.width
@@ -204,7 +200,7 @@ Column {
             }
 
             RoundCheckBox {
-                id: extraParametersCheckBox
+                id: extraParametersCheckbox
                 text: "Use advanced settings"
                 spacing: Style.tinySpacing
                 textColor: Style.offWhite

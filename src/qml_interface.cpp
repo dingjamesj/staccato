@@ -284,6 +284,30 @@ QList<QVariant> StaccatoInterface::getOnlineTrackInfo(const QString& url) {
     };
 }
 
+bool StaccatoInterface::importTrackFromFilesystem(const QString& title, const QStringList& artists, const QString& album, const QString& path) {
+
+    std::vector<std::string> artistsStd {};
+    for(const QString& artist: artists) {
+
+        artistsStd.push_back(artist.toStdString());
+
+    }
+    return TrackManager::import_track_from_filesystem(path.toStdString(), Track(title.toStdString(), artistsStd, album.toStdString()));
+
+}
+
+bool StaccatoInterface::deleteTrack(const QString& title, const QStringList& artists, const QString& album) {
+
+    std::vector<std::string> artistsStd {};
+    for(const QString& artist: artists) {
+
+        artistsStd.push_back(artist.toStdString());
+
+    }
+    return TrackManager::delete_track(Track(title.toStdString(), artistsStd, album.toStdString()));
+
+}
+
 QList<QVariant> StaccatoInterface::downloadTrackFromUrl(const QString& url, const QStringList& args) {
 
     std::vector<std::string> argsStd {};

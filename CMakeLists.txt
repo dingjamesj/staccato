@@ -60,8 +60,9 @@ qt_add_qml_module(staccatoapp
         src/ui/RoundTabButton.qml
         src/ui/RoundCheckBox.qml
         src/ui/RoundRadioButton.qml
-        src/ui/trackImporter.js
-        src/ui/main.js
+        src/ui/trackImporter.mjs
+        src/ui/main.mjs
+        src/ui/util.mjs
     RESOURCES
         src/ui/resources/piggo58.jpg
         src/ui/resources/placeholder.jpg
