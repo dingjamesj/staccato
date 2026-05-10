@@ -28,7 +28,6 @@ Rectangle {
     property bool imageFailed: false
 
     signal clicked()
-    signal doubleClicked()
 
     id: container
     color: enabled ? (mouseArea.pressed ? pressedColor : (mouseArea.containsMouse ? hoverColor : defaultColor)) : disabledColor

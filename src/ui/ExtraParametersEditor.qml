@@ -86,9 +86,8 @@ RowLayout {
             model: [container.forceMP3ParamText, container.forceOpusParamText]
 
             RoundRadioButton {
-                required property var model
-
-                text: model.data
+                required property string modelData
+                text: modelData
                 ButtonGroup.group: extraParametersButtonGroup
                 textColor: Style.offWhite
             }

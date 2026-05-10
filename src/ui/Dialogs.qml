@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Dialogs
 import QtQuick.Window
 import QtQuick.Layouts
 import staccato
@@ -64,15 +63,15 @@ Item {
         width: 420
         height: 250
         visible: false
-        transientParent: mainWindow
+        transientParent: container.mainWindow
         modality: modal ? Qt.ApplicationModal : Qt.NonModal
         color: Style.background
         flags: Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
 
         function open() {
-            if(mainWindow) {
-                x = mainWindow.x + (mainWindow.width - width) / 2;
-                y = mainWindow.y + (mainWindow.height - height) / 2;
+            if(container.mainWindow) {
+                x = container.mainWindow.x + (container.mainWindow.width - width) / 2;
+                y = container.mainWindow.y + (container.mainWindow.height - height) / 2;
             }
 
             visible = true;

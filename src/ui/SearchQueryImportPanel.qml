@@ -214,6 +214,7 @@ Column {
             id: extraParametersEditor
             width: parent.width
             height: container.extraParametersPanelHeight
+            visible: container.isUsingExtraParams
         }
     }
 }

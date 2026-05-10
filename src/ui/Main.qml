@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import "main.mjs" as Logic
 import "util.mjs" as Util
 
 pragma ComponentBehavior: Bound
@@ -101,17 +100,13 @@ ApplicationWindow {
         }
 
         //The right panel
-        StackView {
-            id: currentlyPlayingAndLibraryPanel
+        RightPanel {
+            id: rightPanel
 
             Layout.fillHeight: true
             Layout.row: 1
             Layout.column: 2
             Layout.preferredWidth: parent.width * 0.25
-
-            initialItem: Rectangle {
-                anchors.fill: parent
-            }
         }
     }
 }

@@ -106,7 +106,6 @@ ColumnLayout {
             }
 
             StackLayout {
-                id: importPanels
                 currentIndex: trackImportTabBar.currentIndex
                 width: container.importPanelWidth
 

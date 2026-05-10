@@ -45,7 +45,7 @@ qt_add_qml_module(staccatoapp
         src/ui/ControlPanel.qml
         src/ui/Playbar.qml
         src/ui/HomePanel.qml
-        src/ui/ArtworkTextButton.qml
+        src/ui/LabeledIconButton.qml
         src/ui/LibraryPanel.qml
         src/ui/Style.qml
         src/ui/SearchQueryImportPanel.qml
@@ -54,6 +54,7 @@ qt_add_qml_module(staccatoapp
         src/ui/Dialogs.qml
         src/ui/TrackInfoEditor.qml
         src/ui/ExtraParametersEditor.qml
+        src/ui/RightPanel.qml
         src/ui/RoundImage.qml
         src/ui/RoundButton.qml
         src/ui/RoundTextField.qml
@@ -61,7 +62,6 @@ qt_add_qml_module(staccatoapp
         src/ui/RoundCheckBox.qml
         src/ui/RoundRadioButton.qml
         src/ui/trackImporter.mjs
-        src/ui/main.mjs
         src/ui/util.mjs
     RESOURCES
         src/ui/resources/piggo58.jpg
