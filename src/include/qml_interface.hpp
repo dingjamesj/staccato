@@ -21,20 +21,10 @@ namespace staccato {
         QML_ELEMENT
         QML_SINGLETON
 
-        private:
-        
-        //Helper functions
-
-        void sort_pinned_items_alphabetically(QList<QVariantList>& qt_pinned_items, qsizetype begin, qsizetype end);
-        void sort_playlists_alphabetically(QList<QStringList>& qt_playlists, qsizetype begin, qsizetype end);
-
         public:
 
         Q_INVOKABLE
         void readSettings();
-
-        Q_INVOKABLE
-        QList<QStringList> getBasicPlaylistsInfo();
 
         Q_INVOKABLE
         QVariantList readPersistentData();
@@ -50,6 +40,10 @@ namespace staccato {
 
         Q_INVOKABLE
         QString getPlaylistImagePath(const QString& id);
+
+        /// @brief Each QList represents a folder, and each QList's first element is the folder name.
+        Q_INVOKABLE
+        QList<QVariant> getPlaylistTree();
 
         Q_INVOKABLE
         QList<QVariant> getLocalTrackInfo(const QString& path);

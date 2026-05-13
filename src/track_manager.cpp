@@ -1401,6 +1401,12 @@ bool TrackManager::serialize_playlist_tree() {
 
 }
 
+const PlaylistTree& TrackManager::get_playlist_tree() {
+
+    return playlist_tree;
+
+}
+
 void TrackManager::print_track_dict() {
 
     if(track_dict.empty()) {

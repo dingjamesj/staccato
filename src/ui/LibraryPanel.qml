@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import staccato
-// import "libraryPanel.mjs" as Logic
+import "libraryPanel.mjs" as Logic
 
 pragma ComponentBehavior: Bound
 
@@ -11,7 +11,7 @@ pragma ComponentBehavior: Bound
 //==========================================
 
 ColumnLayout {
-    property int rowHeight: 35
+    property int playlistButtonHeight: 35
 
     id: container
     spacing: Style.smallSpacing
@@ -22,10 +22,17 @@ ColumnLayout {
 
     Instantiator {
         model: playlistsModel
-        delegate: RowLayout {
+        delegate: LabeledIconButton {
             required property var model
 
-            
+            source: model.artworkSource
+            text: model.playlistName
+            subtext: ""
+            width: playlistsColumn.width
+            height: container.playlistButtonHeight
+        }
+        onObjectAdded: (index, object) => {
+            object.parent = playlistsColumn
         }
     }
 

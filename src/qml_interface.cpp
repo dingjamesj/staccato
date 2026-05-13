@@ -1,171 +1,14 @@
 #include "app_manager.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
+#include "playlist_tree.hpp"
 #include "qml_interface.hpp"
 
 using namespace staccato;
 
-void StaccatoInterface::sort_pinned_items_alphabetically(QList<QVariantList>& qt_pinned_items, qsizetype begin, qsizetype end) {
-
-    if(end - begin <= 1) {
-
-        return;
-
-    }
-
-    qsizetype mid = (begin + end) / 2;
-
-    sort_pinned_items_alphabetically(qt_pinned_items, begin, mid);
-    sort_pinned_items_alphabetically(qt_pinned_items, mid, end);
-
-    //Merge:
-
-    QList<QVariantList> list_left {};
-    QList<QVariantList> list_right {};
-
-    for(qsizetype i {0}; i < mid - begin; i++) {
-
-        list_left.append(qt_pinned_items[i + begin]);
-
-    }
-
-    for(qsizetype i {0}; i < end - mid; i++) {
-
-        list_right.append(qt_pinned_items[i + mid]);
-
-    }
-
-    qsizetype l {0}, r {0}, i {begin};
-    while(l < list_left.size() && r < list_right.size()) {
-
-        int compare = QString::compare(list_left[l][1].value<QString>(), list_right[r][1].value<QString>(), Qt::CaseInsensitive);
-        if(compare < 0) {
-
-            qt_pinned_items[i] = list_left[l];
-            l++;
-
-        } else {
-
-            qt_pinned_items[i] = list_right[r];
-            r++;
-
-        }
-        
-        i++;
-
-    }
-
-    while(l < list_left.size()) {
-
-        qt_pinned_items[i] = list_left[l];
-        l++;
-        i++;
-
-    }
-
-    while(r < list_right.size()) {
-
-        qt_pinned_items[i] = list_right[r];
-        r++;
-        i++;
-
-    }
-
-}
-
-void StaccatoInterface::sort_playlists_alphabetically(QList<QStringList>& qt_playlists, qsizetype begin, qsizetype end) {
-
-    if(end - begin <= 1) {
-
-        return;
-
-    }
-
-    qsizetype mid = (begin + end) / 2;
-
-    sort_playlists_alphabetically(qt_playlists, begin, mid);
-    sort_playlists_alphabetically(qt_playlists, mid, end);
-
-    //Merge:
-
-    QList<QStringList> list_left {};
-    QList<QStringList> list_right {};
-
-    for(qsizetype i {0}; i < mid - begin; i++) {
-
-        list_left.append(qt_playlists[i + begin]);
-
-    }
-
-    for(qsizetype i {0}; i < end - mid; i++) {
-
-        list_right.append(qt_playlists[i + mid]);
-
-    }
-
-    qsizetype l {0}, r {0}, i {begin};
-    while(l < list_left.size() && r < list_right.size()) {
-
-        int compare = QString::compare(list_left[l][1], list_right[r][1], Qt::CaseInsensitive);
-        if(compare < 0) {
-
-            qt_playlists[i] = list_left[l];
-            l++;
-
-        } else {
-
-            qt_playlists[i] = list_right[r];
-            r++;
-
-        }
-        
-        i++;
-
-    }
-
-    while(l < list_left.size()) {
-
-        qt_playlists[i] = list_left[l];
-        l++;
-        i++;
-
-    }
-
-    while(r < list_right.size()) {
-
-        qt_playlists[i] = list_right[r];
-        r++;
-        i++;
-
-    }
-
-}
-
 void StaccatoInterface::readSettings() {
 
     AppManager::read_settings();
-
-}
-
-QList<QStringList> StaccatoInterface::getBasicPlaylistsInfo() {
-
-    std::vector<std::tuple<std::string, std::string, std::string, unsigned int>> playlists = TrackManager::get_basic_playlist_info_from_files();
-
-    QList<QStringList> qt_playlists {};
-    for(std::tuple<std::string, std::string, std::string, unsigned int> playlist: playlists) {
-
-        qt_playlists.push_back({
-            QString::fromStdString(std::get<0>(playlist)), 
-            QString::fromStdString(std::get<1>(playlist)), 
-            QString::fromStdString(std::get<2>(playlist)), 
-            QString::fromStdString(std::to_string(std::get<3>(playlist)))
-        });
-
-    }
-
-    sort_playlists_alphabetically(qt_playlists, 0, qt_playlists.size());
-
-    return qt_playlists;
 
 }
 
@@ -242,6 +85,56 @@ QString StaccatoInterface::getTrackFilePath(const QString& title, const QStringL
 QString StaccatoInterface::getPlaylistImagePath(const QString& id) {
 
     return QString::fromStdString(AppManager::get_playlist_image_path(id.toStdString()));
+
+}
+
+QList<QVariant> StaccatoInterface::getPlaylistTree() {
+
+    //Early retur an empty QList if the playlist tree is empty: 
+    if(TrackManager::get_playlist_tree().begin().operator->() == nullptr) {
+
+        return {};
+
+    }
+
+    //Every QList represents a folder of playlists containing only QStrings and child QLists.
+    //Each QList begins with the folder name, followed by its contents (playlist names and child folders).
+
+    QList<QVariant> root {};
+    std::stack<QList<QVariant>*> stack_ptr_qlists;
+    stack_ptr_qlists.push(&root);
+    for(PlaylistTree::ConstIterator iter = TrackManager::get_playlist_tree().begin(); iter != TrackManager::get_playlist_tree().end() && !stack_ptr_qlists.empty(); ++iter) {
+
+        if(iter.operator->() == nullptr) {
+
+            stack_ptr_qlists.pop();
+            continue;
+
+        }
+
+        QList<QVariant>& curr_playlist_folder = *stack_ptr_qlists.top();
+        if(iter.is_folder_start()) {
+
+            //Add a folder
+
+            curr_playlist_folder.push_back(QVariant(QList<QVariant>()));
+            QList<QVariant>* ptr_new_folder = static_cast<QList<QVariant>*>(
+                curr_playlist_folder[curr_playlist_folder.size() - 1].data()
+            );
+            (*ptr_new_folder).push_back(QVariant(QString::fromStdString(*iter))); //First element in the QList is the folder's name
+
+            stack_ptr_qlists.push(ptr_new_folder);
+
+        } else {
+
+            //Add a playlist name
+            curr_playlist_folder.push_back(QVariant(QString::fromStdString(*iter)));
+
+        }
+
+    }
+
+    return root;
 
 }
 

@@ -270,6 +270,9 @@ namespace staccato {
         /// @return `true` if the serialization was successful, `false` otherwise
         static bool serialize_playlist_tree();
 
+        /// @return A constant iterator of the playlist tree
+        static const PlaylistTree& get_playlist_tree();
+
         //=====================================================================================
         //                                      DEBUGGING                                      
         //=====================================================================================

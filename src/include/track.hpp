@@ -77,6 +77,8 @@ namespace staccato {
 
     };
 
+    std::ostream& operator<<(std::ostream& os, const Track& track);
+
 }
 
 //To make hash-using collections work
